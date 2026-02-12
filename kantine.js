@@ -1012,7 +1012,21 @@
         const body = document.createElement('div');
         body.className = 'card-body';
 
-        const sortedItems = [...day.items].sort((a, b) => a.name.localeCompare(b.name));
+        const todayDateStr = new Date().toISOString().split('T')[0];
+        const isToday = day.date === todayDateStr;
+
+        const sortedItems = [...day.items].sort((a, b) => {
+            if (isToday) {
+                const aId = a.articleId || parseInt(a.id.split('_')[1]);
+                const bId = b.articleId || parseInt(b.id.split('_')[1]);
+                const aOrdered = orderMap.has(`${day.date}_${aId}`);
+                const bOrdered = orderMap.has(`${day.date}_${bId}`);
+
+                if (aOrdered && !bOrdered) return -1;
+                if (!aOrdered && bOrdered) return 1;
+            }
+            return a.name.localeCompare(b.name);
+        });
 
         sortedItems.forEach(item => {
             const itemEl = document.createElement('div');
