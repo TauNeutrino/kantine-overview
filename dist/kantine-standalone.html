@@ -1115,7 +1115,26 @@ body {
     100% {
         box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
     }
-}    </style>
+}
+/* Day Header Badges */
+.day-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.menu-code-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #8b5cf6; /* Violet 500 */
+    background-color: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 2px 6px;
+    border-radius: 6px;
+    line-height: normal;
+    display: inline-block;
+}
+    </style>
 </head>
 <body>
     <script>
@@ -2120,12 +2139,39 @@ body {
 
         if (isPastCutoff) card.classList.add('past-day');
 
+        // Collect ordered menu codes
+        const menuBadges = [];
+        if (day.items) {
+            day.items.forEach(item => {
+                const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                const orderKey = `${day.date}_${articleId}`;
+                const orders = orderMap.get(orderKey) || [];
+                const count = orders.length;
+
+                if (count > 0) {
+                    // Regex for M1, M2, M1F etc.
+                    const match = item.name.match(/([M][1-9][Ff]?)/);
+                    if (match) {
+                        let code = match[1];
+                        if (count > 1) code += '+';
+                        menuBadges.push(code);
+                    }
+                }
+            });
+        }
+
         // Header
         const header = document.createElement('div');
         header.className = 'card-header';
         const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+        const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+
         header.innerHTML = `
-            <span class="day-name">${translateDay(day.weekday)}</span>
+            <div class="day-header-left">
+                <span class="day-name">${translateDay(day.weekday)}</span>
+                <div class="day-badges">${badgesHtml}</div>
+            </div>
             <span class="day-date">${dateStr}</span>`;
         card.appendChild(header);
 

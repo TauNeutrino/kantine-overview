@@ -999,12 +999,39 @@
 
         if (isPastCutoff) card.classList.add('past-day');
 
+        // Collect ordered menu codes
+        const menuBadges = [];
+        if (day.items) {
+            day.items.forEach(item => {
+                const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                const orderKey = `${day.date}_${articleId}`;
+                const orders = orderMap.get(orderKey) || [];
+                const count = orders.length;
+
+                if (count > 0) {
+                    // Regex for M1, M2, M1F etc.
+                    const match = item.name.match(/([M][1-9][Ff]?)/);
+                    if (match) {
+                        let code = match[1];
+                        if (count > 1) code += '+';
+                        menuBadges.push(code);
+                    }
+                }
+            });
+        }
+
         // Header
         const header = document.createElement('div');
         header.className = 'card-header';
         const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+        const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+
         header.innerHTML = `
-            <span class="day-name">${translateDay(day.weekday)}</span>
+            <div class="day-header-left">
+                <span class="day-name">${translateDay(day.weekday)}</span>
+                <div class="day-badges">${badgesHtml}</div>
+            </div>
             <span class="day-date">${dateStr}</span>`;
         card.appendChild(header);
 
