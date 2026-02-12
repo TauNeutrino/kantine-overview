@@ -792,8 +792,14 @@
 
         } catch (error) {
             console.error('Error fetching menu:', error);
-            document.getElementById('menu-container').innerHTML = `<p class="error">Fehler beim Laden der Menüdaten: ${error.message}</p>`;
             progressModal.classList.add('hidden');
+
+            showErrorModal(
+                'Keine Verbindung',
+                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
+                'Zur Original-Seite',
+                'https://web.bessa.app/knapp-kantine'
+            );
         } finally {
             loading.classList.add('hidden');
         }
@@ -1226,3 +1232,56 @@
 
     console.log('Kantine Wrapper loaded ✅');
 })();
+
+// === Error Modal ===
+function showErrorModal(title, htmlContent, btnText, url) {
+    const modalId = 'error-modal';
+    let modal = document.getElementById(modalId);
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal hidden';
+    modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
+                        <span class="material-icons-round">signal_wifi_off</span>
+                        ${title}
+                    </h2>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="margin-bottom: 15px; color: var(--text-primary);">${htmlContent}</p>
+                    <div style="margin-top: 20px; display: flex; justify-content: center;">
+                        <button id="btn-error-redirect" style="
+                            background-color: var(--accent-color); 
+                            color: white; 
+                            padding: 12px 24px; 
+                            border-radius: 8px; 
+                            border: none; 
+                            font-weight: 600; 
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            width: 100%;
+                            justify-content: center;
+                            transition: transform 0.1s;
+                        ">
+                            ${btnText}
+                            <span class="material-icons-round">open_in_new</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    document.body.appendChild(modal);
+
+    document.getElementById('btn-error-redirect').addEventListener('click', () => {
+        window.location.href = url;
+    });
+
+    requestAnimationFrame(() => {
+        modal.classList.remove('hidden');
+    });
+}
