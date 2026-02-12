@@ -1,0 +1,483 @@
+openapi: 3.0.0
+info:
+  title: Bessa API
+  version: 1.0.0
+  description: |
+    Unofficial API documentation for Bessa (web.bessa.app) based on network traffic analysis.
+    Targeting the 'knapp-kantine' venue (ID 591).
+
+servers:
+  - url: https://api.bessa.app/v1
+    description: Production Server
+
+components:
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: |
+        Token-based authentication. 
+        Format: `Token <your_token_here>`
+        The token can be retrieved from LocalStorage key `AkitaStores` -> `auth.token`.
+
+security:
+  - TokenAuth: []
+
+paths:
+  /auth/login/:
+    post:
+      summary: User Login
+      description: Authenticates a user with an employee-based email and password. Requires a Guest Token in the Authorization header.
+      operationId: login
+      security:
+        - TokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: User email (e.g., knapp-2041@bessa.app)
+                  example: knapp-2041@bessa.app
+                password:
+                  type: string
+                  format: password
+                  example: "#kaufi+2406@ESSEN#"
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: Authentication session key (Session Token)
+                    example: dba7d86e83c7f462fd8af96521dea41c4facd8a5
+        "400":
+          description: Invalid credentials
+        "401":
+          description: Unauthorized (missing or invalid Guest Token)
+
+  /auth/user/:
+    get:
+      summary: Get Current User Details
+      description: Retrieves the details of the currently authenticated user.
+      operationId: getCurrentUser
+      security:
+        - TokenAuth: []
+      responses:
+        "200":
+          description: Successful response with user details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: User ID
+                    example: 85567
+                  last_login:
+                    type: string
+                    format: date-time
+                    example: "2026-02-05T13:40:04.251289Z"
+                  created:
+                    type: string
+                    format: date-time
+                  updated:
+                    type: string
+                    format: date-time
+                  email:
+                    type: string
+                    example: "knapp-2041@bessa.app"
+                  first_name:
+                    type: string
+                    description: User's first name
+                    example: "Michael"
+                  last_name:
+                    type: string
+                    description: User's last name
+                    example: "Kaufmann"
+                  locale:
+                    type: string
+                    example: "de_de"
+                  country:
+                    type: string
+                  language:
+                    type: string
+                    example: "de"
+                  profile:
+                    type: string
+                    nullable: true
+                  uuid:
+                    type: string
+                    format: uuid
+                  groups:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Managed"]
+                  date_of_birth:
+                    type: string
+                    format: date
+                    nullable: true
+                  password_changed:
+                    type: string
+                    format: date-time
+                  gender:
+                    type: integer
+                    description: Gender identifier
+        "401":
+          description: Unauthorized (missing or invalid token)
+
+  /venues/{venueId}/menu/{menuId}/{date}/:
+    get:
+      summary: Get Daily Menu
+      description: Retrieves the menu for a specific date.
+      operationId: getDailyMenu
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          description: ID of the venue (e.g., 591 for Knapp Kantine)
+          schema:
+            type: integer
+            example: 591
+        - name: menuId
+          in: path
+          required: true
+          description: ID of the menu type (e.g., 7 for certain order types)
+          schema:
+            type: integer
+            example: 7
+        - name: date
+          in: path
+          required: true
+          description: Date in YYYY-MM-DD format
+          schema:
+            type: string
+            format: date
+            example: "2026-02-10"
+      responses:
+        "200":
+          description: Successful response with menu data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  next:
+                    type: string
+                    nullable: true
+                  previous:
+                    type: string
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: ID of the daily menu group
+                        date:
+                          type: string
+                          format: date
+                        venue:
+                          type: integer
+                        items:
+                          type: array
+                          description: List of dishes/items for this menu group
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              name:
+                                type: string
+                                description: Name of the dish (e.g., "M1 Herzhaftes")
+                              description:
+                                type: string
+                                description: Detailed description including allergens
+                              price:
+                                type: string
+                                example: "5.50"
+                              allergens:
+                                type: string
+                              uuid:
+                                type: string
+                              available_amount:
+                                type: string
+                                description: Number of items remaining (e.g. "136")
+                              created:
+                                type: string
+                                format: date-time
+                              updated:
+                                type: string
+
+  /venues/{venueId}/menu/dates/:
+    get:
+      summary: Get Menu Dates with Orders
+      description: |
+        Retrieves menu dates for a venue. When authenticated, includes the user's orders per date.
+        Used to build the order state map in the wrapper app.
+      operationId: getMenuDates
+      parameters:
+        - name: venueId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 591
+      responses:
+        "200":
+          description: Menu dates with orders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        orders:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: Order ID
+                              order_state:
+                                type: integer
+                                description: "5=transmitted, 8=accepted, 9=cancelled"
+                              total:
+                                type: string
+                              items:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    article:
+                                      type: integer
+                                      description: Article/menu item ID
+                                    name:
+                                      type: string
+                                    price:
+                                      type: string
+
+  /user/orders/:
+    post:
+      summary: Place an Order
+      description: |
+        Creates a new pre-order for a future date. Requires full customer info,
+        item details, and order metadata. Returns the created order with pickup code.
+      operationId: placeOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - uuid
+                - order_type
+                - items
+                - venue
+                - date
+                - payment_method
+                - customer
+                - total
+              properties:
+                uuid:
+                  type: string
+                  format: uuid
+                  description: Client-generated unique order ID
+                created:
+                  type: string
+                  format: date-time
+                updated:
+                  type: string
+                  format: date-time
+                order_type:
+                  type: integer
+                  example: 7
+                  description: Menu/order type (7 = Kantine pre-order)
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [article, name, price, amount]
+                    properties:
+                      article:
+                        type: integer
+                        description: Article ID from menu
+                        example: 182378
+                      course_group:
+                        type: integer
+                        nullable: true
+                      modifiers:
+                        type: array
+                        items: {}
+                      uuid:
+                        type: string
+                        format: uuid
+                      name:
+                        type: string
+                        example: "M1 W2"
+                      description:
+                        type: string
+                      price:
+                        type: string
+                        example: "4"
+                      amount:
+                        type: integer
+                        example: 1
+                      vat:
+                        type: string
+                        example: "10.00"
+                      comment:
+                        type: string
+                table:
+                  type: integer
+                  nullable: true
+                total:
+                  type: number
+                  example: 4
+                tip:
+                  type: number
+                  example: 0
+                currency:
+                  type: string
+                  example: "EUR"
+                venue:
+                  type: integer
+                  example: 591
+                states:
+                  type: array
+                  items: {}
+                order_state:
+                  type: integer
+                  example: 1
+                  description: Initial state (1 = new)
+                date:
+                  type: string
+                  format: date-time
+                  description: Order date with pickup time (T10:00:00.000Z)
+                  example: "2026-02-13T10:00:00.000Z"
+                payment_method:
+                  type: string
+                  example: "payroll"
+                customer:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    email:
+                      type: string
+                    newsletter:
+                      type: boolean
+                preorder:
+                  type: boolean
+                  example: false
+                delivery_fee:
+                  type: number
+                  example: 0
+                cash_box_table_name:
+                  type: string
+                  nullable: true
+                take_away:
+                  type: boolean
+                  example: false
+      responses:
+        "201":
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: Bessa order ID
+                    example: 1535097
+                  hash_id:
+                    type: string
+                    example: "o_nqymM"
+                  order_state:
+                    type: integer
+                    description: "5 = transmitted/confirmed"
+                    example: 5
+                  pickup_code:
+                    type: string
+                    example: "67"
+                  total:
+                    type: string
+                    example: "4.00"
+                  date:
+                    type: string
+                    format: date-time
+                  expires:
+                    type: string
+                    format: date-time
+                    description: Pickup expiry time
+        "400":
+          description: Invalid payload
+        "401":
+          description: Unauthorized
+
+  /user/orders/{orderId}/cancel/:
+    patch:
+      summary: Cancel an Order
+      description: |
+        Cancels an existing order by its ID. Sends an empty body.
+        The order transitions to state 9 (cancelled).
+      operationId: cancelOrder
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1535097
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Empty body
+      responses:
+        "200":
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                    description: Hash ID of the cancelled order
+                    example: "o_nqymM"
+                  state:
+                    type: string
+                    example: "order cancelled."
+        "400":
+          description: Order cannot be cancelled
+        "401":
+          description: Unauthorized

@@ -1,0 +1,35 @@
+{
+  "name": "kantine-wrapper",
+  "version": "1.0.0",
+  "description": "Bessa Knapp-Kantine Menu Scraper",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "scrape": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "analyze": "tsx src/scraper/interactive-analyzer.ts",
+    "test:api": "tsx src/scraper/api-test.ts",
+    "server": "tsx src/server.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "scraper",
+    "puppeteer",
+    "bessa",
+    "kantine"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "puppeteer": "^22.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

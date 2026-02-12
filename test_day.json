@@ -1,0 +1,85 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0* Host api.bessa.app:443 was resolved.
+* IPv6: 2a05:d014:6d3:a901:93fa:c6a7:8fc7:f92d
+* IPv4: 3.124.122.174
+*   Trying 3.124.122.174:443...
+* Connected to api.bessa.app (3.124.122.174) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+{ [122 bytes data]
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+{ [19 bytes data]
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+{ [2925 bytes data]
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+{ [520 bytes data]
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+{ [52 bytes data]
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+} [1 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+} [52 bytes data]
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384 / X25519 / RSASSA-PSS
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=api.bessa.app
+*  start date: Dec 18 10:19:21 2025 GMT
+*  expire date: Mar 18 10:19:20 2026 GMT
+*  subjectAltName: host "api.bessa.app" matched cert's "api.bessa.app"
+*  issuer: C=US; O=Let's Encrypt; CN=R12
+*  SSL certificate verify ok.
+*   Certificate level 0: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 1: Public key type RSA (2048/112 Bits/secBits), signed using sha256WithRSAEncryption
+*   Certificate level 2: Public key type RSA (4096/152 Bits/secBits), signed using sha256WithRSAEncryption
+} [5 bytes data]
+* using HTTP/2
+* [HTTP/2] [1] OPENED stream for https://api.bessa.app/v1/venues/591/menu/7/2026-02-10/
+* [HTTP/2] [1] [:method: GET]
+* [HTTP/2] [1] [:scheme: https]
+* [HTTP/2] [1] [:authority: api.bessa.app]
+* [HTTP/2] [1] [:path: /v1/venues/591/menu/7/2026-02-10/]
+* [HTTP/2] [1] [user-agent: curl/8.5.0]
+* [HTTP/2] [1] [accept: */*]
+* [HTTP/2] [1] [authorization: Token c3418725e95a9f90e3645cbc846b4d67c7c66131]
+* [HTTP/2] [1] [x-client-version: 1.7.0_prod/2026-01-26]
+} [5 bytes data]
+> GET /v1/venues/591/menu/7/2026-02-10/ HTTP/2
+> Host: api.bessa.app
+> User-Agent: curl/8.5.0
+> Accept: */*
+> Authorization: Token c3418725e95a9f90e3645cbc846b4d67c7c66131
+> X-Client-Version: 1.7.0_prod/2026-01-26
+> 
+{ [5 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [57 bytes data]
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+{ [57 bytes data]
+* old SSL session ID is stale, removing
+{ [5 bytes data]
+< HTTP/2 200 
+< server: nginx/1.27.3
+< date: Mon, 09 Feb 2026 08:54:00 GMT
+< content-type: application/json
+< content-length: 4685
+< vary: Accept, Accept-Language, origin
+< allow: GET, HEAD, OPTIONS
+< x-frame-options: DENY
+< content-language: en-us
+< strict-transport-security: max-age=16000000
+< x-content-type-options: nosniff
+< referrer-policy: same-origin
+< cross-origin-opener-policy: same-origin
+< strict-transport-security: max-age=31536000
+< 
+{ [4685 bytes data]
+{"next":null,"previous":null,"results":[{"id":11452,"items":[{"id":178714,"price":"5.50","name":"M1 Herzhaftes","description":"Erdäpfelrahmsuppe L,M,C,G, potato soup, Acht Schätze (Rind) L,M,C,F,O, mit Eiernudeln A,C, Kuchen A,C,G,H,O, Silced beef asia with egg noodles","allergens":"","nutrition_facts":"","hash_id":"ar_7BzGM","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.266780Z","updated":"2026-02-03T13:15:20.845052Z","deleted":null,"uuid":"4064152d-6e82-4f4d-9bea-0936ab307b1c","image":null,"number":"dfaa35f6-4604-4e14-9f86-1862a05a5881","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"136","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178728,"price":"5.50","name":"M3 Süß","description":"Erdäpfelrahmsuppe L,M,C,G, potato soup, Milchrahmstrudel mit Vanillesauce A,C,G, milk cream strudel with vanilla sauce","allergens":"","nutrition_facts":"","hash_id":"ar_KalR9","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.268455Z","updated":"2026-02-03T13:14:37.728274Z","deleted":null,"uuid":"12b75bc5-88ab-4df3-ad9b-00b864729ce3","image":null,"number":"a33ce321-1943-430e-a435-b83f87ff1080","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"34","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178735,"price":"5.50","name":"M4 Ginko vegan","description":"Tomaten Kokoscremesuppe, tomato coconut soup, Hirselaibchen A, mit Fisolen Karottengemüse u. Schnittlauchdip F,M, millet patties with fisole vegetable","allergens":"","nutrition_facts":"","hash_id":"ar_YLxwb","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.269340Z","updated":"2026-02-06T09:35:17.671235Z","deleted":null,"uuid":"6b3017a7-c950-4428-a474-8c61a819402d","image":null,"number":"88b59af4-f3fb-45a7-ba0f-9fce88d4710f","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"63","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178742,"price":"5.50","name":"M5 Salat mit Gebäck","description":"Erdäpflerahmsuppe G,L,M, Salatteller mit Prosciutto und Parmesan, salad with prosciutto and parmesan","allergens":"","nutrition_facts":"","hash_id":"ar_Qydpp","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.270215Z","updated":"2026-02-03T13:16:43.665954Z","deleted":null,"uuid":"1c1a14dd-cf4f-4355-a4ba-cb8543ae7e5a","image":null,"number":"ea309dc8-38bf-4e78-9b51-7c9a7efb2763","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"0","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178749,"price":"3.00","name":"M6 Suppe, kleiner Salat + Dessert D","description":"Suppe, kleiner Salat + Dessert","allergens":"","nutrition_facts":"","hash_id":"ar_Nyoxb","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.271125Z","updated":"2026-02-03T13:17:39.906619Z","deleted":null,"uuid":"c2956eb9-6ee0-4e65-96a7-b8b0615f314c","image":null,"number":"f6d5bd6e-2e14-4930-8f27-be027fa477b2","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"29","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178756,"price":"4.30","name":"M7F Kleines Hauptspeisenmenü DI 2","description":"Erdäpflerahmsuppe G,L,M, potato soup, kleine Hauptspeise von Menü 1","allergens":"","nutrition_facts":"","hash_id":"ar_BzGr7","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.272048Z","updated":"2026-02-03T13:18:12.181876Z","deleted":null,"uuid":"6ad46891-a26b-4e22-9a34-ae1cbb225788","ima100  4685  100  4685    0     0  18586      0 --:--:-- --:--:-- --:--:-- 18591
+* Connection #0 to host api.bessa.app left intact
+ge":null,"number":"59b371ea-ab48-4efc-9b63-04cf3df9ffc5","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"3","amount_tracking":true,"dispenser_id":"","course_group":null},{"id":178721,"price":"5.50","name":"M2 Gourmetteller","description":"Erdäpflerahmsuppe G,L,M, potato soup, Selschfleischknödel mit Sauerkraut L,M,C,O, smoked meat dumpling with carbbage","allergens":"","nutrition_facts":"","hash_id":"ar_ZGb2V","image_thumbnail":null,"modifiers":[],"created":"2025-12-04T13:02:07.267451Z","updated":"2026-02-03T13:13:23.315080Z","deleted":null,"uuid":"32753644-de1b-4d68-82d1-001cbf5beeab","image":null,"number":"868291bd-490d-47ef-b5be-e2002ce3bd10","type":1,"vat":"10.00","points":"0.00","minimum_amount":"0","available_amount":"206","amount_tracking":true,"dispenser_id":"","course_group":null}],"name":"Menü","description":"Menü","children":[],"created":"2025-11-26T13:34:51.236986Z","updated":"2026-01-29T07:38:42.691415Z","deleted":null,"uuid":"89c73f18-f3c8-45f3-8227-66a98db86396","sort":0,"image":null,"from_hour":null,"to_hour":null,"collapse":false}]}
