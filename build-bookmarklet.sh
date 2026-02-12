@@ -5,7 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DIST_DIR="$SCRIPT_DIR/dist"
-CSS_FILE="$SCRIPT_DIR/public/style.css"
+CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
 
 mkdir -p "$DIST_DIR"
