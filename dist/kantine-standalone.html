@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kantine Weekly Menu (Standalone)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+:root {
+    /* Premium Slate/Gray-Blue Palette - Light Mode */
+    --bg-body: #f1f5f9;
+    /* Slate 100 */
+    --bg-card: #ffffff;
+    --text-primary: #334155;
+    /* Slate 700 */
+    --text-secondary: #64748b;
+    --accent-color: #0f172a;
+    /* Slate 900 (High contrast) */
+    --border-color: #cbd5e1;
+    /* Slate 300 */
+    --banner-bg: #e2e8f0;
+    --banner-text: #1e293b;
+    --success-color: #059669;
+    --error-color: #dc2626;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --header-bg: rgba(255, 255, 255, 0.9);
+    --header-border: 1px solid rgba(203, 213, 225, 0.6);
+}
+
+[data-theme="dark"] {
+    /* Premium Slate/Gray-Blue Palette - Dark Mode */
+    --bg-body: #1e293b;
+    /* Deep Slate Gray (Requested) */
+    --bg-card: #334155;
+    /* Slate 700 */
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #cbd5e1;
+    /* Slate 300 */
+    --accent-color: #60a5fa;
+    /* Blue 400 */
+    --border-color: #475569;
+    /* Slate 600 */
+    --banner-bg: #475569;
+    --banner-text: #e2e8f0;
+    --header-bg: rgba(30, 41, 59, 0.9);
+    --header-border: 1px solid rgba(71, 85, 105, 0.6);
+    --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Fix scrolling bug: Reset html/body styles from host page */
+html,
+body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Header */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    background-color: var(--header-bg);
+    border-bottom: var(--header-border);
+    padding: 1rem 0;
+}
+
+.header-content {
+    width: 100%;
+    /* Full width */
+    padding: 0 2rem;
+    /* Comfortable padding */
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 0;
+}
+
+.subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 2px;
+}
+
+.logo-icon {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-self: end;
+}
+
+/* Header Week Info (centered) */
+.header-week-info {
+    text-align: center;
+    line-height: 1.3;
+}
+
+.header-center-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.weekly-cost {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--success-color);
+    background-color: var(--bg-body);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.header-week-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.header-week-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.nav-group {
+    display: flex;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem;
+    border-radius: 8px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(100, 116, 139, 0.1);
+}
+
+.nav-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+/* Badge for nav buttons (day count indicator) */
+.nav-badge {
+    background-color: var(--error-color);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    gap: 3px;
+    line-height: 1;
+}
+
+.nav-badge .orderable {
+    color: #fff;
+    font-weight: 800;
+}
+
+.nav-badge .separator {
+    opacity: 0.6;
+    font-weight: 400;
+}
+
+.nav-badge .total {
+    opacity: 0.8;
+    font-weight: 400;
+}
+
+.nav-btn.active .nav-badge {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Primary style for Login Button to match header */
+#btn-login-open {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#btn-login-open:hover {
+    background-color: #334155;
+    /* Slightly lighter than slate-900 */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* User Badge Button (Login) */
+.user-badge-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.user-badge-btn:hover {
+    background: rgba(100, 116, 139, 0.1);
+    border-color: var(--accent-color);
+}
+
+.user-badge-btn .material-icons-round {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background-color: rgba(100, 116, 139, 0.1);
+}
+
+/* Refresh button animation */
+#btn-refresh.refreshing .material-icons-round {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Progress Modal */
+.progress-container {
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color) 0%, #60a5fa 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.progress-percent {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.progress-message {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.weekly-cost {
+    background-color: rgba(59, 130, 246, 0.1);
+    /* Blue tint */
+    color: var(--accent-color);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.weekly-cost .material-icons-round {
+    font-size: 18px;
+}
+
+/* Container */
+.container {
+    width: 100%;
+    /* Full width */
+    margin: 2rem auto;
+    padding: 0 2rem;
+    min-height: 80vh;
+}
+
+/* Banner */
+.banner {
+    background-color: var(--banner-bg);
+    color: var(--banner-text);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    max-width: fit-content;
+}
+
+/* User Badge */
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-card);
+    /* Changed from --surface */
+    border: 1px solid var(--border-color);
+    /* Changed from --border */
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.icon-btn-small {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    /* Changed from --text-muted */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.icon-btn-small:hover {
+    color: var(--error-color);
+    /* Changed from --danger */
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    /* Changed from --surface */
+    width: 90%;
+    max-width: 400px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalSlide 0.3s ease-out;
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    /* Changed from --border */
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+#login-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    /* Changed from --border */
+    border-radius: 8px;
+    background: var(--bg-body);
+    /* Changed from --bg */
+    color: var(--text-primary);
+    /* Changed from --text */
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    /* Changed from --primary */
+}
+
+.help-text {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-secondary);
+    /* Changed from --text-muted */
+    font-size: 0.75rem;
+}
+
+.error-msg {
+    margin-bottom: 16px;
+    padding: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error-color);
+    /* Changed from --danger */
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.modal-actions {
+    margin-top: 24px;
+}
+
+.btn-primary.wide {
+    width: 100%;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Menu Grid */
+.menu-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.week-section {
+    margin-bottom: 3rem;
+}
+
+.week-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+    text-align: center;
+}
+
+.week-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.week-range {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+}
+
+/* Card */
+.menu-card {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Past Day Styling - Target specific elements so ordered items can remain visible */
+.menu-card.past-day .card-header,
+.menu-card.past-day .menu-item:not(.ordered) {
+    opacity: 0.6;
+    filter: grayscale(0.8);
+    transition: opacity 0.3s, filter 0.3s;
+}
+
+.menu-card.past-day:hover .card-header,
+.menu-card.past-day:hover .menu-item:not(.ordered) {
+    opacity: 0.8;
+    filter: grayscale(0.4);
+}
+
+/* Enhancements for ordered items */
+.menu-card.past-day .menu-item.ordered {
+    /* No opacity/filter here - fully visible */
+    background: var(--bg-card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    position: relative;
+    z-index: 10;
+}
+
+.menu-item.today-ordered {
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    background: var(--bg-card);
+    position: relative;
+    z-index: 5;
+    animation: pulse-glow 3s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(96, 165, 250, 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    }
+}
+
+
+.menu-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    background-color: rgba(100, 116, 139, 0.05);
+}
+
+.day-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.day-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.card-body {
+    padding: 1.25rem;
+    display: grid;
+    grid-template-rows: auto;
+    /* Each menu item gets its own row */
+    align-content: start;
+}
+
+.empty-state {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Menu Items */
+.menu-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    gap: 1rem;
+}
+
+.item-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.item-price {
+    font-weight: 700;
+    color: var(--accent-color);
+    white-space: nowrap;
+}
+
+.item-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.item-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    font-size: 0.75rem;
+    padding: 0 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: normal;
+    white-space: nowrap;
+}
+
+.badge.available {
+    background-color: rgba(16, 185, 129, 0.1);
+    /* Emerald 500 / 10% */
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge.sold-out {
+    background-color: rgba(239, 68, 68, 0.1);
+    /* Red 500 / 10% */
+    color: var(--error-color);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge.ordered {
+    background-color: rgba(139, 92, 246, 0.1);
+    /* Violet 500 / 10% */
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    gap: 4px;
+}
+
+.badge.ordered .material-icons-round {
+    font-size: 1rem;
+}
+
+/* Loading */
+.loading-state {
+    text-align: center;
+    padding: 4rem;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Footer */
+.app-footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+/* === Order / Cancel Buttons (inline in status row) === */
+
+.btn-order {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--success-color);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-order .material-icons-round {
+    font-size: 16px;
+}
+
+.btn-order:hover:not(:disabled) {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+.btn-order:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-order.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.btn-order-compact {
+    padding: 2px 4px;
+    gap: 0;
+}
+
+.btn-order-compact .material-icons-round {
+    font-size: 16px;
+}
+
+.btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    border: none;
+    border-radius: 6px;
+    background: var(--error-color);
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-cancel .material-icons-round {
+    font-size: 16px;
+}
+
+.btn-cancel:hover:not(:disabled) {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+.btn-cancel:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Past days: hide action buttons */
+.past-day .item-actions {
+    display: none;
+}
+
+/* Order count badge (for multi-orders) */
+.order-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    margin-left: 4px;
+    line-height: 1;
+}
+
+/* === Toast Notifications === */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast .material-icons-round {
+    font-size: 18px;
+}
+
+.toast-success {
+    background: rgba(5, 150, 105, 0.95);
+}
+
+.toast-error {
+    background: rgba(220, 38, 38, 0.95);
+}
+
+.toast-info {
+    background: rgba(59, 130, 246, 0.95);
+}
+
+/* === Mobile Responsiveness === */
+@media (max-width: 600px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 0.75rem;
+    }
+
+    .week-nav {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-pills {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .nav-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .days-grid {
+        grid-template-columns: 1fr;
+        /* Force single column */
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .week-title {
+        font-size: 1.5rem;
+    }
+
+    /* Adjust toast position for mobile */
+    .toast-container {
+        bottom: 1rem;
+        right: 1rem;
+        left: 1rem;
+        /* Center on mobile */
+        width: auto;
+    }
+
+    .menu-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* === Flagging & Notification Styles === */
+
+.btn-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+    width: 28px;
+    height: 28px;
+}
+
+.btn-flag:hover {
+    background: rgba(234, 179, 8, 0.1);
+    /* Yellow-500 / 10% */
+    color: #eab308;
+    border-color: #eab308;
+}
+
+.btn-flag.active {
+    background: rgba(234, 179, 8, 0.1);
+    color: #eab308;
+    border-color: #eab308;
+}
+
+.btn-flag .material-icons-round {
+    font-size: 1.1rem;
+}
+
+/* Flagged & Sold Out (Yellow Glow) */
+.menu-item.flagged-sold-out {
+    border: 1px solid #eab308;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    background: var(--bg-card);
+    position: relative;
+    z-index: 5;
+    animation: yellow-pulse 3s infinite;
+}
+
+@keyframes yellow-pulse {
+    0% {
+        box-shadow: 0 0 8px rgba(234, 179, 8, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 16px rgba(234, 179, 8, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 8px rgba(234, 179, 8, 0.2);
+    }
+}
+
+/* Flagged & Available (Green Glow) */
+.menu-item.flagged-available {
+    border: 2px solid var(--success-color);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    background: var(--bg-card);
+    position: relative;
+    z-index: 5;
+    animation: green-pulse 3s infinite;
+}
+
+@keyframes green-pulse {
+    0% {
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+}    </style>
+</head>
+<body>
+    <script>
+/**
+ * Kantine Wrapper – Client-Only Bookmarklet
+ * Replaces Bessa page content with enhanced weekly menu view.
+ * All API calls go directly to api.bessa.app (same origin).
+ * Data stored in localStorage (flags, theme, auth).
+ */
+(function () {
+    'use strict';
+
+    // Prevent double injection
+    if (window.__KANTINE_LOADED) return;
+    window.__KANTINE_LOADED = true;
+
+    // === Constants ===
+    const API_BASE = 'https://api.bessa.app/v1';
+    const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
+    const CLIENT_VERSION = '1.7.0_prod/2026-01-26';
+    const VENUE_ID = 591;
+    const MENU_ID = 7;
+    const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+    // === State ===
+    let allWeeks = [];
+    let currentWeekNumber = getISOWeek(new Date());
+    let currentYear = new Date().getFullYear();
+    let displayMode = 'this-week';
+    let authToken = sessionStorage.getItem('kantine_authToken');
+    let currentUser = sessionStorage.getItem('kantine_currentUser');
+    let orderMap = new Map();
+    let userFlags = new Set(JSON.parse(localStorage.getItem('kantine_flags') || '[]'));
+    let pollIntervalId = null;
+
+    // === API Helpers ===
+    function apiHeaders(token) {
+        return {
+            'Authorization': `Token ${token || GUEST_TOKEN}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Client-Version': CLIENT_VERSION
+        };
+    }
+
+    // === Inject UI ===
+    function injectUI() {
+        // Replace entire page content
+        document.title = 'Kantine Weekly Menu';
+
+        // Inject Google Fonts if not already present
+        if (!document.querySelector('link[href*="fonts.googleapis.com/css2?family=Inter"]')) {
+            const fontLink = document.createElement('link');
+            fontLink.rel = 'stylesheet';
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
+            document.head.appendChild(fontLink);
+        }
+        if (!document.querySelector('link[href*="Material+Icons+Round"]')) {
+            const iconLink = document.createElement('link');
+            iconLink.rel = 'stylesheet';
+            iconLink.href = 'https://fonts.googleapis.com/icon?family=Material+Icons+Round';
+            document.head.appendChild(iconLink);
+        }
+
+        document.body.innerHTML = `
+        <div id="kantine-wrapper">
+            <header class="app-header">
+                <div class="header-content">
+                    <div class="brand">
+                        <span class="material-icons-round logo-icon">restaurant_menu</span>
+                        <div class="brand-text">
+                            <h1>Kantinen Übersicht</h1>
+                            <div id="last-updated-subtitle" class="subtitle"></div>
+                        </div>
+                    </div>
+                    <div class="header-center-wrapper">
+                        <div id="header-week-info" class="header-week-info"></div>
+                        <div id="weekly-cost-display" class="weekly-cost hidden"></div>
+                    </div>
+                    <div class="controls">
+                        <button id="btn-refresh" class="icon-btn" aria-label="Menüdaten aktualisieren" title="Menüdaten neu laden">
+                            <span class="material-icons-round">refresh</span>
+                        </button>
+                        <div class="nav-group">
+                            <button id="btn-this-week" class="nav-btn active">Diese Woche</button>
+                            <button id="btn-next-week" class="nav-btn">Nächste Woche</button>
+                        </div>
+                        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                            <span class="material-icons-round theme-icon">light_mode</span>
+                        </button>
+                        <button id="btn-login-open" class="user-badge-btn icon-btn-small">
+                            <span class="material-icons-round">login</span>
+                            <span>Anmelden</span>
+                        </button>
+                        <div id="user-info" class="user-badge hidden">
+                            <span class="material-icons-round">person</span>
+                            <span id="user-id-display"></span>
+                            <button id="btn-logout" class="icon-btn-small" aria-label="Logout">
+                                <span class="material-icons-round">logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="login-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Login</h2>
+                        <button id="btn-login-close" class="icon-btn" aria-label="Close">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="employee-id">Mitarbeiternummer</label>
+                            <input type="text" id="employee-id" name="employee-id" placeholder="z.B. 2041" required>
+                            <small class="help-text">Deine offizielle Knapp Mitarbeiternummer.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Passwort</label>
+                            <input type="password" id="password" name="password" placeholder="Bessa Passwort" required>
+                            <small class="help-text">Das Passwort für deinen Bessa Account.</small>
+                        </div>
+                        <div id="login-error" class="error-msg hidden"></div>
+                        <div class="modal-actions">
+                            <button type="submit" class="btn-primary wide">Einloggen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="progress-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Menüdaten aktualisieren</h2>
+                    </div>
+                    <div class="modal-body" style="padding: 20px;">
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div id="progress-fill" class="progress-fill"></div>
+                            </div>
+                            <div id="progress-percent" class="progress-percent">0%</div>
+                        </div>
+                        <p id="progress-message" class="progress-message">Initialisierung...</p>
+                    </div>
+                </div>
+            </div>
+
+            <main class="container">
+                <div id="last-updated-banner" class="banner hidden">
+                    <span class="material-icons-round">update</span>
+                    <span id="last-updated-text">Gerade aktualisiert</span>
+                </div>
+                <div id="loading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Lade Menüdaten...</p>
+                </div>
+                <div id="menu-container" class="menu-grid"></div>
+            </main>
+
+            <footer class="app-footer">
+                <p>Bessa Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span></p>
+            </footer>
+        </div>`;
+    }
+
+    // === Bind Events ===
+    function bindEvents() {
+        const btnThisWeek = document.getElementById('btn-this-week');
+        const btnNextWeek = document.getElementById('btn-next-week');
+        const btnRefresh = document.getElementById('btn-refresh');
+        const themeToggle = document.getElementById('theme-toggle');
+        const btnLoginOpen = document.getElementById('btn-login-open');
+        const btnLoginClose = document.getElementById('btn-login-close');
+        const btnLogout = document.getElementById('btn-logout');
+        const loginForm = document.getElementById('login-form');
+        const loginModal = document.getElementById('login-modal');
+
+        // Theme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = 'dark_mode';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeIcon.textContent = 'light_mode';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeIcon.textContent = next === 'dark' ? 'dark_mode' : 'light_mode';
+        });
+
+        // Navigation
+        btnThisWeek.addEventListener('click', () => {
+            if (displayMode !== 'this-week') {
+                displayMode = 'this-week';
+                btnThisWeek.classList.add('active');
+                btnNextWeek.classList.remove('active');
+                renderVisibleWeeks();
+            }
+        });
+
+        btnNextWeek.addEventListener('click', () => {
+            if (displayMode !== 'next-week') {
+                displayMode = 'next-week';
+                btnNextWeek.classList.add('active');
+                btnThisWeek.classList.remove('active');
+                renderVisibleWeeks();
+            }
+        });
+
+        // Refresh – fetch fresh data from Bessa API
+        btnRefresh.addEventListener('click', () => {
+            if (!authToken) {
+                loginModal.classList.remove('hidden');
+                return;
+            }
+            loadMenuDataFromAPI();
+        });
+
+        // Login Modal
+        btnLoginOpen.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+            document.getElementById('login-error').classList.add('hidden');
+            loginForm.reset();
+        });
+
+        btnLoginClose.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.classList.add('hidden');
+        });
+
+        // Login Form Submit
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const employeeId = document.getElementById('employee-id').value.trim();
+            const password = document.getElementById('password').value;
+            const loginError = document.getElementById('login-error');
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Wird eingeloggt...';
+
+            try {
+                const email = `knapp-${employeeId}@bessa.app`;
+                const response = await fetch(`${API_BASE}/auth/login/`, {
+                    method: 'POST',
+                    headers: apiHeaders(GUEST_TOKEN),
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.key;
+                    currentUser = employeeId;
+                    sessionStorage.setItem('kantine_authToken', data.key);
+                    sessionStorage.setItem('kantine_currentUser', employeeId);
+
+                    // Fetch user name
+                    try {
+                        const userResp = await fetch(`${API_BASE}/auth/user/`, {
+                            headers: apiHeaders(authToken)
+                        });
+                        if (userResp.ok) {
+                            const userData = await userResp.json();
+                            if (userData.first_name) sessionStorage.setItem('kantine_firstName', userData.first_name);
+                            if (userData.last_name) sessionStorage.setItem('kantine_lastName', userData.last_name);
+                        }
+                    } catch (err) {
+                        console.error('Failed to fetch user info:', err);
+                    }
+
+                    updateAuthUI();
+                    loginModal.classList.add('hidden');
+                    fetchOrders();
+                    loginForm.reset();
+                    startPolling();
+
+                    // Reload menu data with auth for full details
+                    loadMenuDataFromAPI();
+                } else {
+                    loginError.textContent = data.non_field_errors?.[0] || data.error || 'Login fehlgeschlagen';
+                    loginError.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                loginError.textContent = 'Ein Fehler ist aufgetreten';
+                loginError.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // Logout
+        btnLogout.addEventListener('click', () => {
+            sessionStorage.removeItem('kantine_authToken');
+            sessionStorage.removeItem('kantine_currentUser');
+            sessionStorage.removeItem('kantine_firstName');
+            sessionStorage.removeItem('kantine_lastName');
+            authToken = null;
+            currentUser = null;
+            orderMap = new Map();
+            stopPolling();
+            updateAuthUI();
+            renderVisibleWeeks();
+        });
+    }
+
+    // === Auth UI ===
+    function updateAuthUI() {
+        // Try to recover session from Bessa's storage if not already logged in
+        if (!authToken) {
+            try {
+                const akita = localStorage.getItem('AkitaStores');
+                if (akita) {
+                    const parsed = JSON.parse(akita);
+                    if (parsed.auth && parsed.auth.token) {
+                        console.log('Found existing Bessa session!');
+                        authToken = parsed.auth.token;
+                        sessionStorage.setItem('kantine_authToken', authToken);
+
+                        if (parsed.auth.user) {
+                            currentUser = parsed.auth.user.id || 'unknown';
+                            sessionStorage.setItem('kantine_currentUser', currentUser);
+                            if (parsed.auth.user.firstName) sessionStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
+                            if (parsed.auth.user.lastName) sessionStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to parse AkitaStores:', e);
+            }
+        }
+
+        authToken = sessionStorage.getItem('kantine_authToken');
+        currentUser = sessionStorage.getItem('kantine_currentUser');
+        const firstName = sessionStorage.getItem('kantine_firstName');
+        const btnLoginOpen = document.getElementById('btn-login-open');
+        const userInfo = document.getElementById('user-info');
+        const userIdDisplay = document.getElementById('user-id-display');
+
+        if (authToken) {
+            btnLoginOpen.classList.add('hidden');
+            userInfo.classList.remove('hidden');
+            userIdDisplay.textContent = firstName || (currentUser ? `User ${currentUser}` : 'Angemeldet');
+            fetchOrders(); // Always fetch fresh orders on auth update
+        } else {
+            btnLoginOpen.classList.remove('hidden');
+            userInfo.classList.add('hidden');
+            userIdDisplay.textContent = '';
+        }
+
+        renderVisibleWeeks();
+    }
+
+    // === Fetch Orders from Bessa ===
+    async function fetchOrders() {
+        if (!authToken) return;
+        try {
+            // Use user/orders endpoint for reliable history
+            const response = await fetch(`${API_BASE}/user/orders/?venue=${VENUE_ID}&ordering=-created&limit=50`, {
+                headers: apiHeaders(authToken)
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                orderMap = new Map();
+                const results = data.results || [];
+
+                for (const order of results) {
+                    // Filter out cancelled orders (State 9)
+                    // Accepting State 1 (Created?), 5 (Placed?), 8 (Completed)
+                    // TODO: Verify exact states. Subagent saw 5=Active, 8=Completed, 9=Cancelled.
+                    if (order.order_state === 9) continue;
+
+                    // Extract date properly (it comes as ISO string)
+                    const orderDate = order.date.split('T')[0];
+
+                    for (const item of (order.items || [])) {
+                        const key = `${orderDate}_${item.article}`;
+                        if (!orderMap.has(key)) orderMap.set(key, []);
+                        orderMap.get(key).push(order.id);
+                    }
+                }
+                console.log(`Fetched ${results.length} orders, mapped active ones.`);
+                renderVisibleWeeks();
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    }
+
+    // === Place Order ===
+    async function placeOrder(date, articleId, name, price, description) {
+        if (!authToken) return;
+        try {
+            // Get user data for customer object
+            const userResp = await fetch(`${API_BASE}/auth/user/`, {
+                headers: apiHeaders(authToken)
+            });
+            if (!userResp.ok) {
+                showToast('Fehler: Benutzerdaten konnten nicht geladen werden', 'error');
+                return;
+            }
+            const userData = await userResp.json();
+            const now = new Date().toISOString();
+
+            const orderPayload = {
+                uuid: crypto.randomUUID(),
+                created: now,
+                updated: now,
+                order_type: 7,
+                items: [{
+                    article: articleId,
+                    course_group: null,
+                    modifiers: [],
+                    uuid: crypto.randomUUID(),
+                    name: name,
+                    description: description || '',
+                    price: String(parseFloat(price)),
+                    amount: 1,
+                    vat: '10.00',
+                    comment: ''
+                }],
+                table: null,
+                total: parseFloat(price),
+                tip: 0,
+                currency: 'EUR',
+                venue: VENUE_ID,
+                states: [],
+                order_state: 1,
+                date: `${date}T10:00:00.000Z`,
+                payment_method: 'payroll',
+                customer: {
+                    first_name: userData.first_name,
+                    last_name: userData.last_name,
+                    email: userData.email,
+                    newsletter: false
+                },
+                preorder: false,
+                delivery_fee: 0,
+                cash_box_table_name: null,
+                take_away: false
+            };
+
+            const response = await fetch(`${API_BASE}/user/orders/`, {
+                method: 'POST',
+                headers: apiHeaders(authToken),
+                body: JSON.stringify(orderPayload)
+            });
+
+            if (response.ok || response.status === 201) {
+                showToast(`Bestellt: ${name}`, 'success');
+                await fetchOrders();
+            } else {
+                const data = await response.json();
+                showToast(`Fehler: ${data.detail || data.non_field_errors?.[0] || 'Bestellung fehlgeschlagen'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Order error:', error);
+            showToast('Netzwerkfehler bei Bestellung', 'error');
+        }
+    }
+
+    // === Cancel Order ===
+    async function cancelOrder(date, articleId, name) {
+        if (!authToken) return;
+        const key = `${date}_${articleId}`;
+        const orderIds = orderMap.get(key);
+        if (!orderIds || orderIds.length === 0) return;
+
+        // LIFO: cancel most recent
+        const orderId = orderIds[orderIds.length - 1];
+        try {
+            const response = await fetch(`${API_BASE}/user/orders/${orderId}/cancel/`, {
+                method: 'PATCH',
+                headers: apiHeaders(authToken),
+                body: JSON.stringify({})
+            });
+
+            if (response.ok) {
+                showToast(`Storniert: ${name}`, 'success');
+                await fetchOrders();
+            } else {
+                const data = await response.json();
+                showToast(`Fehler: ${data.detail || 'Stornierung fehlgeschlagen'}`, 'error');
+            }
+        } catch (error) {
+            console.error('Cancel error:', error);
+            showToast('Netzwerkfehler bei Stornierung', 'error');
+        }
+    }
+
+    // === Flag Management (localStorage) ===
+    function saveFlags() {
+        localStorage.setItem('kantine_flags', JSON.stringify([...userFlags]));
+    }
+
+    function toggleFlag(date, articleId, name, cutoff) {
+        const id = `${date}_${articleId}`;
+        if (userFlags.has(id)) {
+            userFlags.delete(id);
+            showToast(`Flag entfernt für ${name}`, 'success');
+        } else {
+            userFlags.add(id);
+            showToast(`Benachrichtigung aktiviert für ${name}`, 'success');
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+        saveFlags();
+        renderVisibleWeeks();
+    }
+
+    // FR-019: Auto-remove flags whose cutoff has passed
+    function cleanupExpiredFlags() {
+        const now = new Date();
+        let changed = false;
+        for (const flagId of [...userFlags]) {
+            const [date] = flagId.split('_');
+            const cutoff = new Date(date);
+            cutoff.setHours(10, 0, 0, 0); // Standard cutoff 10:00
+            if (now >= cutoff) {
+                userFlags.delete(flagId);
+                changed = true;
+            }
+        }
+        if (changed) saveFlags();
+    }
+
+    // === Polling (Client-Side) ===
+    function startPolling() {
+        if (pollIntervalId) return;
+        if (!authToken) return;
+        pollIntervalId = setInterval(() => pollFlaggedItems(), POLL_INTERVAL_MS);
+        console.log('Polling started (every 5 min)');
+    }
+
+    function stopPolling() {
+        if (pollIntervalId) {
+            clearInterval(pollIntervalId);
+            pollIntervalId = null;
+            console.log('Polling stopped');
+        }
+    }
+
+    async function pollFlaggedItems() {
+        if (userFlags.size === 0 || !authToken) return;
+        console.log(`Polling ${userFlags.size} flagged items...`);
+
+        for (const flagId of userFlags) {
+            const [date, articleIdStr] = flagId.split('_');
+            const articleId = parseInt(articleIdStr);
+
+            try {
+                const response = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${date}/`, {
+                    headers: apiHeaders(authToken)
+                });
+                if (!response.ok) continue;
+
+                const data = await response.json();
+                const groups = data.results || [];
+                let foundItem = null;
+                for (const group of groups) {
+                    if (group.items) {
+                        foundItem = group.items.find(i => i.id === articleId || i.article === articleId);
+                        if (foundItem) break;
+                    }
+                }
+
+                if (foundItem) {
+                    const isAvailable = (foundItem.amount_tracking === false) || (parseInt(foundItem.available_amount) > 0);
+                    if (isAvailable) {
+                        const itemName = foundItem.name || 'Unbekannt';
+                        showToast(`${itemName} ist jetzt verfügbar!`, 'success');
+                        if (Notification.permission === 'granted') {
+                            new Notification('Kantine Wrapper', {
+                                body: `${itemName} ist jetzt verfügbar!`,
+                                icon: '🍽️'
+                            });
+                        }
+                        // Refresh menu data to update UI
+                        loadMenuDataFromAPI();
+                        break; // One refresh is enough
+                    }
+                }
+            } catch (err) {
+                console.error(`Poll error for ${flagId}:`, err);
+            }
+
+            // Small delay between checks
+            await new Promise(r => setTimeout(r, 200));
+        }
+    }
+
+    // === Local Menu Cache (localStorage) ===
+    const CACHE_KEY = 'kantine_menuCache';
+    const CACHE_TS_KEY = 'kantine_menuCacheTs';
+
+    function saveMenuCache() {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(allWeeks));
+            localStorage.setItem(CACHE_TS_KEY, new Date().toISOString());
+        } catch (e) {
+            console.warn('Failed to cache menu data:', e);
+        }
+    }
+
+    function loadMenuCache() {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            const cachedTs = localStorage.getItem(CACHE_TS_KEY);
+            if (cached) {
+                allWeeks = JSON.parse(cached);
+                currentWeekNumber = getISOWeek(new Date());
+                currentYear = new Date().getFullYear();
+                renderVisibleWeeks();
+                updateNextWeekBadge();
+                if (cachedTs) updateLastUpdatedTime(cachedTs);
+                console.log('Loaded menu from cache');
+                return true;
+            }
+        } catch (e) {
+            console.warn('Failed to load cached menu:', e);
+        }
+        return false;
+    }
+
+    // === Menu Data Fetching (Direct from Bessa API) ===
+    async function loadMenuDataFromAPI() {
+        const loading = document.getElementById('loading');
+        const progressModal = document.getElementById('progress-modal');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressMessage = document.getElementById('progress-message');
+
+        loading.classList.remove('hidden');
+
+        const token = authToken || GUEST_TOKEN;
+
+        try {
+            // Show progress modal
+            progressModal.classList.remove('hidden');
+            progressMessage.textContent = 'Hole verfügbare Daten...';
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+
+            // 1. Fetch available dates
+            const datesResponse = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/dates/`, {
+                headers: apiHeaders(token)
+            });
+
+            if (!datesResponse.ok) throw new Error(`Failed to fetch dates: ${datesResponse.status}`);
+
+            const datesData = await datesResponse.json();
+            let availableDates = datesData.results || [];
+
+            // Filter – last 7 days + future, limit 30
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - 7);
+            const cutoffStr = cutoff.toISOString().split('T')[0];
+
+            availableDates = availableDates
+                .filter(d => d.date >= cutoffStr)
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .slice(0, 30);
+
+            const totalDates = availableDates.length;
+            progressMessage.textContent = `${totalDates} Tage gefunden. Lade Details...`;
+
+            // 2. Fetch details for each date
+            const allDays = [];
+            let completed = 0;
+
+            for (const dateObj of availableDates) {
+                const dateStr = dateObj.date;
+                const pct = Math.round(((completed + 1) / totalDates) * 100);
+                progressFill.style.width = `${pct}%`;
+                progressPercent.textContent = `${pct}%`;
+                progressMessage.textContent = `Lade Menü für ${dateStr}...`;
+
+                try {
+                    const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+                        headers: apiHeaders(token)
+                    });
+
+                    if (detailResp.ok) {
+                        const detailData = await detailResp.json();
+                        // Debug: log raw API response for first date
+                        if (completed === 0) {
+                            console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
+                        }
+                        const menuGroups = detailData.results || [];
+                        let dayItems = [];
+                        for (const group of menuGroups) {
+                            if (group.items && Array.isArray(group.items)) {
+                                dayItems = dayItems.concat(group.items);
+                            }
+                        }
+                        if (dayItems.length > 0) {
+                            // Debug: log first item structure
+                            if (completed === 0) {
+                                console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
+                                console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
+                            }
+                            allDays.push({
+                                date: dateStr,
+                                menu_items: dayItems,
+                                orders: dateObj.orders || []
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Failed to fetch details for ${dateStr}:`, err);
+                }
+
+                completed++;
+                // Small delay to avoid rate limiting
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            // 3. Group by ISO week
+            const weeksMap = new Map();
+            for (const day of allDays) {
+                const d = new Date(day.date);
+                const weekNum = getISOWeek(d);
+                const year = getWeekYear(d);
+                const key = `${year}-${weekNum}`;
+
+                if (!weeksMap.has(key)) {
+                    weeksMap.set(key, { year, weekNumber: weekNum, days: [] });
+                }
+
+                const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
+                const orderCutoffDate = new Date(day.date);
+                orderCutoffDate.setHours(10, 0, 0, 0);
+
+                weeksMap.get(key).days.push({
+                    date: day.date,
+                    weekday: weekday,
+                    orderCutoff: orderCutoffDate.toISOString(),
+                    items: day.menu_items.map(item => {
+                        const isUnlimited = item.amount_tracking === false;
+                        const hasStock = parseInt(item.available_amount) > 0;
+                        return {
+                            id: `${day.date}_${item.id}`,
+                            articleId: item.id,
+                            name: item.name || 'Unknown',
+                            description: item.description || '',
+                            price: parseFloat(item.price) || 0,
+                            available: isUnlimited || hasStock,
+                            availableAmount: parseInt(item.available_amount) || 0,
+                            amountTracking: item.amount_tracking !== false
+                        };
+                    })
+                });
+            }
+
+            allWeeks = Array.from(weeksMap.values()).sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.weekNumber - b.weekNumber;
+            });
+
+            // Save to localStorage cache
+            saveMenuCache();
+
+            // Update timestamp
+            updateLastUpdatedTime(new Date().toISOString());
+
+            currentWeekNumber = getISOWeek(new Date());
+            currentYear = new Date().getFullYear();
+
+
+
+            updateAuthUI(); // This will trigger fetchOrders if logged in
+            renderVisibleWeeks();
+            updateNextWeekBadge();
+
+            progressMessage.textContent = 'Fertig!';
+            setTimeout(() => progressModal.classList.add('hidden'), 500);
+
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+            document.getElementById('menu-container').innerHTML = `<p class="error">Fehler beim Laden der Menüdaten: ${error.message}</p>`;
+            progressModal.classList.add('hidden');
+        } finally {
+            loading.classList.add('hidden');
+        }
+    }
+
+    // === Last Updated Display ===
+    function updateLastUpdatedTime(isoTimestamp) {
+        const subtitle = document.getElementById('last-updated-subtitle');
+        if (!isoTimestamp) return;
+        try {
+            const date = new Date(isoTimestamp);
+            const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+            subtitle.textContent = `Aktualisiert: ${dateStr} ${timeStr}`;
+        } catch (e) {
+            subtitle.textContent = '';
+        }
+    }
+
+    // === Toast Notification ===
+    function showToast(message, type = 'info') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+        toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // === Next Week Badge ===
+    function updateNextWeekBadge() {
+        const btnNextWeek = document.getElementById('btn-next-week');
+        let nextWeek = currentWeekNumber + 1;
+        let nextYear = currentYear;
+        if (nextWeek > 52) { nextWeek = 1; nextYear++; }
+
+        const nextWeekData = allWeeks.find(w => w.weekNumber === nextWeek && w.year === nextYear);
+        let totalDataCount = 0;
+        let orderableCount = 0;
+
+        if (nextWeekData && nextWeekData.days) {
+            nextWeekData.days.forEach(day => {
+                if (day.items && day.items.length > 0) {
+                    totalDataCount++;
+                    if (day.items.some(item => item.available)) orderableCount++;
+                }
+            });
+        }
+
+        let badge = btnNextWeek.querySelector('.nav-badge');
+        if (totalDataCount > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'nav-badge';
+                btnNextWeek.appendChild(badge);
+            }
+            badge.title = `${orderableCount} Tage bestellbar / ${totalDataCount} Tage mit Menüdaten`;
+            badge.innerHTML = `<span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+
+    // === Weekly Cost ===
+    function updateWeeklyCost(days) {
+        let totalCost = 0;
+        if (days && days.length > 0) {
+            days.forEach(day => {
+                if (day.items) {
+                    day.items.forEach(item => {
+                        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                        const key = `${day.date}_${articleId}`;
+                        const orders = orderMap.get(key) || [];
+                        if (orders.length > 0) totalCost += item.price * orders.length;
+                    });
+                }
+            });
+        }
+
+        const costDisplay = document.getElementById('weekly-cost-display');
+        if (totalCost > 0) {
+            costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>Gesamt: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
+            costDisplay.classList.remove('hidden');
+        } else {
+            costDisplay.classList.add('hidden');
+        }
+    }
+
+    // === Render Weeks ===
+    function renderVisibleWeeks() {
+        const menuContainer = document.getElementById('menu-container');
+        if (!menuContainer) return;
+        menuContainer.innerHTML = '';
+
+        let targetWeek = currentWeekNumber;
+        let targetYear = currentYear;
+
+        if (displayMode === 'next-week') {
+            targetWeek++;
+            if (targetWeek > 52) { targetWeek = 1; targetYear++; }
+        }
+
+        // Flatten & filter by week + year
+        const allDays = allWeeks.flatMap(w => w.days || []);
+        const daysInTargetWeek = allDays.filter(day => {
+            const d = new Date(day.date);
+            return getISOWeek(d) === targetWeek && getWeekYear(d) === targetYear;
+        });
+
+        if (daysInTargetWeek.length === 0) {
+            menuContainer.innerHTML = `
+                <div class="empty-state">
+                    <p>Keine Menüdaten für KW ${targetWeek} (${targetYear}) verfügbar.</p>
+                    <small>Versuchen Sie eine andere Woche oder schauen Sie später vorbei.</small>
+                </div>`;
+            document.getElementById('weekly-cost-display').classList.add('hidden');
+            return;
+        }
+
+        updateWeeklyCost(daysInTargetWeek);
+
+        // Update header
+        const headerWeekInfo = document.getElementById('header-week-info');
+        const weekTitle = displayMode === 'this-week' ? 'Diese Woche' : 'Nächste Woche';
+        headerWeekInfo.innerHTML = `
+            <div class="header-week-title">${weekTitle}</div>
+            <div class="header-week-subtitle">Week ${targetWeek} • ${targetYear}</div>`;
+
+        const grid = document.createElement('div');
+        grid.className = 'days-grid';
+
+        daysInTargetWeek.sort((a, b) => a.date.localeCompare(b.date));
+
+        // Filter weekends
+        const workingDays = daysInTargetWeek.filter(d => {
+            const date = new Date(d.date);
+            const day = date.getDay();
+            return day !== 0 && day !== 6;
+        });
+
+        workingDays.forEach(day => {
+            const card = createDayCard(day);
+            if (card) grid.appendChild(card);
+        });
+
+        menuContainer.appendChild(grid);
+        setTimeout(() => syncMenuItemHeights(grid), 0);
+    }
+
+    // === Sync Item Heights ===
+    function syncMenuItemHeights(grid) {
+        const cards = grid.querySelectorAll('.menu-card');
+        if (cards.length === 0) return;
+        let maxItems = 0;
+        cards.forEach(card => {
+            maxItems = Math.max(maxItems, card.querySelectorAll('.menu-item').length);
+        });
+        for (let i = 0; i < maxItems; i++) {
+            let maxHeight = 0;
+            const itemsAtPos = [];
+            cards.forEach(card => {
+                const items = card.querySelectorAll('.menu-item');
+                if (items[i]) {
+                    items[i].style.height = 'auto';
+                    maxHeight = Math.max(maxHeight, items[i].offsetHeight);
+                    itemsAtPos.push(items[i]);
+                }
+            });
+            itemsAtPos.forEach(item => { item.style.height = `${maxHeight}px`; });
+        }
+    }
+
+    // === Create Day Card ===
+    function createDayCard(day) {
+        if (!day.items || day.items.length === 0) return null;
+
+        const card = document.createElement('div');
+        card.className = 'menu-card';
+
+        const now = new Date();
+        const cardDate = new Date(day.date);
+
+        let isPastCutoff = false;
+        if (day.orderCutoff) {
+            isPastCutoff = now >= new Date(day.orderCutoff);
+        } else {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const cd = new Date(day.date);
+            cd.setHours(0, 0, 0, 0);
+            isPastCutoff = cd < today;
+        }
+
+        if (isPastCutoff) card.classList.add('past-day');
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        header.innerHTML = `
+            <span class="day-name">${translateDay(day.weekday)}</span>
+            <span class="day-date">${dateStr}</span>`;
+        card.appendChild(header);
+
+        // Body
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const sortedItems = [...day.items].sort((a, b) => a.name.localeCompare(b.name));
+
+        sortedItems.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'menu-item';
+
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const orderKey = `${day.date}_${articleId}`;
+            const orderIds = orderMap.get(orderKey) || [];
+            const orderCount = orderIds.length;
+
+            // Status badge
+            let statusBadge = '';
+            if (item.available) {
+                statusBadge = item.amountTracking
+                    ? `<span class="badge available">Verfügbar (${item.availableAmount})</span>`
+                    : `<span class="badge available">Verfügbar</span>`;
+            } else {
+                statusBadge = `<span class="badge sold-out">Ausverkauft</span>`;
+            }
+
+            // Order badge
+            let orderedBadge = '';
+            if (orderCount > 0) {
+                const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
+                orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> Bestellt${countBadge}</span>`;
+                itemEl.classList.add('ordered');
+                if (new Date(day.date).toDateString() === now.toDateString()) {
+                    itemEl.classList.add('today-ordered');
+                }
+            }
+
+            // Flagged styles
+            const flagId = `${day.date}_${articleId}`;
+            const isFlagged = userFlags.has(flagId);
+            if (isFlagged) {
+                itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
+            }
+
+            // Action buttons
+            let orderButton = '';
+            let cancelButton = '';
+            let flagButton = '';
+
+            if (authToken && !isPastCutoff) {
+                // Flag button
+                const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
+                const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
+                const flagTitle = isFlagged ? 'Benachrichtigung deaktivieren' : 'Benachrichtigen wenn verfügbar';
+                if (!item.available || isFlagged) {
+                    flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
+                }
+
+                // Order button
+                if (item.available) {
+                    if (orderCount > 0) {
+                        orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} nochmal bestellen"><span class="material-icons-round">add</span></button>`;
+                    } else {
+                        orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} bestellen"><span class="material-icons-round">add_shopping_cart</span> Bestellen</button>`;
+                    }
+                }
+
+                // Cancel button
+                if (orderCount > 0) {
+                    const cancelIcon = orderCount === 1 ? 'close' : 'remove';
+                    const cancelTitle = orderCount === 1 ? 'Bestellung stornieren' : 'Eine Bestellung stornieren';
+                    cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
+                }
+            }
+
+            itemEl.innerHTML = `
+                <div class="item-header">
+                    <span class="item-name">${escapeHtml(item.name)}</span>
+                    <span class="item-price">${item.price.toFixed(2)} €</span>
+                </div>
+                <div class="item-status-row">
+                    ${orderedBadge}
+                    ${cancelButton}
+                    ${orderButton}
+                    ${flagButton}
+                    <div class="badges">${statusBadge}</div>
+                </div>
+                <p class="item-desc">${escapeHtml(item.description)}</p>`;
+
+            // Event: Order
+            const orderBtn = itemEl.querySelector('.btn-order');
+            if (orderBtn) {
+                orderBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    btn.classList.add('loading');
+                    placeOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, parseFloat(btn.dataset.price), btn.dataset.desc || '')
+                        .finally(() => { btn.disabled = false; btn.classList.remove('loading'); });
+                });
+            }
+
+            // Event: Cancel
+            const cancelBtn = itemEl.querySelector('.btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    cancelOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name)
+                        .finally(() => { btn.disabled = false; });
+                });
+            }
+
+            // Event: Flag
+            const flagBtn = itemEl.querySelector('.btn-flag');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    toggleFlag(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
+                });
+            }
+
+            body.appendChild(itemEl);
+        });
+
+        card.appendChild(body);
+        return card;
+    }
+
+    // === Helpers ===
+    function getISOWeek(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    }
+
+    function getWeekYear(d) {
+        const date = new Date(d.getTime());
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+        return date.getFullYear();
+    }
+
+    function translateDay(englishDay) {
+        const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
+        return map[englishDay] || englishDay;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
+
+    // === Bootstrap ===
+    injectUI();
+    bindEvents();
+    updateAuthUI();
+    cleanupExpiredFlags();
+
+    // Load cached data first for instant UI, then refresh from API
+    const hadCache = loadMenuCache();
+    if (hadCache) {
+        // Hide loading spinner since cache is shown
+        document.getElementById('loading').classList.add('hidden');
+    }
+    loadMenuDataFromAPI();
+
+    // Auto-start polling if already logged in
+    if (authToken) {
+        startPolling();
+    }
+
+    console.log('Kantine Wrapper loaded ✅');
+})();
+    </script>
+</body>
+</html>
