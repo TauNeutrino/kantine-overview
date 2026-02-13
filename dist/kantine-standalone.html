@@ -1278,7 +1278,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">v1.0.2</small></h1>
+                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">v1.0.3</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
@@ -2486,9 +2486,10 @@ body {
 
     // === Version Check ===
     async function checkForUpdates() {
-        const CurrentVersion = 'v1.0.2'; // Injected by build script
+        const CurrentVersion = 'v1.0.3'; // Injected by build script
         const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
-        const InstallerUrl = 'https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html';
+        // Use htmlpreview.github.io to render the HTML directly in browser
+        const InstallerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
 
         console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
 

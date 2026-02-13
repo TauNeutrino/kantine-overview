@@ -1276,7 +1276,8 @@
     async function checkForUpdates() {
         const CurrentVersion = '{{VERSION}}'; // Injected by build script
         const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
-        const InstallerUrl = 'https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html';
+        // Use htmlpreview.github.io to render the HTML directly in browser
+        const InstallerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
 
         console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
 
