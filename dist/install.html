@@ -4,13 +4,90 @@
     <meta charset="UTF-8">
     <title>Kantine Wrapper Installer</title>
     <style>
-        body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #1a1a2e; color: #eee; }
-        h1 { color: #e94560; }
-        .instructions { background: #16213e; padding: 20px; border-radius: 12px; margin: 20px 0; }
-        .instructions ol li { margin: 10px 0; }
-        a.bookmarklet { display: inline-block; background: #e94560; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; cursor: grab; }
-        a.bookmarklet:hover { background: #c73652; }
-        code { background: #0f3460; padding: 2px 6px; border-radius: 4px; }
+        :root {
+            --knapp-blue: #029AA8;
+            --knapp-teal: #006269;
+            --knapp-yellow: #FFED00;
+            --text-main: #333333;
+            --bg-body: #f4f6f8;
+            --bg-card: #ffffff;
+        }
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            max-width: 700px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            line-height: 1.6;
+        }
+        h1 { 
+            color: var(--knapp-teal); 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+            border-bottom: 2px solid var(--knapp-blue);
+            padding-bottom: 15px;
+        }
+        h2 { color: var(--knapp-blue); font-size: 1.25em; margin-top: 0; }
+        .instructions { 
+            background: var(--bg-card); 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin: 20px 0; 
+        }
+        .instructions ol { padding-left: 20px; }
+        .instructions ol li { margin-bottom: 10px; }
+        a { color: var(--knapp-blue); text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        
+        a.bookmarklet { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            background: var(--knapp-teal); 
+            color: white; 
+            padding: 15px 30px; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 18px; 
+            cursor: grab; 
+            box-shadow: 0 4px 6px rgba(0,98,105,0.2); 
+            transition: all 0.2s;
+            border-bottom: 3px solid rgba(0,0,0,0.1);
+        }
+        a.bookmarklet:hover { 
+            background: var(--knapp-blue); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(2,154,168,0.25);
+        }
+        a.bookmarklet:active {
+            cursor: grabbing;
+        }
+        
+        code { 
+            background: #eef2f5; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            color: var(--knapp-teal); 
+            font-family: monospace; 
+            border: 1px solid #dae1e7;
+        }
+        
+        ul { padding-left: 20px; color: #555; }
+        ul li { margin-bottom: 8px; }
+        
+        .disclaimer {
+            margin-top: 30px; 
+            padding: 15px; 
+            background: #fffde7; /* Light yellow */
+            border-left: 4px solid var(--knapp-yellow); 
+            border-radius: 4px; 
+            font-size: 0.85em; 
+            color: #444;
+        }
     </style>
 </head>
 <body>
@@ -32,7 +109,7 @@
             <li>🛡️ <strong>Offline-Support:</strong> Speichert Menüdaten lokal.</li>
         </ul>
 
-        <div style="margin-top: 30px; padding: 15px; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
+        <div class="disclaimer">
              <strong>⚠️ Haftungsausschluss:</strong><br>
              Die Verwendung dieses Bookmarklets erfolgt auf eigene Verantwortung. Der Entwickler übernimmt keine Haftung für Schäden, Datenverlust oder ungewollte Bestellungen, die durch die Nutzung dieser Software entstehen.
         </div>
