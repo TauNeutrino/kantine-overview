@@ -89,11 +89,11 @@ cat > "$DIST_DIR/install.html" << 'INSTALLEOF'
     <title>Kantine Wrapper Installer</title>
     <style>
         body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #1a1a2e; color: #eee; }
-        h1 { color: #029AA8; }
+        h1 { color: #e94560; }
         .instructions { background: #16213e; padding: 20px; border-radius: 12px; margin: 20px 0; }
         .instructions ol li { margin: 10px 0; }
-        a.bookmarklet { display: inline-block; background: #029AA8; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; cursor: grab; }
-        a.bookmarklet:hover { background: #006269; }
+        a.bookmarklet { display: inline-block; background: #e94560; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; cursor: grab; }
+        a.bookmarklet:hover { background: #c73652; }
         code { background: #0f3460; padding: 2px 6px; border-radius: 4px; }
     </style>
 </head>
@@ -103,7 +103,7 @@ cat > "$DIST_DIR/install.html" << 'INSTALLEOF'
         <h2>Installation</h2>
         <ol>
             <li>Ziehe den Button unten in deine <strong>Lesezeichen-Leiste</strong> (Drag & Drop)</li>
-            <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#029AA8">web.bessa.app/knapp-kantine</a></li>
+            <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#e94560">web.bessa.app/knapp-kantine</a></li>
             <li>Klicke auf das Lesezeichen <code>Kantine Wrapper</code></li>
         </ol>
 
