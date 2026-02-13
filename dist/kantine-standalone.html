@@ -2061,12 +2061,15 @@ body {
             // Color Logic
             badge.classList.remove('badge-violet', 'badge-green', 'badge-red', 'badge-blue');
 
-            if (daysWithOrders === totalDataCount && totalDataCount > 0) {
-                badge.classList.add('badge-violet'); // All days ordered
+            // Refined Logic (v1.7.4):
+            // Violet: If we have orders AND there are no DAYS left that are orderable but un-ordered.
+            // (i.e. "I have ordered everything I can")
+            if (daysWithOrders > 0 && daysWithOrderableAndNoOrder === 0) {
+                badge.classList.add('badge-violet');
             } else if (daysWithOrderableAndNoOrder > 0) {
                 badge.classList.add('badge-green'); // Orderable days exist without order
             } else if (orderableCount === 0) {
-                badge.classList.add('badge-red'); // No orderable days at all
+                badge.classList.add('badge-red'); // No orderable days at all & no orders
             } else {
                 badge.classList.add('badge-blue'); // Default / partial state
             }
