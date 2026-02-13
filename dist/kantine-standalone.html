@@ -1176,7 +1176,37 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     /* Ensure text remains standard color */
-}    </style>
+}
+/* Update Icon */
+.update-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    background-color: rgba(16, 185, 129, 0.2); /* Green tint */
+    color: var(--success-color);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    text-decoration: none;
+    animation: pulse 2s infinite;
+}
+
+.update-icon:hover {
+    background-color: var(--success-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+    </style>
 </head>
 <body>
     <script>
@@ -1248,7 +1278,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">v1.0.0</small></h1>
+                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">v1.0.1</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
@@ -2454,6 +2484,49 @@ body {
         return card;
     }
 
+    // === Version Check ===
+    async function checkForUpdates() {
+        const CurrentVersion = 'v1.0.1'; // Injected by build script
+        const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
+        const InstallerUrl = 'https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html';
+
+        console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
+
+        try {
+            const response = await fetch(VersionUrl, { cache: 'no-cache' });
+            if (!response.ok) return;
+
+            const remoteVersion = (await response.text()).trim();
+            console.log(`[Kantine] Remote version: ${remoteVersion}`);
+
+            if (remoteVersion && remoteVersion !== CurrentVersion) {
+                // Simple semantic version check or string inequality
+                // Assuming format v1.0.0
+                showUpdateIcon(remoteVersion, InstallerUrl);
+            }
+        } catch (error) {
+            console.warn('[Kantine] Version check failed:', error);
+        }
+    }
+
+    function showUpdateIcon(newVersion, url) {
+        const headerTitle = document.querySelector('.header-left h1');
+        if (!headerTitle) return;
+
+        // Check if already added
+        if (headerTitle.querySelector('.update-icon')) return;
+
+        const icon = document.createElement('a');
+        icon.className = 'update-icon';
+        icon.href = url;
+        icon.target = '_blank';
+        icon.innerHTML = '🆕'; // User requested icon
+        icon.title = `Neue Version verfügbar (${newVersion}). Klick für download`;
+
+        headerTitle.appendChild(icon);
+        showToast(`Update verfügbar: ${newVersion}`, 'info');
+    }
+
     // === Helpers ===
     function getISOWeek(date) {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -2498,6 +2571,9 @@ body {
     if (authToken) {
         startPolling();
     }
+
+    // Check for updates
+    checkForUpdates();
 
     console.log('Kantine Wrapper loaded ✅');
 })();

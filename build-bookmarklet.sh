@@ -9,7 +9,12 @@ CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
 
 # === VERSION ===
-VERSION="v1.0.0"
+if [ -f "$SCRIPT_DIR/version.txt" ]; then
+    VERSION=$(cat "$SCRIPT_DIR/version.txt" | tr -d '\n')
+else
+    echo "ERROR: version.txt not found"
+    exit 1
+fi
 
 mkdir -p "$DIST_DIR"
 

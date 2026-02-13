@@ -1272,6 +1272,49 @@
         return card;
     }
 
+    // === Version Check ===
+    async function checkForUpdates() {
+        const CurrentVersion = '{{VERSION}}'; // Injected by build script
+        const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
+        const InstallerUrl = 'https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html';
+
+        console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
+
+        try {
+            const response = await fetch(VersionUrl, { cache: 'no-cache' });
+            if (!response.ok) return;
+
+            const remoteVersion = (await response.text()).trim();
+            console.log(`[Kantine] Remote version: ${remoteVersion}`);
+
+            if (remoteVersion && remoteVersion !== CurrentVersion) {
+                // Simple semantic version check or string inequality
+                // Assuming format v1.0.0
+                showUpdateIcon(remoteVersion, InstallerUrl);
+            }
+        } catch (error) {
+            console.warn('[Kantine] Version check failed:', error);
+        }
+    }
+
+    function showUpdateIcon(newVersion, url) {
+        const headerTitle = document.querySelector('.header-left h1');
+        if (!headerTitle) return;
+
+        // Check if already added
+        if (headerTitle.querySelector('.update-icon')) return;
+
+        const icon = document.createElement('a');
+        icon.className = 'update-icon';
+        icon.href = url;
+        icon.target = '_blank';
+        icon.innerHTML = '🆕'; // User requested icon
+        icon.title = `Neue Version verfügbar (${newVersion}). Klick für download`;
+
+        headerTitle.appendChild(icon);
+        showToast(`Update verfügbar: ${newVersion}`, 'info');
+    }
+
     // === Helpers ===
     function getISOWeek(date) {
         const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -1316,6 +1359,9 @@
     if (authToken) {
         startPolling();
     }
+
+    // Check for updates
+    checkForUpdates();
 
     console.log('Kantine Wrapper loaded ✅');
 })();
