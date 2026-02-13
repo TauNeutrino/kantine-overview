@@ -730,8 +730,23 @@
                 await new Promise(r => setTimeout(r, 100));
             }
 
-            // 3. Group by ISO week
+            // 3. Group by ISO week (Merge with existing to preserve past days)
             const weeksMap = new Map();
+
+            // Hydrate from existing cache (preserve past data)
+            if (allWeeks && allWeeks.length > 0) {
+                allWeeks.forEach(w => {
+                    const key = `${w.year}-${w.weekNumber}`;
+                    try {
+                        weeksMap.set(key, {
+                            year: w.year,
+                            weekNumber: w.weekNumber,
+                            days: w.days ? w.days.map(d => ({ ...d, items: d.items ? [...d.items] : [] })) : []
+                        });
+                    } catch (e) { console.warn('Error hydrating week:', e); }
+                });
+            }
+
             for (const day of allDays) {
                 const d = new Date(day.date);
                 const weekNum = getISOWeek(d);
@@ -742,11 +757,12 @@
                     weeksMap.set(key, { year, weekNumber: weekNum, days: [] });
                 }
 
+                const weekObj = weeksMap.get(key);
                 const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
                 const orderCutoffDate = new Date(day.date);
                 orderCutoffDate.setHours(10, 0, 0, 0);
 
-                weeksMap.get(key).days.push({
+                const newDayObj = {
                     date: day.date,
                     weekday: weekday,
                     orderCutoff: orderCutoffDate.toISOString(),
@@ -764,12 +780,24 @@
                             amountTracking: item.amount_tracking !== false
                         };
                     })
-                });
+                };
+
+                // Merge: Overwrite if exists, push if new
+                const existingIndex = weekObj.days.findIndex(existing => existing.date === day.date);
+                if (existingIndex >= 0) {
+                    weekObj.days[existingIndex] = newDayObj;
+                } else {
+                    weekObj.days.push(newDayObj);
+                }
             }
 
+            // Sort weeks and days
             allWeeks = Array.from(weeksMap.values()).sort((a, b) => {
                 if (a.year !== b.year) return a.year - b.year;
                 return a.weekNumber - b.weekNumber;
+            });
+            allWeeks.forEach(w => {
+                if (w.days) w.days.sort((a, b) => a.date.localeCompare(b.date));
             });
 
             // Save to localStorage cache
@@ -849,12 +877,25 @@
         const nextWeekData = allWeeks.find(w => w.weekNumber === nextWeek && w.year === nextYear);
         let totalDataCount = 0;
         let orderableCount = 0;
+        let daysWithOrders = 0;
+        let daysWithOrderableAndNoOrder = 0;
 
         if (nextWeekData && nextWeekData.days) {
             nextWeekData.days.forEach(day => {
                 if (day.items && day.items.length > 0) {
                     totalDataCount++;
-                    if (day.items.some(item => item.available)) orderableCount++;
+                    const isOrderable = day.items.some(item => item.available);
+                    if (isOrderable) orderableCount++;
+
+                    let hasOrder = false;
+                    day.items.forEach(item => {
+                        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                        const key = `${day.date}_${articleId}`;
+                        if (orderMap.has(key) && orderMap.get(key).length > 0) hasOrder = true;
+                    });
+
+                    if (hasOrder) daysWithOrders++;
+                    if (isOrderable && !hasOrder) daysWithOrderableAndNoOrder++;
                 }
             });
         }
@@ -866,8 +907,24 @@
                 badge.className = 'nav-badge';
                 btnNextWeek.appendChild(badge);
             }
-            badge.title = `${orderableCount} Tage bestellbar / ${totalDataCount} Tage mit Menüdaten`;
-            badge.innerHTML = `<span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
+
+            // Format: ( Ordered / Orderable / Total )
+            badge.title = `${daysWithOrders} bestellt / ${orderableCount} bestellbar / ${totalDataCount} gesamt`;
+            badge.innerHTML = `<span class="ordered">${daysWithOrders}</span><span class="separator">/</span><span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
+
+            // Color Logic
+            badge.classList.remove('badge-violet', 'badge-green', 'badge-red', 'badge-blue');
+
+            if (daysWithOrders === totalDataCount && totalDataCount > 0) {
+                badge.classList.add('badge-violet'); // All days ordered
+            } else if (daysWithOrderableAndNoOrder > 0) {
+                badge.classList.add('badge-green'); // Orderable days exist without order
+            } else if (orderableCount === 0) {
+                badge.classList.add('badge-red'); // No orderable days at all
+            } else {
+                badge.classList.add('badge-blue'); // Default / partial state
+            }
+
         } else if (badge) {
             badge.remove();
         }

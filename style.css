@@ -1123,3 +1123,9 @@ body {
     line-height: normal;
     display: inline-block;
 }
+
+/* Detailed Badge Colors */
+.nav-badge.badge-violet { background-color: #8b5cf6; }
+.nav-badge.badge-green { background-color: var(--success-color); }
+.nav-badge.badge-red { background-color: var(--error-color); }
+.nav-badge.badge-blue { background-color: var(--accent-color); }
