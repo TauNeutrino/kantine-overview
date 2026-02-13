@@ -8,9 +8,12 @@ DIST_DIR="$SCRIPT_DIR/dist"
 CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
 
+# === VERSION ===
+VERSION="v1.8.5"
+
 mkdir -p "$DIST_DIR"
 
-echo "=== Kantine Bookmarklet Builder ==="
+echo "=== Kantine Bookmarklet Builder ($VERSION) ==="
 
 # Check files exist
 if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
@@ -20,7 +23,7 @@ CSS_CONTENT=$(cat "$CSS_FILE")
 JS_CONTENT=$(cat "$JS_FILE")
 
 # === 1. Build standalone HTML (for local testing/dev) ===
-cat > "$DIST_DIR/kantine-standalone.html" << 'HTMLEOF'
+cat > "$DIST_DIR/kantine-standalone.html" << HTMLEOF
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -37,7 +40,7 @@ HTMLEOF
 # Inject CSS
 cat "$CSS_FILE" >> "$DIST_DIR/kantine-standalone.html"
 
-cat >> "$DIST_DIR/kantine-standalone.html" << 'HTMLEOF'
+cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
     </style>
 </head>
 <body>
@@ -47,7 +50,7 @@ HTMLEOF
 # Inject JS
 cat "$JS_FILE" >> "$DIST_DIR/kantine-standalone.html"
 
-cat >> "$DIST_DIR/kantine-standalone.html" << 'HTMLEOF'
+cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
     </script>
 </body>
 </html>
@@ -81,15 +84,15 @@ echo "javascript:${BOOKMARKLET_RAW}" > "$DIST_DIR/bookmarklet.txt"
 echo "✅ Bookmarklet URL: $DIST_DIR/bookmarklet.txt"
 
 # === 3. Create an easy-to-use HTML installer page ===
-cat > "$DIST_DIR/install.html" << 'INSTALLEOF'
+cat > "$DIST_DIR/install.html" << INSTALLEOF
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Kantine Wrapper Installer</title>
+    <title>Kantine Wrapper Installer ($VERSION)</title>
     <style>
         body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #1a1a2e; color: #eee; }
-        h1 { color: #029AA8; }
+        h1 { color: #029AA8; } /* Knapp Teal */
         .instructions { background: #16213e; padding: 20px; border-radius: 12px; margin: 20px 0; }
         .instructions ol li { margin: 10px 0; }
         a.bookmarklet { display: inline-block; background: #029AA8; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; cursor: grab; }
@@ -98,13 +101,13 @@ cat > "$DIST_DIR/install.html" << 'INSTALLEOF'
     </style>
 </head>
 <body>
-    <h1>🍽️ Kantine Wrapper</h1>
+    <h1>🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
     <div class="instructions">
         <h2>Installation</h2>
         <ol>
             <li>Ziehe den Button unten in deine <strong>Lesezeichen-Leiste</strong> (Drag & Drop)</li>
             <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#029AA8">web.bessa.app/knapp-kantine</a></li>
-            <li>Klicke auf das Lesezeichen <code>Kantine Wrapper</code></li>
+            <li>Klicke auf das Lesezeichen <code>Kantine $VERSION</code></li>
         </ol>
 
         <h2>✨ Features</h2>
@@ -136,8 +139,8 @@ bmk = '''javascript:(function(){if(window.__KANTINE_LOADED){alert(\"Already load
 print(json.dumps(bmk) + ';')
 " 2>/dev/null >> "$DIST_DIR/install.html" || echo "'javascript:alert(\"Build error\")'" >> "$DIST_DIR/install.html"
 
-cat >> "$DIST_DIR/install.html" << 'INSTALLEOF'
-        document.getElementById('bookmarklet-link').textContent = '🍽️ Kantine Wrapper';
+cat >> "$DIST_DIR/install.html" << INSTALLEOF
+        document.getElementById('bookmarklet-link').textContent = 'Kantine $VERSION';
     </script>
 </body>
 </html>
