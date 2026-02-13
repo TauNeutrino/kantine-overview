@@ -1093,6 +1093,33 @@
 
         const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
 
+        // Determine Day Status for Header Color
+        // Violet: Has Order
+        // Green: No Order but Orderable
+        // Red: No Order and Not Orderable (Locked/Sold Out)
+        let headerClass = '';
+        const hasAnyOrder = day.items && day.items.some(item => {
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const key = `${day.date}_${articleId}`;
+            return orderMap.has(key) && orderMap.get(key).length > 0;
+        });
+
+        const hasOrderable = day.items && day.items.some(item => {
+            // Logic from updateNextWeekBadge
+            return (item.amount_tracking === false) || (parseInt(item.available_amount) > 0);
+        });
+
+        if (hasAnyOrder) {
+            headerClass = 'header-violet';
+        } else if (hasOrderable && !isPastCutoff) {
+            headerClass = 'header-green';
+        } else {
+            // Red if not orderable (or past cutoff)
+            headerClass = 'header-red';
+        }
+
+        if (headerClass) header.classList.add(headerClass);
+
         header.innerHTML = `
             <div class="day-header-left">
                 <span class="day-name">${translateDay(day.weekday)}</span>

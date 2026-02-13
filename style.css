@@ -1129,3 +1129,25 @@ body {
 .nav-badge.badge-green { background-color: var(--success-color); }
 .nav-badge.badge-red { background-color: var(--error-color); }
 .nav-badge.badge-blue { background-color: var(--accent-color); }
+
+/* Day Header Status Colors (User Request) */
+.card-header.header-violet {
+    background-color: rgba(139, 92, 246, 0.15);
+    border-bottom: 2px solid #8b5cf6;
+    color: #8b5cf6;
+}
+.card-header.header-green {
+    background-color: rgba(16, 185, 129, 0.15);
+    border-bottom: 2px solid var(--success-color);
+    color: var(--success-color);
+}
+.card-header.header-red {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-bottom: 2px solid var(--error-color);
+    color: var(--error-color);
+}
+.card-header.header-violet .day-name,
+.card-header.header-green .day-name,
+.card-header.header-red .day-name {
+    font-weight: 700;
+}

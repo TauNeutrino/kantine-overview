@@ -1140,6 +1140,28 @@ body {
 .nav-badge.badge-green { background-color: var(--success-color); }
 .nav-badge.badge-red { background-color: var(--error-color); }
 .nav-badge.badge-blue { background-color: var(--accent-color); }
+
+/* Day Header Status Colors (User Request) */
+.card-header.header-violet {
+    background-color: rgba(139, 92, 246, 0.15);
+    border-bottom: 2px solid #8b5cf6;
+    color: #8b5cf6;
+}
+.card-header.header-green {
+    background-color: rgba(16, 185, 129, 0.15);
+    border-bottom: 2px solid var(--success-color);
+    color: var(--success-color);
+}
+.card-header.header-red {
+    background-color: rgba(239, 68, 68, 0.15);
+    border-bottom: 2px solid var(--error-color);
+    color: var(--error-color);
+}
+.card-header.header-violet .day-name,
+.card-header.header-green .day-name,
+.card-header.header-red .day-name {
+    font-weight: 700;
+}
     </style>
 </head>
 <body>
@@ -2238,6 +2260,33 @@ body {
         const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
         const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+
+        // Determine Day Status for Header Color
+        // Violet: Has Order
+        // Green: No Order but Orderable
+        // Red: No Order and Not Orderable (Locked/Sold Out)
+        let headerClass = '';
+        const hasAnyOrder = day.items && day.items.some(item => {
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const key = `${day.date}_${articleId}`;
+            return orderMap.has(key) && orderMap.get(key).length > 0;
+        });
+
+        const hasOrderable = day.items && day.items.some(item => {
+            // Logic from updateNextWeekBadge
+            return (item.amount_tracking === false) || (parseInt(item.available_amount) > 0);
+        });
+
+        if (hasAnyOrder) {
+            headerClass = 'header-violet';
+        } else if (hasOrderable && !isPastCutoff) {
+            headerClass = 'header-green';
+        } else {
+            // Red if not orderable (or past cutoff)
+            headerClass = 'header-red';
+        }
+
+        if (headerClass) header.classList.add(headerClass);
 
         header.innerHTML = `
             <div class="day-header-left">
