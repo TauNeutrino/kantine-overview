@@ -9,7 +9,7 @@ CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
 
 # === VERSION ===
-VERSION="v1.8.5"
+VERSION="v1.8.6"
 
 mkdir -p "$DIST_DIR"
 
@@ -20,7 +20,8 @@ if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
 
 CSS_CONTENT=$(cat "$CSS_FILE")
-JS_CONTENT=$(cat "$JS_FILE")
+# Inject version into JS
+JS_CONTENT=$(cat "$JS_FILE" | sed "s/{{VERSION}}/$VERSION/g")
 
 # === 1. Build standalone HTML (for local testing/dev) ===
 cat > "$DIST_DIR/kantine-standalone.html" << HTMLEOF
@@ -48,7 +49,7 @@ cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
 HTMLEOF
 
 # Inject JS
-cat "$JS_FILE" >> "$DIST_DIR/kantine-standalone.html"
+echo "$JS_CONTENT" >> "$DIST_DIR/kantine-standalone.html"
 
 cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
     </script>
@@ -72,7 +73,7 @@ var s=document.createElement('style');
 s.textContent='${CSS_ESCAPED}';
 document.head.appendChild(s);
 var sc=document.createElement('script');
-sc.textContent=$(cat "$JS_FILE" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || cat "$JS_FILE" | sed 's/\\/\\\\/g' | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g' | tr '\n' ' ' | sed 's/^/"/' | sed 's/$/"/');
+sc.textContent=$(echo "$JS_CONTENT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo "$JS_CONTENT" | sed 's/\\/\\\\/g' | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g' | tr '\n' ' ' | sed 's/^/"/' | sed 's/$/"/');
 document.head.appendChild(sc);
 })();
 PAYLOADEOF
@@ -131,7 +132,7 @@ INSTALLEOF
 
 # Embed the bookmarklet URL inline
 echo "document.getElementById('bookmarklet-link').href = " >> "$DIST_DIR/install.html"
-cat "$JS_FILE" | python3 -c "
+echo "$JS_CONTENT" | python3 -c "
 import sys, json
 js = sys.stdin.read()
 css = open('$CSS_FILE').read().replace('\\n', ' ').replace('  ', ' ')
