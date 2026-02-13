@@ -1105,8 +1105,8 @@
         });
 
         const hasOrderable = day.items && day.items.some(item => {
-            // Logic from updateNextWeekBadge
-            return (item.amount_tracking === false) || (parseInt(item.available_amount) > 0);
+            // Use pre-calculated available flag from loadMenuDataFromAPI calculation
+            return item.available;
         });
 
         if (hasAnyOrder) {

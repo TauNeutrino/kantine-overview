@@ -1116,6 +1116,7 @@ body {
         box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
     }
 }
+
 /* Day Header Badges */
 .day-header-left {
     display: flex;
@@ -1126,7 +1127,8 @@ body {
 .menu-code-badge {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #8b5cf6; /* Violet 500 */
+    color: #8b5cf6;
+    /* Violet 500 */
     background-color: rgba(139, 92, 246, 0.15);
     border: 1px solid rgba(139, 92, 246, 0.3);
     padding: 2px 6px;
@@ -1136,33 +1138,45 @@ body {
 }
 
 /* Detailed Badge Colors */
-.nav-badge.badge-violet { background-color: #8b5cf6; }
-.nav-badge.badge-green { background-color: var(--success-color); }
-.nav-badge.badge-red { background-color: var(--error-color); }
-.nav-badge.badge-blue { background-color: var(--accent-color); }
+.nav-badge.badge-violet {
+    background-color: #8b5cf6;
+}
+
+.nav-badge.badge-green {
+    background-color: var(--success-color);
+}
+
+.nav-badge.badge-red {
+    background-color: var(--error-color);
+}
+
+.nav-badge.badge-blue {
+    background-color: var(--accent-color);
+}
 
 /* Day Header Status Colors (User Request) */
 .card-header.header-violet {
     background-color: rgba(139, 92, 246, 0.15);
     border-bottom: 2px solid #8b5cf6;
-    color: #8b5cf6;
 }
+
 .card-header.header-green {
     background-color: rgba(16, 185, 129, 0.15);
     border-bottom: 2px solid var(--success-color);
-    color: var(--success-color);
 }
+
 .card-header.header-red {
     background-color: rgba(239, 68, 68, 0.15);
     border-bottom: 2px solid var(--error-color);
-    color: var(--error-color);
 }
+
 .card-header.header-violet .day-name,
 .card-header.header-green .day-name,
 .card-header.header-red .day-name {
     font-weight: 700;
-}
-    </style>
+    color: var(--text-primary);
+    /* Ensure text remains standard color */
+}    </style>
 </head>
 <body>
     <script>
@@ -2273,8 +2287,8 @@ body {
         });
 
         const hasOrderable = day.items && day.items.some(item => {
-            // Logic from updateNextWeekBadge
-            return (item.amount_tracking === false) || (parseInt(item.available_amount) > 0);
+            // Use pre-calculated available flag from loadMenuDataFromAPI calculation
+            return item.available;
         });
 
         if (hasAnyOrder) {
