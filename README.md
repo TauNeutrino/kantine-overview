@@ -8,9 +8,8 @@ Ein intelligentes Bookmarklet für die Mitarbeiter-Kantine der Bessa App. Dieses
 *   **Bestellstatus:** Farbige Indikatoren für bestellte Menüs.
 *   **Kostenkontrolle:** Summiert automatisch den Gesamtpreis der Woche.
 *   **Session Reuse:** Nutzt automatisch eine bestehende Login-Session (Loggt dich automatisch ein).
-*   **Bestellhistorie:** Zeigt zuverlässig alle aktiven und abgeschlossenen Bestellungen an (über `/user/orders/`).
-*   **Lokaler Cache:** Lädt Menüdaten blitzschnell aus dem Browser-Speicher.
-*   **Scroll-Fix:** Garantiert Scrollbarkeit auch auf restriktiven Seiten.
+*   **API Fallback:** Prüft die Verbindung und bietet bei Fehlern einen Direktlink zur Originalseite.
+*   **Menu Badges:** Zeigt Menü-Codes (M1, M2+) direkt im Header.
 
 ## 📦 Installation
 
