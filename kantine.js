@@ -66,7 +66,7 @@
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">${CLIENT_VERSION}</small></h1>
+                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">{{VERSION}}</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
