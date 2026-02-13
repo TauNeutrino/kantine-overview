@@ -9,7 +9,7 @@ CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
 
 # === VERSION ===
-VERSION="v1.8.6"
+VERSION="v1.0.0"
 
 mkdir -p "$DIST_DIR"
 
