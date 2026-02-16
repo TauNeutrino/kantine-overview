@@ -1362,12 +1362,8 @@ body {
     transform: translateY(-1px);
 }
 
-/* Update Banner Enhanced */
-.update-banner {
-    /* ... existing styles ... */
-}
 
-/* Matched Tags in Menu Card */
+
 .matched-tags {
     display: flex;
     flex-wrap: wrap;
@@ -1398,25 +1394,7 @@ body {
     border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
-.change-summary {
-    font-size: 0.8rem;
-    background: rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
-    border-radius: 4px;
-    margin: 0.5rem 0;
-    white-space: pre-wrap;
-    font-family: inherit;
-    line-height: 1.4;
-    max-height: 100px;
-    overflow-y: auto;
-}
 
-.update-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-}
 
 /* Installer Changelog */
 .changelog-container ul {

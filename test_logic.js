@@ -91,13 +91,14 @@ try {
     // Execute the code
     vm.runInContext(code, sandbox);
 
-    // Regex Check for the FIX
-    const fixRegex = /lastUpdatedIcon\.replaceWith/;
+
+    // Regex Check: update icon appended to header
+    const fixRegex = /headerTitle\.appendChild\(icon\)/;
     if (!fixRegex.test(code)) {
-        console.error("❌ Logic Test Failed: 'replaceWith' anchor missing in checkForUpdates.");
+        console.error("❌ Logic Test Failed: 'appendChild(icon)' missing in checkForUpdates.");
         process.exit(1);
     } else {
-        console.log("✅ Static Analysis Passed: 'replaceWith' found.");
+        console.log("✅ Static Analysis Passed: 'appendChild(icon)' found.");
     }
 
     // Check dynamic logic usage

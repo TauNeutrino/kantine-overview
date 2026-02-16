@@ -1411,72 +1411,34 @@
         return card;
     }
 
-    // === Version Check ===
+    // === Version Check (periodic, every hour) ===
     async function checkForUpdates() {
-        const CurrentVersion = '{{VERSION}}';
-        const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
-        const InstallerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
-
-        console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
+        const currentVersion = '{{VERSION}}';
+        const versionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
+        const installerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
 
         try {
-            const response = await fetch(VersionUrl, { cache: 'no-cache' });
-            if (!response.ok) return;
+            const resp = await fetch(versionUrl, { cache: 'no-cache' });
+            if (!resp.ok) return;
+            const remoteVersion = (await resp.text()).trim();
+            if (!remoteVersion || remoteVersion === currentVersion) return;
 
-            const remoteVersion = (await response.text()).trim();
+            console.log(`[Kantine] Update verfügbar: ${remoteVersion} (aktuell: ${currentVersion})`);
 
-            if (remoteVersion && remoteVersion !== CurrentVersion) {
-                console.log(`[Kantine] New version available: ${remoteVersion}`);
-
-                // Fetch Changelog content
-                let changeSummary = '';
-                try {
-                    const clResp = await fetch('https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/changelog.md');
-                    if (clResp.ok) {
-                        const clText = await clResp.text();
-                        const match = clText.match(/## (v[^\n]+)\n((?:-[^\n]+\n)+)/);
-                        if (match && match[1].includes(remoteVersion)) {
-                            changeSummary = match[2].replace(/- /g, '• ').trim();
-                        }
-                    }
-                } catch (e) { console.warn('No changelog', e); }
-
-                // Create Banner
-                const updateBanner = document.createElement('div');
-                updateBanner.className = 'update-banner';
-                updateBanner.innerHTML = `
-                        <div class="update-content">
-                            <strong>Update verfügbar: ${remoteVersion}</strong>
-                            ${changeSummary ? `<pre class="change-summary">${changeSummary}</pre>` : ''}
-                            <a href="${InstallerUrl}" target="_blank" class="update-link">
-                                <span class="material-icons-round">system_update_alt</span>
-                                Jetzt aktualisieren
-                            </a>
-                        </div>
-                        <button class="icon-btn-small close-update">&times;</button>
-                    `;
-
-                document.body.appendChild(updateBanner);
-                updateBanner.querySelector('.close-update').addEventListener('click', () => updateBanner.remove());
-
-                // Highlight Header Icon -> Make Clickable
-                const lastUpdatedIcon = document.querySelector('.material-icons-round.logo-icon');
-                if (lastUpdatedIcon) {
-                    const updateLink = document.createElement('a');
-                    updateLink.href = InstallerUrl;
-                    updateLink.target = '_blank';
-                    updateLink.className = 'material-icons-round logo-icon update-pulse';
-                    updateLink.style.color = 'var(--accent-color)';
-                    updateLink.style.textDecoration = 'none';
-                    updateLink.style.cursor = 'pointer';
-                    updateLink.title = `Update verfügbar: ${remoteVersion}`;
-                    updateLink.textContent = 'system_update'; // Change icon to update icon
-
-                    lastUpdatedIcon.replaceWith(updateLink);
-                }
+            // Show 🆕 icon in header (only once)
+            const headerTitle = document.querySelector('.header-left h1');
+            if (headerTitle && !headerTitle.querySelector('.update-icon')) {
+                const icon = document.createElement('a');
+                icon.className = 'update-icon';
+                icon.href = installerUrl;
+                icon.target = '_blank';
+                icon.innerHTML = '🆕';
+                icon.title = `Update verfügbar: ${remoteVersion} — Klick zum Installieren`;
+                icon.style.cssText = 'margin-left:8px;font-size:1em;text-decoration:none;cursor:pointer;vertical-align:middle;';
+                headerTitle.appendChild(icon);
             }
-        } catch (error) {
-            console.warn('[Kantine] Version check failed:', error);
+        } catch (e) {
+            console.warn('[Kantine] Version check failed:', e);
         }
     }
 
@@ -1618,8 +1580,9 @@
         startPolling();
     }
 
-    // Check for updates
+    // Check for updates (now + every hour)
     checkForUpdates();
+    setInterval(checkForUpdates, 60 * 60 * 1000);
 
     console.log('Kantine Wrapper loaded ✅');
 })();
