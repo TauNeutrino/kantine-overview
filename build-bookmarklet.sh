@@ -108,14 +108,23 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 </head>
 <body>
     <h1>🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
-    <div class="instructions">
-        <h2>Installation</h2>
+        <div class="card">
+            <h2>Changelog</h2>
+            <div class="changelog-container">
+                <!-- CHANGELOG_PLACEHOLDER -->
+            </div>
+        </div>
+
+        <div class="card">
+             <h2>So funktioniert's</h2>
         <ol>
             <li>Ziehe den Button unten in deine <strong>Lesezeichen-Leiste</strong> (Drag & Drop)</li>
             <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#029AA8">web.bessa.app/knapp-kantine</a></li>
             <li>Klicke auf das Lesezeichen <code>Kantine $VERSION</code></li>
         </ol>
+        </div>
 
+        <div class="card">
         <h2>✨ Features</h2>
         <ul>
             <li>📅 <strong>Wochenübersicht:</strong> Die ganze Woche auf einen Blick.</li>
@@ -135,15 +144,47 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     <script>
 INSTALLEOF
 
-# Embed the bookmarklet URL inline
+# Generate Changlog HTML from Markdown
+CHANGELOG_HTML=""
+if [ -f "$SCRIPT_DIR/changelog.md" ]; then
+    CHANGELOG_HTML=$(cat "$SCRIPT_DIR/changelog.md" | python3 -c "
+import sys, re
+md = sys.stdin.read()
+# Convert headers to h3/h4
+html = re.sub(r'^## (.*)', r'<h3>\1</h3>', md, flags=re.MULTILINE)
+# Convert bullets to list items
+html = re.sub(r'^- (.*)', r'<li>\1</li>', html, flags=re.MULTILINE)
+# Wrap lists (simple heuristic)
+html = html.replace('</h3>\n<li>', '</h3>\n<ul>\n<li>').replace('</li>\n<h', '</li>\n</ul>\n<h').replace('</li>\n\n', '</li>\n</ul>\n')
+if '<li>' in html and '<ul>' not in html: html = '<ul>' + html + '</ul>'
+print(html)
+")
+fi
+
 echo "document.getElementById('bookmarklet-link').href = " >> "$DIST_DIR/install.html"
 echo "$JS_CONTENT" | python3 -c "
 import sys, json
 js = sys.stdin.read()
 css = open('$CSS_FILE').read().replace('\\n', ' ').replace('  ', ' ')
-bmk = '''javascript:(function(){if(window.__KANTINE_LOADED){alert(\"Already loaded\");return;}var s=document.createElement(\"style\");s.textContent=''' + json.dumps(css) + ''';document.head.appendChild(s);var sc=document.createElement(\"script\");sc.textContent=''' + json.dumps(js) + ''';document.head.appendChild(sc);})();'''
-print(json.dumps(bmk) + ';')
-" 2>/dev/null >> "$DIST_DIR/install.html" || echo "'javascript:alert(\"Build error\")'" >> "$DIST_DIR/install.html"
+escaped_css = css.replace('\\\\', '\\\\\\\\').replace(\"'\", \"\\\\'\").replace('\"', '\\\\\"')
+
+# Inject Update URL with htmlpreview
+update_url = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html'
+js = js.replace('https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html', update_url)
+
+print(json.dumps('javascript:(function(){' + js.replace('{{CSS_ESCAPED}}', escaped_css) + '})();'))
+" >> "$DIST_DIR/install.html"
+
+# Inject Changelog into Installer HTML (Safe Python replace)
+python3 -c "
+import sys
+html = open('$DIST_DIR/install.html').read()
+changelog = sys.stdin.read()
+html = html.replace('<!-- CHANGELOG_PLACEHOLDER -->', changelog)
+open('$DIST_DIR/install.html', 'w').write(html)
+" << EOF
+$CHANGELOG_HTML
+EOF
 
 cat >> "$DIST_DIR/install.html" << INSTALLEOF
         document.getElementById('bookmarklet-link').textContent = 'Kantine $VERSION';
