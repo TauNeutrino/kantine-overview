@@ -25,8 +25,9 @@ if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
 
 CSS_CONTENT=$(cat "$CSS_FILE")
+
 # Inject version into JS
-JS_CONTENT=$(cat "$JS_FILE" | sed "s/{{VERSION}}/$VERSION/g")
+JS_CONTENT=$(cat "$JS_FILE" | sed "s|{{VERSION}}|$VERSION|g")
 
 # === 1. Build standalone HTML (for local testing/dev) ===
 cat > "$DIST_DIR/kantine-standalone.html" << HTMLEOF
@@ -265,3 +266,13 @@ if [ $TEST_EXIT -ne 0 ]; then
     exit 1
 fi
 echo "✅ All build tests passed."
+
+# === 5. Auto-tag version ===
+echo ""
+echo "=== Tagging $VERSION ==="
+if git rev-parse "$VERSION" >/dev/null 2>&1; then
+    echo "ℹ️  Tag $VERSION already exists, skipping."
+else
+    git tag "$VERSION"
+    echo "✅ Created tag: $VERSION"
+fi

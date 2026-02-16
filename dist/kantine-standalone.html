@@ -1423,6 +1423,128 @@ body {
     margin-bottom: 0.5rem;
     font-size: 1.1em;
     color: var(--accent-color);
+}
+
+/* === Version Menu === */
+.version-tag {
+    cursor: pointer;
+    transition: opacity 0.2s ease, text-decoration 0.2s ease;
+}
+
+.version-tag:hover {
+    opacity: 1 !important;
+    text-decoration: underline;
+}
+
+.version-list {
+    list-style: none;
+    padding: 0;
+    max-height: 350px;
+    overflow-y: auto;
+    margin: 0;
+}
+
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background 0.2s;
+}
+
+.version-item:hover {
+    background: rgba(100, 116, 139, 0.08);
+}
+
+.version-item.current {
+    background: rgba(2, 154, 168, 0.1);
+    border: 1px solid rgba(2, 154, 168, 0.25);
+}
+
+[data-theme="dark"] .version-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .version-item.current {
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.version-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-current {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--success-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(5, 150, 105, 0.1);
+}
+
+.badge-new {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #029aa8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(2, 154, 168, 0.1);
+}
+
+[data-theme="dark"] .badge-new {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+}
+
+.install-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(2, 154, 168, 0.1);
+    color: #029aa8;
+    text-decoration: none;
+    border: 1px solid rgba(2, 154, 168, 0.25);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.install-link:hover {
+    background: rgba(2, 154, 168, 0.2);
+    border-color: rgba(2, 154, 168, 0.4);
+}
+
+[data-theme="dark"] .install-link {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+[data-theme="dark"] .install-link:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.4);
+}
+
+.dev-toggle {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(100, 116, 139, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.dev-toggle input[type="checkbox"] {
+    accent-color: #029aa8;
+    width: 16px;
+    height: 16px;
+}
+
+[data-theme="dark"] .dev-toggle input[type="checkbox"] {
+    accent-color: #60a5fa;
 }    </style>
 </head>
 <body>
@@ -1633,6 +1755,11 @@ body {
     const MENU_ID = 7;
     const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
+    // === GitHub Release Management ===
+    const GITHUB_REPO = 'TauNeutrino/kantine-overview';
+    const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
+    const INSTALLER_BASE = `https://htmlpreview.github.io/?https://github.com/${GITHUB_REPO}/blob`;
+
     // === State ===
     let allWeeks = [];
     let currentWeekNumber = getISOWeek(new Date());
@@ -1680,7 +1807,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small style="font-size: 0.6em; opacity: 0.7; font-weight: 400;">v1.2.9</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.3.0</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
@@ -1782,6 +1909,31 @@ body {
                 </div>
             </div>
 
+            <div id="version-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>📦 Versionen</h2>
+                        <button id="btn-version-close" class="icon-btn" aria-label="Close">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Aktuell:</strong> <span id="version-current">v1.3.0</span>
+                        </div>
+                        <div class="dev-toggle">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                                <input type="checkbox" id="dev-mode-toggle">
+                                <span>Dev-Mode (alle Tags anzeigen)</span>
+                            </label>
+                        </div>
+                        <div id="version-list-container" style="margin-top:1rem;">
+                            <p style="color:var(--text-secondary);">Lade Versionen...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <main class="container">
                 <div id="last-updated-banner" class="banner hidden">
                     <span class="material-icons-round">update</span>
@@ -1831,6 +1983,29 @@ body {
 
         window.addEventListener('click', (e) => {
             if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
+        });
+
+        // Version Menu
+        const versionTag = document.querySelector('.version-tag');
+        const versionModal = document.getElementById('version-modal');
+        const btnVersionClose = document.getElementById('btn-version-close');
+
+        if (versionTag) {
+            versionTag.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openVersionMenu();
+            });
+        }
+
+        if (btnVersionClose) {
+            btnVersionClose.addEventListener('click', () => {
+                versionModal.classList.add('hidden');
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === versionModal) versionModal.classList.add('hidden');
         });
 
         btnAddTag.addEventListener('click', () => {
@@ -3025,60 +3200,166 @@ body {
         return card;
     }
 
-    // === Version Check (periodic, every hour) ===
+    // === GitHub Release Management ===
+
+    // Semver comparison: returns true if remote > local
+    function isNewer(remote, local) {
+        if (!remote || !local) return false;
+        const r = remote.replace(/^v/, '').split('.').map(Number);
+        const l = local.replace(/^v/, '').split('.').map(Number);
+        for (let i = 0; i < Math.max(r.length, l.length); i++) {
+            if ((r[i] || 0) > (l[i] || 0)) return true;
+            if ((r[i] || 0) < (l[i] || 0)) return false;
+        }
+        return false;
+    }
+
+    // GitHub API headers
+    function githubHeaders() {
+        return { 'Accept': 'application/vnd.github.v3+json' };
+    }
+
+    // Fetch versions from GitHub (releases or tags)
+    async function fetchVersions(devMode) {
+        const endpoint = devMode
+            ? `${GITHUB_API}/tags?per_page=20`
+            : `${GITHUB_API}/releases?per_page=20`;
+
+        const resp = await fetch(endpoint, { headers: githubHeaders() });
+        if (!resp.ok) throw new Error(`GitHub API ${resp.status}`);
+        const data = await resp.json();
+
+        // Normalize to common format: { tag, name, url, body }
+        return data.map(item => {
+            const tag = devMode ? item.name : item.tag_name;
+            return {
+                tag,
+                name: devMode ? tag : (item.name || tag),
+                url: `${INSTALLER_BASE}/${tag}/dist/install.html`,
+                body: item.body || ''
+            };
+        });
+    }
+
+    // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        console.log('[Kantine] Starting update check...');
-        const currentVersion = 'v1.2.9';
-        const versionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
-        const installerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
+        const currentVersion = 'v1.3.0';
+        const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
-            console.log(`[Kantine] Fetching ${versionUrl}...`);
-            const resp = await fetch(versionUrl, { cache: 'no-cache' });
-            console.log(`[Kantine] Fetch status: ${resp.status}`);
+            const versions = await fetchVersions(devMode);
+            if (!versions.length) return;
 
-            if (!resp.ok) {
-                console.warn(`[Kantine] Version Check HTTP Error: ${resp.status}`);
-                return;
-            }
-            const remoteVersion = (await resp.text()).trim();
+            // Cache for version menu
+            localStorage.setItem('kantine_version_cache', JSON.stringify({
+                timestamp: Date.now(), devMode, versions
+            }));
 
-            console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Remote [${remoteVersion}]`);
+            const latest = versions[0].tag;
+            console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Latest [${latest}] (${devMode ? 'dev' : 'stable'})`);
 
-            // Check if remote is NEWER (simple semver check)
-            const isNewer = (remote, local) => {
-                if (!remote || !local) return false;
-                const r = remote.replace(/^v/, '').split('.').map(Number);
-                const l = local.replace(/^v/, '').split('.').map(Number);
-                for (let i = 0; i < Math.max(r.length, l.length); i++) {
-                    if ((r[i] || 0) > (l[i] || 0)) return true;
-                    if ((r[i] || 0) < (l[i] || 0)) return false;
-                }
-                return false;
-            };
+            if (!isNewer(latest, currentVersion)) return;
 
-            if (!isNewer(remoteVersion, currentVersion)) {
-                console.log('[Kantine] No update needed (Remote is not newer).');
-                return;
-            }
-
-            console.log(`[Kantine] Update verfügbar: ${remoteVersion}`);
+            console.log(`[Kantine] Update verfügbar: ${latest}`);
 
             // Show 🆕 icon in header (only once)
             const headerTitle = document.querySelector('.header-left h1');
             if (headerTitle && !headerTitle.querySelector('.update-icon')) {
                 const icon = document.createElement('a');
                 icon.className = 'update-icon';
-                icon.href = installerUrl;
+                icon.href = versions[0].url;
                 icon.target = '_blank';
                 icon.innerHTML = '🆕';
-                icon.title = `Update verfügbar: ${remoteVersion} — Klick zum Installieren`;
+                icon.title = `Update: ${latest} — Klick zum Installieren`;
                 icon.style.cssText = 'margin-left:8px;font-size:1em;text-decoration:none;cursor:pointer;vertical-align:middle;';
                 headerTitle.appendChild(icon);
             }
         } catch (e) {
             console.warn('[Kantine] Version check failed:', e);
         }
+    }
+
+    // Open Version Menu modal
+    function openVersionMenu() {
+        const modal = document.getElementById('version-modal');
+        const container = document.getElementById('version-list-container');
+        const devToggle = document.getElementById('dev-mode-toggle');
+        const currentVersion = 'v1.3.0';
+
+        if (!modal) return;
+        modal.classList.remove('hidden');
+
+        // Set current version display
+        const cur = document.getElementById('version-current');
+        if (cur) cur.textContent = currentVersion;
+
+        // Init dev toggle
+        const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
+        devToggle.checked = devMode;
+
+        // Load versions (from cache or fresh)
+        async function loadVersions(forceRefresh) {
+            const dm = devToggle.checked;
+            container.innerHTML = '<p style="color:var(--text-secondary);">Lade Versionen...</p>';
+
+            try {
+                let versions;
+                const cached = JSON.parse(localStorage.getItem('kantine_version_cache') || 'null');
+                if (!forceRefresh && cached && cached.devMode === dm && (Date.now() - cached.timestamp < 3600000)) {
+                    versions = cached.versions;
+                } else {
+                    versions = await fetchVersions(dm);
+                    localStorage.setItem('kantine_version_cache', JSON.stringify({
+                        timestamp: Date.now(), devMode: dm, versions
+                    }));
+                }
+
+                if (!versions.length) {
+                    container.innerHTML = '<p style="color:var(--text-secondary);">Keine Versionen gefunden.</p>';
+                    return;
+                }
+
+                container.innerHTML = '<ul class="version-list"></ul>';
+                const list = container.querySelector('.version-list');
+
+                versions.forEach(v => {
+                    const isCurrent = v.tag === currentVersion;
+                    const isNew = isNewer(v.tag, currentVersion);
+                    const li = document.createElement('li');
+                    li.className = 'version-item' + (isCurrent ? ' current' : '');
+
+                    let badge = '';
+                    if (isCurrent) badge = '<span class="badge-current">✓ Installiert</span>';
+                    else if (isNew) badge = '<span class="badge-new">⬆ Neu!</span>';
+
+                    let action = '';
+                    if (!isCurrent) {
+                        action = `<a href="${v.url}" target="_blank" class="install-link" title="${v.tag} installieren">Installieren</a>`;
+                    }
+
+                    li.innerHTML = `
+                        <div class="version-info">
+                            <strong>${v.tag}</strong>
+                            ${badge}
+                        </div>
+                        ${action}
+                    `;
+                    list.appendChild(li);
+                });
+            } catch (e) {
+                container.innerHTML = `<p style="color:#e94560;">Fehler: ${e.message}</p>`;
+            }
+        }
+
+        loadVersions(false);
+
+        // Dev toggle handler
+        devToggle.onchange = () => {
+            localStorage.setItem('kantine_dev_mode', devToggle.checked);
+            // Clear cache to force refresh when mode changes
+            localStorage.removeItem('kantine_version_cache');
+            loadVersions(true);
+        };
     }
 
     // === Order Countdown ===

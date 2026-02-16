@@ -101,6 +101,23 @@ try {
         console.log("✅ Static Analysis Passed: 'appendChild(icon)' found.");
     }
 
+    // Check for GitHub Release Management functions
+    const checks = [
+        [/GITHUB_API/, 'GITHUB_API constant'],
+        [/function\s+fetchVersions/, 'fetchVersions function'],
+        [/function\s+isNewer/, 'isNewer function'],
+        [/function\s+openVersionMenu/, 'openVersionMenu function'],
+        [/kantine_dev_mode/, 'dev-mode localStorage key']
+    ];
+
+    for (const [regex, label] of checks) {
+        if (!regex.test(code)) {
+            console.error(`❌ Static Analysis Failed: '${label}' not found.`);
+            process.exit(1);
+        }
+    }
+    console.log("✅ Static Analysis Passed: All GitHub Release Management functions found.");
+
     // Check dynamic logic usage
     // Note: Since we mock fetch to fail for menu data, the app might perform error handling.
     // We just want to ensure it doesn't CRASH (exit code) and that our specific feature logic ran.

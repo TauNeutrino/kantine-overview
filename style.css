@@ -1413,3 +1413,125 @@ body {
     font-size: 1.1em;
     color: var(--accent-color);
 }
+
+/* === Version Menu === */
+.version-tag {
+    cursor: pointer;
+    transition: opacity 0.2s ease, text-decoration 0.2s ease;
+}
+
+.version-tag:hover {
+    opacity: 1 !important;
+    text-decoration: underline;
+}
+
+.version-list {
+    list-style: none;
+    padding: 0;
+    max-height: 350px;
+    overflow-y: auto;
+    margin: 0;
+}
+
+.version-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background 0.2s;
+}
+
+.version-item:hover {
+    background: rgba(100, 116, 139, 0.08);
+}
+
+.version-item.current {
+    background: rgba(2, 154, 168, 0.1);
+    border: 1px solid rgba(2, 154, 168, 0.25);
+}
+
+[data-theme="dark"] .version-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .version-item.current {
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+.version-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-current {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--success-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(5, 150, 105, 0.1);
+}
+
+.badge-new {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #029aa8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(2, 154, 168, 0.1);
+}
+
+[data-theme="dark"] .badge-new {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+}
+
+.install-link {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(2, 154, 168, 0.1);
+    color: #029aa8;
+    text-decoration: none;
+    border: 1px solid rgba(2, 154, 168, 0.25);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.install-link:hover {
+    background: rgba(2, 154, 168, 0.2);
+    border-color: rgba(2, 154, 168, 0.4);
+}
+
+[data-theme="dark"] .install-link {
+    color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+}
+
+[data-theme="dark"] .install-link:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.4);
+}
+
+.dev-toggle {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(100, 116, 139, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.dev-toggle input[type="checkbox"] {
+    accent-color: #029aa8;
+    width: 16px;
+    height: 16px;
+}
+
+[data-theme="dark"] .dev-toggle input[type="checkbox"] {
+    accent-color: #60a5fa;
+}

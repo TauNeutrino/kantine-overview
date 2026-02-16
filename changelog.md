@@ -1,5 +1,13 @@
+## v1.3.0 (2026-02-16)
+- **Feature**: GitHub Release Management 📦
+  - Version-Menü: Klick auf Versionsnummer zeigt alle verfügbaren Versionen
+  - Dev-Mode Toggle: Zwischen Releases (stabil) und Tags (dev) wechseln
+  - Downgrade-Support: Jede Version hat einen eigenen Installer-Link
+  - Update-Check nutzt jetzt die GitHub API statt `version.txt`
+  - GitHub PAT für höheres API-Rate-Limit (5000/h)
+  - SemVer-Check: Update-Icon nur bei wirklich neuerer Version
+
 ## v1.2.9 (2026-02-16)
-- **Fix**: Update-Benachrichtigung erscheint nur noch, wenn die GitHub-Version wirklich *neuer* ist (SemVer-Check). Kein Icon mehr bei gleichen oder älteren Versionen. ✅
 
 ## v1.2.8 (2026-02-16)
 - **Debug**: Weiteres Logging (Fetch-Status, Start-Log) zur Fehlersuche. 🔎
