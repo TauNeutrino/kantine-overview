@@ -1,3 +1,6 @@
+## v1.2.6 (2026-02-16)
+- **Test**: Version Bump zum Testen der Live-Update-Erkennung. 🧪
+
 ## v1.2.5 (2026-02-16)
 - **Refactor**: Update-Erkennung komplett überarbeitet (stündlicher Check, diskretes 🆕 Icon im Header, kein Banner mehr). 🔄
 - **Cleanup**: Ungenutzter CSS-Code und Netzwerk-Traffic reduziert. 🧹
