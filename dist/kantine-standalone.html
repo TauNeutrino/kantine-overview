@@ -2947,7 +2947,8 @@ body {
             }
 
             // Highlight matching menu items based on user tags
-            if (checkHighlight(item.name) || checkHighlight(item.description)) {
+            const matchedTags = [...new Set([...checkHighlight(item.name), ...checkHighlight(item.description)])];
+            if (matchedTags.length > 0) {
                 itemEl.classList.add('highlight-glow');
             }
 
@@ -2982,6 +2983,13 @@ body {
                 }
             }
 
+            // Build matched-tags HTML (only if tags found)
+            let tagsHtml = '';
+            if (matchedTags.length > 0) {
+                const badges = matchedTags.map(t => `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${escapeHtml(t)}</span>`).join('');
+                tagsHtml = `<div class="matched-tags">${badges}</div>`;
+            }
+
             itemEl.innerHTML = `
                 <div class="item-header">
                     <span class="item-name">${escapeHtml(item.name)}</span>
@@ -2994,6 +3002,7 @@ body {
                     ${flagButton}
                     <div class="badges">${statusBadge}</div>
                 </div>
+                ${tagsHtml}
                 <p class="item-desc">${escapeHtml(item.description)}</p>`;
 
             // Event: Order
