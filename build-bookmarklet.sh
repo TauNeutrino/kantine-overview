@@ -128,7 +128,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     <!-- 1. BUTTON (Top Priority) -->
     <div class="card" style="text-align: center; border: 2px solid #029AA8;">
         <p style="margin-bottom:15px; font-weight:bold;">👇 Diesen Button in die Lesezeichen-Leiste ziehen:</p>
-        <p><a class="bookmarklet" id="bookmarklet-link" href="#">⏳ Wird generiert...</a></p>
+        <p><a class="bookmarklet" id="bookmarklet-link" href="#" onclick="event.preventDefault(); return false;" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">⏳ Wird generiert...</a></p>
     </div>
 
     <!-- 2. INSTRUCTIONS -->
