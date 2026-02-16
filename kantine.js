@@ -1431,7 +1431,22 @@
 
             console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Remote [${remoteVersion}]`);
 
-            if (!remoteVersion || remoteVersion === currentVersion) return;
+            // Check if remote is NEWER (simple semver check)
+            const isNewer = (remote, local) => {
+                if (!remote || !local) return false;
+                const r = remote.replace(/^v/, '').split('.').map(Number);
+                const l = local.replace(/^v/, '').split('.').map(Number);
+                for (let i = 0; i < Math.max(r.length, l.length); i++) {
+                    if ((r[i] || 0) > (l[i] || 0)) return true;
+                    if ((r[i] || 0) < (l[i] || 0)) return false;
+                }
+                return false;
+            };
+
+            if (!isNewer(remoteVersion, currentVersion)) {
+                console.log('[Kantine] No update needed (Remote is not newer).');
+                return;
+            }
 
             console.log(`[Kantine] Update verfügbar: ${remoteVersion}`);
 

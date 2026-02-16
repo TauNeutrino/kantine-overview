@@ -1,3 +1,6 @@
+## v1.2.9 (2026-02-16)
+- **Fix**: Update-Benachrichtigung erscheint nur noch, wenn die GitHub-Version wirklich *neuer* ist (SemVer-Check). Kein Icon mehr bei gleichen oder älteren Versionen. ✅
+
 ## v1.2.8 (2026-02-16)
 - **Debug**: Weiteres Logging (Fetch-Status, Start-Log) zur Fehlersuche. 🔎
 
