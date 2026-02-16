@@ -111,7 +111,10 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     </style>
 </head>
 <body>
-    <h1>🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="margin-bottom: 5px;">🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
+        <p style="font-size: 1.2rem; color: #a0aec0; margin-top: 0; font-style: italic;">"Mahlzeit! Jetzt bessa einfach."</p>
+    </div>
     
     <!-- 1. BUTTON (Top Priority) -->
     <div class="card" style="text-align: center; border: 2px solid #029AA8;">
@@ -154,6 +157,11 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
             <!-- CHANGELOG_PLACEHOLDER -->
         </div>
     </div>
+
+    <div style="text-align: center; margin-top: 40px; color: #5c6b7f; font-size: 0.8rem;">
+        <p>Powered by <strong>Kaufi-Kitchen</strong> 👨‍🍳</p>
+    </div>
+
 
     <script>
 INSTALLEOF
