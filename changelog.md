@@ -1,3 +1,6 @@
+## v1.2.2 (2026-02-16)
+- **UX**: Installer-Changelog jetzt einklappbar für mehr Übersicht. 📂
+
 ## v1.2.1 (2026-02-16)
 - **Fix**: Smart Highlights werden jetzt korrekt auf Menü-Items angewendet (`checkHighlight` in `createDayCard`). 🌟
 - **Feature**: Mock-Daten (`mock-data.js`) für Standalone-Tests eingebaut. 🧪

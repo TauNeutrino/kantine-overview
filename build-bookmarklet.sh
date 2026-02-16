@@ -108,6 +108,15 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
         a.bookmarklet { display: inline-block; background: #029AA8; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; cursor: grab; }
         a.bookmarklet:hover { background: #006269; }
         code { background: #0f3460; padding: 2px 6px; border-radius: 4px; }
+        
+        /* Collapsible Changelog */
+        details.styled-details { background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; }
+        summary.styled-summary { padding: 15px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+        summary.styled-summary:hover { background: rgba(255,255,255,0.05); }
+        summary.styled-summary::-webkit-details-marker { display: none; }
+        summary.styled-summary::after { content: '▼'; font-size: 0.8em; transition: transform 0.2s; }
+        details.styled-details[open] summary.styled-summary::after { transform: rotate(180deg); transition: transform 0.2s; }
+        .changelog-container { padding: 0 15px 15px 15px; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -152,10 +161,12 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 
     <!-- 4. CHANGELOG (Bottom) -->
     <div class="card">
-        <h2>Changelog</h2>
-        <div class="changelog-container">
-            <!-- CHANGELOG_PLACEHOLDER -->
-        </div>
+        <details class="styled-details">
+            <summary class="styled-summary">Changelog & Version History</summary>
+            <div class="changelog-container">
+                <!-- CHANGELOG_PLACEHOLDER -->
+            </div>
+        </details>
     </div>
 
     <div style="text-align: center; margin-top: 40px; color: #5c6b7f; font-size: 0.8rem;">
