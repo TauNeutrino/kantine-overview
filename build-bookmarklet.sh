@@ -53,6 +53,10 @@ cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
     <script>
 HTMLEOF
 
+# Inject mock data for standalone testing (loaded BEFORE kantine.js)
+cat "$SCRIPT_DIR/mock-data.js" >> "$DIST_DIR/kantine-standalone.html"
+echo "" >> "$DIST_DIR/kantine-standalone.html"
+
 # Inject JS
 echo "$JS_CONTENT" >> "$DIST_DIR/kantine-standalone.html"
 

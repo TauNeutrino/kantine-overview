@@ -32,10 +32,21 @@ Ein intelligentes Bookmarklet für die Mitarbeiter-Kantine der Bessa App. Dieses
 *   Bash (für `build-bookmarklet.sh`)
 
 ### Projektstruktur
-*   `kantine.js`: Der Haupt-Quellcode des Bookmarklets.
-*   `public/style.css`: Das Design (CSS).
-*   `build-bookmarklet.sh`: Skript zum Erstellen der `dist/` Dateien.
-*   `dist/`: Enthält die kompilierten Dateien (`bookmarklet.txt`, `install.html`).
+
+#### Quelldateien
+*   `kantine.js`: Der Haupt-Quellcode des Bookmarklets (UI, API-Logik, Rendering).
+*   `style.css`: Das komplette Design (CSS mit Light/Dark Mode).
+*   `mock-data.js`: Mock-Fetch-Interceptor mit realistischen Dummy-Menüdaten für Standalone-Tests.
+*   `build-bookmarklet.sh`: Build-Skript – erzeugt alle `dist/`-Artefakte.
+*   `test_build.py`: Automatische Build-Tests, laufen am Ende jedes Builds.
+
+#### `dist/` – Build-Artefakte
+| Datei | Beschreibung |
+|-------|-------------|
+| `bookmarklet.txt` | Die rohe Bookmarklet-URL (`javascript:...`). Enthält CSS + JS als selbstextrahierendes IIFE. Kann direkt als Lesezeichen-URL eingefügt werden. |
+| `bookmarklet-payload.js` | Der entpackte Bookmarklet-Payload (JS). Erstellt `<style>` + `<script>` Elemente und injiziert sie in die Seite. Nützlich zum Debuggen. |
+| `install.html` | Installer-Seite mit Drag & Drop Button, Anleitung, Feature-Liste und Changelog. Kann lokal oder gehostet geöffnet werden. |
+| `kantine-standalone.html` | Eigenständige HTML-Datei mit eingebettetem CSS + JS + **Mock-Daten**. Lädt automatisch Dummy-Menüs für UI-Tests ohne API-Zugriff. |
 
 ### Build
 Um Änderungen an `kantine.js` oder `style.css` wirksam zu machen, führe den Build aus:

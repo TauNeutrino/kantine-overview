@@ -464,12 +464,15 @@ body {
     justify-content: space-between;
     padding: 20px;
     border-bottom: 1px solid var(--border-color);
-    /* Changed from --border */
 }
 
 .modal-header h2 {
     margin: 0;
     font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 20px;
 }
 
 #login-form {
@@ -1236,14 +1239,31 @@ body {
     }
 }
 
-/* Smart Highlights */
-.highlight-glow {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-    /* Blue glow */
-    border: 1px solid rgba(59, 130, 246, 0.8);
-    background: rgba(59, 130, 246, 0.05);
+/* Smart Highlights (Blue Glow - matches today-ordered/flagged pattern) */
+.menu-item.highlight-glow {
+    border: 2px solid rgba(59, 130, 246, 0.7);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0 -1rem 1.5rem -1rem;
+    background: var(--bg-card);
     position: relative;
-    z-index: 1;
+    z-index: 5;
+    animation: blue-pulse 3s infinite;
+}
+
+@keyframes blue-pulse {
+    0% {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+    }
+
+    100% {
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
 }
 
 /* Nav Badge with Count */
@@ -1271,23 +1291,32 @@ body {
     min-height: 50px;
 }
 
+/* Tag badges styled consistently with .badge (verfügbar/ausverkauft) */
 .tag-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(59, 130, 246, 0.15);
+    justify-content: center;
+    height: 24px;
+    font-size: 0.75rem;
+    padding: 0 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: normal;
+    white-space: nowrap;
+    background-color: rgba(59, 130, 246, 0.1);
     color: #3b82f6;
-    padding: 4px 10px;
-    border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    gap: 4px;
 }
 
 .tag-remove {
-    margin-left: 6px;
     cursor: pointer;
     opacity: 0.7;
     font-size: 1.1em;
     line-height: 1;
+    transition: all 0.2s;
 }
 
 .tag-remove:hover {
@@ -1307,6 +1336,30 @@ body {
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     border-radius: 8px;
+    font-family: inherit;
+}
+
+/* Add tag button - styled like .btn-order with nav-btn.active color */
+#btn-add-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+#btn-add-tag:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
 }
 
 /* Update Banner Enhanced */

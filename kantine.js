@@ -1310,6 +1310,11 @@
                 itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
             }
 
+            // Highlight matching menu items based on user tags
+            if (checkHighlight(item.name) || checkHighlight(item.description)) {
+                itemEl.classList.add('highlight-glow');
+            }
+
             // Action buttons
             let orderButton = '';
             let cancelButton = '';

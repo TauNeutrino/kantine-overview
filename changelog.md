@@ -1,3 +1,12 @@
+## v1.2.1 (2026-02-16)
+- **Fix**: Smart Highlights werden jetzt korrekt auf Menü-Items angewendet (`checkHighlight` in `createDayCard`). 🌟
+- **Feature**: Mock-Daten (`mock-data.js`) für Standalone-Tests eingebaut. 🧪
+- **Style**: Highlight-Glow mit blauer Puls-Animation (`blue-pulse`) überarbeitet. 💎
+- **Style**: Tag-Badges konsistent mit Badge-System gestaltet. 🏷️
+- **Style**: "Hinzufügen"-Button (`#btn-add-tag`) als Primary-Button gestylt. 🎨
+- **Style**: Modal-Body Padding und Input-Font korrigiert. 🔧
+- **Docs**: README Projektstruktur mit Tabelle für `dist/`-Artefakte ergänzt. 📖
+
 ## v1.2.0 (2026-02-16)
 - **Feature**: Bessere UX im Installer (Button oben, Log unten, Features aktualisiert). 💅
 - **Tech**: Build-Tests hinzugefügt. 🧪
