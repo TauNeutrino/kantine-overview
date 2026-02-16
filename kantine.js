@@ -705,9 +705,9 @@
     }
 
     function checkHighlight(text) {
-        if (!text) return false;
+        if (!text) return [];
         text = text.toLowerCase();
-        return highlightTags.some(tag => text.includes(tag));
+        return highlightTags.filter(tag => text.includes(tag));
     }
 
     // === Local Menu Cache (localStorage) ===
@@ -1466,154 +1466,154 @@
                     lastUpdatedIcon.replaceWith(updateLink);
                 }
             }
-} catch (error) {
-    console.warn('[Kantine] Version check failed:', error);
-}
-    }
-
-// === Order Countdown ===
-function updateCountdown() {
-    const now = new Date();
-    const currentDay = now.getDay();
-    // Skip weekends (0=Sun, 6=Sat)
-    if (currentDay === 0 || currentDay === 6) {
-        removeCountdown();
-        return;
-    }
-
-    const todayStr = now.toISOString().split('T')[0];
-
-    // 1. Check if we already ordered for today
-    let hasOrder = false;
-    // Optimization: Check orderMap for today's date
-    // Keys are "YYYY-MM-DD_ArticleID"
-    for (const key of orderMap.keys()) {
-        if (key.startsWith(todayStr)) {
-            hasOrder = true;
-            break;
+        } catch (error) {
+            console.warn('[Kantine] Version check failed:', error);
         }
     }
 
-    if (hasOrder) {
-        removeCountdown();
-        return;
-    }
+    // === Order Countdown ===
+    function updateCountdown() {
+        const now = new Date();
+        const currentDay = now.getDay();
+        // Skip weekends (0=Sun, 6=Sat)
+        if (currentDay === 0 || currentDay === 6) {
+            removeCountdown();
+            return;
+        }
 
-    // 2. Calculate time to cutoff (10:00 AM)
-    const cutoff = new Date();
-    cutoff.setHours(10, 0, 0, 0);
+        const todayStr = now.toISOString().split('T')[0];
 
-    const diff = cutoff - now;
-
-    // If passed cutoff or more than 3 hours away (e.g. 07:00), maybe don't show?
-    // User req: "heute noch keine bestellung... countdown erscheinen"
-    // Let's show it if within valid order window (e.g. 00:00 - 10:00)
-
-    if (diff <= 0) {
-        removeCountdown();
-        return;
-    }
-
-    // 3. Render Countdown
-    const diffHrs = Math.floor(diff / 3600000);
-    const diffMins = Math.floor((diff % 3600000) / 60000);
-
-    const headerCenter = document.querySelector('.header-center-wrapper');
-    if (!headerCenter) return;
-
-    let countdownEl = document.getElementById('order-countdown');
-    if (!countdownEl) {
-        countdownEl = document.createElement('div');
-        countdownEl.id = 'order-countdown';
-        // Insert before cost display or append
-        headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
-    }
-
-    countdownEl.innerHTML = `<span>Bestellschluss:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
-
-    // Red Alert if < 1 hour
-    if (diff < 3600000) { // 1 hour
-        countdownEl.classList.add('urgent');
-
-        // Notification logic (One time)
-        const notifiedKey = `kantine_notified_${todayStr}`;
-        if (!sessionStorage.getItem(notifiedKey)) {
-            if (Notification.permission === 'granted') {
-                new Notification('Kantine: Bestellschluss naht!', {
-                    body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
-                    icon: '⏳'
-                });
-            } else if (Notification.permission === 'default') {
-                Notification.requestPermission();
+        // 1. Check if we already ordered for today
+        let hasOrder = false;
+        // Optimization: Check orderMap for today's date
+        // Keys are "YYYY-MM-DD_ArticleID"
+        for (const key of orderMap.keys()) {
+            if (key.startsWith(todayStr)) {
+                hasOrder = true;
+                break;
             }
-            sessionStorage.setItem(notifiedKey, 'true');
         }
-    } else {
-        countdownEl.classList.remove('urgent');
+
+        if (hasOrder) {
+            removeCountdown();
+            return;
+        }
+
+        // 2. Calculate time to cutoff (10:00 AM)
+        const cutoff = new Date();
+        cutoff.setHours(10, 0, 0, 0);
+
+        const diff = cutoff - now;
+
+        // If passed cutoff or more than 3 hours away (e.g. 07:00), maybe don't show?
+        // User req: "heute noch keine bestellung... countdown erscheinen"
+        // Let's show it if within valid order window (e.g. 00:00 - 10:00)
+
+        if (diff <= 0) {
+            removeCountdown();
+            return;
+        }
+
+        // 3. Render Countdown
+        const diffHrs = Math.floor(diff / 3600000);
+        const diffMins = Math.floor((diff % 3600000) / 60000);
+
+        const headerCenter = document.querySelector('.header-center-wrapper');
+        if (!headerCenter) return;
+
+        let countdownEl = document.getElementById('order-countdown');
+        if (!countdownEl) {
+            countdownEl = document.createElement('div');
+            countdownEl.id = 'order-countdown';
+            // Insert before cost display or append
+            headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
+        }
+
+        countdownEl.innerHTML = `<span>Bestellschluss:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
+
+        // Red Alert if < 1 hour
+        if (diff < 3600000) { // 1 hour
+            countdownEl.classList.add('urgent');
+
+            // Notification logic (One time)
+            const notifiedKey = `kantine_notified_${todayStr}`;
+            if (!sessionStorage.getItem(notifiedKey)) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Kantine: Bestellschluss naht!', {
+                        body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
+                        icon: '⏳'
+                    });
+                } else if (Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+                sessionStorage.setItem(notifiedKey, 'true');
+            }
+        } else {
+            countdownEl.classList.remove('urgent');
+        }
     }
-}
 
-function removeCountdown() {
-    const el = document.getElementById('order-countdown');
-    if (el) el.remove();
-}
+    function removeCountdown() {
+        const el = document.getElementById('order-countdown');
+        if (el) el.remove();
+    }
 
-// Update countdown every minute
-setInterval(updateCountdown, 60000);
-// Also update on load
-setTimeout(updateCountdown, 1000);
+    // Update countdown every minute
+    setInterval(updateCountdown, 60000);
+    // Also update on load
+    setTimeout(updateCountdown, 1000);
 
-// === Helpers === 
-function getISOWeek(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-}
+    // === Helpers === 
+    function getISOWeek(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    }
 
-function getWeekYear(d) {
-    const date = new Date(d.getTime());
-    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-    return date.getFullYear();
-}
+    function getWeekYear(d) {
+        const date = new Date(d.getTime());
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+        return date.getFullYear();
+    }
 
 
-function translateDay(englishDay) {
-    const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
-    return map[englishDay] || englishDay;
-}
+    function translateDay(englishDay) {
+        const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
+        return map[englishDay] || englishDay;
+    }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text || '';
-    return div.innerHTML;
-}
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
 
-// === Bootstrap ===
-injectUI();
-bindEvents();
-updateAuthUI();
-cleanupExpiredFlags();
+    // === Bootstrap ===
+    injectUI();
+    bindEvents();
+    updateAuthUI();
+    cleanupExpiredFlags();
 
-// Load cached data first for instant UI, then refresh from API
-const hadCache = loadMenuCache();
-if (hadCache) {
-    // Hide loading spinner since cache is shown
-    document.getElementById('loading').classList.add('hidden');
-}
-loadMenuDataFromAPI();
+    // Load cached data first for instant UI, then refresh from API
+    const hadCache = loadMenuCache();
+    if (hadCache) {
+        // Hide loading spinner since cache is shown
+        document.getElementById('loading').classList.add('hidden');
+    }
+    loadMenuDataFromAPI();
 
-// Auto-start polling if already logged in
-if (authToken) {
-    startPolling();
-}
+    // Auto-start polling if already logged in
+    if (authToken) {
+        startPolling();
+    }
 
-// Check for updates
-checkForUpdates();
+    // Check for updates
+    checkForUpdates();
 
-console.log('Kantine Wrapper loaded ✅');
-}) ();
+    console.log('Kantine Wrapper loaded ✅');
+})();
 
 // === Error Modal ===
 function showErrorModal(title, htmlContent, btnText, url) {

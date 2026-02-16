@@ -1363,6 +1363,41 @@ body {
 }
 
 /* Update Banner Enhanced */
+.update-banner {
+    /* ... existing styles ... */
+}
+
+/* Matched Tags in Menu Card */
+.matched-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    /* Space between tags and title */
+    margin-top: -5px;
+    /* Pull closer to header */
+}
+
+.tag-badge-small {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+[data-theme="light"] .tag-badge-small {
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
 .change-summary {
     font-size: 0.8rem;
     background: rgba(0, 0, 0, 0.1);

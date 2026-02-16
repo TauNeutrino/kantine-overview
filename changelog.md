@@ -1,3 +1,6 @@
+## v1.2.4 (2026-02-16)
+- **Feature**: Gefundene Highlights werden jetzt direkt im Menü als Badge angezeigt. 🏷️
+
 ## v1.2.3 (2026-02-16)
 - **Fix**: Update-Icon ist jetzt klickbar und führt direkt zum Installer. 🔗
 - **Dev**: Unit-Tests für Update-Logik im Build integriert. 🛡️
