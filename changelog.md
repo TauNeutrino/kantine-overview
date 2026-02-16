@@ -1,3 +1,8 @@
+## v1.2.5 (2026-02-16)
+- **Refactor**: Update-Erkennung komplett überarbeitet (stündlicher Check, diskretes 🆕 Icon im Header, kein Banner mehr). 🔄
+- **Cleanup**: Ungenutzter CSS-Code und Netzwerk-Traffic reduziert. 🧹
+- **Fix**: Highlight-Logik stabilisiert (keine falschen Matches bei leeren Tags). 🏷️
+
 ## v1.2.4 (2026-02-16)
 - **Feature**: Gefundene Highlights werden jetzt direkt im Menü als Badge angezeigt. 🏷️
 
