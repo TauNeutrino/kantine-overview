@@ -1421,9 +1421,12 @@
             const resp = await fetch(versionUrl, { cache: 'no-cache' });
             if (!resp.ok) return;
             const remoteVersion = (await resp.text()).trim();
+
+            console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Remote [${remoteVersion}]`);
+
             if (!remoteVersion || remoteVersion === currentVersion) return;
 
-            console.log(`[Kantine] Update verfügbar: ${remoteVersion} (aktuell: ${currentVersion})`);
+            console.log(`[Kantine] Update verfügbar: ${remoteVersion}`);
 
             // Show 🆕 icon in header (only once)
             const headerTitle = document.querySelector('.header-left h1');

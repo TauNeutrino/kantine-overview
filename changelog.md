@@ -1,3 +1,6 @@
+## v1.2.7 (2026-02-16)
+- **Debug**: Verbose Logging für Update-Check eingebaut. 🐞
+
 ## v1.2.6 (2026-02-16)
 - **Test**: Version Bump zum Testen der Live-Update-Erkennung. 🧪
 
