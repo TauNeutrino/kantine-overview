@@ -1413,13 +1413,20 @@
 
     // === Version Check (periodic, every hour) ===
     async function checkForUpdates() {
+        console.log('[Kantine] Starting update check...');
         const currentVersion = '{{VERSION}}';
         const versionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
         const installerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
 
         try {
+            console.log(`[Kantine] Fetching ${versionUrl}...`);
             const resp = await fetch(versionUrl, { cache: 'no-cache' });
-            if (!resp.ok) return;
+            console.log(`[Kantine] Fetch status: ${resp.status}`);
+
+            if (!resp.ok) {
+                console.warn(`[Kantine] Version Check HTTP Error: ${resp.status}`);
+                return;
+            }
             const remoteVersion = (await resp.text()).trim();
 
             console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Remote [${remoteVersion}]`);

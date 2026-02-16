@@ -1,3 +1,6 @@
+## v1.2.8 (2026-02-16)
+- **Debug**: Weiteres Logging (Fetch-Status, Start-Log) zur Fehlersuche. 🔎
+
 ## v1.2.7 (2026-02-16)
 - **Debug**: Verbose Logging für Update-Check eingebaut. 🐞
 
