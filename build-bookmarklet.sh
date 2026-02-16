@@ -161,18 +161,38 @@ print(html)
 ")
 fi
 
+# Embed the bookmarklet URL inline
 echo "document.getElementById('bookmarklet-link').href = " >> "$DIST_DIR/install.html"
 echo "$JS_CONTENT" | python3 -c "
-import sys, json
-js = sys.stdin.read()
-css = open('$CSS_FILE').read().replace('\\n', ' ').replace('  ', ' ')
+import sys, json, urllib.parse
+
+# 1. Read JS and Replace VERSION
+js_template = sys.stdin.read()
+# We do replacement here in Python to be safe
+js = js_template.replace('{{VERSION}}', '$VERSION')
+
+# 2. Prepare CSS
+css = open('$CSS_FILE').read().replace('\n', ' ').replace('  ', ' ')
 escaped_css = css.replace('\\\\', '\\\\\\\\').replace(\"'\", \"\\\\'\").replace('\"', '\\\\\"')
 
-# Inject Update URL with htmlpreview
+# 3. Inject CSS and Update URL
 update_url = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html'
 js = js.replace('https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html', update_url)
+js = js.replace('{{CSS_ESCAPED}}', escaped_css)
 
-print(json.dumps('javascript:(function(){' + js.replace('{{CSS_ESCAPED}}', escaped_css) + '})();'))
+# 4. Create Bookmarklet Code
+# Wrap in IIFE
+bookmarklet_code = 'javascript:(function(){' + js + '})();'
+
+# 5. URL Encode the body (keeping javascript: prefix)
+# We accept that simple encoding is better. 
+# But browsers expect encoded URI for href.
+# However, for bookmarklet usage, user drags the link.
+# If we encode everything, it's safer.
+encoded_code = urllib.parse.quote(bookmarklet_code, safe=':/()!;=+,')
+
+# Output as JSON string for the HTML script to assign to href
+print(json.dumps(encoded_code) + ';')
 " >> "$DIST_DIR/install.html"
 
 # Inject Changelog into Installer HTML (Safe Python replace)

@@ -661,687 +661,687 @@
         }
     }
 
-        // === Highlight Management ===
-        let highlightTags = JSON.parse(localStorage.getItem('kantine_highlightTags') || '[]');
+    // === Highlight Management ===
+    let highlightTags = JSON.parse(localStorage.getItem('kantine_highlightTags') || '[]');
 
-function saveHighlightTags() {
-    localStorage.setItem('kantine_highlightTags', JSON.stringify(highlightTags));
-    renderVisibleWeeks(); // Refresh UI to apply changes
-    updateNextWeekBadge();
-}
-
-function addHighlightTag(tag) {
-    tag = tag.trim().toLowerCase();
-    if (tag && !highlightTags.includes(tag)) {
-        highlightTags.push(tag);
-        saveHighlightTags();
-        return true;
+    function saveHighlightTags() {
+        localStorage.setItem('kantine_highlightTags', JSON.stringify(highlightTags));
+        renderVisibleWeeks(); // Refresh UI to apply changes
+        updateNextWeekBadge();
     }
-    return false;
-}
 
-function removeHighlightTag(tag) {
-    highlightTags = highlightTags.filter(t => t !== tag);
-    saveHighlightTags();
-}
-
-function renderTagsList() {
-    const list = document.getElementById('tags-list');
-    list.innerHTML = '';
-    highlightTags.forEach(tag => {
-        const badge = document.createElement('span');
-        badge.className = 'tag-badge';
-        badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}">&times;</span>`;
-        list.appendChild(badge);
-    });
-
-    // Bind remove events
-    list.querySelectorAll('.tag-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            removeHighlightTag(e.target.dataset.tag);
-            renderTagsList();
-        });
-    });
-}
-
-function checkHighlight(text) {
-    if (!text) return false;
-    text = text.toLowerCase();
-    return highlightTags.some(tag => text.includes(tag));
-}
-
-// === Local Menu Cache (localStorage) ===
-const CACHE_KEY = 'kantine_menuCache';
-const CACHE_TS_KEY = 'kantine_menuCacheTs';
-
-function saveMenuCache() {
-    try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(allWeeks));
-        localStorage.setItem(CACHE_TS_KEY, new Date().toISOString());
-    } catch (e) {
-        console.warn('Failed to cache menu data:', e);
-    }
-}
-
-function loadMenuCache() {
-    try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        const cachedTs = localStorage.getItem(CACHE_TS_KEY);
-        if (cached) {
-            allWeeks = JSON.parse(cached);
-            currentWeekNumber = getISOWeek(new Date());
-            currentYear = new Date().getFullYear();
-            renderVisibleWeeks();
-            updateNextWeekBadge();
-            if (cachedTs) updateLastUpdatedTime(cachedTs);
-            console.log('Loaded menu from cache');
+    function addHighlightTag(tag) {
+        tag = tag.trim().toLowerCase();
+        if (tag && !highlightTags.includes(tag)) {
+            highlightTags.push(tag);
+            saveHighlightTags();
             return true;
         }
-    } catch (e) {
-        console.warn('Failed to load cached menu:', e);
+        return false;
     }
-    return false;
-}
 
-// === Menu Data Fetching (Direct from Bessa API) ===
-async function loadMenuDataFromAPI() {
-    const loading = document.getElementById('loading');
-    const progressModal = document.getElementById('progress-modal');
-    const progressFill = document.getElementById('progress-fill');
-    const progressPercent = document.getElementById('progress-percent');
-    const progressMessage = document.getElementById('progress-message');
+    function removeHighlightTag(tag) {
+        highlightTags = highlightTags.filter(t => t !== tag);
+        saveHighlightTags();
+    }
 
-    loading.classList.remove('hidden');
-
-    const token = authToken || GUEST_TOKEN;
-
-    try {
-        // Show progress modal
-        progressModal.classList.remove('hidden');
-        progressMessage.textContent = 'Hole verfügbare Daten...';
-        progressFill.style.width = '0%';
-        progressPercent.textContent = '0%';
-
-        // 1. Fetch available dates
-        const datesResponse = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/dates/`, {
-            headers: apiHeaders(token)
+    function renderTagsList() {
+        const list = document.getElementById('tags-list');
+        list.innerHTML = '';
+        highlightTags.forEach(tag => {
+            const badge = document.createElement('span');
+            badge.className = 'tag-badge';
+            badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}">&times;</span>`;
+            list.appendChild(badge);
         });
 
-        if (!datesResponse.ok) throw new Error(`Failed to fetch dates: ${datesResponse.status}`);
-
-        const datesData = await datesResponse.json();
-        let availableDates = datesData.results || [];
-
-        // Filter – last 7 days + future, limit 30
-        const cutoff = new Date();
-        cutoff.setDate(cutoff.getDate() - 7);
-        const cutoffStr = cutoff.toISOString().split('T')[0];
-
-        availableDates = availableDates
-            .filter(d => d.date >= cutoffStr)
-            .sort((a, b) => a.date.localeCompare(b.date))
-            .slice(0, 30);
-
-        const totalDates = availableDates.length;
-        progressMessage.textContent = `${totalDates} Tage gefunden. Lade Details...`;
-
-        // 2. Fetch details for each date
-        const allDays = [];
-        let completed = 0;
-
-        for (const dateObj of availableDates) {
-            const dateStr = dateObj.date;
-            const pct = Math.round(((completed + 1) / totalDates) * 100);
-            progressFill.style.width = `${pct}%`;
-            progressPercent.textContent = `${pct}%`;
-            progressMessage.textContent = `Lade Menü für ${dateStr}...`;
-
-            try {
-                const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
-                    headers: apiHeaders(token)
-                });
-
-                if (detailResp.ok) {
-                    const detailData = await detailResp.json();
-                    // Debug: log raw API response for first date
-                    if (completed === 0) {
-                        console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
-                    }
-                    const menuGroups = detailData.results || [];
-                    let dayItems = [];
-                    for (const group of menuGroups) {
-                        if (group.items && Array.isArray(group.items)) {
-                            dayItems = dayItems.concat(group.items);
-                        }
-                    }
-                    if (dayItems.length > 0) {
-                        // Debug: log first item structure
-                        if (completed === 0) {
-                            console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
-                            console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
-                        }
-                        allDays.push({
-                            date: dateStr,
-                            menu_items: dayItems,
-                            orders: dateObj.orders || []
-                        });
-                    }
-                }
-            } catch (err) {
-                console.error(`Failed to fetch details for ${dateStr}:`, err);
-            }
-
-            completed++;
-            // Small delay to avoid rate limiting
-            await new Promise(r => setTimeout(r, 100));
-        }
-
-        // 3. Group by ISO week (Merge with existing to preserve past days)
-        const weeksMap = new Map();
-
-        // Hydrate from existing cache (preserve past data)
-        if (allWeeks && allWeeks.length > 0) {
-            allWeeks.forEach(w => {
-                const key = `${w.year}-${w.weekNumber}`;
-                try {
-                    weeksMap.set(key, {
-                        year: w.year,
-                        weekNumber: w.weekNumber,
-                        days: w.days ? w.days.map(d => ({ ...d, items: d.items ? [...d.items] : [] })) : []
-                    });
-                } catch (e) { console.warn('Error hydrating week:', e); }
+        // Bind remove events
+        list.querySelectorAll('.tag-remove').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                removeHighlightTag(e.target.dataset.tag);
+                renderTagsList();
             });
+        });
+    }
+
+    function checkHighlight(text) {
+        if (!text) return false;
+        text = text.toLowerCase();
+        return highlightTags.some(tag => text.includes(tag));
+    }
+
+    // === Local Menu Cache (localStorage) ===
+    const CACHE_KEY = 'kantine_menuCache';
+    const CACHE_TS_KEY = 'kantine_menuCacheTs';
+
+    function saveMenuCache() {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(allWeeks));
+            localStorage.setItem(CACHE_TS_KEY, new Date().toISOString());
+        } catch (e) {
+            console.warn('Failed to cache menu data:', e);
         }
+    }
 
-        for (const day of allDays) {
-            const d = new Date(day.date);
-            const weekNum = getISOWeek(d);
-            const year = getWeekYear(d);
-            const key = `${year}-${weekNum}`;
+    function loadMenuCache() {
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            const cachedTs = localStorage.getItem(CACHE_TS_KEY);
+            if (cached) {
+                allWeeks = JSON.parse(cached);
+                currentWeekNumber = getISOWeek(new Date());
+                currentYear = new Date().getFullYear();
+                renderVisibleWeeks();
+                updateNextWeekBadge();
+                if (cachedTs) updateLastUpdatedTime(cachedTs);
+                console.log('Loaded menu from cache');
+                return true;
+            }
+        } catch (e) {
+            console.warn('Failed to load cached menu:', e);
+        }
+        return false;
+    }
 
-            if (!weeksMap.has(key)) {
-                weeksMap.set(key, { year, weekNumber: weekNum, days: [] });
+    // === Menu Data Fetching (Direct from Bessa API) ===
+    async function loadMenuDataFromAPI() {
+        const loading = document.getElementById('loading');
+        const progressModal = document.getElementById('progress-modal');
+        const progressFill = document.getElementById('progress-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressMessage = document.getElementById('progress-message');
+
+        loading.classList.remove('hidden');
+
+        const token = authToken || GUEST_TOKEN;
+
+        try {
+            // Show progress modal
+            progressModal.classList.remove('hidden');
+            progressMessage.textContent = 'Hole verfügbare Daten...';
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+
+            // 1. Fetch available dates
+            const datesResponse = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/dates/`, {
+                headers: apiHeaders(token)
+            });
+
+            if (!datesResponse.ok) throw new Error(`Failed to fetch dates: ${datesResponse.status}`);
+
+            const datesData = await datesResponse.json();
+            let availableDates = datesData.results || [];
+
+            // Filter – last 7 days + future, limit 30
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - 7);
+            const cutoffStr = cutoff.toISOString().split('T')[0];
+
+            availableDates = availableDates
+                .filter(d => d.date >= cutoffStr)
+                .sort((a, b) => a.date.localeCompare(b.date))
+                .slice(0, 30);
+
+            const totalDates = availableDates.length;
+            progressMessage.textContent = `${totalDates} Tage gefunden. Lade Details...`;
+
+            // 2. Fetch details for each date
+            const allDays = [];
+            let completed = 0;
+
+            for (const dateObj of availableDates) {
+                const dateStr = dateObj.date;
+                const pct = Math.round(((completed + 1) / totalDates) * 100);
+                progressFill.style.width = `${pct}%`;
+                progressPercent.textContent = `${pct}%`;
+                progressMessage.textContent = `Lade Menü für ${dateStr}...`;
+
+                try {
+                    const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+                        headers: apiHeaders(token)
+                    });
+
+                    if (detailResp.ok) {
+                        const detailData = await detailResp.json();
+                        // Debug: log raw API response for first date
+                        if (completed === 0) {
+                            console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
+                        }
+                        const menuGroups = detailData.results || [];
+                        let dayItems = [];
+                        for (const group of menuGroups) {
+                            if (group.items && Array.isArray(group.items)) {
+                                dayItems = dayItems.concat(group.items);
+                            }
+                        }
+                        if (dayItems.length > 0) {
+                            // Debug: log first item structure
+                            if (completed === 0) {
+                                console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
+                                console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
+                            }
+                            allDays.push({
+                                date: dateStr,
+                                menu_items: dayItems,
+                                orders: dateObj.orders || []
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.error(`Failed to fetch details for ${dateStr}:`, err);
+                }
+
+                completed++;
+                // Small delay to avoid rate limiting
+                await new Promise(r => setTimeout(r, 100));
             }
 
-            const weekObj = weeksMap.get(key);
-            const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
-            const orderCutoffDate = new Date(day.date);
-            orderCutoffDate.setHours(10, 0, 0, 0);
+            // 3. Group by ISO week (Merge with existing to preserve past days)
+            const weeksMap = new Map();
 
-            const newDayObj = {
-                date: day.date,
-                weekday: weekday,
-                orderCutoff: orderCutoffDate.toISOString(),
-                items: day.menu_items.map(item => {
-                    const isUnlimited = item.amount_tracking === false;
-                    const hasStock = parseInt(item.available_amount) > 0;
-                    return {
-                        id: `${day.date}_${item.id}`,
-                        articleId: item.id,
-                        name: item.name || 'Unknown',
-                        description: item.description || '',
-                        price: parseFloat(item.price) || 0,
-                        available: isUnlimited || hasStock,
-                        availableAmount: parseInt(item.available_amount) || 0,
-                        amountTracking: item.amount_tracking !== false
-                    };
-                })
-            };
-
-            // Merge: Overwrite if exists, push if new
-            const existingIndex = weekObj.days.findIndex(existing => existing.date === day.date);
-            if (existingIndex >= 0) {
-                weekObj.days[existingIndex] = newDayObj;
-            } else {
-                weekObj.days.push(newDayObj);
-            }
-        }
-
-        // Sort weeks and days
-        allWeeks = Array.from(weeksMap.values()).sort((a, b) => {
-            if (a.year !== b.year) return a.year - b.year;
-            return a.weekNumber - b.weekNumber;
-        });
-        allWeeks.forEach(w => {
-            if (w.days) w.days.sort((a, b) => a.date.localeCompare(b.date));
-        });
-
-        // Save to localStorage cache
-        saveMenuCache();
-
-        // Update timestamp
-        updateLastUpdatedTime(new Date().toISOString());
-
-        currentWeekNumber = getISOWeek(new Date());
-        currentYear = new Date().getFullYear();
-
-
-
-        updateAuthUI(); // This will trigger fetchOrders if logged in
-        renderVisibleWeeks();
-        updateNextWeekBadge();
-
-        progressMessage.textContent = 'Fertig!';
-        setTimeout(() => progressModal.classList.add('hidden'), 500);
-
-    } catch (error) {
-        console.error('Error fetching menu:', error);
-        progressModal.classList.add('hidden');
-
-        showErrorModal(
-            'Keine Verbindung',
-            `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
-            'Zur Original-Seite',
-            'https://web.bessa.app/knapp-kantine'
-        );
-    } finally {
-        loading.classList.add('hidden');
-    }
-}
-
-// === Last Updated Display ===
-function updateLastUpdatedTime(isoTimestamp) {
-    const subtitle = document.getElementById('last-updated-subtitle');
-    if (!isoTimestamp) return;
-    try {
-        const date = new Date(isoTimestamp);
-        const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-        const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-        subtitle.textContent = `Aktualisiert: ${dateStr} ${timeStr}`;
-    } catch (e) {
-        subtitle.textContent = '';
-    }
-}
-
-// === Toast Notification ===
-function showToast(message, type = 'info') {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
-    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
-    container.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// === Next Week Badge ===
-function updateNextWeekBadge() {
-    const btnNextWeek = document.getElementById('btn-next-week');
-    let nextWeek = currentWeekNumber + 1;
-    let nextYear = currentYear;
-    if (nextWeek > 52) { nextWeek = 1; nextYear++; }
-
-    const nextWeekData = allWeeks.find(w => w.weekNumber === nextWeek && w.year === nextYear);
-    let totalDataCount = 0;
-    let orderableCount = 0;
-    let daysWithOrders = 0;
-    let daysWithOrderableAndNoOrder = 0;
-
-    if (nextWeekData && nextWeekData.days) {
-        nextWeekData.days.forEach(day => {
-            if (day.items && day.items.length > 0) {
-                totalDataCount++;
-                const isOrderable = day.items.some(item => item.available);
-                if (isOrderable) orderableCount++;
-
-                let hasOrder = false;
-                day.items.forEach(item => {
-                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-                    const key = `${day.date}_${articleId}`;
-                    if (orderMap.has(key) && orderMap.get(key).length > 0) hasOrder = true;
+            // Hydrate from existing cache (preserve past data)
+            if (allWeeks && allWeeks.length > 0) {
+                allWeeks.forEach(w => {
+                    const key = `${w.year}-${w.weekNumber}`;
+                    try {
+                        weeksMap.set(key, {
+                            year: w.year,
+                            weekNumber: w.weekNumber,
+                            days: w.days ? w.days.map(d => ({ ...d, items: d.items ? [...d.items] : [] })) : []
+                        });
+                    } catch (e) { console.warn('Error hydrating week:', e); }
                 });
-
-                if (hasOrder) daysWithOrders++;
-                if (isOrderable && !hasOrder) daysWithOrderableAndNoOrder++;
             }
-        });
+
+            for (const day of allDays) {
+                const d = new Date(day.date);
+                const weekNum = getISOWeek(d);
+                const year = getWeekYear(d);
+                const key = `${year}-${weekNum}`;
+
+                if (!weeksMap.has(key)) {
+                    weeksMap.set(key, { year, weekNumber: weekNum, days: [] });
+                }
+
+                const weekObj = weeksMap.get(key);
+                const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
+                const orderCutoffDate = new Date(day.date);
+                orderCutoffDate.setHours(10, 0, 0, 0);
+
+                const newDayObj = {
+                    date: day.date,
+                    weekday: weekday,
+                    orderCutoff: orderCutoffDate.toISOString(),
+                    items: day.menu_items.map(item => {
+                        const isUnlimited = item.amount_tracking === false;
+                        const hasStock = parseInt(item.available_amount) > 0;
+                        return {
+                            id: `${day.date}_${item.id}`,
+                            articleId: item.id,
+                            name: item.name || 'Unknown',
+                            description: item.description || '',
+                            price: parseFloat(item.price) || 0,
+                            available: isUnlimited || hasStock,
+                            availableAmount: parseInt(item.available_amount) || 0,
+                            amountTracking: item.amount_tracking !== false
+                        };
+                    })
+                };
+
+                // Merge: Overwrite if exists, push if new
+                const existingIndex = weekObj.days.findIndex(existing => existing.date === day.date);
+                if (existingIndex >= 0) {
+                    weekObj.days[existingIndex] = newDayObj;
+                } else {
+                    weekObj.days.push(newDayObj);
+                }
+            }
+
+            // Sort weeks and days
+            allWeeks = Array.from(weeksMap.values()).sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.weekNumber - b.weekNumber;
+            });
+            allWeeks.forEach(w => {
+                if (w.days) w.days.sort((a, b) => a.date.localeCompare(b.date));
+            });
+
+            // Save to localStorage cache
+            saveMenuCache();
+
+            // Update timestamp
+            updateLastUpdatedTime(new Date().toISOString());
+
+            currentWeekNumber = getISOWeek(new Date());
+            currentYear = new Date().getFullYear();
+
+
+
+            updateAuthUI(); // This will trigger fetchOrders if logged in
+            renderVisibleWeeks();
+            updateNextWeekBadge();
+
+            progressMessage.textContent = 'Fertig!';
+            setTimeout(() => progressModal.classList.add('hidden'), 500);
+
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+            progressModal.classList.add('hidden');
+
+            showErrorModal(
+                'Keine Verbindung',
+                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
+                'Zur Original-Seite',
+                'https://web.bessa.app/knapp-kantine'
+            );
+        } finally {
+            loading.classList.add('hidden');
+        }
     }
 
-    let badge = btnNextWeek.querySelector('.nav-badge');
-    if (totalDataCount > 0) {
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'nav-badge';
-            btnNextWeek.appendChild(badge);
+    // === Last Updated Display ===
+    function updateLastUpdatedTime(isoTimestamp) {
+        const subtitle = document.getElementById('last-updated-subtitle');
+        if (!isoTimestamp) return;
+        try {
+            const date = new Date(isoTimestamp);
+            const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+            subtitle.textContent = `Aktualisiert: ${dateStr} ${timeStr}`;
+        } catch (e) {
+            subtitle.textContent = '';
         }
+    }
 
-        // Format: ( Ordered / Orderable / Total )
-        badge.title = `${daysWithOrders} bestellt / ${orderableCount} bestellbar / ${totalDataCount} gesamt`;
-        badge.innerHTML = `<span class="ordered">${daysWithOrders}</span><span class="separator">/</span><span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
-
-        // Color Logic
-        badge.classList.remove('badge-violet', 'badge-green', 'badge-red', 'badge-blue');
-
-        // Refined Logic (v1.7.4):
-        // Violet: If we have orders AND there are no DAYS left that are orderable but un-ordered.
-        // (i.e. "I have ordered everything I can")
-        if (daysWithOrders > 0 && daysWithOrderableAndNoOrder === 0) {
-            badge.classList.add('badge-violet');
-        } else if (daysWithOrderableAndNoOrder > 0) {
-            badge.classList.add('badge-green'); // Orderable days exist without order
-        } else if (orderableCount === 0) {
-            badge.classList.add('badge-red'); // No orderable days at all & no orders
-        } else {
-            badge.classList.add('badge-blue'); // Default / partial state
+    // === Toast Notification ===
+    function showToast(message, type = 'info') {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            document.body.appendChild(container);
         }
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+        toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 
-        // Advanced Feature: Highlight Count
-        let highlightCount = 0;
+    // === Next Week Badge ===
+    function updateNextWeekBadge() {
+        const btnNextWeek = document.getElementById('btn-next-week');
+        let nextWeek = currentWeekNumber + 1;
+        let nextYear = currentYear;
+        if (nextWeek > 52) { nextWeek = 1; nextYear++; }
+
+        const nextWeekData = allWeeks.find(w => w.weekNumber === nextWeek && w.year === nextYear);
+        let totalDataCount = 0;
+        let orderableCount = 0;
+        let daysWithOrders = 0;
+        let daysWithOrderableAndNoOrder = 0;
+
         if (nextWeekData && nextWeekData.days) {
             nextWeekData.days.forEach(day => {
-                day.items.forEach(item => {
-                    if (checkHighlight(item.name) || checkHighlight(item.description)) {
-                        highlightCount++;
-                    }
-                });
+                if (day.items && day.items.length > 0) {
+                    totalDataCount++;
+                    const isOrderable = day.items.some(item => item.available);
+                    if (isOrderable) orderableCount++;
+
+                    let hasOrder = false;
+                    day.items.forEach(item => {
+                        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                        const key = `${day.date}_${articleId}`;
+                        if (orderMap.has(key) && orderMap.get(key).length > 0) hasOrder = true;
+                    });
+
+                    if (hasOrder) daysWithOrders++;
+                    if (isOrderable && !hasOrder) daysWithOrderableAndNoOrder++;
+                }
             });
         }
 
-        if (highlightCount > 0) {
-            // Append blue count
-            badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
-            badge.title += ` • ${highlightCount} Highlights gefunden`;
-            badge.classList.add('has-highlights');
-        }
+        let badge = btnNextWeek.querySelector('.nav-badge');
+        if (totalDataCount > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'nav-badge';
+                btnNextWeek.appendChild(badge);
+            }
 
-    } else if (badge) {
-        badge.remove();
-    }
-}
+            // Format: ( Ordered / Orderable / Total )
+            badge.title = `${daysWithOrders} bestellt / ${orderableCount} bestellbar / ${totalDataCount} gesamt`;
+            badge.innerHTML = `<span class="ordered">${daysWithOrders}</span><span class="separator">/</span><span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
 
-// === Weekly Cost ===
-function updateWeeklyCost(days) {
-    let totalCost = 0;
-    if (days && days.length > 0) {
-        days.forEach(day => {
-            if (day.items) {
-                day.items.forEach(item => {
-                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-                    const key = `${day.date}_${articleId}`;
-                    const orders = orderMap.get(key) || [];
-                    if (orders.length > 0) totalCost += item.price * orders.length;
+            // Color Logic
+            badge.classList.remove('badge-violet', 'badge-green', 'badge-red', 'badge-blue');
+
+            // Refined Logic (v1.7.4):
+            // Violet: If we have orders AND there are no DAYS left that are orderable but un-ordered.
+            // (i.e. "I have ordered everything I can")
+            if (daysWithOrders > 0 && daysWithOrderableAndNoOrder === 0) {
+                badge.classList.add('badge-violet');
+            } else if (daysWithOrderableAndNoOrder > 0) {
+                badge.classList.add('badge-green'); // Orderable days exist without order
+            } else if (orderableCount === 0) {
+                badge.classList.add('badge-red'); // No orderable days at all & no orders
+            } else {
+                badge.classList.add('badge-blue'); // Default / partial state
+            }
+
+            // Advanced Feature: Highlight Count
+            let highlightCount = 0;
+            if (nextWeekData && nextWeekData.days) {
+                nextWeekData.days.forEach(day => {
+                    day.items.forEach(item => {
+                        if (checkHighlight(item.name) || checkHighlight(item.description)) {
+                            highlightCount++;
+                        }
+                    });
                 });
             }
+
+            if (highlightCount > 0) {
+                // Append blue count
+                badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
+                badge.title += ` • ${highlightCount} Highlights gefunden`;
+                badge.classList.add('has-highlights');
+            }
+
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+
+    // === Weekly Cost ===
+    function updateWeeklyCost(days) {
+        let totalCost = 0;
+        if (days && days.length > 0) {
+            days.forEach(day => {
+                if (day.items) {
+                    day.items.forEach(item => {
+                        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                        const key = `${day.date}_${articleId}`;
+                        const orders = orderMap.get(key) || [];
+                        if (orders.length > 0) totalCost += item.price * orders.length;
+                    });
+                }
+            });
+        }
+
+        const costDisplay = document.getElementById('weekly-cost-display');
+        if (totalCost > 0) {
+            costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>Gesamt: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
+            costDisplay.classList.remove('hidden');
+        } else {
+            costDisplay.classList.add('hidden');
+        }
+    }
+
+    // === Render Weeks ===
+    function renderVisibleWeeks() {
+        const menuContainer = document.getElementById('menu-container');
+        if (!menuContainer) return;
+        menuContainer.innerHTML = '';
+
+        let targetWeek = currentWeekNumber;
+        let targetYear = currentYear;
+
+        if (displayMode === 'next-week') {
+            targetWeek++;
+            if (targetWeek > 52) { targetWeek = 1; targetYear++; }
+        }
+
+        // Flatten & filter by week + year
+        const allDays = allWeeks.flatMap(w => w.days || []);
+        const daysInTargetWeek = allDays.filter(day => {
+            const d = new Date(day.date);
+            return getISOWeek(d) === targetWeek && getWeekYear(d) === targetYear;
         });
-    }
 
-    const costDisplay = document.getElementById('weekly-cost-display');
-    if (totalCost > 0) {
-        costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>Gesamt: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
-        costDisplay.classList.remove('hidden');
-    } else {
-        costDisplay.classList.add('hidden');
-    }
-}
-
-// === Render Weeks ===
-function renderVisibleWeeks() {
-    const menuContainer = document.getElementById('menu-container');
-    if (!menuContainer) return;
-    menuContainer.innerHTML = '';
-
-    let targetWeek = currentWeekNumber;
-    let targetYear = currentYear;
-
-    if (displayMode === 'next-week') {
-        targetWeek++;
-        if (targetWeek > 52) { targetWeek = 1; targetYear++; }
-    }
-
-    // Flatten & filter by week + year
-    const allDays = allWeeks.flatMap(w => w.days || []);
-    const daysInTargetWeek = allDays.filter(day => {
-        const d = new Date(day.date);
-        return getISOWeek(d) === targetWeek && getWeekYear(d) === targetYear;
-    });
-
-    if (daysInTargetWeek.length === 0) {
-        menuContainer.innerHTML = `
+        if (daysInTargetWeek.length === 0) {
+            menuContainer.innerHTML = `
                 <div class="empty-state">
                     <p>Keine Menüdaten für KW ${targetWeek} (${targetYear}) verfügbar.</p>
                     <small>Versuchen Sie eine andere Woche oder schauen Sie später vorbei.</small>
                 </div>`;
-        document.getElementById('weekly-cost-display').classList.add('hidden');
-        return;
-    }
+            document.getElementById('weekly-cost-display').classList.add('hidden');
+            return;
+        }
 
-    updateWeeklyCost(daysInTargetWeek);
+        updateWeeklyCost(daysInTargetWeek);
 
-    // Update header
-    const headerWeekInfo = document.getElementById('header-week-info');
-    const weekTitle = displayMode === 'this-week' ? 'Diese Woche' : 'Nächste Woche';
-    headerWeekInfo.innerHTML = `
+        // Update header
+        const headerWeekInfo = document.getElementById('header-week-info');
+        const weekTitle = displayMode === 'this-week' ? 'Diese Woche' : 'Nächste Woche';
+        headerWeekInfo.innerHTML = `
             <div class="header-week-title">${weekTitle}</div>
             <div class="header-week-subtitle">Week ${targetWeek} • ${targetYear}</div>`;
 
-    const grid = document.createElement('div');
-    grid.className = 'days-grid';
+        const grid = document.createElement('div');
+        grid.className = 'days-grid';
 
-    daysInTargetWeek.sort((a, b) => a.date.localeCompare(b.date));
+        daysInTargetWeek.sort((a, b) => a.date.localeCompare(b.date));
 
-    // Filter weekends
-    const workingDays = daysInTargetWeek.filter(d => {
-        const date = new Date(d.date);
-        const day = date.getDay();
-        return day !== 0 && day !== 6;
-    });
+        // Filter weekends
+        const workingDays = daysInTargetWeek.filter(d => {
+            const date = new Date(d.date);
+            const day = date.getDay();
+            return day !== 0 && day !== 6;
+        });
 
-    workingDays.forEach(day => {
-        const card = createDayCard(day);
-        if (card) grid.appendChild(card);
-    });
+        workingDays.forEach(day => {
+            const card = createDayCard(day);
+            if (card) grid.appendChild(card);
+        });
 
-    menuContainer.appendChild(grid);
-    setTimeout(() => syncMenuItemHeights(grid), 0);
-}
+        menuContainer.appendChild(grid);
+        setTimeout(() => syncMenuItemHeights(grid), 0);
+    }
 
-// === Sync Item Heights ===
-function syncMenuItemHeights(grid) {
-    const cards = grid.querySelectorAll('.menu-card');
-    if (cards.length === 0) return;
-    let maxItems = 0;
-    cards.forEach(card => {
-        maxItems = Math.max(maxItems, card.querySelectorAll('.menu-item').length);
-    });
-    for (let i = 0; i < maxItems; i++) {
-        let maxHeight = 0;
-        const itemsAtPos = [];
+    // === Sync Item Heights ===
+    function syncMenuItemHeights(grid) {
+        const cards = grid.querySelectorAll('.menu-card');
+        if (cards.length === 0) return;
+        let maxItems = 0;
         cards.forEach(card => {
-            const items = card.querySelectorAll('.menu-item');
-            if (items[i]) {
-                items[i].style.height = 'auto';
-                maxHeight = Math.max(maxHeight, items[i].offsetHeight);
-                itemsAtPos.push(items[i]);
-            }
+            maxItems = Math.max(maxItems, card.querySelectorAll('.menu-item').length);
         });
-        itemsAtPos.forEach(item => { item.style.height = `${maxHeight}px`; });
-    }
-}
-
-// === Create Day Card ===
-function createDayCard(day) {
-    if (!day.items || day.items.length === 0) return null;
-
-    const card = document.createElement('div');
-    card.className = 'menu-card';
-
-    const now = new Date();
-    const cardDate = new Date(day.date);
-
-    let isPastCutoff = false;
-    if (day.orderCutoff) {
-        isPastCutoff = now >= new Date(day.orderCutoff);
-    } else {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const cd = new Date(day.date);
-        cd.setHours(0, 0, 0, 0);
-        isPastCutoff = cd < today;
-    }
-
-    if (isPastCutoff) card.classList.add('past-day');
-
-    // Collect ordered menu codes
-    const menuBadges = [];
-    if (day.items) {
-        day.items.forEach(item => {
-            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-            const orderKey = `${day.date}_${articleId}`;
-            const orders = orderMap.get(orderKey) || [];
-            const count = orders.length;
-
-            if (count > 0) {
-                // Regex for M1, M2, M1F etc.
-                const match = item.name.match(/([M][1-9][Ff]?)/);
-                if (match) {
-                    let code = match[1];
-                    if (count > 1) code += '+';
-                    menuBadges.push(code);
+        for (let i = 0; i < maxItems; i++) {
+            let maxHeight = 0;
+            const itemsAtPos = [];
+            cards.forEach(card => {
+                const items = card.querySelectorAll('.menu-item');
+                if (items[i]) {
+                    items[i].style.height = 'auto';
+                    maxHeight = Math.max(maxHeight, items[i].offsetHeight);
+                    itemsAtPos.push(items[i]);
                 }
-            }
+            });
+            itemsAtPos.forEach(item => { item.style.height = `${maxHeight}px`; });
+        }
+    }
+
+    // === Create Day Card ===
+    function createDayCard(day) {
+        if (!day.items || day.items.length === 0) return null;
+
+        const card = document.createElement('div');
+        card.className = 'menu-card';
+
+        const now = new Date();
+        const cardDate = new Date(day.date);
+
+        let isPastCutoff = false;
+        if (day.orderCutoff) {
+            isPastCutoff = now >= new Date(day.orderCutoff);
+        } else {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const cd = new Date(day.date);
+            cd.setHours(0, 0, 0, 0);
+            isPastCutoff = cd < today;
+        }
+
+        if (isPastCutoff) card.classList.add('past-day');
+
+        // Collect ordered menu codes
+        const menuBadges = [];
+        if (day.items) {
+            day.items.forEach(item => {
+                const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                const orderKey = `${day.date}_${articleId}`;
+                const orders = orderMap.get(orderKey) || [];
+                const count = orders.length;
+
+                if (count > 0) {
+                    // Regex for M1, M2, M1F etc.
+                    const match = item.name.match(/([M][1-9][Ff]?)/);
+                    if (match) {
+                        let code = match[1];
+                        if (count > 1) code += '+';
+                        menuBadges.push(code);
+                    }
+                }
+            });
+        }
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+        const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+
+        // Determine Day Status for Header Color
+        // Violet: Has Order
+        // Green: No Order but Orderable
+        // Red: No Order and Not Orderable (Locked/Sold Out)
+        let headerClass = '';
+        const hasAnyOrder = day.items && day.items.some(item => {
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const key = `${day.date}_${articleId}`;
+            return orderMap.has(key) && orderMap.get(key).length > 0;
         });
-    }
 
-    // Header
-    const header = document.createElement('div');
-    header.className = 'card-header';
-    const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        const hasOrderable = day.items && day.items.some(item => {
+            // Use pre-calculated available flag from loadMenuDataFromAPI calculation
+            return item.available;
+        });
 
-    const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+        if (hasAnyOrder) {
+            headerClass = 'header-violet';
+        } else if (hasOrderable && !isPastCutoff) {
+            headerClass = 'header-green';
+        } else {
+            // Red if not orderable (or past cutoff)
+            headerClass = 'header-red';
+        }
 
-    // Determine Day Status for Header Color
-    // Violet: Has Order
-    // Green: No Order but Orderable
-    // Red: No Order and Not Orderable (Locked/Sold Out)
-    let headerClass = '';
-    const hasAnyOrder = day.items && day.items.some(item => {
-        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-        const key = `${day.date}_${articleId}`;
-        return orderMap.has(key) && orderMap.get(key).length > 0;
-    });
+        if (headerClass) header.classList.add(headerClass);
 
-    const hasOrderable = day.items && day.items.some(item => {
-        // Use pre-calculated available flag from loadMenuDataFromAPI calculation
-        return item.available;
-    });
-
-    if (hasAnyOrder) {
-        headerClass = 'header-violet';
-    } else if (hasOrderable && !isPastCutoff) {
-        headerClass = 'header-green';
-    } else {
-        // Red if not orderable (or past cutoff)
-        headerClass = 'header-red';
-    }
-
-    if (headerClass) header.classList.add(headerClass);
-
-    header.innerHTML = `
+        header.innerHTML = `
             <div class="day-header-left">
                 <span class="day-name">${translateDay(day.weekday)}</span>
                 <div class="day-badges">${badgesHtml}</div>
             </div>
             <span class="day-date">${dateStr}</span>`;
-    card.appendChild(header);
+        card.appendChild(header);
 
-    // Body
-    const body = document.createElement('div');
-    body.className = 'card-body';
+        // Body
+        const body = document.createElement('div');
+        body.className = 'card-body';
 
-    const todayDateStr = new Date().toISOString().split('T')[0];
-    const isToday = day.date === todayDateStr;
+        const todayDateStr = new Date().toISOString().split('T')[0];
+        const isToday = day.date === todayDateStr;
 
-    const sortedItems = [...day.items].sort((a, b) => {
-        if (isToday) {
-            const aId = a.articleId || parseInt(a.id.split('_')[1]);
-            const bId = b.articleId || parseInt(b.id.split('_')[1]);
-            const aOrdered = orderMap.has(`${day.date}_${aId}`);
-            const bOrdered = orderMap.has(`${day.date}_${bId}`);
+        const sortedItems = [...day.items].sort((a, b) => {
+            if (isToday) {
+                const aId = a.articleId || parseInt(a.id.split('_')[1]);
+                const bId = b.articleId || parseInt(b.id.split('_')[1]);
+                const aOrdered = orderMap.has(`${day.date}_${aId}`);
+                const bOrdered = orderMap.has(`${day.date}_${bId}`);
 
-            if (aOrdered && !bOrdered) return -1;
-            if (!aOrdered && bOrdered) return 1;
-        }
-        return a.name.localeCompare(b.name);
-    });
-
-    sortedItems.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'menu-item';
-
-        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-        const orderKey = `${day.date}_${articleId}`;
-        const orderIds = orderMap.get(orderKey) || [];
-        const orderCount = orderIds.length;
-
-        // Status badge
-        let statusBadge = '';
-        if (item.available) {
-            statusBadge = item.amountTracking
-                ? `<span class="badge available">Verfügbar (${item.availableAmount})</span>`
-                : `<span class="badge available">Verfügbar</span>`;
-        } else {
-            statusBadge = `<span class="badge sold-out">Ausverkauft</span>`;
-        }
-
-        // Order badge
-        let orderedBadge = '';
-        if (orderCount > 0) {
-            const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
-            orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> Bestellt${countBadge}</span>`;
-            itemEl.classList.add('ordered');
-            if (new Date(day.date).toDateString() === now.toDateString()) {
-                itemEl.classList.add('today-ordered');
+                if (aOrdered && !bOrdered) return -1;
+                if (!aOrdered && bOrdered) return 1;
             }
-        }
+            return a.name.localeCompare(b.name);
+        });
 
-        // Flagged styles
-        const flagId = `${day.date}_${articleId}`;
-        const isFlagged = userFlags.has(flagId);
-        if (isFlagged) {
-            itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
-        }
+        sortedItems.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'menu-item';
 
-        // Action buttons
-        let orderButton = '';
-        let cancelButton = '';
-        let flagButton = '';
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const orderKey = `${day.date}_${articleId}`;
+            const orderIds = orderMap.get(orderKey) || [];
+            const orderCount = orderIds.length;
 
-        if (authToken && !isPastCutoff) {
-            // Flag button
-            const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
-            const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
-            const flagTitle = isFlagged ? 'Benachrichtigung deaktivieren' : 'Benachrichtigen wenn verfügbar';
-            if (!item.available || isFlagged) {
-                flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
-            }
-
-            // Order button
+            // Status badge
+            let statusBadge = '';
             if (item.available) {
-                if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} nochmal bestellen"><span class="material-icons-round">add</span></button>`;
-                } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} bestellen"><span class="material-icons-round">add_shopping_cart</span> Bestellen</button>`;
+                statusBadge = item.amountTracking
+                    ? `<span class="badge available">Verfügbar (${item.availableAmount})</span>`
+                    : `<span class="badge available">Verfügbar</span>`;
+            } else {
+                statusBadge = `<span class="badge sold-out">Ausverkauft</span>`;
+            }
+
+            // Order badge
+            let orderedBadge = '';
+            if (orderCount > 0) {
+                const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
+                orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> Bestellt${countBadge}</span>`;
+                itemEl.classList.add('ordered');
+                if (new Date(day.date).toDateString() === now.toDateString()) {
+                    itemEl.classList.add('today-ordered');
                 }
             }
 
-            // Cancel button
-            if (orderCount > 0) {
-                const cancelIcon = orderCount === 1 ? 'close' : 'remove';
-                const cancelTitle = orderCount === 1 ? 'Bestellung stornieren' : 'Eine Bestellung stornieren';
-                cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
+            // Flagged styles
+            const flagId = `${day.date}_${articleId}`;
+            const isFlagged = userFlags.has(flagId);
+            if (isFlagged) {
+                itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
             }
-        }
 
-        itemEl.innerHTML = `
+            // Action buttons
+            let orderButton = '';
+            let cancelButton = '';
+            let flagButton = '';
+
+            if (authToken && !isPastCutoff) {
+                // Flag button
+                const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
+                const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
+                const flagTitle = isFlagged ? 'Benachrichtigung deaktivieren' : 'Benachrichtigen wenn verfügbar';
+                if (!item.available || isFlagged) {
+                    flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
+                }
+
+                // Order button
+                if (item.available) {
+                    if (orderCount > 0) {
+                        orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} nochmal bestellen"><span class="material-icons-round">add</span></button>`;
+                    } else {
+                        orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} bestellen"><span class="material-icons-round">add_shopping_cart</span> Bestellen</button>`;
+                    }
+                }
+
+                // Cancel button
+                if (orderCount > 0) {
+                    const cancelIcon = orderCount === 1 ? 'close' : 'remove';
+                    const cancelTitle = orderCount === 1 ? 'Bestellung stornieren' : 'Eine Bestellung stornieren';
+                    cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
+                }
+            }
+
+            itemEl.innerHTML = `
                 <div class="item-header">
                     <span class="item-name">${escapeHtml(item.name)}</span>
                     <span class="item-price">${item.price.toFixed(2)} €</span>
@@ -1355,203 +1355,251 @@ function createDayCard(day) {
                 </div>
                 <p class="item-desc">${escapeHtml(item.description)}</p>`;
 
-        // Event: Order
-        const orderBtn = itemEl.querySelector('.btn-order');
-        if (orderBtn) {
-            orderBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                btn.disabled = true;
-                btn.classList.add('loading');
-                placeOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, parseFloat(btn.dataset.price), btn.dataset.desc || '')
-                    .finally(() => { btn.disabled = false; btn.classList.remove('loading'); });
-            });
-        }
-
-        // Event: Cancel
-        const cancelBtn = itemEl.querySelector('.btn-cancel');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                btn.disabled = true;
-                cancelOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name)
-                    .finally(() => { btn.disabled = false; });
-            });
-        }
-
-        // Event: Flag
-        const flagBtn = itemEl.querySelector('.btn-flag');
-        if (flagBtn) {
-            flagBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                toggleFlag(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
-            });
-        }
-
-        body.appendChild(itemEl);
-    });
-
-    card.appendChild(body);
-    return card;
-}
-
-// === Version Check ===
-async function checkForUpdates() {
-    icon.className = 'update-icon';
-    icon.href = url;
-    icon.target = '_blank';
-    icon.innerHTML = '🆕'; // User requested icon
-    icon.title = `Neue Version verfügbar (${newVersion}). Klick für download`;
-
-    headerTitle.appendChild(icon);
-    showToast(`Update verfügbar: ${newVersion}`, 'info');
-}
-
-// === Order Countdown ===
-function updateCountdown() {
-    const now = new Date();
-    const currentDay = now.getDay();
-    // Skip weekends (0=Sun, 6=Sat)
-    if (currentDay === 0 || currentDay === 6) {
-        removeCountdown();
-        return;
-    }
-
-    const todayStr = now.toISOString().split('T')[0];
-
-    // 1. Check if we already ordered for today
-    let hasOrder = false;
-    // Optimization: Check orderMap for today's date
-    // Keys are "YYYY-MM-DD_ArticleID"
-    for (const key of orderMap.keys()) {
-        if (key.startsWith(todayStr)) {
-            hasOrder = true;
-            break;
-        }
-    }
-
-    if (hasOrder) {
-        removeCountdown();
-        return;
-    }
-
-    // 2. Calculate time to cutoff (10:00 AM)
-    const cutoff = new Date();
-    cutoff.setHours(10, 0, 0, 0);
-
-    const diff = cutoff - now;
-
-    // If passed cutoff or more than 3 hours away (e.g. 07:00), maybe don't show?
-    // User req: "heute noch keine bestellung... countdown erscheinen"
-    // Let's show it if within valid order window (e.g. 00:00 - 10:00)
-
-    if (diff <= 0) {
-        removeCountdown();
-        return;
-    }
-
-    // 3. Render Countdown
-    const diffHrs = Math.floor(diff / 3600000);
-    const diffMins = Math.floor((diff % 3600000) / 60000);
-
-    const headerCenter = document.querySelector('.header-center-wrapper');
-    if (!headerCenter) return;
-
-    let countdownEl = document.getElementById('order-countdown');
-    if (!countdownEl) {
-        countdownEl = document.createElement('div');
-        countdownEl.id = 'order-countdown';
-        // Insert before cost display or append
-        headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
-    }
-
-    countdownEl.innerHTML = `<span>Bestellschluss:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
-
-    // Red Alert if < 1 hour
-    if (diff < 3600000) { // 1 hour
-        countdownEl.classList.add('urgent');
-
-        // Notification logic (One time)
-        const notifiedKey = `kantine_notified_${todayStr}`;
-        if (!sessionStorage.getItem(notifiedKey)) {
-            if (Notification.permission === 'granted') {
-                new Notification('Kantine: Bestellschluss naht!', {
-                    body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
-                    icon: '⏳'
+            // Event: Order
+            const orderBtn = itemEl.querySelector('.btn-order');
+            if (orderBtn) {
+                orderBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    btn.classList.add('loading');
+                    placeOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, parseFloat(btn.dataset.price), btn.dataset.desc || '')
+                        .finally(() => { btn.disabled = false; btn.classList.remove('loading'); });
                 });
-            } else if (Notification.permission === 'default') {
-                Notification.requestPermission();
             }
-            sessionStorage.setItem(notifiedKey, 'true');
-        }
-    } else {
-        countdownEl.classList.remove('urgent');
+
+            // Event: Cancel
+            const cancelBtn = itemEl.querySelector('.btn-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    cancelOrder(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name)
+                        .finally(() => { btn.disabled = false; });
+                });
+            }
+
+            // Event: Flag
+            const flagBtn = itemEl.querySelector('.btn-flag');
+            if (flagBtn) {
+                flagBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const btn = e.currentTarget;
+                    toggleFlag(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
+                });
+            }
+
+            body.appendChild(itemEl);
+        });
+
+        card.appendChild(body);
+        return card;
     }
-}
 
-function removeCountdown() {
-    const el = document.getElementById('order-countdown');
-    if (el) el.remove();
-}
+    // === Version Check ===
+    async function checkForUpdates() {
+        const CurrentVersion = '{{VERSION}}';
+        const VersionUrl = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/version.txt';
+        const InstallerUrl = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html';
 
-// Update countdown every minute
-setInterval(updateCountdown, 60000);
-// Also update on load
-setTimeout(updateCountdown, 1000);
+        console.log(`[Kantine] Checking for updates... (Current: ${CurrentVersion})`);
 
-// === Helpers === 
-function getISOWeek(date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-}
+        try {
+            const response = await fetch(VersionUrl, { cache: 'no-cache' });
+            if (!response.ok) return;
 
-function getWeekYear(d) {
-    const date = new Date(d.getTime());
-    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-    return date.getFullYear();
-}
+            const remoteVersion = (await response.text()).trim();
+
+            if (remoteVersion && remoteVersion !== CurrentVersion) {
+                console.log(`[Kantine] New version available: ${remoteVersion}`);
+
+                // Fetch Changelog content
+                let changeSummary = '';
+                try {
+                    const clResp = await fetch('https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/changelog.md');
+                    if (clResp.ok) {
+                        const clText = await clResp.text();
+                        const match = clText.match(/## (v[^\n]+)\n((?:-[^\n]+\n)+)/);
+                        if (match && match[1].includes(remoteVersion)) {
+                            changeSummary = match[2].replace(/- /g, '• ').trim();
+                        }
+                    }
+                } catch (e) { console.warn('No changelog', e); }
+
+                // Create Banner
+                const updateBanner = document.createElement('div');
+                updateBanner.className = 'update-banner';
+                updateBanner.innerHTML = `
+                        <div class="update-content">
+                            <strong>Update verfügbar: ${remoteVersion}</strong>
+                            ${changeSummary ? `<pre class="change-summary">${changeSummary}</pre>` : ''}
+                            <a href="${InstallerUrl}" target="_blank" class="update-link">
+                                <span class="material-icons-round">system_update_alt</span>
+                                Jetzt aktualisieren
+                            </a>
+                        </div>
+                        <button class="icon-btn-small close-update">&times;</button>
+                    `;
+
+                document.body.appendChild(updateBanner);
+                updateBanner.querySelector('.close-update').addEventListener('click', () => updateBanner.remove());
+
+                // Highlight Header Icon
+                const lastUpdatedIcon = document.querySelector('.material-icons-round.logo-icon');
+                if (lastUpdatedIcon) {
+                    lastUpdatedIcon.style.color = 'var(--accent-color)';
+                    lastUpdatedIcon.parentElement.title = `Update verfügbar: ${remoteVersion}`;
+                }
+            }
+        } catch (error) {
+            console.warn('[Kantine] Version check failed:', error);
+        }
+    }
+
+    // === Order Countdown ===
+    function updateCountdown() {
+        const now = new Date();
+        const currentDay = now.getDay();
+        // Skip weekends (0=Sun, 6=Sat)
+        if (currentDay === 0 || currentDay === 6) {
+            removeCountdown();
+            return;
+        }
+
+        const todayStr = now.toISOString().split('T')[0];
+
+        // 1. Check if we already ordered for today
+        let hasOrder = false;
+        // Optimization: Check orderMap for today's date
+        // Keys are "YYYY-MM-DD_ArticleID"
+        for (const key of orderMap.keys()) {
+            if (key.startsWith(todayStr)) {
+                hasOrder = true;
+                break;
+            }
+        }
+
+        if (hasOrder) {
+            removeCountdown();
+            return;
+        }
+
+        // 2. Calculate time to cutoff (10:00 AM)
+        const cutoff = new Date();
+        cutoff.setHours(10, 0, 0, 0);
+
+        const diff = cutoff - now;
+
+        // If passed cutoff or more than 3 hours away (e.g. 07:00), maybe don't show?
+        // User req: "heute noch keine bestellung... countdown erscheinen"
+        // Let's show it if within valid order window (e.g. 00:00 - 10:00)
+
+        if (diff <= 0) {
+            removeCountdown();
+            return;
+        }
+
+        // 3. Render Countdown
+        const diffHrs = Math.floor(diff / 3600000);
+        const diffMins = Math.floor((diff % 3600000) / 60000);
+
+        const headerCenter = document.querySelector('.header-center-wrapper');
+        if (!headerCenter) return;
+
+        let countdownEl = document.getElementById('order-countdown');
+        if (!countdownEl) {
+            countdownEl = document.createElement('div');
+            countdownEl.id = 'order-countdown';
+            // Insert before cost display or append
+            headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
+        }
+
+        countdownEl.innerHTML = `<span>Bestellschluss:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
+
+        // Red Alert if < 1 hour
+        if (diff < 3600000) { // 1 hour
+            countdownEl.classList.add('urgent');
+
+            // Notification logic (One time)
+            const notifiedKey = `kantine_notified_${todayStr}`;
+            if (!sessionStorage.getItem(notifiedKey)) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Kantine: Bestellschluss naht!', {
+                        body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
+                        icon: '⏳'
+                    });
+                } else if (Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+                sessionStorage.setItem(notifiedKey, 'true');
+            }
+        } else {
+            countdownEl.classList.remove('urgent');
+        }
+    }
+
+    function removeCountdown() {
+        const el = document.getElementById('order-countdown');
+        if (el) el.remove();
+    }
+
+    // Update countdown every minute
+    setInterval(updateCountdown, 60000);
+    // Also update on load
+    setTimeout(updateCountdown, 1000);
+
+    // === Helpers === 
+    function getISOWeek(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+    }
+
+    function getWeekYear(d) {
+        const date = new Date(d.getTime());
+        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+        return date.getFullYear();
+    }
 
 
-function translateDay(englishDay) {
-    const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
-    return map[englishDay] || englishDay;
-}
+    function translateDay(englishDay) {
+        const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
+        return map[englishDay] || englishDay;
+    }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text || '';
-    return div.innerHTML;
-}
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
 
-// === Bootstrap ===
-injectUI();
-bindEvents();
-updateAuthUI();
-cleanupExpiredFlags();
+    // === Bootstrap ===
+    injectUI();
+    bindEvents();
+    updateAuthUI();
+    cleanupExpiredFlags();
 
-// Load cached data first for instant UI, then refresh from API
-const hadCache = loadMenuCache();
-if (hadCache) {
-    // Hide loading spinner since cache is shown
-    document.getElementById('loading').classList.add('hidden');
-}
-loadMenuDataFromAPI();
+    // Load cached data first for instant UI, then refresh from API
+    const hadCache = loadMenuCache();
+    if (hadCache) {
+        // Hide loading spinner since cache is shown
+        document.getElementById('loading').classList.add('hidden');
+    }
+    loadMenuDataFromAPI();
 
-// Auto-start polling if already logged in
-if (authToken) {
-    startPolling();
-}
+    // Auto-start polling if already logged in
+    if (authToken) {
+        startPolling();
+    }
 
-// Check for updates
-checkForUpdates();
+    // Check for updates
+    checkForUpdates();
 
-console.log('Kantine Wrapper loaded ✅');
-}) ();
+    console.log('Kantine Wrapper loaded ✅');
+})();
 
 // === Error Modal ===
 function showErrorModal(title, htmlContent, btnText, url) {

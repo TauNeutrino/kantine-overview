@@ -1,3 +1,6 @@
+## v1.1.2 (2026-02-16)
+- **Fix**: Encoding-Problem beim Bookmarklet behoben (URL Malformed Error). 🔗
+
 ## v1.1.1 (2026-02-16)
 - **Fix**: Kritischer Fehler behoben, der das Laden des Wrappers verhinderte. 🐛
 
