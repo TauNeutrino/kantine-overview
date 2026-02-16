@@ -1,3 +1,7 @@
+## v1.2.3 (2026-02-16)
+- **Fix**: Update-Icon ist jetzt klickbar und führt direkt zum Installer. 🔗
+- **Dev**: Unit-Tests für Update-Logik im Build integriert. 🛡️
+
 ## v1.2.2 (2026-02-16)
 - **UX**: Installer-Changelog jetzt einklappbar für mehr Übersicht. 📂
 

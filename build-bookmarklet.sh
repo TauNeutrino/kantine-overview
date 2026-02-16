@@ -249,6 +249,14 @@ ls -la "$DIST_DIR/"
 
 # === 4. Run build-time tests ===
 echo ""
+echo "=== Running Logic Tests ==="
+node "$SCRIPT_DIR/test_logic.js"
+LOGIC_EXIT=$?
+if [ $LOGIC_EXIT -ne 0 ]; then
+    echo "❌ Logic tests FAILED! See above for details."
+    exit 1
+fi
+
 echo "=== Running Build Tests ==="
 python3 "$SCRIPT_DIR/test_build.py"
 TEST_EXIT=$?
