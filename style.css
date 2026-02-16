@@ -141,17 +141,6 @@ body {
     justify-content: center;
 }
 
-.weekly-cost {
-    white-space: nowrap;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--success-color);
-    background-color: var(--bg-body);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    border: 1px solid var(--border-color);
-}
 
 .header-week-title {
     font-size: 1.1rem;
@@ -1166,13 +1155,15 @@ body {
     color: var(--text-primary);
     /* Ensure text remains standard color */
 }
+
 /* Update Icon */
 .update-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     margin-left: 8px;
-    background-color: rgba(16, 185, 129, 0.2); /* Green tint */
+    background-color: rgba(16, 185, 129, 0.2);
+    /* Green tint */
     color: var(--success-color);
     border-radius: 50%;
     width: 24px;
@@ -1191,9 +1182,17 @@ body {
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
 }
 
 /* Order Countdown */
@@ -1224,14 +1223,23 @@ body {
 }
 
 @keyframes pulse-red {
-    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
 }
 
 /* Smart Highlights */
 .highlight-glow {
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); /* Blue glow */
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    /* Blue glow */
     border: 1px solid rgba(59, 130, 246, 0.8);
     background: rgba(59, 130, 246, 0.05);
     position: relative;
@@ -1240,14 +1248,16 @@ body {
 
 /* Nav Badge with Count */
 .nav-badge.has-highlights {
-    background-color: var(--card-bg); /* Neutral background */
+    background-color: var(--bg-card);
+    /* Neutral background */
     color: var(--text-primary);
     border: 1px solid var(--border-color);
     padding: 2px 6px;
 }
 
 .nav-badge .highlight-count {
-    color: #3b82f6; /* Blue 500 */
+    color: #3b82f6;
+    /* Blue 500 */
     font-weight: 700;
     margin-left: 4px;
 }
@@ -1293,7 +1303,7 @@ body {
 .input-group input {
     flex: 1;
     padding: 0.75rem;
-    background: var(--bg-color);
+    background: var(--bg-body);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     border-radius: 8px;
@@ -1302,7 +1312,7 @@ body {
 /* Update Banner Enhanced */
 .change-summary {
     font-size: 0.8rem;
-    background: rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
     border-radius: 4px;
     margin: 0.5rem 0;
@@ -1312,6 +1322,7 @@ body {
     max-height: 100px;
     overflow-y: auto;
 }
+
 .update-content {
     display: flex;
     flex-direction: column;
@@ -1320,14 +1331,16 @@ body {
 }
 
 /* Installer Changelog */
-.changelog-container ul { 
-    padding-left: 1.5rem; 
+.changelog-container ul {
+    padding-left: 1.5rem;
     margin: 0.5rem 0;
 }
+
 .changelog-container li {
     margin-bottom: 0.4rem;
     line-height: 1.5;
 }
+
 .changelog-container h3 {
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;

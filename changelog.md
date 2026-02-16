@@ -1,3 +1,8 @@
+## v1.2.0 (2026-02-16)
+- **Feature**: Bessere UX im Installer (Button oben, Log unten, Features aktualisiert). 💅
+- **Tech**: Build-Tests hinzugefügt. 🧪
+- **Fix**: Encoding-Probleme final behoben (dank Python Buildlogic). 🐍
+
 ## v1.1.2 (2026-02-16)
 - **Fix**: Encoding-Problem beim Bookmarklet behoben (URL Malformed Error). 🔗
 

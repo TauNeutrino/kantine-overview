@@ -108,39 +108,49 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 </head>
 <body>
     <h1>🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
-        <div class="card">
-            <h2>Changelog</h2>
-            <div class="changelog-container">
-                <!-- CHANGELOG_PLACEHOLDER -->
-            </div>
-        </div>
+    
+    <!-- 1. BUTTON (Top Priority) -->
+    <div class="card" style="text-align: center; border: 2px solid #029AA8;">
+        <p style="margin-bottom:15px; font-weight:bold;">👇 Diesen Button in die Lesezeichen-Leiste ziehen:</p>
+        <p><a class="bookmarklet" id="bookmarklet-link" href="#">⏳ Wird generiert...</a></p>
+    </div>
 
-        <div class="card">
-             <h2>So funktioniert's</h2>
-        <ol>
-            <li>Ziehe den Button unten in deine <strong>Lesezeichen-Leiste</strong> (Drag & Drop)</li>
-            <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#029AA8">web.bessa.app/knapp-kantine</a></li>
-            <li>Klicke auf das Lesezeichen <code>Kantine $VERSION</code></li>
-        </ol>
-        </div>
+    <!-- 2. INSTRUCTIONS -->
+    <div class="card">
+         <h2>So funktioniert's</h2>
+    <ol>
+        <li>Ziehe den Button oben in deine <strong>Lesezeichen-Leiste</strong> (Drag & Drop)</li>
+        <li>Navigiere zu <a href="https://web.bessa.app/knapp-kantine" style="color:#029AA8">web.bessa.app/knapp-kantine</a></li>
+        <li>Klicke auf das Lesezeichen <code>Kantine $VERSION</code></li>
+    </ol>
+    </div>
 
-        <div class="card">
-        <h2>✨ Features</h2>
-        <ul>
-            <li>📅 <strong>Wochenübersicht:</strong> Die ganze Woche auf einen Blick.</li>
-            <li>💰 <strong>Kostenkontrolle:</strong> Automatische Berechnung der Wochensumme.</li>
-            <li>🔑 <strong>Auto-Login:</strong> Nutzt deine bestehende Session.</li>
-            <li>🏷️ <strong>Badges & Status:</strong> Menü-Codes (M1, M2) und Bestellstatus direkt sichtbar.</li>
-            <li>🛡️ <strong>Offline-Support:</strong> Speichert Menüdaten lokal.</li>
-        </ul>
+    <!-- 3. FEATURES -->
+    <div class="card">
+    <h2>✨ Features</h2>
+    <ul>
+        <li>📅 <strong>Wochenübersicht:</strong> Die ganze Woche auf einen Blick.</li>
+        <li>⏳ <strong>Order Countdown:</strong> Roter Alarm 1h vor Bestellschluss.</li>
+        <li>🌟 <strong>Smart Highlights:</strong> Markiere deine Favoriten (z.B. "Schnitzel").</li>
+        <li>💰 <strong>Kostenkontrolle:</strong> Automatische Berechnung der Wochensumme.</li>
+        <li>🔑 <strong>Auto-Login:</strong> Nutzt deine bestehende Session.</li>
+        <li>🏷️ <strong>Badges & Status:</strong> Menü-Codes (M1, M2) und Bestellstatus direkt sichtbar.</li>
+    </ul>
 
-        <div style="margin-top: 30px; padding: 15px; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
+    <div style="margin-top: 30px; padding: 15px; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
              <strong>⚠️ Haftungsausschluss:</strong><br>
              Die Verwendung dieses Bookmarklets erfolgt auf eigene Verantwortung. Der Entwickler übernimmt keine Haftung für Schäden, Datenverlust oder ungewollte Bestellungen, die durch die Nutzung dieser Software entstehen.
+    </div>
+    </div>
+
+    <!-- 4. CHANGELOG (Bottom) -->
+    <div class="card">
+        <h2>Changelog</h2>
+        <div class="changelog-container">
+            <!-- CHANGELOG_PLACEHOLDER -->
         </div>
     </div>
-    <p>👇 Diesen Button in die Lesezeichen-Leiste ziehen:</p>
-    <p><a class="bookmarklet" id="bookmarklet-link" href="#">⏳ Wird generiert...</a></p>
+
     <script>
 INSTALLEOF
 
@@ -168,27 +178,22 @@ import sys, json, urllib.parse
 
 # 1. Read JS and Replace VERSION
 js_template = sys.stdin.read()
-# We do replacement here in Python to be safe
 js = js_template.replace('{{VERSION}}', '$VERSION')
 
-# 2. Prepare CSS
+# 2. Prepare CSS for injection via createElement('style')
 css = open('$CSS_FILE').read().replace('\n', ' ').replace('  ', ' ')
 escaped_css = css.replace('\\\\', '\\\\\\\\').replace(\"'\", \"\\\\'\").replace('\"', '\\\\\"')
 
-# 3. Inject CSS and Update URL
+# 3. Update URL
 update_url = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html'
 js = js.replace('https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html', update_url)
-js = js.replace('{{CSS_ESCAPED}}', escaped_css)
 
-# 4. Create Bookmarklet Code
-# Wrap in IIFE
-bookmarklet_code = 'javascript:(function(){' + js + '})();'
+# 4. Create Bookmarklet Code with CSS injection
+# Inject CSS via style element (same pattern as bookmarklet-payload.js)
+css_injection = \"var s=document.createElement('style');s.textContent='\" + escaped_css + \"';document.head.appendChild(s);\"
+bookmarklet_code = 'javascript:(function(){' + css_injection + js + '})();'
 
-# 5. URL Encode the body (keeping javascript: prefix)
-# We accept that simple encoding is better. 
-# But browsers expect encoded URI for href.
-# However, for bookmarklet usage, user drags the link.
-# If we encode everything, it's safer.
+# 5. URL Encode
 encoded_code = urllib.parse.quote(bookmarklet_code, safe=':/()!;=+,')
 
 # Output as JSON string for the HTML script to assign to href
@@ -218,3 +223,14 @@ echo ""
 echo "=== Build Complete ==="
 echo "Files in $DIST_DIR:"
 ls -la "$DIST_DIR/"
+
+# === 4. Run build-time tests ===
+echo ""
+echo "=== Running Build Tests ==="
+python3 "$SCRIPT_DIR/test_build.py"
+TEST_EXIT=$?
+if [ $TEST_EXIT -ne 0 ]; then
+    echo "❌ Build tests FAILED! See above for details."
+    exit 1
+fi
+echo "✅ All build tests passed."
