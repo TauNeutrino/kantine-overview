@@ -48,3 +48,10 @@ trigger: always_on
 ## 6. Workspace Scopes
 - **Browser**: Allowed for documentation and safe browsing. No automated logins without permission.
 - **Terminal**: No `rm -rf`. Run tests (`pytest` etc.) after logic changes.
+
+## 7. Requirements-Konsistenz 📋
+Alle umgesetzten Anforderungen müssen mit `REQUIREMENTS.md` übereinstimmen.
+1.  **Vor der Umsetzung prüfen**: Passt die neue Anforderung zu den bestehenden Requirements?
+2.  **Fehlende Requirements**: Wenn eine umzusetzende Anforderung in `REQUIREMENTS.md` fehlt, muss dies im **Implementation Plan** explizit dokumentiert und freigegeben werden.
+3.  **Widersprüche**: Wenn eine neue Anforderung im Widerspruch zu bestehenden Requirements steht, muss dies im **Implementation Plan** als ⚠️ Warning hervorgehoben werden.
+4.  **Nach Freigabe**: Bei Genehmigung des Implementation Plans muss `REQUIREMENTS.md` entsprechend erweitert oder korrigiert werden (neue ID, Version, Beschreibung). Obsolet gewordene Requirements werden nicht aus `REQUIREMENTS.md` gelöscht sondern nur als durchgestrichen markiert und ein Kommentar mit dem Grund hinzugefügt.

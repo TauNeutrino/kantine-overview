@@ -271,7 +271,8 @@ echo "✅ All build tests passed."
 echo ""
 echo "=== Tagging $VERSION ==="
 if git rev-parse "$VERSION" >/dev/null 2>&1; then
-    echo "ℹ️  Tag $VERSION already exists, skipping."
+    git tag -f "$VERSION"
+    echo "🔄 Tag $VERSION moved to current commit."
 else
     git tag "$VERSION"
     echo "✅ Created tag: $VERSION"

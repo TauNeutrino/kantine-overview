@@ -107,7 +107,8 @@ try {
         [/function\s+fetchVersions/, 'fetchVersions function'],
         [/function\s+isNewer/, 'isNewer function'],
         [/function\s+openVersionMenu/, 'openVersionMenu function'],
-        [/kantine_dev_mode/, 'dev-mode localStorage key']
+        [/kantine_dev_mode/, 'dev-mode localStorage key'],
+        [/function\s+isCacheFresh/, 'isCacheFresh function']
     ];
 
     for (const [regex, label] of checks) {

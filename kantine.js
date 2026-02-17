@@ -796,6 +796,34 @@
         return false;
     }
 
+    // FR-024: Check if cache is fresh enough to skip API refresh
+    function isCacheFresh() {
+        const cachedTs = localStorage.getItem(CACHE_TS_KEY);
+        if (!cachedTs) return false;
+
+        // Condition 1: Cache < 1 hour old
+        const ageMs = Date.now() - new Date(cachedTs).getTime();
+        if (ageMs > 60 * 60 * 1000) return false;
+
+        // Condition 2: Data covers next 5 working days
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const cachedDates = new Set();
+        allWeeks.forEach(w => (w.days || []).forEach(d => cachedDates.add(d.date)));
+
+        let coveredDays = 0;
+        for (let i = 0; i < 7 && coveredDays < 5; i++) {
+            const check = new Date(today);
+            check.setDate(check.getDate() + i);
+            const dow = check.getDay();
+            if (dow === 0 || dow === 6) continue; // Skip weekends
+            const dateStr = check.toISOString().split('T')[0];
+            if (cachedDates.has(dateStr)) coveredDays++;
+        }
+
+        return coveredDays >= 5;
+    }
+
     // === Menu Data Fetching (Direct from Bessa API) ===
     async function loadMenuDataFromAPI() {
         const loading = document.getElementById('loading');
@@ -1751,13 +1779,19 @@
     updateAuthUI();
     cleanupExpiredFlags();
 
-    // Load cached data first for instant UI, then refresh from API
+    // Load cached data first for instant UI, refresh only if stale (FR-024)
     const hadCache = loadMenuCache();
     if (hadCache) {
-        // Hide loading spinner since cache is shown
         document.getElementById('loading').classList.add('hidden');
+        if (!isCacheFresh()) {
+            console.log('Cache stale or incomplete – refreshing from API');
+            loadMenuDataFromAPI();
+        } else {
+            console.log('Cache fresh & complete – skipping API refresh');
+        }
+    } else {
+        loadMenuDataFromAPI();
     }
-    loadMenuDataFromAPI();
 
     // Auto-start polling if already logged in
     if (authToken) {
