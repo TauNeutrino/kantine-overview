@@ -1020,17 +1020,39 @@
     }
 
     // === Last Updated Display ===
+    let lastUpdatedTimestamp = null;
+    let lastUpdatedIntervalId = null;
+
     function updateLastUpdatedTime(isoTimestamp) {
         const subtitle = document.getElementById('last-updated-subtitle');
         if (!isoTimestamp) return;
+        lastUpdatedTimestamp = isoTimestamp;
         try {
             const date = new Date(isoTimestamp);
             const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
             const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-            subtitle.textContent = `Aktualisiert: ${dateStr} ${timeStr}`;
+            const ago = getRelativeTime(date);
+            subtitle.textContent = `Aktualisiert: ${dateStr} ${timeStr} (${ago})`;
         } catch (e) {
             subtitle.textContent = '';
         }
+        // Auto-refresh relative time every minute
+        if (!lastUpdatedIntervalId) {
+            lastUpdatedIntervalId = setInterval(() => {
+                if (lastUpdatedTimestamp) updateLastUpdatedTime(lastUpdatedTimestamp);
+            }, 60 * 1000);
+        }
+    }
+
+    function getRelativeTime(date) {
+        const diffMs = Date.now() - date.getTime();
+        const diffMin = Math.floor(diffMs / 60000);
+        if (diffMin < 1) return 'gerade eben';
+        if (diffMin === 1) return 'vor 1 min.';
+        if (diffMin < 60) return `vor ${diffMin} min.`;
+        const diffH = Math.floor(diffMin / 60);
+        if (diffH === 1) return 'vor 1 Std.';
+        return `vor ${diffH} Std.`;
     }
 
     // === Toast Notification ===
