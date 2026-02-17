@@ -284,4 +284,5 @@ git add -A
 git commit -m "dist files for $VERSION built" --allow-empty
 git push
 git push origin --force tag "$VERSION"
+git push github --force tag "$VERSION"
 echo "✅ Pushed commit + tag $VERSION"

@@ -780,10 +780,12 @@
         try {
             const cached = localStorage.getItem(CACHE_KEY);
             const cachedTs = localStorage.getItem(CACHE_TS_KEY);
+            console.log(`[Cache] localStorage: key=${!!cached} (${cached ? cached.length : 0} chars), ts=${cachedTs}`);
             if (cached) {
                 allWeeks = JSON.parse(cached);
                 currentWeekNumber = getISOWeek(new Date());
                 currentYear = new Date().getFullYear();
+                console.log(`[Cache] Parsed ${allWeeks.length} weeks:`, allWeeks.map(w => `KW${w.weekNumber}/${w.year} (${(w.days || []).length} days)`));
                 renderVisibleWeeks();
                 updateNextWeekBadge();
                 if (cachedTs) updateLastUpdatedTime(cachedTs);
@@ -799,7 +801,10 @@
     // FR-024: Check if cache is fresh enough to skip API refresh
     function isCacheFresh() {
         const cachedTs = localStorage.getItem(CACHE_TS_KEY);
-        if (!cachedTs) return false;
+        if (!cachedTs) {
+            console.log('[Cache] No timestamp found');
+            return false;
+        }
 
         // Condition 1: Cache < 1 hour old
         const ageMs = Date.now() - new Date(cachedTs).getTime();
@@ -814,7 +819,7 @@
         const thisYear = getWeekYear(new Date());
         const hasCurrentWeek = allWeeks.some(w => w.weekNumber === thisWeek && w.year === thisYear && w.days && w.days.length > 0);
 
-        console.log(`[Cache] Age: ${ageMin}min, KW${thisWeek}: ${hasCurrentWeek ? 'vorhanden' : 'fehlt'}`);
+        console.log(`[Cache] Age: ${ageMin}min, looking for KW${thisWeek}/${thisYear}, found: ${hasCurrentWeek}`);
         return hasCurrentWeek;
     }
 
