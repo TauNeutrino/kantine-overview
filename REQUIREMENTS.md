@@ -32,7 +32,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-021 | Das System muss bereits geladene Menüdaten zwischenspeichern, um bei erneutem Aufruf sofort eine Übersicht anzeigen zu können. | Mittel | v1.0.1 |
 | FR-022 | Das System muss dem Benutzer die Möglichkeit bieten, die Menüdaten manuell neu zu laden. | Niedrig | v1.0.1 |
 | FR-023 | Der Zeitpunkt der letzten Aktualisierung muss für den Benutzer sichtbar sein. | Niedrig | v1.0.1 |
-| FR-024 | Das System darf beim Start keinen automatischen API-Refresh durchführen, wenn der Cache frisch (< 1 Stunde) und vollständig ist (nächste 5 Arbeitstage abgedeckt). | Mittel | v1.3.1 |
+| FR-024 | Das System darf beim Start keinen automatischen API-Refresh durchführen, wenn der Cache frisch (< 1 Stunde) und Daten für die aktuelle Kalenderwoche vorhanden sind. | Mittel | v1.3.1 |
 | **Bestellfunktion** | | | |
 | FR-030 | Authentifizierte Benutzer müssen ein verfügbares Menü direkt aus der Übersicht bestellen können. | Hoch | v1.0.1 |
 | FR-031 | Authentifizierte Benutzer müssen eine bestehende Bestellung direkt aus der Übersicht stornieren können. | Hoch | v1.0.1 |

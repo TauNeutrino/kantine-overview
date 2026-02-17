@@ -1,5 +1,5 @@
 ## v1.3.1 (2026-02-17)
-- **Feature**: Smart Cache – Initialer API-Refresh wird übersprungen wenn Cache < 1h alt und nächste 5 Arbeitstage abgedeckt. ⚡
+- **Feature**: Smart Cache – API-Refresh beim Start wird übersprungen wenn Daten für die aktuelle KW vorhanden und Cache < 1h alt ist. ⚡
 
 ## v1.3.0 (2026-02-16)
 - **Feature**: GitHub Release Management 📦

@@ -267,14 +267,21 @@ if [ $TEST_EXIT -ne 0 ]; then
 fi
 echo "✅ All build tests passed."
 
-# === 5. Auto-tag version ===
+# === 5. Auto-tag and push ===
 echo ""
 echo "=== Tagging $VERSION ==="
 if git rev-parse "$VERSION" >/dev/null 2>&1; then
     git tag -f "$VERSION"
     echo "🔄 Tag $VERSION moved to current commit."
-    echo "   ⚠️  Force-push required: git push origin --force tag $VERSION"
 else
     git tag "$VERSION"
     echo "✅ Created tag: $VERSION"
 fi
+
+echo ""
+echo "=== Committing & Pushing ==="
+git add -A
+git commit -m "dist files for $VERSION built" --allow-empty
+git push
+git push origin --force tag "$VERSION"
+echo "✅ Pushed commit + tag $VERSION"

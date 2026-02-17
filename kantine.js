@@ -803,25 +803,19 @@
 
         // Condition 1: Cache < 1 hour old
         const ageMs = Date.now() - new Date(cachedTs).getTime();
-        if (ageMs > 60 * 60 * 1000) return false;
-
-        // Condition 2: Data covers next 5 working days
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const cachedDates = new Set();
-        allWeeks.forEach(w => (w.days || []).forEach(d => cachedDates.add(d.date)));
-
-        let coveredDays = 0;
-        for (let i = 0; i < 7 && coveredDays < 5; i++) {
-            const check = new Date(today);
-            check.setDate(check.getDate() + i);
-            const dow = check.getDay();
-            if (dow === 0 || dow === 6) continue; // Skip weekends
-            const dateStr = check.toISOString().split('T')[0];
-            if (cachedDates.has(dateStr)) coveredDays++;
+        const ageMin = Math.round(ageMs / 60000);
+        if (ageMs > 60 * 60 * 1000) {
+            console.log(`[Cache] Stale: ${ageMin}min old (max 60)`);
+            return false;
         }
 
-        return coveredDays >= 5;
+        // Condition 2: Data for current week exists
+        const thisWeek = getISOWeek(new Date());
+        const thisYear = getWeekYear(new Date());
+        const hasCurrentWeek = allWeeks.some(w => w.weekNumber === thisWeek && w.year === thisYear && w.days && w.days.length > 0);
+
+        console.log(`[Cache] Age: ${ageMin}min, KW${thisWeek}: ${hasCurrentWeek ? 'vorhanden' : 'fehlt'}`);
+        return hasCurrentWeek;
     }
 
     // === Menu Data Fetching (Direct from Bessa API) ===
