@@ -273,6 +273,7 @@ echo "=== Tagging $VERSION ==="
 if git rev-parse "$VERSION" >/dev/null 2>&1; then
     git tag -f "$VERSION"
     echo "🔄 Tag $VERSION moved to current commit."
+    echo "   ⚠️  Force-push required: git push origin --force tag $VERSION"
 else
     git tag "$VERSION"
     echo "✅ Created tag: $VERSION"
