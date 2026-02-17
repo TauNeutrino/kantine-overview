@@ -1,4 +1,4 @@
-# Kantine Wrapper Bookmarklet (v1.2.0)
+# Kantine Wrapper Bookmarklet 
 
 Ein intelligentes Bookmarklet für die Mitarbeiter-Kantine der Bessa App. Dieses Skript erweitert die Standardansicht um eine **Wochenübersicht**, Kostenkontrolle und verbesserte Usability.
 
