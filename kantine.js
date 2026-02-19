@@ -1141,7 +1141,9 @@
             if (nextWeekData && nextWeekData.days) {
                 nextWeekData.days.forEach(day => {
                     day.items.forEach(item => {
-                        if (checkHighlight(item.name) || checkHighlight(item.description)) {
+                        const nameMatches = checkHighlight(item.name);
+                        const descMatches = checkHighlight(item.description);
+                        if (nameMatches.length > 0 || descMatches.length > 0) {
                             highlightCount++;
                         }
                     });

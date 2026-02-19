@@ -1,3 +1,6 @@
+## v1.3.2 (2026-02-19)
+- **Fix**: Falsche Anzahl an Highlight-Menüs im "Nächste Woche"-Badge korrigiert (zählte alle Menüs statt nur Highlights). 🐛
+
 ## v1.3.1 (2026-02-17)
 - **Feature**: Smart Cache – API-Refresh beim Start wird übersprungen wenn Daten für die aktuelle KW vorhanden und Cache < 1h alt ist. ⚡
 
