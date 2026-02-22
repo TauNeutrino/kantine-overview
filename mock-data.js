@@ -128,8 +128,31 @@
         // Orders endpoint
         if (urlStr.includes('/user/orders/') && (!options || options.method === 'GET' || !options.method)) {
             console.log('[MOCK] Returning mock orders');
+            // Formatter for history mapping
+            const mappedOrders = mockOrders.map(o => ({
+                id: o.id,
+                date: `${o.date}T10:00:00Z`,
+                order_state: o.status === 'cancelled' ? 9 : 5,
+                total: o.price || '6.50',
+                items: [{
+                    article: o.article,
+                    name: o.article_name,
+                    price: o.price || '6.50',
+                    amount: 1
+                }]
+            }));
+
+            // Handle lazy load / pagination if requesting full history
+            if (urlStr.includes('limit=50')) {
+                return Promise.resolve(new Response(JSON.stringify({
+                    count: mappedOrders.length,
+                    next: null,
+                    results: mappedOrders
+                }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+            }
+
             return Promise.resolve(new Response(JSON.stringify({
-                results: mockOrders
+                results: mappedOrders
             }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
 

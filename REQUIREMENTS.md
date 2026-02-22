@@ -38,8 +38,9 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-031 | Authentifizierte Benutzer müssen eine bestehende Bestellung direkt aus der Übersicht stornieren können. | Hoch | v1.0.1 |
 | FR-032 | Nach Bestellschluss (Cutoff-Zeit) dürfen keine neuen Bestellungen oder Stornierungen für diesen Tag möglich sein. | Hoch | v1.0.1 |
 | FR-033 | Es muss möglich sein, dasselbe Menü mehrfach zu bestellen. Bei Mehrfachbestellungen muss die Anzahl angezeigt werden. | Niedrig | v1.0.1 |
-| **Kostentransparenz** | | | |
+| **Kostentransparenz & Bestellhistorie** | | | |
 | FR-040 | Das System muss die Gesamtkosten aller Bestellungen einer Woche automatisch berechnen und anzeigen. | Mittel | v1.1.0 |
+| FR-041 | Das System muss dem Benutzer eine paginierte oder vollständige Bestellhistorie (gruppiert nach Monat und KW) mit Fortschrittsanzeige auf Abruf in einem Modal bereitstellen. | Mittel | v1.4.0 |
 | **Bestell-Countdown** | | | |
 | FR-050 | Das System muss vor Bestellschluss einen visuell hervorgehobenen Countdown anzeigen. | Mittel | v1.1.0 |
 | **Menü-Flagging & Benachrichtigungen** | | | |

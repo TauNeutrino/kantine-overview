@@ -83,6 +83,9 @@
                         <button id="btn-refresh" class="icon-btn" aria-label="Menüdaten aktualisieren" title="Menüdaten neu laden">
                             <span class="material-icons-round">refresh</span>
                         </button>
+                        <button id="btn-history" class="icon-btn" aria-label="Bestellhistorie" title="Bestellhistorie">
+                            <span class="material-icons-round">receipt_long</span>
+                        </button>
                         <button id="btn-highlights" class="icon-btn" aria-label="Persönliche Highlights verwalten" title="Persönliche Highlights verwalten">
                             <span class="material-icons-round">label</span>
                         </button>
@@ -173,6 +176,30 @@
                 </div>
             </div>
 
+            <div id="history-modal" class="modal hidden">
+                <div class="modal-content history-modal-content">
+                    <div class="modal-header">
+                        <h2>Bestellhistorie</h2>
+                        <button id="btn-history-close" class="icon-btn" aria-label="Close">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="history-loading" class="hidden">
+                            <p id="history-progress-text" style="text-align: center; margin-bottom: 1rem; color: var(--text-secondary);">Lade Historie...</p>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div id="history-progress-fill" class="progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="history-content">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="version-modal" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -235,17 +262,26 @@
         const btnAddTag = document.getElementById('btn-add-tag');
         const tagInput = document.getElementById('tag-input');
 
-        btnHighlights.addEventListener('click', () => {
-            highlightsModal.classList.remove('hidden');
-            renderTagsList();
-            tagInput.focus();
+        // History Modal
+        const btnHistory = document.getElementById('btn-history');
+        const historyModal = document.getElementById('history-modal');
+        const btnHistoryClose = document.getElementById('btn-history-close');
+
+        btnHistory.addEventListener('click', () => {
+            if (!authToken) {
+                loginModal.classList.remove('hidden');
+                return;
+            }
+            historyModal.classList.remove('hidden');
+            fetchFullOrderHistory();
         });
 
-        btnHighlightsClose.addEventListener('click', () => {
-            highlightsModal.classList.add('hidden');
+        btnHistoryClose.addEventListener('click', () => {
+            historyModal.classList.add('hidden');
         });
 
         window.addEventListener('click', (e) => {
+            if (e.target === historyModal) historyModal.classList.add('hidden');
             if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
         });
 

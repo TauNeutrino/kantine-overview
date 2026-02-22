@@ -1,3 +1,6 @@
+## v1.4.0 (2026-02-22)
+- **Feature**: Bestellhistorie per Knopfdruck abrufbar. Übersichtliche Darstellung, gruppiert nach Monaten und Kalenderwochen, inklusive Stornos. 📜✨
+
 ## v1.3.2 (2026-02-19)
 - **Fix**: Falsche Anzahl an Highlight-Menüs im "Nächste Woche"-Badge korrigiert (zählte alle Menüs statt nur Highlights). 🐛
 

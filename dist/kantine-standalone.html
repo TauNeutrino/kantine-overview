@@ -448,13 +448,120 @@ body {
 
 .modal-content {
     background: var(--bg-card);
-    /* Changed from --surface */
     width: 90%;
     max-width: 400px;
     border-radius: 16px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     animation: modalSlide 0.3s ease-out;
+}
+
+/* History Modal specific */
+.history-modal-content {
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-modal-content .modal-body {
+    overflow-y: auto;
+    padding: 0; /* Padding is handled by inner elements */
+}
+
+/* History Styles */
+.history-month-group {
+    margin-bottom: 24px;
+}
+
+.history-month-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    padding: 12px 20px;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.history-month-group:first-child .history-month-header {
+    border-top: none;
+}
+
+.history-week-group {
+    padding: 16px 20px 8px;
+}
+
+.history-week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.history-week-summary {
+    font-size: 0.85rem;
+    font-weight: 500;
+    background: rgba(100, 116, 139, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--bg-body);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.history-item-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.history-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-item-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.history-item-price {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.history-item-name-cancelled {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.history-item-price-cancelled {
+    text-decoration: line-through;
+    color: var(--text-secondary);
 }
 
 @keyframes modalSlide {
@@ -1679,8 +1786,31 @@ body {
         // Orders endpoint
         if (urlStr.includes('/user/orders/') && (!options || options.method === 'GET' || !options.method)) {
             console.log('[MOCK] Returning mock orders');
+            // Formatter for history mapping
+            const mappedOrders = mockOrders.map(o => ({
+                id: o.id,
+                date: `${o.date}T10:00:00Z`,
+                order_state: o.status === 'cancelled' ? 9 : 5,
+                total: o.price || '6.50',
+                items: [{
+                    article: o.article,
+                    name: o.article_name,
+                    price: o.price || '6.50',
+                    amount: 1
+                }]
+            }));
+
+            // Handle lazy load / pagination if requesting full history
+            if (urlStr.includes('limit=50')) {
+                return Promise.resolve(new Response(JSON.stringify({
+                    count: mappedOrders.length,
+                    next: null,
+                    results: mappedOrders
+                }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+            }
+
             return Promise.resolve(new Response(JSON.stringify({
-                results: mockOrders
+                results: mappedOrders
             }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
 
@@ -1807,7 +1937,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.3.2</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.0</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
@@ -1818,6 +1948,9 @@ body {
                     <div class="controls">
                         <button id="btn-refresh" class="icon-btn" aria-label="Menüdaten aktualisieren" title="Menüdaten neu laden">
                             <span class="material-icons-round">refresh</span>
+                        </button>
+                        <button id="btn-history" class="icon-btn" aria-label="Bestellhistorie" title="Bestellhistorie">
+                            <span class="material-icons-round">receipt_long</span>
                         </button>
                         <button id="btn-highlights" class="icon-btn" aria-label="Persönliche Highlights verwalten" title="Persönliche Highlights verwalten">
                             <span class="material-icons-round">label</span>
@@ -1909,6 +2042,30 @@ body {
                 </div>
             </div>
 
+            <div id="history-modal" class="modal hidden">
+                <div class="modal-content history-modal-content">
+                    <div class="modal-header">
+                        <h2>Bestellhistorie</h2>
+                        <button id="btn-history-close" class="icon-btn" aria-label="Close">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="history-loading" class="hidden">
+                            <p id="history-progress-text" style="text-align: center; margin-bottom: 1rem; color: var(--text-secondary);">Lade Historie...</p>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div id="history-progress-fill" class="progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="history-content">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="version-modal" class="modal hidden">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1919,7 +2076,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.3.2</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.0</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -1971,17 +2128,26 @@ body {
         const btnAddTag = document.getElementById('btn-add-tag');
         const tagInput = document.getElementById('tag-input');
 
-        btnHighlights.addEventListener('click', () => {
-            highlightsModal.classList.remove('hidden');
-            renderTagsList();
-            tagInput.focus();
+        // History Modal
+        const btnHistory = document.getElementById('btn-history');
+        const historyModal = document.getElementById('history-modal');
+        const btnHistoryClose = document.getElementById('btn-history-close');
+
+        btnHistory.addEventListener('click', () => {
+            if (!authToken) {
+                loginModal.classList.remove('hidden');
+                return;
+            }
+            historyModal.classList.remove('hidden');
+            fetchFullOrderHistory();
         });
 
-        btnHighlightsClose.addEventListener('click', () => {
-            highlightsModal.classList.add('hidden');
+        btnHistoryClose.addEventListener('click', () => {
+            historyModal.classList.add('hidden');
         });
 
         window.addEventListener('click', (e) => {
+            if (e.target === historyModal) historyModal.classList.add('hidden');
             if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
         });
 
@@ -3294,7 +3460,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.3.2';
+        const currentVersion = 'v1.4.0';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -3335,7 +3501,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.3.2';
+        const currentVersion = 'v1.4.0';
 
         if (!modal) return;
         modal.classList.remove('hidden');

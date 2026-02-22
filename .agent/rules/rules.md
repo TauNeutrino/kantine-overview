@@ -26,16 +26,15 @@ trigger: always_on
 - **Interaction**: Be proactive, concise, and helpful. Focus on code value.
 
 ## 4. Development Standards
-**Tech Stack:**
-- **Container**: Docker-based application.
-- **Config**: Configurable port.
-
 **Coding Style:**
 - **Typing**: Strict typing where applicable.
 - **Comments**: Concise, English.
 - **Frontend/UX**: 
     - Priority on Usability.
     - **MANDATORY**: Tooltips/Help texts for all interactions.
+- **Versioning**:
+    - version.txt has to be increased for any implemented features or fixed bugs)
+    - a change summary has to be documented in changelog.md 
 
 ## 5. Agentic Workflow & Artifacts
 **Core Philosophy**: Plan first, act second.
