@@ -646,7 +646,7 @@
                     date: order.date,
                     name: item.name || 'Menü',
                     price: itemPrice,
-                    state: order.order_state // 9 is cancelled
+                    state: order.order_state // 9 is cancelled, 5 is active, 8 is completed
                 });
 
                 if (order.order_state !== 9) {
@@ -673,7 +673,7 @@
                 const monthGroup = yearGroup.months[mKey];
 
                 html += `<div class="history-month-group">
-                    <div class="history-month-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="history-month-header" tabindex="0" role="button" aria-expanded="false">
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <span>${monthGroup.name}</span>
                             <div class="history-month-summary">
@@ -695,15 +695,26 @@
                         </div>`;
 
                     week.items.forEach(item => {
-                        const isCancelled = item.state === 9;
                         const dateObj = new Date(item.date);
                         const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+                        let statusBadge = '';
+                        if (item.state === 9) {
+                            statusBadge = '<span class="history-item-status-badge status-cancelled">Storniert</span>';
+                        } else if (item.state === 8) {
+                            statusBadge = '<span class="history-item-status-badge status-completed">Abgeschlossen</span>';
+                        } else {
+                            statusBadge = '<span class="history-item-status-badge status-active">Offen</span>';
+                        }
 
                         html += `
                         <div class="history-item">
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
-                            <div class="history-item-name ${isCancelled ? 'history-item-name-cancelled' : ''}">${escapeHtml(item.name)}</div>
-                            <div class="history-item-price ${isCancelled ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
+                            <div class="history-item-details">
+                                <span class="history-item-name">${escapeHtml(item.name)}</span>
+                                <div>${statusBadge}</div>
+                            </div>
+                            <div class="history-item-price ${item.state === 9 ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
                         </div>`;
                     });
                     html += `</div>`;
@@ -715,9 +726,30 @@
 
         content.innerHTML = html;
 
+        // Bind Accordion Click Events via JS
+        const monthHeaders = content.querySelectorAll('.history-month-header');
+        monthHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const parentGroup = header.parentElement;
+                const isOpen = parentGroup.classList.contains('open');
+
+                // Toggle current
+                if (isOpen) {
+                    parentGroup.classList.remove('open');
+                    header.setAttribute('aria-expanded', 'false');
+                } else {
+                    parentGroup.classList.add('open');
+                    header.setAttribute('aria-expanded', 'true');
+                }
+            });
+        });
+
         // Open the first month of the first year automatically
         const firstMonth = content.querySelector('.history-month-group');
-        if (firstMonth) firstMonth.classList.add('open');
+        if (firstMonth) {
+            firstMonth.classList.add('open');
+            firstMonth.querySelector('.history-month-header').setAttribute('aria-expanded', 'true');
+        }
     }
 
     // === Place Order ===
