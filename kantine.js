@@ -700,15 +700,15 @@
 
                         let statusBadge = '';
                         if (item.state === 9) {
-                            statusBadge = '<span class="history-item-status-badge status-cancelled">Storniert</span>';
+                            statusBadge = '<span class="history-item-status">Storniert</span>';
                         } else if (item.state === 8) {
-                            statusBadge = '<span class="history-item-status-badge status-completed">Abgeschlossen</span>';
+                            statusBadge = '<span class="history-item-status">Abgeschlossen</span>';
                         } else {
-                            statusBadge = '<span class="history-item-status-badge status-active">Offen</span>';
+                            statusBadge = '<span class="history-item-status">Übertragen</span>';
                         }
 
                         html += `
-                        <div class="history-item">
+                        <div class="history-item ${item.state === 9 ? 'history-item-cancelled' : ''}">
                             <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
                             <div class="history-item-details">
                                 <span class="history-item-name">${escapeHtml(item.name)}</span>
@@ -743,13 +743,6 @@
                 }
             });
         });
-
-        // Open the first month of the first year automatically
-        const firstMonth = content.querySelector('.history-month-group');
-        if (firstMonth) {
-            firstMonth.classList.add('open');
-            firstMonth.querySelector('.history-month-header').setAttribute('aria-expanded', 'true');
-        }
     }
 
     // === Place Order ===
