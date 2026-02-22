@@ -617,7 +617,7 @@
             return;
         }
 
-        // Group by Month -> Week Number (KW)
+        // Group by Year -> Month -> Week Number (KW)
         const groups = {};
 
         orders.forEach(order => {
@@ -625,69 +625,99 @@
             const y = d.getFullYear();
             const m = d.getMonth();
             const monthKey = `${y}-${m.toString().padStart(2, '0')}`;
-            const monthName = d.toLocaleString('de-AT', { month: 'long', year: 'numeric' });
+            const monthName = d.toLocaleString('de-AT', { month: 'long' }); // Only month name
 
             const kw = getISOWeek(d);
 
-            if (!groups[monthKey]) {
-                groups[monthKey] = { name: monthName, year: y, monthIndex: m, weeks: {} };
+            if (!groups[y]) {
+                groups[y] = { year: y, months: {} };
             }
-            if (!groups[monthKey].weeks[kw]) {
-                groups[monthKey].weeks[kw] = { label: `KW ${kw}`, items: [], count: 0, total: 0 };
+            if (!groups[y].months[monthKey]) {
+                groups[y].months[monthKey] = { name: monthName, year: y, monthIndex: m, count: 0, total: 0, weeks: {} };
+            }
+            if (!groups[y].months[monthKey].weeks[kw]) {
+                groups[y].months[monthKey].weeks[kw] = { label: `KW ${kw}`, items: [], count: 0, total: 0 };
             }
 
             const items = order.items || [];
             items.forEach(item => {
-                groups[monthKey].weeks[kw].items.push({
+                const itemPrice = parseFloat(item.price || order.total || 0);
+                groups[y].months[monthKey].weeks[kw].items.push({
                     date: order.date,
                     name: item.name || 'Menü',
-                    price: parseFloat(item.price || order.total || 0),
+                    price: itemPrice,
                     state: order.order_state // 9 is cancelled
                 });
+
                 if (order.order_state !== 9) {
-                    groups[monthKey].weeks[kw].count++;
-                    groups[monthKey].weeks[kw].total += parseFloat(item.price || order.total || 0);
+                    groups[y].months[monthKey].weeks[kw].count++;
+                    groups[y].months[monthKey].weeks[kw].total += itemPrice;
+                    groups[y].months[monthKey].count++;
+                    groups[y].months[monthKey].total += itemPrice;
                 }
             });
         });
 
         // Generate HTML 
-        const sortedMonths = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+        const sortedYears = Object.keys(groups).sort((a, b) => b - a);
         let html = '';
 
-        sortedMonths.forEach(mKey => {
-            const monthGroup = groups[mKey];
-            html += `<div class="history-month-group">
-                <h3 class="history-month-header">${monthGroup.name}</h3>`;
+        sortedYears.forEach(yKey => {
+            const yearGroup = groups[yKey];
+            html += `<div class="history-year-group">
+                <h2 class="history-year-header">${yearGroup.year}</h2>`;
 
-            const sortedKWs = Object.keys(monthGroup.weeks).sort((a, b) => parseInt(b) - parseInt(a));
+            const sortedMonths = Object.keys(yearGroup.months).sort((a, b) => b.localeCompare(a));
 
-            sortedKWs.forEach(kw => {
-                const week = monthGroup.weeks[kw];
-                html += `<div class="history-week-group" style="padding: 10px 20px;">
-                    <div class="history-week-header" style="display:flex; justify-content:space-between; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.95rem;">
-                        <strong>${week.label}</strong>
-                        <span>${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong></span>
-                    </div>`;
+            sortedMonths.forEach(mKey => {
+                const monthGroup = yearGroup.months[mKey];
 
-                week.items.forEach(item => {
-                    const isCancelled = item.state === 9;
-                    const dateObj = new Date(item.date);
-                    const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                html += `<div class="history-month-group">
+                    <div class="history-month-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <span>${monthGroup.name}</span>
+                            <div class="history-month-summary">
+                                <span>${monthGroup.count} Bestellungen &bull; <strong>€${monthGroup.total.toFixed(2)}</strong></span>
+                            </div>
+                        </div>
+                        <span class="material-icons-round">expand_more</span>
+                    </div>
+                    <div class="history-month-content">`;
 
-                    html += `
-                    <div class="history-item">
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
-                        <div class="history-item-name ${isCancelled ? 'history-item-name-cancelled' : ''}">${escapeHtml(item.name)}</div>
-                        <div class="history-item-price ${isCancelled ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
-                    </div>`;
+                const sortedKWs = Object.keys(monthGroup.weeks).sort((a, b) => parseInt(b) - parseInt(a));
+
+                sortedKWs.forEach(kw => {
+                    const week = monthGroup.weeks[kw];
+                    html += `<div class="history-week-group">
+                        <div class="history-week-header">
+                            <strong>${week.label}</strong>
+                            <span>${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong></span>
+                        </div>`;
+
+                    week.items.forEach(item => {
+                        const isCancelled = item.state === 9;
+                        const dateObj = new Date(item.date);
+                        const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+                        html += `
+                        <div class="history-item">
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
+                            <div class="history-item-name ${isCancelled ? 'history-item-name-cancelled' : ''}">${escapeHtml(item.name)}</div>
+                            <div class="history-item-price ${isCancelled ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
+                        </div>`;
+                    });
+                    html += `</div>`;
                 });
-                html += `</div>`;
+                html += `</div></div>`; // Close month-content and month-group
             });
-            html += `</div>`;
+            html += `</div>`; // Close year-group
         });
 
         content.innerHTML = html;
+
+        // Open the first month of the first year automatically
+        const firstMonth = content.querySelector('.history-month-group');
+        if (firstMonth) firstMonth.classList.add('open');
     }
 
     // === Place Order ===
