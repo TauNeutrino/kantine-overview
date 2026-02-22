@@ -1,3 +1,6 @@
+## v1.4.1 (2026-02-22)
+- **UX Verbesserungen**: Bestellhistorie gruppiert nach Jahren und Monaten mittels einklappbarem Akkordeon. Monatssummen integriert und Stati farblich abgehoben (Offen, Abgeschlossen, Storniert).
+
 ## v1.4.0 (2026-02-22)
 - **Feature**: Bestellhistorie per Knopfdruck abrufbar. Übersichtliche Darstellung, gruppiert nach Monaten und Kalenderwochen, inklusive Stornos. 📜✨
 
