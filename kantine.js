@@ -549,6 +549,147 @@
         }
     }
 
+    // === History Modal Flow ===
+    let fullOrderHistoryCache = null;
+
+    async function fetchFullOrderHistory() {
+        const historyLoading = document.getElementById('history-loading');
+        const historyContent = document.getElementById('history-content');
+        const progressFill = document.getElementById('history-progress-fill');
+        const progressText = document.getElementById('history-progress-text');
+
+        if (fullOrderHistoryCache) {
+            renderHistory(fullOrderHistoryCache);
+            return;
+        }
+
+        if (!authToken) return;
+
+        historyContent.innerHTML = '';
+        historyLoading.classList.remove('hidden');
+        progressFill.style.width = '0%';
+        progressText.textContent = 'Lade Bestellhistorie...';
+
+        let nextUrl = `${API_BASE}/user/orders/?venue=${VENUE_ID}&ordering=-created&limit=50`;
+        let allOrders = [];
+        let totalCount = 0;
+
+        try {
+            while (nextUrl) {
+                const response = await fetch(nextUrl, { headers: apiHeaders(authToken) });
+                if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
+
+                const data = await response.json();
+
+                if (data.count && totalCount === 0) {
+                    totalCount = data.count;
+                }
+
+                allOrders = allOrders.concat(data.results || []);
+
+                // Update progress
+                if (totalCount > 0) {
+                    const pct = Math.round((allOrders.length / totalCount) * 100);
+                    progressFill.style.width = `${pct}%`;
+                    progressText.textContent = `Lade Bestellung ${allOrders.length} von ${totalCount}...`;
+                } else {
+                    progressText.textContent = `Lade Bestellung ${allOrders.length}...`;
+                }
+
+                nextUrl = data.next;
+            }
+
+            fullOrderHistoryCache = allOrders;
+            renderHistory(fullOrderHistoryCache);
+
+        } catch (error) {
+            console.error('Error fetching full history:', error);
+            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">Fehler beim Laden der Historie.</p>`;
+        } finally {
+            historyLoading.classList.add('hidden');
+        }
+    }
+
+    function renderHistory(orders) {
+        const content = document.getElementById('history-content');
+        if (!orders || orders.length === 0) {
+            content.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Keine Bestellungen gefunden.</p>';
+            return;
+        }
+
+        // Group by Month -> Week Number (KW)
+        const groups = {};
+
+        orders.forEach(order => {
+            const d = new Date(order.date);
+            const y = d.getFullYear();
+            const m = d.getMonth();
+            const monthKey = `${y}-${m.toString().padStart(2, '0')}`;
+            const monthName = d.toLocaleString('de-AT', { month: 'long', year: 'numeric' });
+
+            const kw = getISOWeek(d);
+
+            if (!groups[monthKey]) {
+                groups[monthKey] = { name: monthName, year: y, monthIndex: m, weeks: {} };
+            }
+            if (!groups[monthKey].weeks[kw]) {
+                groups[monthKey].weeks[kw] = { label: `KW ${kw}`, items: [], count: 0, total: 0 };
+            }
+
+            const items = order.items || [];
+            items.forEach(item => {
+                groups[monthKey].weeks[kw].items.push({
+                    date: order.date,
+                    name: item.name || 'Menü',
+                    price: parseFloat(item.price || order.total || 0),
+                    state: order.order_state // 9 is cancelled
+                });
+                if (order.order_state !== 9) {
+                    groups[monthKey].weeks[kw].count++;
+                    groups[monthKey].weeks[kw].total += parseFloat(item.price || order.total || 0);
+                }
+            });
+        });
+
+        // Generate HTML 
+        const sortedMonths = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+        let html = '';
+
+        sortedMonths.forEach(mKey => {
+            const monthGroup = groups[mKey];
+            html += `<div class="history-month-group">
+                <h3 class="history-month-header">${monthGroup.name}</h3>`;
+
+            const sortedKWs = Object.keys(monthGroup.weeks).sort((a, b) => parseInt(b) - parseInt(a));
+
+            sortedKWs.forEach(kw => {
+                const week = monthGroup.weeks[kw];
+                html += `<div class="history-week-group" style="padding: 10px 20px;">
+                    <div class="history-week-header" style="display:flex; justify-content:space-between; margin-bottom: 8px; color: var(--text-secondary); font-size: 0.95rem;">
+                        <strong>${week.label}</strong>
+                        <span>${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong></span>
+                    </div>`;
+
+                week.items.forEach(item => {
+                    const isCancelled = item.state === 9;
+                    const dateObj = new Date(item.date);
+                    const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+                    html += `
+                    <div class="history-item">
+                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
+                        <div class="history-item-name ${isCancelled ? 'history-item-name-cancelled' : ''}">${escapeHtml(item.name)}</div>
+                        <div class="history-item-price ${isCancelled ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            });
+            html += `</div>`;
+        });
+
+        content.innerHTML = html;
+    }
+
     // === Place Order ===
     async function placeOrder(date, articleId, name, price, description) {
         if (!authToken) return;
