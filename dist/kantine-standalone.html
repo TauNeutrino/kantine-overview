@@ -796,7 +796,7 @@ body {
 
 .menu-item.today-ordered {
     border: 2px solid var(--accent-color);
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
@@ -808,15 +808,15 @@ body {
 
 @keyframes pulse-glow {
     0% {
-        box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
     }
 
     50% {
-        box-shadow: 0 0 25px rgba(96, 165, 250, 0.6);
+        box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
     }
 
     100% {
-        box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
     }
 }
 
@@ -1997,7 +1997,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.1</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.2</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                     </div>
@@ -2136,7 +2136,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.1</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.2</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -3699,7 +3699,12 @@ body {
             : `${GITHUB_API}/releases?per_page=20`;
 
         const resp = await fetch(endpoint, { headers: githubHeaders() });
-        if (!resp.ok) throw new Error(`GitHub API ${resp.status}`);
+        if (!resp.ok) {
+            if (resp.status === 403) {
+                throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
+            }
+            throw new Error(`GitHub API ${resp.status}`);
+        }
         const data = await resp.json();
 
         // Normalize to common format: { tag, name, url, body }
@@ -3716,7 +3721,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.1';
+        const currentVersion = 'v1.4.2';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -3757,7 +3762,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.1';
+        const currentVersion = 'v1.4.2';
 
         if (!modal) return;
         modal.classList.remove('hidden');

@@ -1773,7 +1773,12 @@
             : `${GITHUB_API}/releases?per_page=20`;
 
         const resp = await fetch(endpoint, { headers: githubHeaders() });
-        if (!resp.ok) throw new Error(`GitHub API ${resp.status}`);
+        if (!resp.ok) {
+            if (resp.status === 403) {
+                throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
+            }
+            throw new Error(`GitHub API ${resp.status}`);
+        }
         const data = await resp.json();
 
         // Normalize to common format: { tag, name, url, body }

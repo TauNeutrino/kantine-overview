@@ -1,3 +1,7 @@
+## v1.4.2 (2026-02-23)
+- **Fix**: Das "Heute Bestellt" Menü leuchtet nun stimmig im Design-Violett statt Blau.
+- **Fix**: Abfangen des GitHub API Rate Limit (403) im Versionsdialog mit einer freundlicheren Fehlermeldung, da der User-Agent im Browser nicht manuell gesetzt werden darf.
+
 ## v1.4.1 (2026-02-22)
 - **UX Verbesserungen**: Bestellhistorie gruppiert nach Jahren und Monaten mittels einklappbarem Akkordeon. Monatssummen integriert und Stati farblich abgehoben (Offen, Abgeschlossen, Storniert).
 
