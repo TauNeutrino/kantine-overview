@@ -1,3 +1,7 @@
+## v1.4.8 (2026-02-24)
+- **Fix**: Die Benachrichtigungs-Glocke wird nun korrekt in Gelb dargestellt, wenn beobachtete Menüs verfügbar sind.
+- **Tools**: Fehler in Testskript behoben, der den CI/CD Build verlangsamt hat.
+
 ## v1.4.7 (2026-02-24)
 - **Performance**: Die Bestellhistorie nutzt nun einen inkrementellen Delta-Cache anstatt immer alle Seiten von der API herunterzuladen, was die Ladezeiten für Vielbesteller enorm reduziert.
 
