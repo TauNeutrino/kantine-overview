@@ -1,3 +1,6 @@
+## v1.4.18
+- 🧪 **Testing**: Die automatische DOM-Testing Suite (`test_dom.js`) wurde massiv ausgebaut. Sie prüft nun neben der Alarmglocke und den Highlights auch systematisch alle anderen UI-Komponenten (Login-Modal, History-Modal, Versionen-Modal, Theme-Toggle, und Navigation Tabs) auf korrekte Event-Listener-Bindungen, um Regressionen (tote Buttons) endgültig auszuschließen.
+
 ## v1.4.17
 - 🐛 **Bugfix**: Regression behoben: Der "Persönliche Highlights" (Stern-Button) Dialog öffnet sich nun wieder korrekt.
 - 🧪 **Testing**: Es wurde ein initialer UI-Testing-Hook (`test_dom.js` mit `jsdom`) in die Build-Pipeline integriert, um kritische DOM Event-Listener Regressionen (wie den Highlights-Button und die Alarmglocke) automatisch zu preventen.

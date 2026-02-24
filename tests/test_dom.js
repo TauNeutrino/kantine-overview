@@ -29,6 +29,43 @@ const html = `
         <button id="btn-add-tag">Add</button>
         <ul id="tags-list"></ul>
     </div>
+    
+    <!-- Mocks for Login Modal -->
+    <button id="btn-login-open">Login</button>
+    <div id="login-modal" class="modal hidden">
+        <button id="btn-login-close">Close</button>
+        <form id="login-form"></form>
+        <div id="login-error" class="hidden"></div>
+    </div>
+    
+    <!-- Mocks for History Modal -->
+    <button id="btn-history">History</button>
+    <div id="history-modal" class="modal hidden">
+        <button id="btn-history-close">Close</button>
+        <div id="history-loading" class="hidden"></div>
+        <div id="history-content"></div>
+    </div>
+
+    <!-- Mocks for Version Modal -->
+    <span class="version-tag">v1.4.17</span>
+    <div id="version-modal" class="modal hidden">
+        <button id="btn-version-close">Close</button>
+        <button id="btn-clear-cache">Clear</button>
+        <span id="version-current"></span>
+        <div id="version-list-container"></div>
+    </div>
+
+    <!-- Mocks for Theme Toggle -->
+    <button id="theme-toggle"><span class="theme-icon">light_mode</span></button>
+
+    <!-- Mocks for Navigation Tabs -->
+    <button id="btn-this-week" class="active">This Week</button>
+    <button id="btn-next-week">Next Week</button>
+    
+    <button id="btn-refresh">Refresh</button>
+    <button id="btn-logout">Logout</button>
+    <div class="order-history-header">Header</div>
+    <button id="btn-error-redirect">Error Redirect</button>
 </body>
 </html>
 `;
@@ -37,7 +74,8 @@ log("Reading file jsCode...");
 const jsCode = fs.readFileSync('kantine.js', 'utf8')
     .replace('(function () {', '')
     .replace('})();', '')
-    .replace('if (window.__KANTINE_LOADED) return;', '');
+    .replace('if (window.__KANTINE_LOADED) return;', '')
+    .replace('window.location.reload();', 'window.__RELOAD_CALLED = true;');
 
 log("Instantiating JSDOM...");
 const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
@@ -74,9 +112,6 @@ const testCode = `
         const hlModal = document.getElementById('highlights-modal');
         if (!hlModal.classList.contains('hidden')) throw new Error("Highlights modal should be hidden initially");
 
-        // Call bindEvents manually to attach the listeners since the IIFE is stripped
-        bindEvents();
-
         // Click to open
         document.getElementById('btn-highlights').click();
         if (hlModal.classList.contains('hidden')) throw new Error("Highlights modal did not open upon clicking btn-highlights!");
@@ -87,6 +122,56 @@ const testCode = `
 
         console.log("✅ Highlights Modal Test Passed");
         
+        console.log("--- Testing Login Modal ---");
+        const loginModal = document.getElementById('login-modal');
+        document.getElementById('btn-login-open').click();
+        if (loginModal.classList.contains('hidden')) throw new Error("Login modal should open");
+        document.getElementById('btn-login-close').click();
+        if (!loginModal.classList.contains('hidden')) throw new Error("Login modal should close");
+        console.log("✅ Login Modal Test Passed");
+
+        console.log("--- Testing History Modal ---");
+        // We need authToken to be truthy to open history modal
+        authToken = "fake_token";
+        const historyModal = document.getElementById('history-modal');
+        document.getElementById('btn-history').click();
+        if (historyModal.classList.contains('hidden')) throw new Error("History modal should open");
+        document.getElementById('btn-history-close').click();
+        if (!historyModal.classList.contains('hidden')) throw new Error("History modal should close");
+        console.log("✅ History Modal Test Passed");
+
+        console.log("--- Testing Version Modal ---");
+        const versionModal = document.getElementById('version-modal');
+        document.querySelector('.version-tag').click();
+        if (versionModal.classList.contains('hidden')) throw new Error("Version modal should open");
+        document.getElementById('btn-version-close').click();
+        if (!versionModal.classList.contains('hidden')) throw new Error("Version modal should close");
+        console.log("✅ Version Modal Test Passed");
+
+        console.log("--- Testing Theme Toggle ---");
+        const themeBtn = document.getElementById('theme-toggle');
+        const initialTheme = document.documentElement.getAttribute('data-theme');
+        themeBtn.click();
+        const newTheme = document.documentElement.getAttribute('data-theme');
+        if (initialTheme === newTheme) throw new Error("Theme did not toggle");
+        console.log("✅ Theme Toggle Test Passed");
+
+        console.log("--- Testing Navigation Tabs ---");
+        const btnThis = document.getElementById('btn-this-week');
+        const btnNext = document.getElementById('btn-next-week');
+        btnNext.click();
+        if (!btnNext.classList.contains('active') || btnThis.classList.contains('active')) throw new Error("Next week tab not active");
+        btnThis.click();
+        if (!btnThis.classList.contains('active') || btnNext.classList.contains('active')) throw new Error("This week tab not active");
+        console.log("✅ Navigation Tabs Test Passed");
+        
+        console.log("--- Testing Clear Cache Button ---");
+        // Mock confirm directly inside evaluated JSDOM context
+        window.confirm = () => true;
+        document.getElementById('btn-clear-cache').click();
+        if (!window.__RELOAD_CALLED) throw new Error("Clear cache did not reload the page");
+        console.log("✅ Clear Cache Button Test Passed");
+
         window.__TEST_PASSED = true;
     `;
 
