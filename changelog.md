@@ -1,3 +1,6 @@
+## v1.4.11 (2026-02-24)
+- **Feature**: Das Versionsmenü prüft nun im Hintergrund direkt beim Öffnen nach neuen Versionen und aktualisiert die Liste automatisch, selbst wenn eine veraltete Liste noch im Cache liegt.
+
 ## v1.4.10 (2026-02-24)
 - **Fix**: Die Farben der Benachrichtigungs-Glocke wurden korrigiert: Sie ist nun gelb, während man auf ein Menü wartet, und wird grün, sobald eines verfügbar ist.
 

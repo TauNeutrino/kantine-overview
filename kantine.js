@@ -2002,19 +2002,8 @@
             const dm = devToggle.checked;
             container.innerHTML = '<p style="color:var(--text-secondary);">Lade Versionen...</p>';
 
-            try {
-                let versions;
-                const cached = JSON.parse(localStorage.getItem('kantine_version_cache') || 'null');
-                if (!forceRefresh && cached && cached.devMode === dm && (Date.now() - cached.timestamp < 3600000)) {
-                    versions = cached.versions;
-                } else {
-                    versions = await fetchVersions(dm);
-                    localStorage.setItem('kantine_version_cache', JSON.stringify({
-                        timestamp: Date.now(), devMode: dm, versions
-                    }));
-                }
-
-                if (!versions.length) {
+            function renderVersionsList(versions) {
+                if (!versions || !versions.length) {
                     container.innerHTML = '<p style="color:var(--text-secondary);">Keine Versionen gefunden.</p>';
                     return;
                 }
@@ -2046,6 +2035,34 @@
                     `;
                     list.appendChild(li);
                 });
+            }
+
+            try {
+                // 1. Show cached versions immediately if available
+                const cachedRaw = localStorage.getItem('kantine_version_cache');
+                let cached = null;
+                if (cachedRaw) {
+                    try { cached = JSON.parse(cachedRaw); } catch (e) { }
+                }
+
+                if (cached && cached.devMode === dm && cached.versions) {
+                    renderVersionsList(cached.versions);
+                }
+
+                // 2. Fetch fresh versions in background (or foreground if no cache)
+                const liveVersions = await fetchVersions(dm);
+
+                // Compare with cache to see if we need to re-render
+                const liveVersionsStr = JSON.stringify(liveVersions);
+                const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
+
+                if (liveVersionsStr !== cachedVersionsStr) {
+                    localStorage.setItem('kantine_version_cache', JSON.stringify({
+                        timestamp: Date.now(), devMode: dm, versions: liveVersions
+                    }));
+                    renderVersionsList(liveVersions);
+                }
+
             } catch (e) {
                 container.innerHTML = `<p style="color:#e94560;">Fehler: ${e.message}</p>`;
             }
