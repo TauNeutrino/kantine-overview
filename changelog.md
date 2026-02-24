@@ -1,3 +1,6 @@
+## v1.4.19
+- 🎨 **Feature**: Eigenes Favicon für die Installer-Seite hinzugefügt (Dreieck + Gabel & Messer). Wird beim Drag & Drop in die Lesezeichenleiste als Icon übernommen.
+
 ## v1.4.18
 - 🧪 **Testing**: Die automatische DOM-Testing Suite (`test_dom.js`) wurde massiv ausgebaut. Sie prüft nun neben der Alarmglocke und den Highlights auch systematisch alle anderen UI-Komponenten (Login-Modal, History-Modal, Versionen-Modal, Theme-Toggle, und Navigation Tabs) auf korrekte Event-Listener-Bindungen, um Regressionen (tote Buttons) endgültig auszuschließen.
 
