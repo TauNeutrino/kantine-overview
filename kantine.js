@@ -1084,12 +1084,27 @@
     // FR-019: Auto-remove flags whose cutoff has passed
     function cleanupExpiredFlags() {
         const now = new Date();
+        const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
         let changed = false;
+
         for (const flagId of [...userFlags]) {
-            const [date] = flagId.split('_');
-            const cutoff = new Date(date);
-            cutoff.setHours(10, 0, 0, 0); // Standard cutoff 10:00
-            if (now >= cutoff) {
+            const [dateStr] = flagId.split('_'); // Format usually is YYYY-MM-DD
+
+            // If the flag's date string is entirely in the past (before today)
+            // or if it's today but past the 10:00 cutoff time
+            let isExpired = false;
+
+            if (dateStr < todayStr) {
+                isExpired = true;
+            } else if (dateStr === todayStr) {
+                const cutoff = new Date(dateStr);
+                cutoff.setHours(10, 0, 0, 0); // Standard cutoff 10:00
+                if (now >= cutoff) {
+                    isExpired = true;
+                }
+            }
+
+            if (isExpired) {
                 userFlags.delete(flagId);
                 changed = true;
             }

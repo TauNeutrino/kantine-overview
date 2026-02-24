@@ -1,3 +1,6 @@
+## v1.4.15
+- 🧹 **Bugfix**: In der Vergangenheit gesetzte Alarme/Flags wurden nicht zuverlässig gelöscht. Dies ist nun behoben, sodass verfallene Menüs nach 10:00 Uhr bzw. an vergangenen Tagen automatisch aus dem Tracker verschwinden.
+
 ## v1.4.14
 - 🐛 **Bugfix**: Alarmglocke versteckt sich jetzt zuverlässig auch auf Endgeräten mit CSS Konflikten 
 - 🚀 **Feature**: Sofortige API-Aktualisierung (Refresh) bei Aktivierung eines Menüalarms

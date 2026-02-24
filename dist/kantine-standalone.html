@@ -2021,7 +2021,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.14</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.15</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2163,7 +2163,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.14</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.15</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -3034,12 +3034,27 @@ body {
     // FR-019: Auto-remove flags whose cutoff has passed
     function cleanupExpiredFlags() {
         const now = new Date();
+        const todayStr = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
         let changed = false;
+
         for (const flagId of [...userFlags]) {
-            const [date] = flagId.split('_');
-            const cutoff = new Date(date);
-            cutoff.setHours(10, 0, 0, 0); // Standard cutoff 10:00
-            if (now >= cutoff) {
+            const [dateStr] = flagId.split('_'); // Format usually is YYYY-MM-DD
+
+            // If the flag's date string is entirely in the past (before today)
+            // or if it's today but past the 10:00 cutoff time
+            let isExpired = false;
+
+            if (dateStr < todayStr) {
+                isExpired = true;
+            } else if (dateStr === todayStr) {
+                const cutoff = new Date(dateStr);
+                cutoff.setHours(10, 0, 0, 0); // Standard cutoff 10:00
+                if (now >= cutoff) {
+                    isExpired = true;
+                }
+            }
+
+            if (isExpired) {
                 userFlags.delete(flagId);
                 changed = true;
             }
@@ -3969,7 +3984,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.14';
+        const currentVersion = 'v1.4.15';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4010,7 +4025,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.14';
+        const currentVersion = 'v1.4.15';
 
         if (!modal) return;
         modal.classList.remove('hidden');
