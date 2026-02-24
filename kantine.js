@@ -939,6 +939,67 @@
         localStorage.setItem('kantine_flags', JSON.stringify([...userFlags]));
     }
 
+    async function refreshFlaggedItems() {
+        if (userFlags.size === 0) return;
+        const token = authToken || GUEST_TOKEN;
+        const datesToFetch = new Set();
+
+        for (const flagId of userFlags) {
+            const [dateStr] = flagId.split('_');
+            datesToFetch.add(dateStr);
+        }
+
+        let updated = false;
+        for (const dateStr of datesToFetch) {
+            try {
+                const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+                    headers: apiHeaders(token)
+                });
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                const menuGroups = data.results || [];
+                let dayItems = [];
+                for (const group of menuGroups) {
+                    if (group.items && Array.isArray(group.items)) {
+                        dayItems = dayItems.concat(group.items);
+                    }
+                }
+
+                // Update allWeeks in memory
+                for (let week of allWeeks) {
+                    if (!week.days) continue;
+                    let dayObj = week.days.find(d => d.date === dateStr);
+                    if (dayObj) {
+                        dayObj.items = dayItems.map(item => {
+                            const isUnlimited = item.amount_tracking === false;
+                            const hasStock = parseInt(item.available_amount) > 0;
+                            return {
+                                id: `${dateStr}_${item.id}`,
+                                articleId: item.id,
+                                name: item.name || 'Unknown',
+                                description: item.description || '',
+                                price: parseFloat(item.price) || 0,
+                                available: isUnlimited || hasStock,
+                                availableAmount: parseInt(item.available_amount) || 0,
+                                amountTracking: item.amount_tracking !== false
+                            };
+                        });
+                        updated = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Error refreshing flag date', dateStr, e);
+            }
+        }
+
+        if (updated) {
+            saveMenuCache();
+            updateLastUpdatedTime(new Date().toISOString());
+            updateAlarmBell();
+            renderVisibleWeeks();
+        }
+    }
+
     function updateAlarmBell() {
         const bellBtn = document.getElementById('alarm-bell');
         const bellIcon = document.getElementById('alarm-bell-icon');
@@ -946,12 +1007,14 @@
 
         if (userFlags.size === 0) {
             bellBtn.classList.add('hidden');
+            bellBtn.style.display = 'none';
             bellIcon.style.color = 'var(--text-secondary)';
             bellIcon.style.textShadow = 'none';
             return;
         }
 
         bellBtn.classList.remove('hidden');
+        bellBtn.style.display = 'inline-flex';
 
         // Check if any flagged item is available
         let anyAvailable = false;
@@ -970,15 +1033,20 @@
             if (anyAvailable) break;
         }
 
-        const lastUpdatedStr = localStorage.getItem('kantine_last_updated');
-        let timeStr = 'Unbekannt';
-        if (lastUpdatedStr) {
-            const lastUpdated = new Date(lastUpdatedStr);
-            const diffMs = Date.now() - lastUpdated.getTime();
-            const diffMins = Math.floor(diffMs / 60000);
-            if (diffMins < 60) timeStr = `vor ${diffMins} Min.`;
-            else timeStr = `vor ${Math.floor(diffMins / 60)} Std.`;
+        let lastUpdatedStr = localStorage.getItem('kantine_last_updated');
+        let timeStr = 'gerade eben'; // Fallback instead of Unbekannt
+        if (!lastUpdatedStr) {
+            lastUpdatedStr = new Date().toISOString();
+            localStorage.setItem('kantine_last_updated', lastUpdatedStr);
         }
+
+        const lastUpdated = new Date(lastUpdatedStr);
+        const diffMs = Date.now() - lastUpdated.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        if (diffMins < 1) timeStr = 'gerade eben';
+        else if (diffMins < 60) timeStr = `vor ${diffMins} Min.`;
+        else timeStr = `vor ${Math.floor(diffMins / 60)} Std.`;
+
         bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
         if (anyAvailable) {
@@ -992,11 +1060,13 @@
 
     function toggleFlag(date, articleId, name, cutoff) {
         const id = `${date}_${articleId}`;
+        let flagAdded = false;
         if (userFlags.has(id)) {
             userFlags.delete(id);
             showToast(`Flag entfernt für ${name}`, 'success');
         } else {
             userFlags.add(id);
+            flagAdded = true;
             showToast(`Benachrichtigung aktiviert für ${name}`, 'success');
             if (Notification.permission === 'default') {
                 Notification.requestPermission();
@@ -1005,6 +1075,10 @@
         saveFlags();
         updateAlarmBell();
         renderVisibleWeeks();
+
+        if (flagAdded) {
+            refreshFlaggedItems();
+        }
     }
 
     // FR-019: Auto-remove flags whose cutoff has passed

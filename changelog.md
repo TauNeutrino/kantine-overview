@@ -1,3 +1,8 @@
+## v1.4.14
+- 🐛 **Bugfix**: Alarmglocke versteckt sich jetzt zuverlässig auch auf Endgeräten mit CSS Konflikten 
+- 🚀 **Feature**: Sofortige API-Aktualisierung (Refresh) bei Aktivierung eines Menüalarms
+- ⚡ **Optimierung**: "Unbekannt" im letzten Refresh-Zeitpunkt wird abgefangen und zeigt initial "gerade eben"
+
 ## v1.4.13 (2026-02-24)
 - **Fix**: Die Farben der Glocke funktionieren nun verlässlich, da CSS-Variablen durch direkte Hex-Codes ersetzt wurden.
 
