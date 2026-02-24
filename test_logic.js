@@ -108,7 +108,8 @@ try {
         [/function\s+isNewer/, 'isNewer function'],
         [/function\s+openVersionMenu/, 'openVersionMenu function'],
         [/kantine_dev_mode/, 'dev-mode localStorage key'],
-        [/function\s+isCacheFresh/, 'isCacheFresh function']
+        [/function\s+isCacheFresh/, 'isCacheFresh function'],
+        [/limit=5/, 'Delta fetch limit parameter']
     ];
 
     for (const [regex, label] of checks) {

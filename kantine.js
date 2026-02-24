@@ -570,37 +570,49 @@
         const progressFill = document.getElementById('history-progress-fill');
         const progressText = document.getElementById('history-progress-text');
 
-        // Check memory cache first
+        // Check local storage cache (we still use memory cache if available)
+        let localCache = [];
         if (fullOrderHistoryCache) {
-            renderHistory(fullOrderHistoryCache);
-            return;
+            localCache = fullOrderHistoryCache;
+        } else {
+            const ls = localStorage.getItem('kantine_history_cache');
+            if (ls) {
+                try {
+                    localCache = JSON.parse(ls);
+                    fullOrderHistoryCache = localCache;
+                } catch (e) {
+                    console.warn('History cache parse error', e);
+                }
+            }
         }
 
-        // Check local storage cache
-        const localCache = localStorage.getItem('kantine_history_cache');
-        if (localCache) {
-            try {
-                fullOrderHistoryCache = JSON.parse(localCache);
-                renderHistory(fullOrderHistoryCache);
-                return;
-            } catch (e) {
-                console.warn('History cache parse error', e);
-            }
+        // Show cached version immediately if we have one
+        if (localCache.length > 0) {
+            renderHistory(localCache);
         }
 
         if (!authToken) return;
 
-        historyContent.innerHTML = '';
-        historyLoading.classList.remove('hidden');
-        progressFill.style.width = '0%';
-        progressText.textContent = 'Lade Bestellhistorie...';
+        // Start background delta sync
+        if (localCache.length === 0) {
+            historyContent.innerHTML = '';
+            historyLoading.classList.remove('hidden');
+        }
 
-        let nextUrl = `${API_BASE}/user/orders/?venue=${VENUE_ID}&ordering=-created&limit=50`;
-        let allOrders = [];
+        progressFill.style.width = '0%';
+        progressText.textContent = localCache.length > 0 ? 'Suche nach neuen Bestellungen...' : 'Lade Bestellhistorie...';
+        if (localCache.length > 0) historyLoading.classList.remove('hidden');
+
+        let nextUrl = localCache.length > 0
+            ? `${API_BASE}/user/orders/?venue=${VENUE_ID}&ordering=-created&limit=5`
+            : `${API_BASE}/user/orders/?venue=${VENUE_ID}&ordering=-created&limit=50`;
+        let fetchedOrders = [];
         let totalCount = 0;
+        let requiresFullFetch = localCache.length === 0;
+        let deltaComplete = false;
 
         try {
-            while (nextUrl) {
+            while (nextUrl && !deltaComplete) {
                 const response = await fetch(nextUrl, { headers: apiHeaders(authToken) });
                 if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
 
@@ -610,29 +622,75 @@
                     totalCount = data.count;
                 }
 
-                allOrders = allOrders.concat(data.results || []);
+                const results = data.results || [];
 
-                // Update progress
-                if (totalCount > 0) {
-                    const pct = Math.round((allOrders.length / totalCount) * 100);
-                    progressFill.style.width = `${pct}%`;
-                    progressText.textContent = `Lade Bestellung ${allOrders.length} von ${totalCount}...`;
-                } else {
-                    progressText.textContent = `Lade Bestellung ${allOrders.length}...`;
+                for (const order of results) {
+                    // Check if we hit an order that is already in our cache AND has the exact same state/update time
+                    // Bessa returns 'updated' timestamp, we can use it to determine if anything changed
+                    const existingOrderIndex = localCache.findIndex(cached => cached.id === order.id);
+
+                    if (!requiresFullFetch && existingOrderIndex !== -1) {
+                        const existingOrder = localCache[existingOrderIndex];
+                        // If order exists and wasn't updated since our cache, we've reached the point 
+                        // where everything older is already correctly cached.
+                        // order.updated is an ISO string like "2025-02-18T10:30:15.123456Z"
+                        if (existingOrder.updated === order.updated && existingOrder.order_state === order.order_state) {
+                            deltaComplete = true;
+                            break;
+                        }
+                    }
+                    fetchedOrders.push(order);
                 }
 
-                nextUrl = data.next;
+                // Update progress
+                if (!deltaComplete && requiresFullFetch) {
+                    if (totalCount > 0) {
+                        const pct = Math.round((fetchedOrders.length / totalCount) * 100);
+                        progressFill.style.width = `${pct}%`;
+                        progressText.textContent = `Lade Bestellung ${fetchedOrders.length} von ${totalCount}...`;
+                    } else {
+                        progressText.textContent = `Lade Bestellung ${fetchedOrders.length}...`;
+                    }
+                } else if (!deltaComplete) {
+                    progressText.textContent = `${fetchedOrders.length} neue/geänderte Bestellungen gefunden...`;
+                }
+
+                nextUrl = deltaComplete ? null : data.next;
             }
 
-            fullOrderHistoryCache = allOrders;
-            try {
-                localStorage.setItem('kantine_history_cache', JSON.stringify(allOrders));
-            } catch (e) { console.warn('History cache write error', e); }
-            renderHistory(fullOrderHistoryCache);
+            // Merge fetched orders with cache
+            if (fetchedOrders.length > 0) {
+                // We have new/updated orders. We need to merge them into the cache.
+                // 1. Create a map of the existing cache for quick ID lookup
+                const cacheMap = new Map(localCache.map(o => [o.id, o]));
+
+                // 2. Update/Insert the newly fetched orders
+                for (const order of fetchedOrders) {
+                    cacheMap.set(order.id, order); // Overwrites existing, or adds new
+                }
+
+                // 3. Convert back to array and sort by created date (descending)
+                const mergedOrders = Array.from(cacheMap.values());
+                mergedOrders.sort((a, b) => new Date(b.created) - new Date(a.created));
+
+                fullOrderHistoryCache = mergedOrders;
+                try {
+                    localStorage.setItem('kantine_history_cache', JSON.stringify(mergedOrders));
+                } catch (e) {
+                    console.warn('History cache write error', e);
+                }
+
+                // Render the updated history
+                renderHistory(fullOrderHistoryCache);
+            }
 
         } catch (error) {
-            console.error('Error fetching full history:', error);
-            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">Fehler beim Laden der Historie.</p>`;
+            console.error('Error in history sync:', error);
+            if (localCache.length === 0) {
+                historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">Fehler beim Laden der Historie.</p>`;
+            } else {
+                showToast('Hintergrund-Synchronisation fehlgeschlagen', 'error');
+            }
         } finally {
             historyLoading.classList.add('hidden');
         }
@@ -834,7 +892,7 @@
 
             if (response.ok || response.status === 201) {
                 showToast(`Bestellt: ${name}`, 'success');
-                localStorage.removeItem('kantine_history_cache');
+                fullOrderHistoryCache = null; // Clear memory cache so next history open triggers delta sync
                 await fetchOrders();
             } else {
                 const data = await response.json();
@@ -864,7 +922,7 @@
 
             if (response.ok) {
                 showToast(`Storniert: ${name}`, 'success');
-                localStorage.removeItem('kantine_history_cache');
+                fullOrderHistoryCache = null; // Clear memory cache so next history open triggers delta sync
                 await fetchOrders();
             } else {
                 const data = await response.json();

@@ -1,3 +1,6 @@
+## v1.4.7 (2026-02-24)
+- **Performance**: Die Bestellhistorie nutzt nun einen inkrementellen Delta-Cache anstatt immer alle Seiten von der API herunterzuladen, was die Ladezeiten für Vielbesteller enorm reduziert.
+
 ## v1.4.6 (2026-02-24)
 - **Fix**: Die Umrandung für bereits bestellte Menüs der vergangenen Tage ist nun ebenfalls einheitlich violett statt blau.
 

@@ -171,7 +171,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     </div>
 
     <div style="text-align: center; margin-top: 40px; color: #5c6b7f; font-size: 0.8rem;">
-        <p>Powered by <strong>Kaufi-Kitchen</strong> 👨‍🍳</p>
+        <p>Powered by <strong>Kaufis-Kitchen</strong> 👨‍🍳</p>
     </div>
 
 
