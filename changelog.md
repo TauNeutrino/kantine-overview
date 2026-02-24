@@ -1,3 +1,6 @@
+## v1.4.3 (2026-02-24)
+- **Fix**: Der Rahmen des "Heute Bestellt" Menüs ist nun konsequent violett (passend zum Glow-Effekt).
+
 ## v1.4.2 (2026-02-23)
 - **Fix**: Das "Heute Bestellt" Menü leuchtet nun stimmig im Design-Violett statt Blau.
 - **Fix**: Abfangen des GitHub API Rate Limit (403) im Versionsdialog mit einer freundlicheren Fehlermeldung, da der User-Agent im Browser nicht manuell gesetzt werden darf.
