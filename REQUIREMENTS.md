@@ -40,7 +40,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-033 | Es muss möglich sein, dasselbe Menü mehrfach zu bestellen. Bei Mehrfachbestellungen muss die Anzahl angezeigt werden. | Niedrig | v1.0.1 |
 | **Kostentransparenz & Bestellhistorie** | | | |
 | FR-040 | Das System muss die Gesamtkosten aller Bestellungen einer Woche automatisch berechnen und anzeigen. | Mittel | v1.1.0 |
-| FR-041 | Das System muss dem Benutzer eine paginierte oder vollständige Bestellhistorie (gruppiert nach Monat und KW) mit Fortschrittsanzeige auf Abruf in einem Modal bereitstellen. | Mittel | v1.4.0 |
+| FR-041 | Das System muss dem Benutzer eine Bestellhistorie (gruppiert nach Monat und KW) mit Fortschrittsanzeige auf Abruf in einem Modal bereitstellen. Die Historie muss über ein lokales Delta-Caching verfügen, um Ladezeiten zu minimieren. | Mittel | v1.4.0 (Update v1.4.7) |
 | **Bestell-Countdown** | | | |
 | FR-050 | Das System muss vor Bestellschluss einen visuell hervorgehobenen Countdown anzeigen. | Mittel | v1.1.0 |
 | **Menü-Flagging & Benachrichtigungen** | | | |
@@ -59,7 +59,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-082 | Das System muss beim erstmaligen Laden die Betriebssystem-Präferenz für das Farbschema berücksichtigen. | Niedrig | v1.0.1 |
 | **Header UI & Navigation** | | | |
 | FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
-| FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv, Grün=Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 |
+| FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv aber kein Menü verfügbar, Grün=Mindestens ein Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 (Update v1.4.10) |
 | FR-092 | Sobald über den Daten-Refresh erstmals Menüdaten für die Nächste Woche geladen werden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Zusätzlich muss einmalig ein Hinweis eingeblendet werden. Bei Klick auf den Button muss die Hervorhebung erlöschen. | Mittel | v1.6.0 |
 | **Benutzer-Feedback** | | | |
 | FR-090 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
@@ -93,4 +93,4 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 *   **Datenhaltung**: Clientseitig via `localStorage` (Menü-Cache, Flags, Highlights, Theme) und `sessionStorage` (Auth-Token).
 *   **Build**: Bash-basiertes Build-Script, das Bookmarklet-URL, Standalone-HTML und Installer-Seite generiert.
 *   **Versionierung**: SemVer, verwaltet über GitHub Releases/Tags.
-*   **Tests**: Python-basierte Build-Tests + Node.js-basierte Logik-Tests.
+*   **Tests**: Python-basierte Build-Tests (`python3`) + Node.js-basierte Logik-Tests.
