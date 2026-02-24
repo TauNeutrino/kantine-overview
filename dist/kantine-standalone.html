@@ -2021,7 +2021,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.15</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.16</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2163,7 +2163,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.15</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.16</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -2181,6 +2181,9 @@ body {
                             <a href="https://github.com/TauNeutrino/kantine-overview/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;" title="Schlage ein neues Feature auf GitHub vor">
                                 <span class="material-icons-round" style="font-size: 1.2em;">lightbulb</span> Feature vorschlagen
                             </a>
+                            <button id="btn-clear-cache" style="background: none; border: none; padding: 0; color: var(--error-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-align: left; font-size: inherit; font-family: inherit;" title="Löscht alle lokalen Daten & erzwingt einen Neuladen">
+                                <span class="material-icons-round" style="font-size: 1.2em;">delete_forever</span> Lokalen Cache leeren
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2262,6 +2265,17 @@ body {
         if (btnVersionClose) {
             btnVersionClose.addEventListener('click', () => {
                 versionModal.classList.add('hidden');
+            });
+        }
+
+        const btnClearCache = document.getElementById('btn-clear-cache');
+        if (btnClearCache) {
+            btnClearCache.addEventListener('click', () => {
+                if (confirm('Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.')) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.reload();
+                }
             });
         }
 
@@ -3984,7 +3998,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.15';
+        const currentVersion = 'v1.4.16';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4025,7 +4039,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.15';
+        const currentVersion = 'v1.4.16';
 
         if (!modal) return;
         modal.classList.remove('hidden');

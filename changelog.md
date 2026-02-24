@@ -1,3 +1,6 @@
+## v1.4.16
+- ⚡ **Feature**: Ein Button "Lokalen Cache leeren" wurde zum Versionen-Menü hinzugefügt, um bei hartnäckigen lokalen Fehlern alle Caches und Sessions bereinigen zu können, ohne die Entwicklertools (F12) des Browsers bemühen zu müssen.
+
 ## v1.4.15
 - 🧹 **Bugfix**: In der Vergangenheit gesetzte Alarme/Flags wurden nicht zuverlässig gelöscht. Dies ist nun behoben, sodass verfallene Menüs nach 10:00 Uhr bzw. an vergangenen Tagen automatisch aus dem Tracker verschwinden.
 

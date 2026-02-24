@@ -231,6 +231,9 @@
                             <a href="https://github.com/TauNeutrino/kantine-overview/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;" title="Schlage ein neues Feature auf GitHub vor">
                                 <span class="material-icons-round" style="font-size: 1.2em;">lightbulb</span> Feature vorschlagen
                             </a>
+                            <button id="btn-clear-cache" style="background: none; border: none; padding: 0; color: var(--error-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; text-align: left; font-size: inherit; font-family: inherit;" title="Löscht alle lokalen Daten & erzwingt einen Neuladen">
+                                <span class="material-icons-round" style="font-size: 1.2em;">delete_forever</span> Lokalen Cache leeren
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -312,6 +315,17 @@
         if (btnVersionClose) {
             btnVersionClose.addEventListener('click', () => {
                 versionModal.classList.add('hidden');
+            });
+        }
+
+        const btnClearCache = document.getElementById('btn-clear-cache');
+        if (btnClearCache) {
+            btnClearCache.addEventListener('click', () => {
+                if (confirm('Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.')) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    window.location.reload();
+                }
             });
         }
 
