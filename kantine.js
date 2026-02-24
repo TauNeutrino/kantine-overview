@@ -946,6 +946,8 @@
 
         if (userFlags.size === 0) {
             bellBtn.classList.add('hidden');
+            bellIcon.style.color = 'var(--text-secondary)';
+            bellIcon.style.textShadow = 'none';
             return;
         }
 

@@ -1,3 +1,6 @@
+## v1.4.12 (2026-02-24)
+- **Fix**: Das Glocken-Icon sollte nun endgültig versteckt bleiben, wenn keine Benachrichtigungen aktiv sind (CSS-Kollision mit `.hidden` behoben).
+
 ## v1.4.11 (2026-02-24)
 - **Feature**: Das Versionsmenü prüft nun im Hintergrund direkt beim Öffnen nach neuen Versionen und aktualisiert die Liste automatisch, selbst wenn eine veraltete Liste noch im Cache liegt.
 
