@@ -74,6 +74,13 @@
                             <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
+                        <div class="nav-group" style="margin-left: 1rem;">
+                            <button id="btn-this-week" class="nav-btn active">Diese Woche</button>
+                            <button id="btn-next-week" class="nav-btn">Nächste Woche</button>
+                        </div>
+                        <button id="alarm-bell" class="icon-btn hidden" aria-label="Benachrichtigungen" title="Keine beobachteten Menüs" style="margin-left: -0.5rem;">
+                            <span class="material-icons-round" id="alarm-bell-icon" style="color:var(--text-secondary); transition: color 0.3s;">notifications</span>
+                        </button>
                     </div>
                     <div class="header-center-wrapper">
                         <div id="header-week-info" class="header-week-info"></div>
@@ -89,10 +96,6 @@
                         <button id="btn-highlights" class="icon-btn" aria-label="Persönliche Highlights verwalten" title="Persönliche Highlights verwalten">
                             <span class="material-icons-round">label</span>
                         </button>
-                        <div class="nav-group">
-                            <button id="btn-this-week" class="nav-btn active">Diese Woche</button>
-                            <button id="btn-next-week" class="nav-btn">Nächste Woche</button>
-                        </div>
                         <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
                             <span class="material-icons-round theme-icon">light_mode</span>
                         </button>
@@ -558,9 +561,22 @@
         const progressFill = document.getElementById('history-progress-fill');
         const progressText = document.getElementById('history-progress-text');
 
+        // Check memory cache first
         if (fullOrderHistoryCache) {
             renderHistory(fullOrderHistoryCache);
             return;
+        }
+
+        // Check local storage cache
+        const localCache = localStorage.getItem('kantine_history_cache');
+        if (localCache) {
+            try {
+                fullOrderHistoryCache = JSON.parse(localCache);
+                renderHistory(fullOrderHistoryCache);
+                return;
+            } catch (e) {
+                console.warn('History cache parse error', e);
+            }
         }
 
         if (!authToken) return;
@@ -600,6 +616,9 @@
             }
 
             fullOrderHistoryCache = allOrders;
+            try {
+                localStorage.setItem('kantine_history_cache', JSON.stringify(allOrders));
+            } catch (e) { console.warn('History cache write error', e); }
             renderHistory(fullOrderHistoryCache);
 
         } catch (error) {
@@ -806,6 +825,7 @@
 
             if (response.ok || response.status === 201) {
                 showToast(`Bestellt: ${name}`, 'success');
+                localStorage.removeItem('kantine_history_cache');
                 await fetchOrders();
             } else {
                 const data = await response.json();
@@ -835,6 +855,7 @@
 
             if (response.ok) {
                 showToast(`Storniert: ${name}`, 'success');
+                localStorage.removeItem('kantine_history_cache');
                 await fetchOrders();
             } else {
                 const data = await response.json();
@@ -851,6 +872,55 @@
         localStorage.setItem('kantine_flags', JSON.stringify([...userFlags]));
     }
 
+    function updateAlarmBell() {
+        const bellBtn = document.getElementById('alarm-bell');
+        const bellIcon = document.getElementById('alarm-bell-icon');
+        if (!bellBtn || !bellIcon) return;
+
+        if (userFlags.size === 0) {
+            bellBtn.classList.add('hidden');
+            return;
+        }
+
+        bellBtn.classList.remove('hidden');
+
+        // Check if any flagged item is available
+        let anyAvailable = false;
+        for (const wk of allWeeks) {
+            if (!wk.days) continue;
+            for (const d of wk.days) {
+                if (!d.items) continue;
+                for (const item of d.items) {
+                    if (item.available && userFlags.has(item.id)) {
+                        anyAvailable = true;
+                        break;
+                    }
+                }
+                if (anyAvailable) break;
+            }
+            if (anyAvailable) break;
+        }
+
+        const lastUpdatedStr = localStorage.getItem('kantine_last_updated');
+        let timeStr = 'Unbekannt';
+        if (lastUpdatedStr) {
+            const lastUpdated = new Date(lastUpdatedStr);
+            const diffMs = Date.now() - lastUpdated.getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            if (diffMins < 60) timeStr = `vor ${diffMins} Min.`;
+            else timeStr = `vor ${Math.floor(diffMins / 60)} Std.`;
+        }
+        bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
+
+        if (anyAvailable) {
+            bellIcon.style.color = 'var(--success-color)';
+            bellIcon.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
+        } else {
+            bellIcon.style.color = 'var(--warning-color)';
+            bellIcon.style.textShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
+        }
+    }
+
     function toggleFlag(date, articleId, name, cutoff) {
         const id = `${date}_${articleId}`;
         if (userFlags.has(id)) {
@@ -864,6 +934,7 @@
             }
         }
         saveFlags();
+        updateAlarmBell();
         renderVisibleWeeks();
     }
 
@@ -1232,6 +1303,7 @@
             updateAuthUI(); // This will trigger fetchOrders if logged in
             renderVisibleWeeks();
             updateNextWeekBadge();
+            updateAlarmBell();
 
             progressMessage.textContent = 'Fertig!';
             setTimeout(() => progressModal.classList.add('hidden'), 500);

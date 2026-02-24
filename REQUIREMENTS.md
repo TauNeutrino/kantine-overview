@@ -54,10 +54,12 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-071 | Die Hervorhebung muss anhand von Menüname und Beschreibung erfolgen (Substring-Matching, case-insensitive). | Niedrig | v1.1.0 |
 | FR-072 | Hervorgehobene Menüs müssen ein Tag-Badge mit dem matchenden Schlagwort anzeigen. | Niedrig | v1.2.4 |
 | FR-073 | Die Nächste-Woche-Navigation muss die Anzahl der dort gefundenen Highlights als Badge anzeigen. | Niedrig | v1.2.5 |
-| **Darstellung & Theming** | | | |
 | FR-080 | Das System muss einen hellen und einen dunklen Darstellungsmodus (Light/Dark Theme) unterstützen. | Niedrig | v1.0.1 |
 | FR-081 | Die Theme-Präferenz des Benutzers muss persistent gespeichert werden. | Niedrig | v1.0.1 |
 | FR-082 | Das System muss beim erstmaligen Laden die Betriebssystem-Präferenz für das Farbschema berücksichtigen. | Niedrig | v1.0.1 |
+| **Header UI & Navigation** | | | |
+| FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
+| FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv, Grün=Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 |
 | **Benutzer-Feedback** | | | |
 | FR-090 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
 | FR-091 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |
