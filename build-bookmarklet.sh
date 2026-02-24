@@ -258,6 +258,14 @@ if [ $LOGIC_EXIT -ne 0 ]; then
     exit 1
 fi
 
+echo "=== Running DOM Interaction Tests ==="
+node "$SCRIPT_DIR/tests/test_dom.js"
+DOM_EXIT=$?
+if [ $DOM_EXIT -ne 0 ]; then
+    echo "❌ DOM UI tests FAILED! Regressions detected."
+    exit 1
+fi
+
 echo "=== Running Build Tests ==="
 python3 "$SCRIPT_DIR/test_build.py"
 TEST_EXIT=$?

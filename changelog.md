@@ -1,3 +1,7 @@
+## v1.4.17
+- 🐛 **Bugfix**: Regression behoben: Der "Persönliche Highlights" (Stern-Button) Dialog öffnet sich nun wieder korrekt.
+- 🧪 **Testing**: Es wurde ein initialer UI-Testing-Hook (`test_dom.js` mit `jsdom`) in die Build-Pipeline integriert, um kritische DOM Event-Listener Regressionen (wie den Highlights-Button und die Alarmglocke) automatisch zu preventen.
+
 ## v1.4.16
 - ⚡ **Feature**: Ein Button "Lokalen Cache leeren" wurde zum Versionen-Menü hinzugefügt, um bei hartnäckigen lokalen Fehlern alle Caches und Sessions bereinigen zu können, ohne die Entwicklertools (F12) des Browsers bemühen zu müssen.
 

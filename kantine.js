@@ -281,6 +281,18 @@
         const historyModal = document.getElementById('history-modal');
         const btnHistoryClose = document.getElementById('btn-history-close');
 
+        if (btnHighlights) {
+            btnHighlights.addEventListener('click', () => {
+                highlightsModal.classList.remove('hidden');
+            });
+        }
+
+        if (btnHighlightsClose) {
+            btnHighlightsClose.addEventListener('click', () => {
+                highlightsModal.classList.add('hidden');
+            });
+        }
+
         btnHistory.addEventListener('click', () => {
             if (!authToken) {
                 loginModal.classList.remove('hidden');

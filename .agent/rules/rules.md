@@ -48,6 +48,11 @@ trigger: always_on
 - **Browser**: Allowed for documentation and safe browsing. No automated logins without permission.
 - **Terminal**: No `rm -rf`. Run tests (`pytest` etc.) after logic changes.
 
+## 7. Mandatory Testing Policy 🧪
+**CRITICAL: No logic or UI fix is complete without a corresponding automated test.**
+- If you fix a regression or implement a new UI feature, you **MUST** write or update a test in `tests/test_dom.js` or `test_logic.js`. 
+- Refactoring MUST include verifying that no click listeners drop out. This guarantees that features like modal toggles stay functional.
+
 ## 7. Requirements-Konsistenz 📋
 Alle umgesetzten Anforderungen müssen mit `REQUIREMENTS.md` übereinstimmen.
 1.  **Vor der Umsetzung prüfen**: Passt die neue Anforderung zu den bestehenden Requirements?
