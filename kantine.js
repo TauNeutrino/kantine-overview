@@ -1158,6 +1158,7 @@
                 console.log(`[Cache] Parsed ${allWeeks.length} weeks:`, allWeeks.map(w => `KW${w.weekNumber}/${w.year} (${(w.days || []).length} days)`));
                 renderVisibleWeeks();
                 updateNextWeekBadge();
+                updateAlarmBell();
                 if (cachedTs) updateLastUpdatedTime(cachedTs);
                 console.log('Loaded menu from cache');
                 return true;

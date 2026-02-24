@@ -1,3 +1,6 @@
+## v1.4.9 (2026-02-24)
+- **Fix**: Das Glocken-Icon für Benachrichtigungen wird nun direkt beim Start (wenn Daten aus dem lokalen Cache geladen werden) korrekt angezeigt.
+
 ## v1.4.8 (2026-02-24)
 - **Fix**: Die Benachrichtigungs-Glocke wird nun korrekt in Gelb dargestellt, wenn beobachtete Menüs verfügbar sind.
 - **Tools**: Fehler in Testskript behoben, der den CI/CD Build verlangsamt hat.
