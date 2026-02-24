@@ -1,3 +1,6 @@
+## v1.4.5 (2026-02-24)
+- **Fix**: Doppelten Scrollbalken in der Versionen-Liste entfernt.
+
 ## v1.4.4 (2026-02-24)
 - **Feature**: Das Versionsmenü enthält nun direkte Links zu GitHub, um Fehler zu melden oder neue Features vorzuschlagen.
 
