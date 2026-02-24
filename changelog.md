@@ -1,3 +1,6 @@
+## v1.4.6 (2026-02-24)
+- **Fix**: Die Umrandung für bereits bestellte Menüs der vergangenen Tage ist nun ebenfalls einheitlich violett statt blau.
+
 ## v1.4.5 (2026-02-24)
 - **Fix**: Doppelten Scrollbalken in der Versionen-Liste entfernt.
 

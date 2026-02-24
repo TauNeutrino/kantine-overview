@@ -801,7 +801,7 @@ body {
     /* No opacity/filter here - fully visible */
     background: var(--bg-card);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--accent-color);
+    border: 1px solid #8b5cf6;
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
