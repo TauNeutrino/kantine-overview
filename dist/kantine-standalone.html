@@ -2021,7 +2021,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.16</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.17</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2163,7 +2163,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.16</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.17</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -2230,6 +2230,18 @@ body {
         const btnHistory = document.getElementById('btn-history');
         const historyModal = document.getElementById('history-modal');
         const btnHistoryClose = document.getElementById('btn-history-close');
+
+        if (btnHighlights) {
+            btnHighlights.addEventListener('click', () => {
+                highlightsModal.classList.remove('hidden');
+            });
+        }
+
+        if (btnHighlightsClose) {
+            btnHighlightsClose.addEventListener('click', () => {
+                highlightsModal.classList.add('hidden');
+            });
+        }
 
         btnHistory.addEventListener('click', () => {
             if (!authToken) {
@@ -3998,7 +4010,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.16';
+        const currentVersion = 'v1.4.17';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4039,7 +4051,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.16';
+        const currentVersion = 'v1.4.17';
 
         if (!modal) return;
         modal.classList.remove('hidden');
