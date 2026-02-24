@@ -1,3 +1,6 @@
+## v1.4.10 (2026-02-24)
+- **Fix**: Die Farben der Benachrichtigungs-Glocke wurden korrigiert: Sie ist nun gelb, während man auf ein Menü wartet, und wird grün, sobald eines verfügbar ist.
+
 ## v1.4.9 (2026-02-24)
 - **Fix**: Das Glocken-Icon für Benachrichtigungen wird nun direkt beim Start (wenn Daten aus dem lokalen Cache geladen werden) korrekt angezeigt.
 

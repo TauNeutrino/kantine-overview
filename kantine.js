@@ -980,11 +980,11 @@
         bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
         if (anyAvailable) {
+            bellIcon.style.color = 'var(--success-color)';
+            bellIcon.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
+        } else {
             bellIcon.style.color = 'var(--warning-color)';
             bellIcon.style.textShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
-        } else {
-            bellIcon.style.color = 'var(--text-secondary)';
-            bellIcon.style.textShadow = 'none';
         }
     }
 
