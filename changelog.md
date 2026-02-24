@@ -1,3 +1,6 @@
+## v1.4.13 (2026-02-24)
+- **Fix**: Die Farben der Glocke funktionieren nun verlässlich, da CSS-Variablen durch direkte Hex-Codes ersetzt wurden.
+
 ## v1.4.12 (2026-02-24)
 - **Fix**: Das Glocken-Icon sollte nun endgültig versteckt bleiben, wenn keine Benachrichtigungen aktiv sind (CSS-Kollision mit `.hidden` behoben).
 

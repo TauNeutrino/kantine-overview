@@ -982,10 +982,10 @@
         bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
         if (anyAvailable) {
-            bellIcon.style.color = 'var(--success-color)';
+            bellIcon.style.color = '#10b981'; // green / success
             bellIcon.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
         } else {
-            bellIcon.style.color = 'var(--warning-color)';
+            bellIcon.style.color = '#f59e0b'; // yellow / warning
             bellIcon.style.textShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
         }
     }
