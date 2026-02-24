@@ -60,6 +60,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Header UI & Navigation** | | | |
 | FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
 | FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv, Grün=Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 |
+| FR-092 | Sobald über den Daten-Refresh erstmals Menüdaten für die Nächste Woche geladen werden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Zusätzlich muss einmalig ein Hinweis eingeblendet werden. Bei Klick auf den Button muss die Hervorhebung erlöschen. | Mittel | v1.6.0 |
 | **Benutzer-Feedback** | | | |
 | FR-090 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
 | FR-091 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |
@@ -71,6 +72,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-112 | Benutzer müssen eine Versionsliste mit Installationslinks einsehen können (Versionsmenü). | Niedrig | v1.3.0 |
 | FR-113 | Es muss möglich sein, zu einer älteren Version zurückzukehren (Downgrade). | Niedrig | v1.3.0 |
 | FR-114 | Ein Dev-Mode muss es ermöglichen, zwischen stabilen Releases und Entwicklungs-Tags umzuschalten. | Niedrig | v1.3.0 |
+| FR-115 | Das Versionsmenü muss Links zur Erstellung von Feature-Requests und Bug-Reports auf GitHub enthalten. | Niedrig | v1.4.4 |
 
 ## 3. Nicht-funktionale Anforderungen
 

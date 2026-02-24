@@ -1,3 +1,6 @@
+## v1.4.4 (2026-02-24)
+- **Feature**: Das Versionsmenü enthält nun direkte Links zu GitHub, um Fehler zu melden oder neue Features vorzuschlagen.
+
 ## v1.4.3 (2026-02-24)
 - **Fix**: Der Rahmen des "Heute Bestellt" Menüs ist nun konsequent violett (passend zum Glow-Effekt).
 

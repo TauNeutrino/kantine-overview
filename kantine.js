@@ -221,8 +221,16 @@
                                 <span>Dev-Mode (alle Tags anzeigen)</span>
                             </label>
                         </div>
-                        <div id="version-list-container" style="margin-top:1rem;">
+                        <div id="version-list-container" style="margin-top:1rem; max-height: 250px; overflow-y: auto;">
                             <p style="color:var(--text-secondary);">Lade Versionen...</p>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9em;">
+                            <a href="https://github.com/TauNeutrino/kantine-overview/issues" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;" title="Melde einen Fehler auf GitHub">
+                                <span class="material-icons-round" style="font-size: 1.2em;">bug_report</span> Fehler melden
+                            </a>
+                            <a href="https://github.com/TauNeutrino/kantine-overview/discussions/categories/ideas" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;" title="Schlage ein neues Feature auf GitHub vor">
+                                <span class="material-icons-round" style="font-size: 1.2em;">lightbulb</span> Feature vorschlagen
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -357,6 +365,7 @@
         });
 
         btnNextWeek.addEventListener('click', () => {
+            btnNextWeek.classList.remove('new-week-available');
             if (displayMode !== 'next-week') {
                 displayMode = 'next-week';
                 btnNextWeek.classList.add('active');
@@ -1459,6 +1468,14 @@
                 badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
                 badge.title += ` • ${highlightCount} Highlights gefunden`;
                 badge.classList.add('has-highlights');
+            }
+
+            // FR-092: Highlight Next Week Button when new data arrives
+            const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
+            if (!localStorage.getItem(storageKey)) {
+                localStorage.setItem(storageKey, 'true');
+                btnNextWeek.classList.add('new-week-available');
+                showToast('Neue Menüdaten für nächste Woche verfügbar!', 'info');
             }
 
         } else if (badge) {

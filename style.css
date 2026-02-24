@@ -186,6 +186,29 @@ body {
     color: white;
 }
 
+/* Notification state for Next Week */
+.nav-btn.new-week-available {
+    animation: goldPulse 2s infinite;
+    border-color: #f59e0b;
+    color: var(--accent-color);
+}
+.nav-btn.new-week-available.active {
+    color: white;
+}
+
+@keyframes goldPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+
 /* Badge for nav buttons (day count indicator) */
 .nav-badge {
     background-color: var(--error-color);
