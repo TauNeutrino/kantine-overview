@@ -1647,12 +1647,17 @@
                 badge.classList.add('has-highlights');
             }
 
-            // FR-092: Highlight Next Week Button when new data arrives
-            const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
-            if (!localStorage.getItem(storageKey)) {
-                localStorage.setItem(storageKey, 'true');
+            // FR-092: Glow Next Week button while data exists but no orders placed
+            if (daysWithOrders === 0) {
                 btnNextWeek.classList.add('new-week-available');
-                showToast('Neue Menüdaten für nächste Woche verfügbar!', 'info');
+                // One-time toast notification when new data first arrives
+                const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
+                if (!localStorage.getItem(storageKey)) {
+                    localStorage.setItem(storageKey, 'true');
+                    showToast('Neue Menüdaten für nächste Woche verfügbar!', 'info');
+                }
+            } else {
+                btnNextWeek.classList.remove('new-week-available');
             }
 
         } else if (badge) {

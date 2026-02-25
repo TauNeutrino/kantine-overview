@@ -1,3 +1,6 @@
+## v1.4.21
+- ✨ **UX**: Der Glow-Effekt des „Nächste Woche"-Buttons bleibt nun aktiv, solange Menüdaten vorhanden aber noch keine Bestellungen getätigt wurden. Verschwindet automatisch nach der ersten Bestellung.
+
 ## v1.4.20
 - 🐛 **Bugfix**: Der Badge-Counter im „Nächste Woche"-Tab wird jetzt sofort nach einer Bestellung oder Stornierung aktualisiert.
 
