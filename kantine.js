@@ -581,6 +581,7 @@
                 }
                 console.log(`Fetched ${results.length} orders, mapped active ones.`);
                 renderVisibleWeeks();
+                updateNextWeekBadge();
             }
         } catch (error) {
             console.error('Error fetching orders:', error);

@@ -1,3 +1,6 @@
+## v1.4.20
+- 🐛 **Bugfix**: Der Badge-Counter im „Nächste Woche"-Tab wird jetzt sofort nach einer Bestellung oder Stornierung aktualisiert.
+
 ## v1.4.19
 - 🎨 **Feature**: Eigenes Favicon für die Installer-Seite hinzugefügt (Dreieck + Gabel & Messer). Wird beim Drag & Drop in die Lesezeichenleiste als Icon übernommen.
 
