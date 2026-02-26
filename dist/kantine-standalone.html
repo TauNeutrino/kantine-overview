@@ -2007,7 +2007,7 @@ body {
         const favicon = document.createElement('link');
         favicon.rel = 'icon';
         favicon.type = 'image/png';
-        favicon.href = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC9UlEQVR4AcRVO28TQRCe2UtAQgkFShWIkoDogiAdFUo6XoYGIRoePwSw4Q/QUCBRgIA/gLCokBL+QIKBAipwwkt0pAlwvhtmxrvH+Xy39tkxjG5uZmdf3zf7MvCfZSgA59Y2ppfefp8YhsPAACqNj/Nk4ncT4faHk+tf5wYFMTAAIrgOgJOIMDWGv27AgDIQgPNvPs8g4VU3J7IvMVcuY70AKq+aJINlbRyFVUAIOAstUfE1Bm2R9qfXmvfaJf/fCyCvqzIlvKZ1SI94CZ6ozzGt0wKAMXS4nw1aGkActW4LYyCIgmC8ZoKxm+JLLIrCW3Z+4FgwGf68kJQLnNIAeODLMhYx+6dH9m+K8uSPJcZ74Uo6CwBxO1NSWaDlASAEDELYV8GKKcgCIZ4487p50DbLNX0DSDNz7N2I2Sy4OAIgxnARPNI3gFjWXgYiXfuEvYRE01mQcqJElxI/x+kJQI6U7afrmWVv6yCdBY2h2Q1Av8HAXS0X/HoC0IuAOzvLO7/KxdwvyQLXItBxANzFG/M+eMQL4NmxWSTAO64/AT1Qpi6QsVqHoCciU1VY9AKQXsxkWSzvfPKx1zb8M+5EsC+fkBBbpF4AuvMJjkpnZt9QhlLwqLZJZUHH8LT3AtCdj4DaH82K2j5+mgXbLkrfjjaWNoUAFDmB3nrSAYm2xPajmgXbEAkzt6OtsKYQQCznHkFuPYJhBCGIPFnIBZBmL2sPQ4ovC7kA4r/sIyix9rk4+ebkXVSYhS4AHez5xSuz9rkA7IkoykIXgDT7fs597qSpoHH3AubvhQ4AWfaym+uLszW5TMRCCZE+ojIGL4HejnlZ6AAQRWGNGwcyD7/lL8+uby7thMYIqyCCmoUapCQBcKrx6QAC6osn9YbgIT/mKzuhMhZYQZ6j8v7LlC3yY2k9DMIWuwkg9kf00RaFsMcNnkz4fGH+G42NzxKZ5VHq9uTeufrC9EYXAAlIRX1xZnWU+uLQvh8yl9MkAy7wr+3IAfQi9AcAAP//cvfPmgAAAAZJREFUAwAATd1Qkd2fWwAAAABJRU5ErkJggg==';
+        favicon.href = 'data:image/png;base64,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';
         document.head.appendChild(favicon);
 
         // Inject Google Fonts if not already present
@@ -2031,7 +2031,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.27</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.28</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2173,7 +2173,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.27</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.28</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -4026,7 +4026,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.27';
+        const currentVersion = 'v1.4.28';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4067,7 +4067,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.27';
+        const currentVersion = 'v1.4.28';
 
         if (!modal) return;
         modal.classList.remove('hidden');
