@@ -1,3 +1,6 @@
+## v1.4.28
+- 🎨 **Favicon**: Eigenes Favicon-Design aus `favicon_base.png` (2048x2048) auf 32x32 skaliert. Wird beim Build automatisch als PNG-Data-URI in Bookmarklet und Installer injiziert.
+
 ## v1.4.27
 - 🔧 **Build**: Favicon wird jetzt sauber aus `favicon.png` per Build-Script als PNG-Base64-Data-URI generiert und über `{{FAVICON_DATA_URI}}` Platzhalter in `kantine.js` + `install.html` injiziert. Funktioniert auf allen Browsern und Proxy-Diensten.
 
