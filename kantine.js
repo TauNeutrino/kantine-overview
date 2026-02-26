@@ -57,7 +57,7 @@
         const favicon = document.createElement('link');
         favicon.rel = 'icon';
         favicon.type = 'image/png';
-        favicon.href = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/favicon.png';
+        favicon.href = '{{FAVICON_DATA_URI}}';
         document.head.appendChild(favicon);
 
         // Inject Google Fonts if not already present

@@ -26,13 +26,14 @@ if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
 if [ ! -f "$FAVICON_FILE" ]; then echo "ERROR: $FAVICON_FILE not found"; exit 1; fi
 
-# Favicon URL (served from GitHub raw)
-FAVICON_URL="https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/favicon.png"
+# Generate favicon Base64 data URI from PNG
+FAVICON_B64=$(base64 -w0 "$FAVICON_FILE")
+FAVICON_URL="data:image/png;base64,${FAVICON_B64}"
 
 CSS_CONTENT=$(cat "$CSS_FILE")
 
-# Inject version into JS
-JS_CONTENT=$(cat "$JS_FILE" | sed "s|{{VERSION}}|$VERSION|g")
+# Inject version and favicon into JS
+JS_CONTENT=$(cat "$JS_FILE" | sed "s|{{VERSION}}|$VERSION|g" | sed "s|{{FAVICON_DATA_URI}}|$FAVICON_URL|g")
 
 # === 1. Build standalone HTML (for local testing/dev) ===
 cat > "$DIST_DIR/kantine-standalone.html" << HTMLEOF
@@ -206,9 +207,9 @@ echo "document.getElementById('bookmarklet-link').href = " >> "$DIST_DIR/install
 echo "$JS_CONTENT" | python3 -c "
 import sys, json, urllib.parse
 
-# 1. Read JS and Replace VERSION
+# 1. Read JS and Replace VERSION + Favicon
 js_template = sys.stdin.read()
-js = js_template.replace('{{VERSION}}', '$VERSION')
+js = js_template.replace('{{VERSION}}', '$VERSION').replace('{{FAVICON_DATA_URI}}', '$FAVICON_URL')
 
 # 2. Prepare CSS for injection via createElement('style')
 css = open('$CSS_FILE').read().replace('\n', ' ').replace('  ', ' ')

@@ -1,3 +1,6 @@
+## v1.4.27
+- 🔧 **Build**: Favicon wird jetzt sauber aus `favicon.png` per Build-Script als PNG-Base64-Data-URI generiert und über `{{FAVICON_DATA_URI}}` Platzhalter in `kantine.js` + `install.html` injiziert. Funktioniert auf allen Browsern und Proxy-Diensten.
+
 ## v1.4.26
 - 🎨 **Favicon**: Von SVG-Base64 auf PNG-Datei (`favicon.png`) umgestellt, verlinkt via raw.githubusercontent.com. Funktioniert zuverlässig auf allen Browsern und Proxy-Diensten (htmlpreview.github.io).
 
