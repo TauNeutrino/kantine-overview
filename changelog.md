@@ -1,3 +1,6 @@
+## v1.4.24
+- 🐛 **Bugfix**: Favicon-Encoding korrigiert – `encodeURIComponent` verursachte doppeltes Encoding der Farbcodes (`%23` → `%2523`). Auf Base64 umgestellt, funktioniert nun auch unter Chrome/Windows.
+
 ## v1.4.23
 - 🐛 **Bugfix**: Favicon wird jetzt beim Ausführen des Bookmarklets in die Seite injiziert (ersetzt das Bessa-Favicon im Tab). Chrome cached das Icon und übernimmt es anschließend auch in die Lesezeichenleiste.
 
