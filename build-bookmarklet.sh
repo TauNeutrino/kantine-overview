@@ -24,6 +24,24 @@ echo "=== Kantine Bookmarklet Builder ($VERSION) ==="
 # Check files exist
 if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
+
+# Generate favicon.png from favicon_base.png if base exists
+FAVICON_BASE="$SCRIPT_DIR/favicon_base.png"
+if [ -f "$FAVICON_BASE" ]; then
+    echo "Generating 32x32 favicon.png from favicon_base.png..."
+    python3 -c "
+import sys
+from PIL import Image
+try:
+    img = Image.open('$FAVICON_BASE')
+    img_resized = img.resize((32, 32), Image.Resampling.LANCZOS)
+    img_resized.save('$FAVICON_FILE')
+except Exception as e:
+    print('Favicon generation error:', e)
+    sys.exit(1)
+"
+fi
+
 if [ ! -f "$FAVICON_FILE" ]; then echo "ERROR: $FAVICON_FILE not found"; exit 1; fi
 
 # Generate favicon Base64 data URI from PNG
