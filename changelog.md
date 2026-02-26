@@ -1,3 +1,6 @@
+## v1.4.25
+- 🐛 **Bugfix**: Favicon wird in `install.html` jetzt zusätzlich per JavaScript injiziert, um Proxy-Dienste wie htmlpreview.github.io zu überschreiben. Release-Script pusht nun auch `main` Branch zu GitHub.
+
 ## v1.4.24
 - 🐛 **Bugfix**: Favicon-Encoding korrigiert – `encodeURIComponent` verursachte doppeltes Encoding der Farbcodes (`%23` → `%2523`). Auf Base64 umgestellt, funktioniert nun auch unter Chrome/Windows.
 
