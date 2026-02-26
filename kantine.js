@@ -344,7 +344,12 @@
         if (btnClearCache) {
             btnClearCache.addEventListener('click', () => {
                 if (confirm('Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.')) {
-                    localStorage.clear();
+                    // Only clear our own keys so we don't destroy the host app's (Bessa's) session
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('kantine_')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
                     window.location.reload();
                 }
             });

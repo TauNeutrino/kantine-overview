@@ -1,3 +1,6 @@
+## v1.4.31
+- 🐛 **Bugfix**: Der "Lokalen Cache leeren"-Button löscht nun gezielt nur noch Kantine-spezifische Daten (`kantine_` Präfix). Bisher wurde die gesamte `localStorage` geleert, was dazu führte, dass man auch aus der zugrundeliegenden bessa.app-Sitzung ausgeloggt wurde.
+
 ## v1.4.30
 - 🐛 **Bugfix**: Login-Sitzung (`authToken` etc.) wird nun in der `localStorage` statt `sessionStorage` gespeichert, wodurch die Anmeldung beim Öffnen von Bookmarklets in neuen Tabs/Fenstern erhalten bleibt.
 - 🐛 **Bugfix**: Bestell-Erinnerungscountdown und Alarm-Notifications erscheinen nun nur noch für angemeldete Nutzer.
