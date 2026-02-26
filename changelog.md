@@ -1,3 +1,7 @@
+## v1.4.30
+- 🐛 **Bugfix**: Login-Sitzung (`authToken` etc.) wird nun in der `localStorage` statt `sessionStorage` gespeichert, wodurch die Anmeldung beim Öffnen von Bookmarklets in neuen Tabs/Fenstern erhalten bleibt.
+- 🐛 **Bugfix**: Bestell-Erinnerungscountdown und Alarm-Notifications erscheinen nun nur noch für angemeldete Nutzer.
+
 ## v1.4.29
 - 🐛 **Bugfix**: Favicon-Injection in `install.html` mit `setTimeout(0)` verzögert, sodass sie nach dem `document.write()` von htmlpreview.github.io läuft. Chrome erkennt Favicon-Änderungen erst im nächsten Event-Loop-Tick.
 

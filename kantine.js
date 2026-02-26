@@ -29,8 +29,8 @@
     let currentWeekNumber = getISOWeek(new Date());
     let currentYear = new Date().getFullYear();
     let displayMode = 'this-week';
-    let authToken = sessionStorage.getItem('kantine_authToken');
-    let currentUser = sessionStorage.getItem('kantine_currentUser');
+    let authToken = localStorage.getItem('kantine_authToken');
+    let currentUser = localStorage.getItem('kantine_currentUser');
     let orderMap = new Map();
     let userFlags = new Set(JSON.parse(localStorage.getItem('kantine_flags') || '[]'));
     let pollIntervalId = null;
@@ -345,7 +345,6 @@
             btnClearCache.addEventListener('click', () => {
                 if (confirm('Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.')) {
                     localStorage.clear();
-                    sessionStorage.clear();
                     window.location.reload();
                 }
             });
@@ -459,8 +458,8 @@
                 if (response.ok) {
                     authToken = data.key;
                     currentUser = employeeId;
-                    sessionStorage.setItem('kantine_authToken', data.key);
-                    sessionStorage.setItem('kantine_currentUser', employeeId);
+                    localStorage.setItem('kantine_authToken', data.key);
+                    localStorage.setItem('kantine_currentUser', employeeId);
 
                     // Fetch user name
                     try {
@@ -469,8 +468,8 @@
                         });
                         if (userResp.ok) {
                             const userData = await userResp.json();
-                            if (userData.first_name) sessionStorage.setItem('kantine_firstName', userData.first_name);
-                            if (userData.last_name) sessionStorage.setItem('kantine_lastName', userData.last_name);
+                            if (userData.first_name) localStorage.setItem('kantine_firstName', userData.first_name);
+                            if (userData.last_name) localStorage.setItem('kantine_lastName', userData.last_name);
                         }
                     } catch (err) {
                         console.error('Failed to fetch user info:', err);
@@ -500,10 +499,10 @@
 
         // Logout
         btnLogout.addEventListener('click', () => {
-            sessionStorage.removeItem('kantine_authToken');
-            sessionStorage.removeItem('kantine_currentUser');
-            sessionStorage.removeItem('kantine_firstName');
-            sessionStorage.removeItem('kantine_lastName');
+            localStorage.removeItem('kantine_authToken');
+            localStorage.removeItem('kantine_currentUser');
+            localStorage.removeItem('kantine_firstName');
+            localStorage.removeItem('kantine_lastName');
             authToken = null;
             currentUser = null;
             orderMap = new Map();
@@ -524,13 +523,13 @@
                     if (parsed.auth && parsed.auth.token) {
                         console.log('Found existing Bessa session!');
                         authToken = parsed.auth.token;
-                        sessionStorage.setItem('kantine_authToken', authToken);
+                        localStorage.setItem('kantine_authToken', authToken);
 
                         if (parsed.auth.user) {
                             currentUser = parsed.auth.user.id || 'unknown';
-                            sessionStorage.setItem('kantine_currentUser', currentUser);
-                            if (parsed.auth.user.firstName) sessionStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
-                            if (parsed.auth.user.lastName) sessionStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
+                            localStorage.setItem('kantine_currentUser', currentUser);
+                            if (parsed.auth.user.firstName) localStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
+                            if (parsed.auth.user.lastName) localStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
                         }
                     }
                 }
@@ -539,9 +538,9 @@
             }
         }
 
-        authToken = sessionStorage.getItem('kantine_authToken');
-        currentUser = sessionStorage.getItem('kantine_currentUser');
-        const firstName = sessionStorage.getItem('kantine_firstName');
+        authToken = localStorage.getItem('kantine_authToken');
+        currentUser = localStorage.getItem('kantine_currentUser');
+        const firstName = localStorage.getItem('kantine_firstName');
         const btnLoginOpen = document.getElementById('btn-login-open');
         const userInfo = document.getElementById('user-info');
         const userIdDisplay = document.getElementById('user-id-display');
@@ -2214,6 +2213,12 @@
 
     // === Order Countdown ===
     function updateCountdown() {
+        // Only show order alarms for logged-in users
+        if (!authToken || !currentUser) {
+            removeCountdown();
+            return;
+        }
+
         const now = new Date();
         const currentDay = now.getDay();
         // Skip weekends (0=Sun, 6=Sat)
@@ -2278,7 +2283,7 @@
 
             // Notification logic (One time)
             const notifiedKey = `kantine_notified_${todayStr}`;
-            if (!sessionStorage.getItem(notifiedKey)) {
+            if (!localStorage.getItem(notifiedKey)) {
                 if (Notification.permission === 'granted') {
                     new Notification('Kantine: Bestellschluss naht!', {
                         body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
@@ -2287,7 +2292,7 @@
                 } else if (Notification.permission === 'default') {
                     Notification.requestPermission();
                 }
-                sessionStorage.setItem(notifiedKey, 'true');
+                localStorage.setItem(notifiedKey, 'true');
             }
         } else {
             countdownEl.classList.remove('urgent');
