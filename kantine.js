@@ -50,15 +50,14 @@
         // Replace entire page content
         document.title = 'Kantine Weekly Menu';
 
-        // Inject custom favicon (triangle + fork & knife)
+        // Inject custom favicon (triangle + fork & knife PNG)
         if (document.querySelectorAll) {
             document.querySelectorAll('link[rel*="icon"]').forEach(el => el.remove());
         }
         const favicon = document.createElement('link');
         favicon.rel = 'icon';
-        favicon.type = 'image/svg+xml';
-        // Pre-encoded Base64 of the SVG favicon (triangle + fork & knife)
-        favicon.href = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMiwxMCkiPjxyZWN0IHg9IjEiIHk9IjAiIHdpZHRoPSIxLjgiIGhlaWdodD0iMTYiIHJ4PSIuOSIgZmlsbD0iIzMzMyIvPjxyZWN0IHg9IjQuNiIgeT0iMCIgd2lkdGg9IjEuOCIgaGVpZ2h0PSIxNiIgcng9Ii45IiBmaWxsPSIjMzMzIi8+PHJlY3QgeD0iOC4yIiB5PSIwIiB3aWR0aD0iMS44IiBoZWlnaHQ9IjE2IiByeD0iLjkiIGZpbGw9IiMzMzMiLz48cmVjdCB4PSIxIiB5PSIxNCIgd2lkdGg9IjkiIGhlaWdodD0iMy41IiByeD0iMS41IiBmaWxsPSIjMzMzIi8+PHJlY3QgeD0iMy41IiB5PSIxNi41IiB3aWR0aD0iNCIgaGVpZ2h0PSIyNCIgcng9IjIiIGZpbGw9IiMzMzMiLz48L2c+PHBvbHlnb24gcG9pbnRzPSIzMiw4IDQ3LDQ4IDE3LDQ4IiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUwLDEwKSI+PHBhdGggZD0iTTMsMEMzLDAsMywwLDMsMEwzLDE3TDEwLDE0QzEwLDYsNywwLDMsMFoiIGZpbGw9IiMzMzMiLz48cmVjdCB4PSIxLjUiIHk9IjAiIHdpZHRoPSIyIiBoZWlnaHQ9IjE4IiByeD0iMSIgZmlsbD0iIzMzMyIvPjxyZWN0IHg9IjEuNSIgeT0iMTYuNSIgd2lkdGg9IjguNSIgaGVpZ2h0PSIzLjUiIHJ4PSIxLjIiIGZpbGw9IiMzMzMiLz48cmVjdCB4PSIzLjUiIHk9IjE5IiB3aWR0aD0iNCIgaGVpZ2h0PSIyMiIgcng9IjIiIGZpbGw9IiMzMzMiLz48L2c+PC9zdmc+';
+        favicon.type = 'image/png';
+        favicon.href = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/favicon.png';
         document.head.appendChild(favicon);
 
         // Inject Google Fonts if not already present

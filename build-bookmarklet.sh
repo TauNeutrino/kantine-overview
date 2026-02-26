@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DIST_DIR="$SCRIPT_DIR/dist"
 CSS_FILE="$SCRIPT_DIR/style.css"
 JS_FILE="$SCRIPT_DIR/kantine.js"
-FAVICON_FILE="$SCRIPT_DIR/favicon.svg"
+FAVICON_FILE="$SCRIPT_DIR/favicon.png"
 
 # === VERSION ===
 if [ -f "$SCRIPT_DIR/version.txt" ]; then
@@ -26,9 +26,8 @@ if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
 if [ ! -f "$FAVICON_FILE" ]; then echo "ERROR: $FAVICON_FILE not found"; exit 1; fi
 
-# Generate favicon Base64 data URI
-FAVICON_B64=$(base64 -w0 "$FAVICON_FILE")
-FAVICON_URI="data:image/svg+xml;base64,${FAVICON_B64}"
+# Favicon URL (served from GitHub raw)
+FAVICON_URL="https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/favicon.png"
 
 CSS_CONTENT=$(cat "$CSS_FILE")
 
@@ -107,7 +106,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 <head>
     <meta charset="UTF-8">
     <title>Kantine Wrapper Installer ($VERSION)</title>
-    <link rel="icon" type="image/svg+xml" href="$FAVICON_URI">
+    <link rel="icon" type="image/png" href="$FAVICON_URL">
     <style>
         body { font-family: 'Inter', sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #1a1a2e; color: #eee; }
         h1 { color: #029AA8; } /* Knapp Teal */
@@ -247,8 +246,8 @@ cat >> "$DIST_DIR/install.html" << INSTALLEOF
         document.querySelectorAll('link[rel*="icon"]').forEach(function(el) { el.remove(); });
         var fi = document.createElement('link');
         fi.rel = 'icon';
-        fi.type = 'image/svg+xml';
-        fi.href = '$FAVICON_URI';
+        fi.type = 'image/png';
+        fi.href = '$FAVICON_URL';
         document.head.appendChild(fi);
         document.getElementById('bookmarklet-link').textContent = 'Kantine $VERSION';
     </script>

@@ -1,3 +1,6 @@
+## v1.4.26
+- 🎨 **Favicon**: Von SVG-Base64 auf PNG-Datei (`favicon.png`) umgestellt, verlinkt via raw.githubusercontent.com. Funktioniert zuverlässig auf allen Browsern und Proxy-Diensten (htmlpreview.github.io).
+
 ## v1.4.25
 - 🐛 **Bugfix**: Favicon wird in `install.html` jetzt zusätzlich per JavaScript injiziert, um Proxy-Dienste wie htmlpreview.github.io zu überschreiben. Release-Script pusht nun auch `main` Branch zu GitHub.
 
