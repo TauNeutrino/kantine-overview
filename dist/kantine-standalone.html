@@ -2007,7 +2007,7 @@ body {
         const favicon = document.createElement('link');
         favicon.rel = 'icon';
         favicon.type = 'image/png';
-        favicon.href = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/favicon.png';
+        favicon.href = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC9UlEQVR4AcRVO28TQRCe2UtAQgkFShWIkoDogiAdFUo6XoYGIRoePwSw4Q/QUCBRgIA/gLCokBL+QIKBAipwwkt0pAlwvhtmxrvH+Xy39tkxjG5uZmdf3zf7MvCfZSgA59Y2ppfefp8YhsPAACqNj/Nk4ncT4faHk+tf5wYFMTAAIrgOgJOIMDWGv27AgDIQgPNvPs8g4VU3J7IvMVcuY70AKq+aJINlbRyFVUAIOAstUfE1Bm2R9qfXmvfaJf/fCyCvqzIlvKZ1SI94CZ6ozzGt0wKAMXS4nw1aGkActW4LYyCIgmC8ZoKxm+JLLIrCW3Z+4FgwGf68kJQLnNIAeODLMhYx+6dH9m+K8uSPJcZ74Uo6CwBxO1NSWaDlASAEDELYV8GKKcgCIZ4487p50DbLNX0DSDNz7N2I2Sy4OAIgxnARPNI3gFjWXgYiXfuEvYRE01mQcqJElxI/x+kJQI6U7afrmWVv6yCdBY2h2Q1Av8HAXS0X/HoC0IuAOzvLO7/KxdwvyQLXItBxANzFG/M+eMQL4NmxWSTAO64/AT1Qpi6QsVqHoCciU1VY9AKQXsxkWSzvfPKx1zb8M+5EsC+fkBBbpF4AuvMJjkpnZt9QhlLwqLZJZUHH8LT3AtCdj4DaH82K2j5+mgXbLkrfjjaWNoUAFDmB3nrSAYm2xPajmgXbEAkzt6OtsKYQQCznHkFuPYJhBCGIPFnIBZBmL2sPQ4ovC7kA4r/sIyix9rk4+ebkXVSYhS4AHez5xSuz9rkA7IkoykIXgDT7fs597qSpoHH3AubvhQ4AWfaym+uLszW5TMRCCZE+ojIGL4HejnlZ6AAQRWGNGwcyD7/lL8+uby7thMYIqyCCmoUapCQBcKrx6QAC6osn9YbgIT/mKzuhMhZYQZ6j8v7LlC3yY2k9DMIWuwkg9kf00RaFsMcNnkz4fGH+G42NzxKZ5VHq9uTeufrC9EYXAAlIRX1xZnWU+uLQvh8yl9MkAy7wr+3IAfQi9AcAAP//cvfPmgAAAAZJREFUAwAATd1Qkd2fWwAAAABJRU5ErkJggg==';
         document.head.appendChild(favicon);
 
         // Inject Google Fonts if not already present
@@ -2031,7 +2031,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.26</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.27</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2173,7 +2173,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.26</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.27</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -4026,7 +4026,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.26';
+        const currentVersion = 'v1.4.27';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4067,7 +4067,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.26';
+        const currentVersion = 'v1.4.27';
 
         if (!modal) return;
         modal.classList.remove('hidden');
