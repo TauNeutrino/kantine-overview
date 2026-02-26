@@ -1,101 +1,16 @@
-## v1.4.31
-- 🐛 **Bugfix**: Der "Lokalen Cache leeren"-Button löscht nun gezielt nur noch Kantine-spezifische Daten (`kantine_` Präfix). Bisher wurde die gesamte `localStorage` geleert, was dazu führte, dass man auch aus der zugrundeliegenden bessa.app-Sitzung ausgeloggt wurde.
+## v1.5.0 (2026-02-26)
+Das große "Quality of Life"-Update! Zusammenfassung aller Features und Fixes seit v1.4.0:
 
-## v1.4.30
-- 🐛 **Bugfix**: Login-Sitzung (`authToken` etc.) wird nun in der `localStorage` statt `sessionStorage` gespeichert, wodurch die Anmeldung beim Öffnen von Bookmarklets in neuen Tabs/Fenstern erhalten bleibt.
-- 🐛 **Bugfix**: Bestell-Erinnerungscountdown und Alarm-Notifications erscheinen nun nur noch für angemeldete Nutzer.
+- ✨ **Bestellhistorie**: Übersichtliche Historie direkt in der App – gruppiert nach Jahr/Monat, inklusive Summen, Stati (Offen/Abgeschlossen/Storniert) und Delta-Cache für rasantes Laden.
+- ⚡ **Smart Cache & Performance**: Massive Reduzierung von API-Calls und Ladezeiten durch intelligenten lokalen Cache. Das Bookmarklet startet nun praktisch verzögerungsfrei.
+- 🔄 **GitHub Release Management**: In-App Versions-Menü mit Auto-Update Check (`🆕` Icon). Umschalten zwischen "Stable" und "Dev" Versionen sowie Downgrade-Möglichkeit direkt über die GitHub API.
+- 🌟 **Smart Highlights & UX**: Speisen-Favoriten leuchten nun im Design-Violett und erhalten Feature-Badges. Der Bestell-Badge für nächste Woche filtert nun intelligent personalisierte Highlights voraus.
+- 🔔 **Bestell-Warnung & Notifications**: Der System-Alarm berücksichtigt nun Sessions korrekt, zeigt dynamische Farbwechsel (gelb/grün/rot) und warnt verlässlich vor dem Bestellschluss (10:00 Uhr). Altlasten von Vortagen werden automatisch geputzt.
+- 🎨 **Eigenes Favicon**: Das Bookmarklet und der Installer haben nun ein eigenes Icon (Dreieck mit Besteck), das beim Hineinziehen in die Lesezeichenleiste übernommen wird (dynamisch generiert als lokales PNG).
+- 🧹 **Lokaler Cache-Clear**: Ein in das Versions-Menü eingebauter "Papierkorb", der ausschließlich fehlerhafte Kantinen-Caches putzt, ohne dabei versehentlich die aktive Bessa-Host-Session zu zerstören.
+- 🔒 **Sitzungs-Persistenz**: Die Login-Session überdauert jetzt neue Tabs, Fenster und Version-Upgrades reibungslos durch den Wechsel auf `localStorage`.
+- 🛡️ **Testing & Stabilität**: Vollautomatische DOM- und Logik-Testing-Suites in der Release-Pipeline integriert. Fehlerhafte UI-Buttons gehören der Vergangenheit an.
 
-## v1.4.29
-- 🐛 **Bugfix**: Favicon-Injection in `install.html` mit `setTimeout(0)` verzögert, sodass sie nach dem `document.write()` von htmlpreview.github.io läuft. Chrome erkennt Favicon-Änderungen erst im nächsten Event-Loop-Tick.
-
-## v1.4.28
-- 🎨 **Favicon**: Eigenes Favicon-Design aus `favicon_base.png` (2048x2048) auf 32x32 skaliert. Wird beim Build automatisch als PNG-Data-URI in Bookmarklet und Installer injiziert.
-
-## v1.4.27
-- 🔧 **Build**: Favicon wird jetzt sauber aus `favicon.png` per Build-Script als PNG-Base64-Data-URI generiert und über `{{FAVICON_DATA_URI}}` Platzhalter in `kantine.js` + `install.html` injiziert. Funktioniert auf allen Browsern und Proxy-Diensten.
-
-## v1.4.26
-- 🎨 **Favicon**: Von SVG-Base64 auf PNG-Datei (`favicon.png`) umgestellt, verlinkt via raw.githubusercontent.com. Funktioniert zuverlässig auf allen Browsern und Proxy-Diensten (htmlpreview.github.io).
-
-## v1.4.25
-- 🐛 **Bugfix**: Favicon wird in `install.html` jetzt zusätzlich per JavaScript injiziert, um Proxy-Dienste wie htmlpreview.github.io zu überschreiben. Release-Script pusht nun auch `main` Branch zu GitHub.
-
-## v1.4.24
-- 🐛 **Bugfix**: Favicon-Encoding korrigiert – `encodeURIComponent` verursachte doppeltes Encoding der Farbcodes (`%23` → `%2523`). Auf Base64 umgestellt, funktioniert nun auch unter Chrome/Windows.
-
-## v1.4.23
-- 🐛 **Bugfix**: Favicon wird jetzt beim Ausführen des Bookmarklets in die Seite injiziert (ersetzt das Bessa-Favicon im Tab). Chrome cached das Icon und übernimmt es anschließend auch in die Lesezeichenleiste.
-
-## v1.4.22
-- 📝 **Docs**: Vollständiger Dokumentations-Audit: README.md um fehlende Dateien (favicon.svg, release.sh, Tests) und Features (Bestellhistorie, Version-Menü, Cache leeren, Favicon) ergänzt. REQUIREMENTS.md: Doppelte IDs (FR-090/091) behoben, FR-092 an dynamische Glow-Logik angepasst, FR-116 (Cache leeren) und FR-117 (Favicon) hinzugefügt, NFR-008 um DOM-Tests erweitert.
-
-## v1.4.21
-- ✨ **UX**: Der Glow-Effekt des „Nächste Woche"-Buttons bleibt nun aktiv, solange Menüdaten vorhanden aber noch keine Bestellungen getätigt wurden. Verschwindet automatisch nach der ersten Bestellung.
-
-## v1.4.20
-- 🐛 **Bugfix**: Der Badge-Counter im „Nächste Woche"-Tab wird jetzt sofort nach einer Bestellung oder Stornierung aktualisiert.
-
-## v1.4.19
-- 🎨 **Feature**: Eigenes Favicon für die Installer-Seite hinzugefügt (Dreieck + Gabel & Messer). Wird beim Drag & Drop in die Lesezeichenleiste als Icon übernommen.
-
-## v1.4.18
-- 🧪 **Testing**: Die automatische DOM-Testing Suite (`test_dom.js`) wurde massiv ausgebaut. Sie prüft nun neben der Alarmglocke und den Highlights auch systematisch alle anderen UI-Komponenten (Login-Modal, History-Modal, Versionen-Modal, Theme-Toggle, und Navigation Tabs) auf korrekte Event-Listener-Bindungen, um Regressionen (tote Buttons) endgültig auszuschließen.
-
-## v1.4.17
-- 🐛 **Bugfix**: Regression behoben: Der "Persönliche Highlights" (Stern-Button) Dialog öffnet sich nun wieder korrekt.
-- 🧪 **Testing**: Es wurde ein initialer UI-Testing-Hook (`test_dom.js` mit `jsdom`) in die Build-Pipeline integriert, um kritische DOM Event-Listener Regressionen (wie den Highlights-Button und die Alarmglocke) automatisch zu preventen.
-
-## v1.4.16
-- ⚡ **Feature**: Ein Button "Lokalen Cache leeren" wurde zum Versionen-Menü hinzugefügt, um bei hartnäckigen lokalen Fehlern alle Caches und Sessions bereinigen zu können, ohne die Entwicklertools (F12) des Browsers bemühen zu müssen.
-
-## v1.4.15
-- 🧹 **Bugfix**: In der Vergangenheit gesetzte Alarme/Flags wurden nicht zuverlässig gelöscht. Dies ist nun behoben, sodass verfallene Menüs nach 10:00 Uhr bzw. an vergangenen Tagen automatisch aus dem Tracker verschwinden.
-
-## v1.4.14
-- 🐛 **Bugfix**: Alarmglocke versteckt sich jetzt zuverlässig auch auf Endgeräten mit CSS Konflikten 
-- 🚀 **Feature**: Sofortige API-Aktualisierung (Refresh) bei Aktivierung eines Menüalarms
-- ⚡ **Optimierung**: "Unbekannt" im letzten Refresh-Zeitpunkt wird abgefangen und zeigt initial "gerade eben"
-
-## v1.4.13 (2026-02-24)
-- **Fix**: Die Farben der Glocke funktionieren nun verlässlich, da CSS-Variablen durch direkte Hex-Codes ersetzt wurden.
-
-## v1.4.12 (2026-02-24)
-- **Fix**: Das Glocken-Icon sollte nun endgültig versteckt bleiben, wenn keine Benachrichtigungen aktiv sind (CSS-Kollision mit `.hidden` behoben).
-
-## v1.4.11 (2026-02-24)
-- **Feature**: Das Versionsmenü prüft nun im Hintergrund direkt beim Öffnen nach neuen Versionen und aktualisiert die Liste automatisch, selbst wenn eine veraltete Liste noch im Cache liegt.
-
-## v1.4.10 (2026-02-24)
-- **Fix**: Die Farben der Benachrichtigungs-Glocke wurden korrigiert: Sie ist nun gelb, während man auf ein Menü wartet, und wird grün, sobald eines verfügbar ist.
-
-## v1.4.9 (2026-02-24)
-- **Fix**: Das Glocken-Icon für Benachrichtigungen wird nun direkt beim Start (wenn Daten aus dem lokalen Cache geladen werden) korrekt angezeigt.
-
-## v1.4.8 (2026-02-24)
-- **Fix**: Die Benachrichtigungs-Glocke wird nun korrekt in Gelb dargestellt, wenn beobachtete Menüs verfügbar sind.
-- **Tools**: Fehler in Testskript behoben, der den CI/CD Build verlangsamt hat.
-
-## v1.4.7 (2026-02-24)
-- **Performance**: Die Bestellhistorie nutzt nun einen inkrementellen Delta-Cache anstatt immer alle Seiten von der API herunterzuladen, was die Ladezeiten für Vielbesteller enorm reduziert.
-
-## v1.4.6 (2026-02-24)
-- **Fix**: Die Umrandung für bereits bestellte Menüs der vergangenen Tage ist nun ebenfalls einheitlich violett statt blau.
-
-## v1.4.5 (2026-02-24)
-- **Fix**: Doppelten Scrollbalken in der Versionen-Liste entfernt.
-
-## v1.4.4 (2026-02-24)
-- **Feature**: Das Versionsmenü enthält nun direkte Links zu GitHub, um Fehler zu melden oder neue Features vorzuschlagen.
-
-## v1.4.3 (2026-02-24)
-- **Fix**: Der Rahmen des "Heute Bestellt" Menüs ist nun konsequent violett (passend zum Glow-Effekt).
-
-## v1.4.2 (2026-02-23)
-- **Fix**: Das "Heute Bestellt" Menü leuchtet nun stimmig im Design-Violett statt Blau.
-- **Fix**: Abfangen des GitHub API Rate Limit (403) im Versionsdialog mit einer freundlicheren Fehlermeldung, da der User-Agent im Browser nicht manuell gesetzt werden darf.
-
-## v1.4.1 (2026-02-22)
-- **UX Verbesserungen**: Bestellhistorie gruppiert nach Jahren und Monaten mittels einklappbarem Akkordeon. Monatssummen integriert und Stati farblich abgehoben (Offen, Abgeschlossen, Storniert).
 
 ## v1.4.0 (2026-02-22)
 - **Feature**: Bestellhistorie per Knopfdruck abrufbar. Übersichtliche Darstellung, gruppiert nach Monaten und Kalenderwochen, inklusive Stornos. 📜✨
