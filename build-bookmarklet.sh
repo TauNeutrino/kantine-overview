@@ -147,7 +147,11 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 </head>
 <body>
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="margin-bottom: 5px;">🍽️ Kantine Wrapper <span style="font-size:0.5em; opacity:0.6; font-weight:400; vertical-align:middle; margin-left:10px;">$VERSION</span></h1>
+        <h1 style="margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <img src="$FAVICON_URL" alt="Logo" style="width: 38px; height: 38px;"> 
+            Kantine Wrapper 
+            <span style="font-size:0.5em; opacity:0.6; font-weight:400; margin-left:5px;">$VERSION</span>
+        </h1>
         <p style="font-size: 1.2rem; color: #a0aec0; margin-top: 0; font-style: italic;">"Mahlzeit! Jetzt bessa einfach."</p>
     </div>
     
