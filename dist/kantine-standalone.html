@@ -1979,8 +1979,8 @@ body {
     let currentWeekNumber = getISOWeek(new Date());
     let currentYear = new Date().getFullYear();
     let displayMode = 'this-week';
-    let authToken = sessionStorage.getItem('kantine_authToken');
-    let currentUser = sessionStorage.getItem('kantine_currentUser');
+    let authToken = localStorage.getItem('kantine_authToken');
+    let currentUser = localStorage.getItem('kantine_currentUser');
     let orderMap = new Map();
     let userFlags = new Set(JSON.parse(localStorage.getItem('kantine_flags') || '[]'));
     let pollIntervalId = null;
@@ -2031,7 +2031,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.29</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.4.30</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2173,7 +2173,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.4.29</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.4.30</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -2295,7 +2295,6 @@ body {
             btnClearCache.addEventListener('click', () => {
                 if (confirm('Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.')) {
                     localStorage.clear();
-                    sessionStorage.clear();
                     window.location.reload();
                 }
             });
@@ -2409,8 +2408,8 @@ body {
                 if (response.ok) {
                     authToken = data.key;
                     currentUser = employeeId;
-                    sessionStorage.setItem('kantine_authToken', data.key);
-                    sessionStorage.setItem('kantine_currentUser', employeeId);
+                    localStorage.setItem('kantine_authToken', data.key);
+                    localStorage.setItem('kantine_currentUser', employeeId);
 
                     // Fetch user name
                     try {
@@ -2419,8 +2418,8 @@ body {
                         });
                         if (userResp.ok) {
                             const userData = await userResp.json();
-                            if (userData.first_name) sessionStorage.setItem('kantine_firstName', userData.first_name);
-                            if (userData.last_name) sessionStorage.setItem('kantine_lastName', userData.last_name);
+                            if (userData.first_name) localStorage.setItem('kantine_firstName', userData.first_name);
+                            if (userData.last_name) localStorage.setItem('kantine_lastName', userData.last_name);
                         }
                     } catch (err) {
                         console.error('Failed to fetch user info:', err);
@@ -2450,10 +2449,10 @@ body {
 
         // Logout
         btnLogout.addEventListener('click', () => {
-            sessionStorage.removeItem('kantine_authToken');
-            sessionStorage.removeItem('kantine_currentUser');
-            sessionStorage.removeItem('kantine_firstName');
-            sessionStorage.removeItem('kantine_lastName');
+            localStorage.removeItem('kantine_authToken');
+            localStorage.removeItem('kantine_currentUser');
+            localStorage.removeItem('kantine_firstName');
+            localStorage.removeItem('kantine_lastName');
             authToken = null;
             currentUser = null;
             orderMap = new Map();
@@ -2474,13 +2473,13 @@ body {
                     if (parsed.auth && parsed.auth.token) {
                         console.log('Found existing Bessa session!');
                         authToken = parsed.auth.token;
-                        sessionStorage.setItem('kantine_authToken', authToken);
+                        localStorage.setItem('kantine_authToken', authToken);
 
                         if (parsed.auth.user) {
                             currentUser = parsed.auth.user.id || 'unknown';
-                            sessionStorage.setItem('kantine_currentUser', currentUser);
-                            if (parsed.auth.user.firstName) sessionStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
-                            if (parsed.auth.user.lastName) sessionStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
+                            localStorage.setItem('kantine_currentUser', currentUser);
+                            if (parsed.auth.user.firstName) localStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
+                            if (parsed.auth.user.lastName) localStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
                         }
                     }
                 }
@@ -2489,9 +2488,9 @@ body {
             }
         }
 
-        authToken = sessionStorage.getItem('kantine_authToken');
-        currentUser = sessionStorage.getItem('kantine_currentUser');
-        const firstName = sessionStorage.getItem('kantine_firstName');
+        authToken = localStorage.getItem('kantine_authToken');
+        currentUser = localStorage.getItem('kantine_currentUser');
+        const firstName = localStorage.getItem('kantine_firstName');
         const btnLoginOpen = document.getElementById('btn-login-open');
         const userInfo = document.getElementById('user-info');
         const userIdDisplay = document.getElementById('user-id-display');
@@ -4026,7 +4025,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.4.29';
+        const currentVersion = 'v1.4.30';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4067,7 +4066,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.4.29';
+        const currentVersion = 'v1.4.30';
 
         if (!modal) return;
         modal.classList.remove('hidden');
@@ -4164,6 +4163,12 @@ body {
 
     // === Order Countdown ===
     function updateCountdown() {
+        // Only show order alarms for logged-in users
+        if (!authToken || !currentUser) {
+            removeCountdown();
+            return;
+        }
+
         const now = new Date();
         const currentDay = now.getDay();
         // Skip weekends (0=Sun, 6=Sat)
@@ -4228,7 +4233,7 @@ body {
 
             // Notification logic (One time)
             const notifiedKey = `kantine_notified_${todayStr}`;
-            if (!sessionStorage.getItem(notifiedKey)) {
+            if (!localStorage.getItem(notifiedKey)) {
                 if (Notification.permission === 'granted') {
                     new Notification('Kantine: Bestellschluss naht!', {
                         body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
@@ -4237,7 +4242,7 @@ body {
                 } else if (Notification.permission === 'default') {
                     Notification.requestPermission();
                 }
-                sessionStorage.setItem(notifiedKey, 'true');
+                localStorage.setItem(notifiedKey, 'true');
             }
         } else {
             countdownEl.classList.remove('urgent');
