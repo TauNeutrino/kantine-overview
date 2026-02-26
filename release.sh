@@ -49,8 +49,9 @@ echo "=== Pushing to remotes ==="
 git push origin HEAD
 git push origin --force tag "$VERSION"
 
-# If a remote named 'github' exists, push tags there too
+# If a remote named 'github' exists, push branch and tags there too
 if git remote | grep -q "^github$"; then
+    git push github HEAD
     git push github --force tag "$VERSION"
 fi
 
