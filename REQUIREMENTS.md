@@ -60,10 +60,10 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Header UI & Navigation** | | | |
 | FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
 | FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv aber kein Menü verfügbar, Grün=Mindestens ein Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 (Update v1.4.10) |
-| FR-092 | Sobald über den Daten-Refresh erstmals Menüdaten für die Nächste Woche geladen werden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Zusätzlich muss einmalig ein Hinweis eingeblendet werden. Bei Klick auf den Button muss die Hervorhebung erlöschen. | Mittel | v1.6.0 |
+| FR-092 | Solange Menüdaten für die Nächste Woche verfügbar sind, aber noch keine Bestellungen getätigt wurden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Nach der ersten Bestellung muss die Hervorhebung automatisch erlöschen. Zusätzlich muss beim erstmaligen Erscheinen der Daten ein einmaliger Toast-Hinweis angezeigt werden. | Mittel | v1.6.0 (Update v1.4.21) |
 | **Benutzer-Feedback** | | | |
-| FR-090 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
-| FR-091 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |
+| FR-095 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
+| FR-096 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |
 | **Nächste-Woche-Badge** | | | |
 | FR-100 | Die Navigation zur nächsten Woche muss ein Badge anzeigen, das den Überblick über den Bestellstatus der kommenden Woche visualisiert (bestellt / bestellbar / gesamt). | Niedrig | v1.0.1 |
 | **Update-Management** | | | |
@@ -73,6 +73,8 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-113 | Es muss möglich sein, zu einer älteren Version zurückzukehren (Downgrade). | Niedrig | v1.3.0 |
 | FR-114 | Ein Dev-Mode muss es ermöglichen, zwischen stabilen Releases und Entwicklungs-Tags umzuschalten. | Niedrig | v1.3.0 |
 | FR-115 | Das Versionsmenü muss Links zur Erstellung von Feature-Requests und Bug-Reports auf GitHub enthalten. | Niedrig | v1.4.4 |
+| FR-116 | Das Versionsmenü muss eine Funktion zum Leeren des lokalen Caches bereitstellen, um bei hartnäckigen Fehlern alle gespeicherten Daten bereinigen zu können. | Niedrig | v1.4.16 |
+| FR-117 | Die Installer-Seite muss ein eingebettetes Favicon bereitstellen, das beim Drag & Drop in die Lesezeichenleiste als Icon für das Bookmarklet übernommen wird. | Niedrig | v1.4.19 |
 
 ## 3. Nicht-funktionale Anforderungen
 
@@ -85,7 +87,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Benutzbarkeit** | NFR-005 | Die Oberfläche muss auf mobilen Geräten fehlerfrei nutzbar sein. | Viewports ab 320px Breite |
 | **Benutzbarkeit** | NFR-006 | Alle interaktiven Elemente müssen Tooltips oder Hilfetexte bieten. | 100% Coverage |
 | **Benutzbarkeit** | NFR-007 | Die Benutzeroberfläche muss vollständig in deutscher Sprache sein. | Vollständige Lokalisierung |
-| **Wartbarkeit** | NFR-008 | Die Build-Artefakte müssen durch automatisierte Tests validiert werden. | Build-Tests + Logik-Tests |
+| **Wartbarkeit** | NFR-008 | Die Build-Artefakte müssen durch automatisierte Tests validiert werden. | Build-Tests + Logik-Tests + DOM-Tests |
 
 ## 4. Technische Randbedingungen
 *   **Deployment**: Das System wird als Bookmarklet ausgeliefert, das auf der Bessa-Webseite ausgeführt wird.
@@ -93,4 +95,4 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 *   **Datenhaltung**: Clientseitig via `localStorage` (Menü-Cache, Flags, Highlights, Theme) und `sessionStorage` (Auth-Token).
 *   **Build**: Bash-basiertes Build-Script, das Bookmarklet-URL, Standalone-HTML und Installer-Seite generiert.
 *   **Versionierung**: SemVer, verwaltet über GitHub Releases/Tags.
-*   **Tests**: Python-basierte Build-Tests (`python3`) + Node.js-basierte Logik-Tests.
+*   **Tests**: Python-basierte Build-Tests (`python3`) + Node.js-basierte Logik-Tests + Node.js-basierte DOM-Interaktionstests (JSDOM).
