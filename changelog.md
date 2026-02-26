@@ -1,3 +1,6 @@
+## v1.4.29
+- 🐛 **Bugfix**: Favicon-Injection in `install.html` mit `setTimeout(0)` verzögert, sodass sie nach dem `document.write()` von htmlpreview.github.io läuft. Chrome erkennt Favicon-Änderungen erst im nächsten Event-Loop-Tick.
+
 ## v1.4.28
 - 🎨 **Favicon**: Eigenes Favicon-Design aus `favicon_base.png` (2048x2048) auf 32x32 skaliert. Wird beim Build automatisch als PNG-Data-URI in Bookmarklet und Installer injiziert.
 

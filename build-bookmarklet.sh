@@ -243,13 +243,16 @@ $CHANGELOG_HTML
 EOF
 
 cat >> "$DIST_DIR/install.html" << INSTALLEOF
-        // Dynamic favicon injection (overrides proxy defaults like htmlpreview.github.io)
-        document.querySelectorAll('link[rel*="icon"]').forEach(function(el) { el.remove(); });
-        var fi = document.createElement('link');
-        fi.rel = 'icon';
-        fi.type = 'image/png';
-        fi.href = '$FAVICON_URL';
-        document.head.appendChild(fi);
+        // Dynamic favicon injection — setTimeout ensures it runs AFTER
+        // htmlpreview.github.io's document.write() processing completes
+        setTimeout(function() {
+            document.querySelectorAll('link[rel*="icon"]').forEach(function(el) { el.remove(); });
+            var fi = document.createElement('link');
+            fi.rel = 'icon';
+            fi.type = 'image/png';
+            fi.href = '$FAVICON_URL';
+            document.head.appendChild(fi);
+        }, 0);
         document.getElementById('bookmarklet-link').textContent = 'Kantine $VERSION';
     </script>
 </body>
