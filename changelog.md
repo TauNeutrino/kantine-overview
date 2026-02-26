@@ -1,3 +1,6 @@
+## v1.4.23
+- 🐛 **Bugfix**: Favicon wird jetzt beim Ausführen des Bookmarklets in die Seite injiziert (ersetzt das Bessa-Favicon im Tab). Chrome cached das Icon und übernimmt es anschließend auch in die Lesezeichenleiste.
+
 ## v1.4.22
 - 📝 **Docs**: Vollständiger Dokumentations-Audit: README.md um fehlende Dateien (favicon.svg, release.sh, Tests) und Features (Bestellhistorie, Version-Menü, Cache leeren, Favicon) ergänzt. REQUIREMENTS.md: Doppelte IDs (FR-090/091) behoben, FR-092 an dynamische Glow-Logik angepasst, FR-116 (Cache leeren) und FR-117 (Favicon) hinzugefügt, NFR-008 um DOM-Tests erweitert.
 

@@ -50,6 +50,16 @@
         // Replace entire page content
         document.title = 'Kantine Weekly Menu';
 
+        // Inject custom favicon (triangle + fork & knife)
+        if (document.querySelectorAll) {
+            document.querySelectorAll('link[rel*="icon"]').forEach(el => el.remove());
+        }
+        const favicon = document.createElement('link');
+        favicon.rel = 'icon';
+        favicon.type = 'image/svg+xml';
+        favicon.href = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g transform="translate(2,10)"><rect x="1" y="0" width="1.8" height="16" rx=".9" fill="%23333"/><rect x="4.6" y="0" width="1.8" height="16" rx=".9" fill="%23333"/><rect x="8.2" y="0" width="1.8" height="16" rx=".9" fill="%23333"/><rect x="1" y="14" width="9" height="3.5" rx="1.5" fill="%23333"/><rect x="3.5" y="16.5" width="4" height="24" rx="2" fill="%23333"/></g><polygon points="32,8 47,48 17,48" fill="none" stroke="%23333" stroke-width="4" stroke-linejoin="round"/><g transform="translate(50,10)"><path d="M3,0C3,0,3,0,3,0L3,17L10,14C10,6,7,0,3,0Z" fill="%23333"/><rect x="1.5" y="0" width="2" height="18" rx="1" fill="%23333"/><rect x="1.5" y="16.5" width="8.5" height="3.5" rx="1.2" fill="%23333"/><rect x="3.5" y="19" width="4" height="22" rx="2" fill="%23333"/></g></svg>');
+        document.head.appendChild(favicon);
+
         // Inject Google Fonts if not already present
         if (!document.querySelector('link[href*="fonts.googleapis.com/css2?family=Inter"]')) {
             const fontLink = document.createElement('link');
