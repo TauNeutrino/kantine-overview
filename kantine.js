@@ -86,8 +86,8 @@
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
-                            <button id="btn-this-week" class="nav-btn active">Diese Woche</button>
-                            <button id="btn-next-week" class="nav-btn">Nächste Woche</button>
+                            <button id="btn-this-week" class="nav-btn active" title="Menü dieser Woche anzeigen">Diese Woche</button>
+                            <button id="btn-next-week" class="nav-btn" title="Menü nächster Woche anzeigen">Nächste Woche</button>
                         </div>
                         <button id="alarm-bell" class="icon-btn hidden" aria-label="Benachrichtigungen" title="Keine beobachteten Menüs" style="margin-left: -0.5rem;">
                             <span class="material-icons-round" id="alarm-bell-icon" style="color:var(--text-secondary); transition: color 0.3s;">notifications</span>
@@ -112,17 +112,17 @@
                         <button id="btn-highlights" class="icon-btn" aria-label="Persönliche Highlights verwalten" title="Persönliche Highlights verwalten">
                             <span class="material-icons-round">label</span>
                         </button>
-                        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                        <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme" title="Erscheinungsbild (Hell/Dunkel) wechseln">
                             <span class="material-icons-round theme-icon">light_mode</span>
                         </button>
-                        <button id="btn-login-open" class="user-badge-btn icon-btn-small">
+                        <button id="btn-login-open" class="user-badge-btn icon-btn-small" title="Mit Bessa.app Account anmelden">
                             <span class="material-icons-round">login</span>
                             <span>Anmelden</span>
                         </button>
                         <div id="user-info" class="user-badge hidden">
                             <span class="material-icons-round">person</span>
                             <span id="user-id-display"></span>
-                            <button id="btn-logout" class="icon-btn-small" aria-label="Logout">
+                            <button id="btn-logout" class="icon-btn-small" aria-label="Logout" title="Von Bessa.app abmelden">
                                 <span class="material-icons-round">logout</span>
                             </button>
                         </div>
@@ -134,7 +134,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Login</h2>
-                        <button id="btn-login-close" class="icon-btn" aria-label="Close">
+                        <button id="btn-login-close" class="icon-btn" aria-label="Close" title="Schließen">
                             <span class="material-icons-round">close</span>
                         </button>
                     </div>
@@ -178,7 +178,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Meine Highlights</h2>
-                        <button id="btn-highlights-close" class="icon-btn" aria-label="Close">
+                        <button id="btn-highlights-close" class="icon-btn" aria-label="Close" title="Schließen">
                             <span class="material-icons-round">close</span>
                         </button>
                     </div>
@@ -187,8 +187,8 @@
                             Markiere Menüs automatisch, wenn sie diese Schlagwörter enthalten.
                         </p>
                         <div class="input-group">
-                            <input type="text" id="tag-input" placeholder="z.B. Schnitzel, Vegetarisch...">
-                            <button id="btn-add-tag" class="btn-primary">Hinzufügen</button>
+                            <input type="text" id="tag-input" placeholder="z.B. Schnitzel, Vegetarisch..." title="Neues Schlagwort zum Hervorheben eingeben">
+                            <button id="btn-add-tag" class="btn-primary" title="Schlagwort zur Liste hinzufügen">Hinzufügen</button>
                         </div>
                         <div id="tags-list"></div>
                     </div>
@@ -199,7 +199,7 @@
                 <div class="modal-content history-modal-content">
                     <div class="modal-header">
                         <h2>Bestellhistorie</h2>
-                        <button id="btn-history-close" class="icon-btn" aria-label="Close">
+                        <button id="btn-history-close" class="icon-btn" aria-label="Close" title="Schließen">
                             <span class="material-icons-round">close</span>
                         </button>
                     </div>
@@ -223,7 +223,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>📦 Versionen</h2>
-                        <button id="btn-version-close" class="icon-btn" aria-label="Close">
+                        <button id="btn-version-close" class="icon-btn" aria-label="Close" title="Schließen">
                             <span class="material-icons-round">close</span>
                         </button>
                     </div>
@@ -817,7 +817,7 @@
                 const monthGroup = yearGroup.months[mKey];
 
                 html += `<div class="history-month-group">
-                    <div class="history-month-header" tabindex="0" role="button" aria-expanded="false">
+                    <div class="history-month-header" tabindex="0" role="button" aria-expanded="false" title="Klicken, um die Bestellungen für diesen Monat ein-/auszublenden">
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <span>${monthGroup.name}</span>
                             <div class="history-month-summary">
@@ -1263,7 +1263,7 @@
         highlightTags.forEach(tag => {
             const badge = document.createElement('span');
             badge.className = 'tag-badge';
-            badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}">&times;</span>`;
+            badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}" title="Schlagwort entfernen">&times;</span>`;
             list.appendChild(badge);
         });
 
