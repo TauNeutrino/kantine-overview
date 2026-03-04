@@ -153,6 +153,38 @@ body {
     color: var(--text-secondary);
 }
 
+/* Language Toggle (FR-100) */
+.lang-toggle {
+    display: inline-flex;
+    gap: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+}
+
+.lang-btn {
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lang-btn:hover {
+    color: var(--text-primary);
+    background: rgba(100, 116, 139, 0.1);
+}
+
+.lang-btn.active {
+    background: var(--accent-color);
+    color: white;
+}
+
 .nav-group {
     display: flex;
     background-color: var(--bg-card);
@@ -913,6 +945,7 @@ body {
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 0.75rem;
+    white-space: pre-wrap;
 }
 
 .badges {

@@ -1,3 +1,6 @@
+## v1.6.0 (2026-03-04)
+- ✨ **Feature**: Sprachfilter für zweisprachige Menübeschreibungen. Neuer DE/EN/ALL Toggle im Header ermöglicht das Umschalten zwischen Deutsch, Englisch und dem vollen Originaltext. Allergen-Codes werden in allen Modi angezeigt. Einstellung wird persistent gespeichert.
+
 ## v1.5.1 (2026-03-04)
 - 🐛 **Bugfix**: Freitagsbestellungen schlugen fehl ("Onlinebestellung sind nicht verfügbar"). Ursache: Der Order-Payload verwendete `preorder: false` und eine falsche Uhrzeit (`T10:00:00.000Z` statt `T10:30:00Z`). Beides wurde anhand der originalen Bessa-API korrigiert.
 

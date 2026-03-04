@@ -34,6 +34,7 @@
     let orderMap = new Map();
     let userFlags = new Set(JSON.parse(localStorage.getItem('kantine_flags') || '[]'));
     let pollIntervalId = null;
+    let langMode = localStorage.getItem('kantine_lang') || 'de';
 
     // === API Helpers ===
     function apiHeaders(token) {
@@ -93,6 +94,11 @@
                         </button>
                     </div>
                     <div class="header-center-wrapper">
+                        <div id="lang-toggle" class="lang-toggle" title="Sprache der Menübeschreibung">
+                            <button class="lang-btn${langMode === 'de' ? ' active' : ''}" data-lang="de">DE</button>
+                            <button class="lang-btn${langMode === 'en' ? ' active' : ''}" data-lang="en">EN</button>
+                            <button class="lang-btn${langMode === 'all' ? ' active' : ''}" data-lang="all">ALL</button>
+                        </div>
                         <div id="header-week-info" class="header-week-info"></div>
                         <div id="weekly-cost-display" class="weekly-cost hidden"></div>
                     </div>
@@ -290,6 +296,17 @@
         const btnHistory = document.getElementById('btn-history');
         const historyModal = document.getElementById('history-modal');
         const btnHistoryClose = document.getElementById('btn-history-close');
+
+        // Language Toggle
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                langMode = btn.dataset.lang;
+                localStorage.setItem('kantine_lang', langMode);
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderVisibleWeeks();
+            });
+        });
 
         if (btnHighlights) {
             btnHighlights.addEventListener('click', () => {
@@ -1988,7 +2005,7 @@
                     <div class="badges">${statusBadge}</div>
                 </div>
                 ${tagsHtml}
-                <p class="item-desc">${escapeHtml(item.description)}</p>`;
+                <p class="item-desc">${escapeHtml(getLocalizedText(item.description))}</p>`;
 
             // Event: Order
             const orderBtn = itemEl.querySelector('.btn-order');
@@ -2339,6 +2356,108 @@
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
+    }
+
+    // === Language Filter (FR-100) ===
+    // DE keywords for fallback language detection
+    const DE_KEYWORDS = ['mit', 'und', 'oder', 'vom', 'dazu', 'auf', 'nach', 'ein', 'eine', 'der', 'die', 'das', 'aus', 'in', 'an', 'für',
+        'suppe', 'salat', 'gemüse', 'reis', 'nudeln', 'kartoffel', 'fleisch', 'soße', 'sauce', 'brot', 'joghurt',
+        'gebraten', 'gekocht', 'gegrillt', 'überbacken', 'gefüllt', 'frisch', 'hausgemacht'];
+    const EN_KEYWORDS = ['with', 'and', 'or', 'from', 'served', 'on', 'in', 'a', 'the', 'of', 'for',
+        'soup', 'salad', 'vegetables', 'rice', 'pasta', 'potato', 'meat', 'sauce', 'bread', 'yogurt',
+        'fried', 'cooked', 'grilled', 'baked', 'stuffed', 'fresh', 'homemade'];
+
+    /**
+     * Splits bilingual menu text into DE and EN parts.
+     * Pattern per course: [DE] / [EN](ALLERGENS)
+     * Max 3 courses per menu item (sanity check).
+     * @param {string} text - The bilingual description text
+     * @returns {{ de: string, en: string, raw: string }}
+     */
+    function splitLanguage(text) {
+        if (!text) return { de: '', en: '', raw: '' };
+
+        const raw = text;
+        const formattedRaw = '• ' + text.replace(/\(([A-Z ]+)\)\s*(?=\S)/g, '($1)\n• ');
+
+        // Check if text contains the bilingual separator ' / '
+        if (!text.includes(' / ')) {
+            // Fallback: detect language via keyword scoring
+            const words = text.toLowerCase().split(/\s+/);
+            let deScore = 0, enScore = 0;
+            words.forEach(w => {
+                const clean = w.replace(/[^a-zäöüß]/g, '');
+                if (DE_KEYWORDS.includes(clean)) deScore++;
+                if (EN_KEYWORDS.includes(clean)) enScore++;
+            });
+            // No split possible – return full text for detected language, empty for other
+            if (enScore > deScore) {
+                return { de: '', en: formattedRaw, raw: formattedRaw };
+            }
+            return { de: formattedRaw, en: '', raw: formattedRaw };
+        }
+
+        // Split by ' / ' – produces alternating DE/EN fragments
+        const parts = text.split(' / ');
+        // Sanity check: max 3 courses means max 3 slashes → max 4 parts
+        if (parts.length > 4) {
+            // Too many slashes – possibly not bilingual, return as-is
+            return { de: formattedRaw, en: '', raw: formattedRaw };
+        }
+
+        const deParts = [];
+        const enParts = [];
+
+        // First fragment is always DE (course 1)
+        deParts.push(parts[0].trim());
+
+        // Process remaining fragments: each contains "EN(ALLERGENS) next_DE"
+        // Allergen pattern: (LETTERS_AND_SPACES) at the boundary
+        const allergenRegex = /\(([A-Z ]+)\)\s*/;
+
+        for (let i = 1; i < parts.length; i++) {
+            const fragment = parts[i].trim();
+            const match = fragment.match(allergenRegex);
+
+            if (match) {
+                // Split: everything before allergen + allergen = EN, after = next DE
+                const allergenEnd = match.index + match[0].length;
+                const enPart = fragment.substring(0, match.index).trim();
+                const allergenCode = match[1];
+                const nextDe = fragment.substring(allergenEnd).trim();
+
+                enParts.push(enPart + '(' + allergenCode + ')');
+                // Also append allergen to the last DE part
+                if (deParts.length > 0) {
+                    deParts[deParts.length - 1] = deParts[deParts.length - 1] + '(' + allergenCode + ')';
+                }
+
+                if (nextDe) {
+                    deParts.push(nextDe);
+                }
+            } else {
+                // No allergen code – this is the last EN part
+                enParts.push(fragment);
+            }
+        }
+
+        return {
+            de: deParts.map(p => '• ' + p).join('\n'),
+            en: enParts.map(p => '• ' + p).join('\n'),
+            raw: formattedRaw
+        };
+    }
+
+    /**
+     * Returns text filtered by the current language mode.
+     * @param {string} text - The bilingual text
+     * @returns {string}
+     */
+    function getLocalizedText(text) {
+        if (langMode === 'all') return text || '';
+        const split = splitLanguage(text);
+        if (langMode === 'en') return split.en || split.raw;
+        return split.de || split.raw; // 'de' is default
     }
 
     // === Bootstrap ===
