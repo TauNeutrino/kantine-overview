@@ -911,7 +911,7 @@
                 venue: VENUE_ID,
                 states: [],
                 order_state: 1,
-                date: `${date}T10:00:00.000Z`,
+                date: `${date}T10:30:00Z`,
                 payment_method: 'payroll',
                 customer: {
                     first_name: userData.first_name,
@@ -919,7 +919,7 @@
                     email: userData.email,
                     newsletter: false
                 },
-                preorder: false,
+                preorder: true,
                 delivery_fee: 0,
                 cash_box_table_name: null,
                 take_away: false

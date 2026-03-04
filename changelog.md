@@ -1,3 +1,6 @@
+## v1.5.1 (2026-03-04)
+- 🐛 **Bugfix**: Freitagsbestellungen schlugen fehl ("Onlinebestellung sind nicht verfügbar"). Ursache: Der Order-Payload verwendete `preorder: false` und eine falsche Uhrzeit (`T10:00:00.000Z` statt `T10:30:00Z`). Beides wurde anhand der originalen Bessa-API korrigiert.
+
 ## v1.5.0 (2026-02-26)
 Das große "Quality of Life"-Update! Zusammenfassung aller Features und Fixes seit v1.4.0:
 
