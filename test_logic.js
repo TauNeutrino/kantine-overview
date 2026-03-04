@@ -62,6 +62,7 @@ const sandbox = {
             }
             return createMockElement('query-result');
         },
+        querySelectorAll: () => [createMockElement()],
         getElementById: (id) => createMockElement(id),
         documentElement: {
             setAttribute: () => { },

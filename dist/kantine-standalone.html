@@ -4342,13 +4342,32 @@ body {
     }
 
     // === Language Filter (FR-100) ===
-    // DE keywords for fallback language detection
-    const DE_KEYWORDS = ['mit', 'und', 'oder', 'vom', 'dazu', 'auf', 'nach', 'ein', 'eine', 'der', 'die', 'das', 'aus', 'in', 'an', 'für',
-        'suppe', 'salat', 'gemüse', 'reis', 'nudeln', 'kartoffel', 'fleisch', 'soße', 'sauce', 'brot', 'joghurt',
-        'gebraten', 'gekocht', 'gegrillt', 'überbacken', 'gefüllt', 'frisch', 'hausgemacht'];
-    const EN_KEYWORDS = ['with', 'and', 'or', 'from', 'served', 'on', 'in', 'a', 'the', 'of', 'for',
-        'soup', 'salad', 'vegetables', 'rice', 'pasta', 'potato', 'meat', 'sauce', 'bread', 'yogurt',
-        'fried', 'cooked', 'grilled', 'baked', 'stuffed', 'fresh', 'homemade'];
+    // DE stems for fallback language detection
+    const DE_STEMS = [
+        'mit', 'und', 'oder', 'für', 'vom', 'zum', 'zur', 'gebraten', 'kartoffel', 'gemüse', 'suppe',
+        'kuchen', 'schwein', 'rind', 'hähnchen', 'huhn', 'fisch', 'nudel', 'soße', 'sosse', 'wurst',
+        'kürbis', 'braten', 'sahne', 'apfel', 'käse', 'fleisch', 'pilz', 'kirsch', 'joghurt', 'spätzle',
+        'knödel', 'kraut', 'schnitzel', 'püree', 'rahm', 'erdbeer', 'schoko', 'vanille', 'tomate',
+        'gurke', 'salat', 'zwiebel', 'paprika', 'reis', 'bohne', 'erbse', 'karotte', 'möhre', 'lauch',
+        'knoblauch', 'chili', 'gewürz', 'kräuter', 'pfeffer', 'salz', 'butter', 'milch', 'eier',
+        'pfanne', 'auflauf', 'gratin', 'ragout', 'gulasch', 'eintopf', 'filet', 'steak', 'brust',
+        'salami', 'schinken', 'speck', 'brokkoli', 'blumenkohl', 'zucchini', 'aubergine',
+        'spinat', 'spargel', 'olive', 'mandel', 'nuss', 'honig', 'senf', 'essig', 'öl', 'brot',
+        'brötchen', 'pfannkuchen', 'eis', 'torte', 'dessert', 'kompott', 'obst', 'frucht', 'beere',
+        'plunder', 'dip', 'tofu', 'jambalaya'
+    ];
+    const EN_STEMS = [
+        'with', 'and', 'or', 'for', 'from', 'to', 'fried', 'potato', 'vegetable', 'soup', 'cake',
+        'pork', 'beef', 'chicken', 'fish', 'noodle', 'sauce', 'sausage', 'pumpkin', 'roast',
+        'cream', 'apple', 'cheese', 'meat', 'mushroom', 'cherry', 'yogurt', 'wedge', 'sweet',
+        'sour', 'dumpling', 'cabbage', 'mash', 'strawberr', 'choco', 'vanilla', 'tomat', 'cucumber',
+        'salad', 'onion', 'pepper', 'rice', 'bean', 'pea', 'carrot', 'leek', 'garlic', 'chili',
+        'spice', 'herb', 'salt', 'butter', 'milk', 'egg', 'pan', 'casserole', 'gratin', 'ragout',
+        'goulash', 'stew', 'filet', 'steak', 'breast', 'salami', 'ham', 'bacon', 'broccoli',
+        'cauliflower', 'zucchini', 'eggplant', 'spinach', 'asparagus', 'olive', 'almond', 'nut',
+        'honey', 'mustard', 'vinegar', 'oil', 'bread', 'bun', 'pancake', 'ice', 'tart', 'dessert',
+        'compote', 'fruit', 'berry', 'dip', 'danish', 'tofu', 'jambalaya'
+    ];
 
     /**
      * Splits bilingual menu text into DE and EN parts.
@@ -4363,18 +4382,86 @@ body {
         const raw = text;
         const formattedRaw = '• ' + text.replace(/\(([A-Z ]+)\)\s*(?=\S)/g, '($1)\n• ');
 
+        // Utility to compute DE/EN score for a subset of words
+        function scoreBlock(wordArray) {
+            let de = 0, en = 0;
+            wordArray.forEach(word => {
+                const w = word.toLowerCase().replace(/[^a-zäöüß]/g, '');
+                if (w) {
+                    let bestDeMatch = 0;
+                    let bestEnMatch = 0;
+                    // Full match is better than partial string match
+                    if (DE_STEMS.includes(w)) bestDeMatch = w.length;
+                    else DE_STEMS.forEach(s => { if (w.includes(s) && s.length > bestDeMatch) bestDeMatch = s.length; });
+
+                    if (EN_STEMS.includes(w)) bestEnMatch = w.length;
+                    else EN_STEMS.forEach(s => { if (w.includes(s) && s.length > bestEnMatch) bestEnMatch = s.length; });
+
+                    if (bestDeMatch > 0) de += (bestDeMatch / w.length);
+                    if (bestEnMatch > 0) en += (bestEnMatch / w.length);
+
+                    // Capitalized noun heuristic matches German text styles typically
+                    if (/^[A-ZÄÖÜ]/.test(word)) {
+                        de += 0.5;
+                    }
+                }
+            });
+            return { de, en };
+        }
+
+        // Heuristic sliding window to split a fragment containing "EN DE"
+        // E.g., "Bratwurst with pumpkin Kirschjoghurt" => enPart: "Bratwurst with pumpkin", dePart: "Kirschjoghurt"
+        function heuristicSplitEnDe(fragment) {
+            const words = fragment.trim().split(/\s+/);
+            if (words.length < 2) return { enPart: fragment, nextDe: '' };
+
+            let bestK = -1;
+            let maxScore = -9999;
+
+            for (let k = 1; k < words.length; k++) {
+                const left = words.slice(0, k);
+                const right = words.slice(k);
+
+                const leftScore = scoreBlock(left);
+                const rightScore = scoreBlock(right);
+
+                // left should be EN, right should be DE
+                // Metric = (EN votes in left - DE votes in left) + (DE votes in right - EN votes in right)
+                const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en);
+
+                // Extra penalty if the split puts a low-case word as the first word of the right (DE) part
+                // because a new German sentence usually starts with a capital noun.
+                const rightFirstWord = right[0];
+                let capitalBonus = 0;
+                if (/^[A-ZÄÖÜ]/.test(rightFirstWord)) {
+                    capitalBonus = 2.0;
+                }
+
+                const finalScore = score + capitalBonus;
+
+                if (finalScore > maxScore) {
+                    maxScore = finalScore;
+                    bestK = k;
+                }
+            }
+
+            if (bestK !== -1) {
+                return {
+                    enPart: words.slice(0, bestK).join(' '),
+                    nextDe: words.slice(bestK).join(' ')
+                };
+            }
+            return { enPart: fragment, nextDe: '' };
+        }
+
         // Check if text contains the bilingual separator ' / '
         if (!text.includes(' / ')) {
             // Fallback: detect language via keyword scoring
             const words = text.toLowerCase().split(/\s+/);
-            let deScore = 0, enScore = 0;
-            words.forEach(w => {
-                const clean = w.replace(/[^a-zäöüß]/g, '');
-                if (DE_KEYWORDS.includes(clean)) deScore++;
-                if (EN_KEYWORDS.includes(clean)) enScore++;
-            });
+            const score = scoreBlock(words);
+
             // No split possible – return full text for detected language, empty for other
-            if (enScore > deScore) {
+            if (score.en > score.de) {
                 return { de: '', en: formattedRaw, raw: formattedRaw };
             }
             return { de: formattedRaw, en: '', raw: formattedRaw };
@@ -4419,8 +4506,14 @@ body {
                     deParts.push(nextDe);
                 }
             } else {
-                // No allergen code – this is the last EN part
-                enParts.push(fragment);
+                // No allergen code found!
+                // If it's not the last part (or even if it is, but we highly suspect merged languages),
+                // we use the heuristic to find the hidden split-point.
+                const split = heuristicSplitEnDe(fragment);
+                enParts.push(split.enPart);
+                if (split.nextDe) {
+                    deParts.push(split.nextDe);
+                }
             }
         }
 
