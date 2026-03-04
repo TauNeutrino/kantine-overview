@@ -146,6 +146,19 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     </style>
 </head>
 <body>
+    <!-- Banner Video: plays once, collapses after ending -->
+    <div id="banner-video-wrap" style="width: 100%; max-width: 600px; margin: 0 auto 20px auto; border-radius: 12px; overflow: hidden; pointer-events: none; user-select: none; max-height: 400px; opacity: 1; transition: max-height 0.8s ease-in-out, opacity 0.6s ease-in-out, margin 0.8s ease-in-out;">
+        <video id="banner-video" autoplay muted playsinline disablepictureinpicture style="width: 100%; display: block;" src="https://github.com/TauNeutrino/kantine-overview/raw/main/dist/Arrow_and_fork_fly_away_bd43310bea.mp4"></video>
+    </div>
+    <script>
+        document.getElementById('banner-video').addEventListener('ended', function() {
+            var w = document.getElementById('banner-video-wrap');
+            w.style.maxHeight = '0';
+            w.style.opacity = '0';
+            w.style.marginBottom = '0';
+        });
+    </script>
+
     <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <img src="$FAVICON_URL" alt="Logo" style="width: 38px; height: 38px;"> 
