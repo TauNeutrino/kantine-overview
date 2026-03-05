@@ -67,12 +67,22 @@ body {
 }
 
 /* Fix scrolling bug: Reset html/body styles from host page */
-html,
+/* IMPORTANT: html must NOT have overflow set, or it creates a scroll container that breaks position: sticky */
+html {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 body {
     height: auto !important;
     min-height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
+    /* clip prevents horizontal overflow without breaking sticky */
+    overflow-y: visible !important;
     position: static !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -80,8 +90,7 @@ body {
 
 /* Header */
 .app-header {
-    position: sticky;
-    top: 0;
+    flex-shrink: 0;
     z-index: 100;
     backdrop-filter: blur(12px);
     background-color: var(--header-bg);
@@ -423,13 +432,21 @@ body {
     font-size: 18px;
 }
 
-/* Container */
+/* Container - flex column, full width so child scrollbar is at edge */
 .container {
+    flex: 1;
     width: 100%;
-    /* Full width */
-    margin: 2rem auto;
-    padding: 0 2rem;
-    min-height: 80vh;
+    overflow: hidden;
+    padding: 2rem 0 0 0;
+    /* Only top padding, no horizontal so child fills width */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Add horizontal padding to direct children of container to maintain layout */
+.container>*:not(.menu-grid) {
+    padding-left: 2rem;
+    padding-right: 2rem;
 }
 
 /* Banner */
@@ -778,14 +795,17 @@ body {
     display: none !important;
 }
 
-/* Menu Grid */
+/* Menu Grid Container */
 .menu-grid {
-    display: grid;
-    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    gap: 1rem;
 }
 
 .week-section {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .week-header {
@@ -807,10 +827,25 @@ body {
     margin-top: 0.25rem;
 }
 
+/* Full-viewport layout: header + scrollable content + footer */
+#kantine-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    /* Dynamic viewport height for mobile browsers */
+    overflow: hidden;
+}
+
 .days-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.75rem;
+    flex: 1;
+    overflow-y: auto;
+    /* This is the scroll container at the window edge */
+    align-content: start;
+    padding: 0 2rem 2rem 2rem;
 }
 
 /* Card */
@@ -819,21 +854,33 @@ body {
     border-radius: 12px;
     border: 1px solid var(--border-color);
     box-shadow: var(--card-shadow);
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: clip;
+    /* Clips scrolling content behind sticky header */
+    transition: box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
 }
 
-/* Past Day Styling - Target specific elements so ordered items can remain visible */
-.menu-card.past-day .card-header,
+/* Past Day Styling - Target specific elements so ordered items can remain visible AND preserve sticky context */
+/* We MUST apply filter/opacity to children, not the parent .menu-card, or else position: sticky breaks */
+
+/* Header keeps fully opaque background to hide scrolling items, only grayscales */
+.menu-card.past-day .card-header {
+    filter: grayscale(0.8);
+    transition: filter 0.3s;
+}
+
+/* Items become semi-transparent */
 .menu-card.past-day .menu-item:not(.ordered) {
     opacity: 0.6;
     filter: grayscale(0.8);
     transition: opacity 0.3s, filter 0.3s;
 }
 
-.menu-card.past-day:hover .card-header,
+.menu-card.past-day:hover .card-header {
+    filter: grayscale(0.4);
+}
+
 .menu-card.past-day:hover .menu-item:not(.ordered) {
     opacity: 0.8;
     filter: grayscale(0.4);
@@ -880,7 +927,6 @@ body {
 
 
 .menu-card:hover {
-    transform: translateY(-2px);
     box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
@@ -890,7 +936,23 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    background-color: rgba(100, 116, 139, 0.05);
+    background-color: var(--bg-card);
+
+    /* Removed border-radius: 12px 12px 0 0;
+       .menu-card's overflow: clip will round the corners initially.
+       When sticky at the top, it will be square and perfectly hide scrolling content! */
+
+    /* Sticky within .container scroll area */
+    position: sticky;
+    top: 0;
+    z-index: 90;
+}
+
+.card-body {
+    padding: 1.25rem;
+    display: grid;
+    grid-template-rows: auto;
+    align-content: start;
 }
 
 .day-name {
@@ -903,13 +965,6 @@ body {
     color: var(--text-secondary);
 }
 
-.card-body {
-    padding: 1.25rem;
-    display: grid;
-    grid-template-rows: auto;
-    /* Each menu item gets its own row */
-    align-content: start;
-}
 
 .empty-state {
     color: var(--text-secondary);
@@ -1038,12 +1093,12 @@ body {
 
 /* Footer */
 .app-footer {
+    flex-shrink: 0;
     text-align: center;
-    padding: 2rem;
+    padding: 1rem 2rem;
     color: var(--text-secondary);
     font-size: 0.875rem;
     border-top: 1px solid var(--border-color);
-    margin-top: auto;
 }
 
 /* === Order / Cancel Buttons (inline in status row) === */
@@ -1374,17 +1429,20 @@ body {
 
 /* Day Header Status Colors (User Request) */
 .card-header.header-violet {
-    background-color: rgba(139, 92, 246, 0.15);
+    background-color: var(--bg-card);
+    background-image: linear-gradient(rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.15));
     border-bottom: 2px solid #8b5cf6;
 }
 
 .card-header.header-green {
-    background-color: rgba(16, 185, 129, 0.15);
+    background-color: var(--bg-card);
+    background-image: linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15));
     border-bottom: 2px solid var(--success-color);
 }
 
 .card-header.header-red {
-    background-color: rgba(239, 68, 68, 0.15);
+    background-color: var(--bg-card);
+    background-image: linear-gradient(rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.15));
     border-bottom: 2px solid var(--error-color);
 }
 
@@ -2065,7 +2123,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.1</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.2</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2212,7 +2270,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.6.1</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.6.2</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -4080,7 +4138,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.6.1';
+        const currentVersion = 'v1.6.2';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4121,7 +4179,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.6.1';
+        const currentVersion = 'v1.6.2';
 
         if (!modal) return;
         modal.classList.remove('hidden');

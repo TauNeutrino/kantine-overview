@@ -43,6 +43,7 @@ trigger: always_on
     - **Visuals**: Generate screenshots/mockups for UI changes.
     - **Evidence**: Log outputs for verification.
 3.  **Design**: Optimize code for AI readability (context efficiency).
+4. **Retry on Failure**: When an operation does not finish or does not work as expected, do not try endlessly to fix this. Try a few times and ask the user if no progress can be made.
 
 ## 6. Workspace Scopes
 - **Browser**: Allowed for documentation and safe browsing. No automated logins without permission.

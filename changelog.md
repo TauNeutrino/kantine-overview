@@ -1,3 +1,9 @@
+## v1.6.2 (2026-03-05)
+- ✨ **Feature**: Wochentags-Header (Montag, Dienstag etc.) scrollen nun als "Sticky Header" mit und bleiben am oberen Bildschirmrand haften.
+  - Das Layout clippt scrollende Speisen ordentlich darunter weg.
+  - Vollständiges Viewport-Scrolling: Das Layout nutzt nun die ganze Höhe aus (`100dvh`), wodurch Scrollbalken sauber am Rand positioniert sind.
+- 🐛 **Bugfix**: Probleme mit Bessa's default `overflow` Verhalten behoben, das `position: sticky` auf iOS/WebKit-Browsern blockierte.
+
 ## v1.6.0 (2026-03-04)
 - ✨ **Feature**: Sprachfilter für zweisprachige Menübeschreibungen. Neuer DE/EN/ALL Toggle im Header ermöglicht das Umschalten zwischen Deutsch, Englisch und dem vollen Originaltext. Allergen-Codes werden in allen Modi angezeigt. Einstellung wird persistent gespeichert.
 
