@@ -1,3 +1,9 @@
+## v1.6.4 (2026-03-05)
+- ✨ **Feature**: Sprach-Lexikon (DE/EN) massiv erweitert um österreichische Begriffe (Nockerl, Fleckerl, Topfen, Mohn, Most etc.) und gängige Tippfehler aus dem Bessa-System (trukey, coffe, oveb etc.).
+- 🧹 **Cleanup**: Sprach-Lexikon dedupliziert und alphabetisch sortiert für bessere Performance und Wartbarkeit.
+- 🐛 **Bugfix**: Trennung von zweisprachigen Menüs (`splitLanguage`) verbessert: Erfasst nun auch Schrägstriche ohne Leerzeichen (z.B. `Suppe/Soup`).
+- 🐛 **Bugfix**: Fehlerhafte Badge-Anzeige korrigiert (Variable `count` vs `orderCount`).
+
 ## v1.6.3 (2026-03-05)
 - ✨ **Chore**: Slogan im Footer aktualisiert ("Jetzt Bessa Einfach! • Knapp-Kantine Wrapper • 2026 by Kaufis-Kitchen") und Footer-Höhe für mehr Platzierung optimiert.
 

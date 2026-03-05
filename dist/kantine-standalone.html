@@ -2123,7 +2123,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.3</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.4</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2270,7 +2270,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.6.3</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.6.4</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -4157,7 +4157,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.6.3';
+        const currentVersion = 'v1.6.4';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4198,7 +4198,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.6.3';
+        const currentVersion = 'v1.6.4';
 
         if (!modal) return;
         modal.classList.remove('hidden');
@@ -4421,29 +4421,35 @@ body {
     // === Language Filter (FR-100) ===
     // DE stems for fallback language detection
     const DE_STEMS = [
-        'mit', 'und', 'oder', 'für', 'vom', 'zum', 'zur', 'gebraten', 'kartoffel', 'gemüse', 'suppe',
-        'kuchen', 'schwein', 'rind', 'hähnchen', 'huhn', 'fisch', 'nudel', 'soße', 'sosse', 'wurst',
-        'kürbis', 'braten', 'sahne', 'apfel', 'käse', 'fleisch', 'pilz', 'kirsch', 'joghurt', 'spätzle',
-        'knödel', 'kraut', 'schnitzel', 'püree', 'rahm', 'erdbeer', 'schoko', 'vanille', 'tomate',
-        'gurke', 'salat', 'zwiebel', 'paprika', 'reis', 'bohne', 'erbse', 'karotte', 'möhre', 'lauch',
-        'knoblauch', 'chili', 'gewürz', 'kräuter', 'pfeffer', 'salz', 'butter', 'milch', 'eier',
-        'pfanne', 'auflauf', 'gratin', 'ragout', 'gulasch', 'eintopf', 'filet', 'steak', 'brust',
-        'salami', 'schinken', 'speck', 'brokkoli', 'blumenkohl', 'zucchini', 'aubergine',
-        'spinat', 'spargel', 'olive', 'mandel', 'nuss', 'honig', 'senf', 'essig', 'öl', 'brot',
-        'brötchen', 'pfannkuchen', 'eis', 'torte', 'dessert', 'kompott', 'obst', 'frucht', 'beere',
-        'plunder', 'dip', 'tofu', 'jambalaya'
+        'apfel', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
+        'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
+        'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
+        'gemüse', 'gewürz', 'gratin', 'grieß', 'gulasch', 'gurke', 'himbeer', 'honig', 'huhn', 'hähnchen',
+        'jambalaya', 'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
+        'kraut', 'kräuter', 'kuchen', 'käse', 'kürbis', 'lauch', 'mandel', 'milch', 'mild', 'mit',
+        'mohn', 'most', 'möhre', 'natur', 'nockerl', 'nudel', 'nuss', 'nuß', 'obst', 'oder',
+        'olive', 'paprika', 'pfanne', 'pfannkuchen', 'pfeffer', 'pikant', 'pilz', 'plunder', 'püree', 'ragout',
+        'rahm', 'reis', 'rind', 'sahne', 'salami', 'salat', 'salz', 'sauer', 'scharf', 'schinken',
+        'schnitte', 'schnitzel', 'schoko', 'schupf', 'schwein', 'sellerie', 'senf', 'sosse', 'soße', 'spargel',
+        'spätzle', 'speck', 'spieß', 'spinat', 'steak', 'suppe', 'süß', 'tofu', 'tomate', 'topfen',
+        'torte', 'trüffel', 'und', 'vanille', 'vogerl', 'vom', 'wien', 'wurst', 'zucchini', 'zum',
+        'zur', 'zwiebel', 'öl'
     ];
+
     const EN_STEMS = [
-        'with', 'and', 'or', 'for', 'from', 'to', 'fried', 'potato', 'vegetable', 'soup', 'cake',
-        'pork', 'beef', 'chicken', 'fish', 'noodle', 'sauce', 'sausage', 'pumpkin', 'roast',
-        'cream', 'apple', 'cheese', 'meat', 'mushroom', 'cherry', 'yogurt', 'wedge', 'sweet',
-        'sour', 'dumpling', 'cabbage', 'mash', 'strawberr', 'choco', 'vanilla', 'tomat', 'cucumber',
-        'salad', 'onion', 'pepper', 'rice', 'bean', 'pea', 'carrot', 'leek', 'garlic', 'chili',
-        'spice', 'herb', 'salt', 'butter', 'milk', 'egg', 'pan', 'casserole', 'gratin', 'ragout',
-        'goulash', 'stew', 'filet', 'steak', 'breast', 'salami', 'ham', 'bacon', 'broccoli',
-        'cauliflower', 'zucchini', 'eggplant', 'spinach', 'asparagus', 'olive', 'almond', 'nut',
-        'honey', 'mustard', 'vinegar', 'oil', 'bread', 'bun', 'pancake', 'ice', 'tart', 'dessert',
-        'compote', 'fruit', 'berry', 'dip', 'danish', 'tofu', 'jambalaya'
+        'almond', 'and', 'apple', 'asparagus', 'bacon', 'baked', 'ball', 'bean', 'beef', 'berry',
+        'bread', 'breast', 'broccoli', 'bun', 'butter', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
+        'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'chili', 'choco', 'chocolate', 'cider', 'cilantro',
+        'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dessert', 'dip', 'dumpling', 'egg',
+        'eggplant', 'filet', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash', 'gratin',
+        'ham', 'herb', 'honey', 'hot', 'ice', 'jambalaya', 'leek', 'leg', 'mash', 'meat',
+        'mexican', 'mild', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
+        'olive', 'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
+        'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'ragout', 'raspberry', 'rice', 'roast', 'roll',
+        'salad', 'salami', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
+        'spice', 'spicy', 'spinach', 'steak', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
+        'thyme', 'to', 'tofu', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
+        'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
     ];
 
     /**
@@ -4457,7 +4463,11 @@ body {
         if (!text) return { de: '', en: '', raw: '' };
 
         const raw = text;
-        const formattedRaw = '• ' + text.replace(/\(([A-Z ]+)\)\s*(?=\S)/g, '($1)\n• ');
+        // Formatting: add • for new lines, using the forgiving regex
+        let formattedRaw = text.replace(/(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?=\S)/g, '($1)\n• ');
+        if (!formattedRaw.startsWith('• ')) {
+            formattedRaw = '• ' + formattedRaw;
+        }
 
         // Utility to compute DE/EN score for a subset of words
         function scoreBlock(wordArray) {
@@ -4487,7 +4497,6 @@ body {
         }
 
         // Heuristic sliding window to split a fragment containing "EN DE"
-        // E.g., "Bratwurst with pumpkin Kirschjoghurt" => enPart: "Bratwurst with pumpkin", dePart: "Kirschjoghurt"
         function heuristicSplitEnDe(fragment) {
             const words = fragment.trim().split(/\s+/);
             if (words.length < 2) return { enPart: fragment, nextDe: '' };
@@ -4502,22 +4511,20 @@ body {
                 const leftScore = scoreBlock(left);
                 const rightScore = scoreBlock(right);
 
-                // left should be EN, right should be DE
-                // Metric = (EN votes in left - DE votes in left) + (DE votes in right - EN votes in right)
-                const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en);
-
-                // Extra penalty if the split puts a low-case word as the first word of the right (DE) part
-                // because a new German sentence usually starts with a capital noun.
                 const rightFirstWord = right[0];
                 let capitalBonus = 0;
+                // Nouns are capitalized in German
                 if (/^[A-ZÄÖÜ]/.test(rightFirstWord)) {
-                    capitalBonus = 2.0;
+                    capitalBonus = 1.0;
                 }
 
-                const finalScore = score + capitalBonus;
+                const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en) + capitalBonus;
 
-                if (finalScore > maxScore) {
-                    maxScore = finalScore;
+                // Strict condition! The assumed German part must actually look German
+                const rightLooksGerman = (rightScore.de + capitalBonus) > rightScore.en;
+
+                if (rightLooksGerman && score > maxScore) {
+                    maxScore = score;
                     bestK = k;
                 }
             }
@@ -4531,50 +4538,34 @@ body {
             return { enPart: fragment, nextDe: '' };
         }
 
-        // Check if text contains the bilingual separator ' / '
-        if (!text.includes(' / ')) {
-            // Fallback: detect language via keyword scoring
-            const words = text.toLowerCase().split(/\s+/);
-            const score = scoreBlock(words);
+        // NEW LOGIC: We no longer split by slash if the slash is part of a missing-parenthesis allergen like /ACGL)
+        const parts = text.split(/\s*\/\s*(?![A-Z,]+\))/);
 
-            // No split possible – return full text for detected language, empty for other
-            if (score.en > score.de) {
-                return { de: '', en: formattedRaw, raw: formattedRaw };
-            }
-            return { de: formattedRaw, en: '', raw: formattedRaw };
-        }
-
-        // Split by ' / ' – produces alternating DE/EN fragments
-        const parts = text.split(' / ');
         // Sanity check: max 3 courses means max 3 slashes → max 4 parts
         if (parts.length > 4) {
-            // Too many slashes – possibly not bilingual, return as-is
             return { de: formattedRaw, en: '', raw: formattedRaw };
         }
 
         const deParts = [];
         const enParts = [];
 
-        // First fragment is always DE (course 1)
+        // Part 0 is ALWAYS German (beginning of the menu item)
         deParts.push(parts[0].trim());
 
-        // Process remaining fragments: each contains "EN(ALLERGENS) next_DE"
-        // Allergen pattern: (LETTERS_AND_SPACES) at the boundary
-        const allergenRegex = /\(([A-Z ]+)\)\s*/;
+        // Matches e.g., "(GLM)" OR "/GLM)" OR " GLM)" with trailing spaces
+        const allergenRegex = /(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*/;
 
         for (let i = 1; i < parts.length; i++) {
             const fragment = parts[i].trim();
             const match = fragment.match(allergenRegex);
 
             if (match) {
-                // Split: everything before allergen + allergen = EN, after = next DE
                 const allergenEnd = match.index + match[0].length;
                 const enPart = fragment.substring(0, match.index).trim();
                 const allergenCode = match[1];
                 const nextDe = fragment.substring(allergenEnd).trim();
 
                 enParts.push(enPart + '(' + allergenCode + ')');
-                // Also append allergen to the last DE part
                 if (deParts.length > 0) {
                     deParts[deParts.length - 1] = deParts[deParts.length - 1] + '(' + allergenCode + ')';
                 }
@@ -4583,25 +4574,36 @@ body {
                     deParts.push(nextDe);
                 }
             } else {
-                // No allergen code found!
-                // If this is the last fragment, it contains only the English text of the final course.
-                // It should not be split again.
-                if (i === parts.length - 1) {
-                    enParts.push(fragment);
-                } else {
-                    // We use the heuristic to find the hidden split-point.
-                    const split = heuristicSplitEnDe(fragment);
-                    enParts.push(split.enPart);
-                    if (split.nextDe) {
-                        deParts.push(split.nextDe);
-                    }
+                // No allergen code found! Need to heuristically split "EN DE"
+                const split = heuristicSplitEnDe(fragment);
+                enParts.push(split.enPart);
+                if (split.nextDe) {
+                    deParts.push(split.nextDe);
                 }
             }
         }
 
+        // FIX FOR SINGLE-LANGUAGE COURSES OR MISSING EN
+        if (parts.length === 1 && enParts.length === 0) {
+            enParts.push(deParts[0]);
+        }
+
+        // Mirror untranslated DE courses to EN (e.g. Dessert)
+        if (deParts.length > enParts.length) {
+            for (let i = enParts.length; i < deParts.length; i++) {
+                enParts.push(deParts[i]);
+            }
+        }
+
+        let deJoined = deParts.join('\n• ');
+        if (deParts.length > 0 && !deJoined.startsWith('• ')) deJoined = '• ' + deJoined;
+
+        let enJoined = enParts.join('\n• ');
+        if (enParts.length > 0 && !enJoined.startsWith('• ')) enJoined = '• ' + enJoined;
+
         return {
-            de: deParts.map(p => '• ' + p).join('\n'),
-            en: enParts.map(p => '• ' + p).join('\n'),
+            de: deJoined,
+            en: enJoined,
             raw: formattedRaw
         };
     }
