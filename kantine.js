@@ -1309,6 +1309,25 @@
                 updateNextWeekBadge();
                 updateAlarmBell();
                 if (cachedTs) updateLastUpdatedTime(cachedTs);
+
+                // --- TEMP DEBUG LOGGER ---
+                try {
+                    const uniqueMenus = new Set();
+                    allWeeks.forEach(w => {
+                        (w.days || []).forEach(d => {
+                            (d.items || []).forEach(item => {
+                                let text = (item.name || '').replace(/\s+/g, ' ').trim();
+                                if (text && text.includes(' / ')) {
+                                    uniqueMenus.add(text);
+                                }
+                            });
+                        });
+                    });
+                    const res = Array.from(uniqueMenus).join('\n\n');
+                    console.log("=== GEFUNDENE MENÜ-TEXTE (" + uniqueMenus.size + ") ===");
+                    console.log(res);
+                } catch (e) { }
+
                 console.log('Loaded menu from cache');
                 return true;
             }
