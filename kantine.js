@@ -1316,7 +1316,7 @@
                     allWeeks.forEach(w => {
                         (w.days || []).forEach(d => {
                             (d.items || []).forEach(item => {
-                                let text = (item.name || '').replace(/\s+/g, ' ').trim();
+                                let text = (item.description || '').replace(/\s+/g, ' ').trim();
                                 if (text && text.includes(' / ')) {
                                     uniqueMenus.add(text);
                                 }
