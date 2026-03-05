@@ -2524,12 +2524,17 @@
                 }
             } else {
                 // No allergen code found!
-                // If it's not the last part (or even if it is, but we highly suspect merged languages),
-                // we use the heuristic to find the hidden split-point.
-                const split = heuristicSplitEnDe(fragment);
-                enParts.push(split.enPart);
-                if (split.nextDe) {
-                    deParts.push(split.nextDe);
+                // If this is the last fragment, it contains only the English text of the final course.
+                // It should not be split again.
+                if (i === parts.length - 1) {
+                    enParts.push(fragment);
+                } else {
+                    // We use the heuristic to find the hidden split-point.
+                    const split = heuristicSplitEnDe(fragment);
+                    enParts.push(split.enPart);
+                    if (split.nextDe) {
+                        deParts.push(split.nextDe);
+                    }
                 }
             }
         }
