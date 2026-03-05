@@ -437,7 +437,7 @@ body {
     flex: 1;
     width: 100%;
     overflow: hidden;
-    padding: 2rem 0 0 0;
+    padding: 0 0 0 0;
     /* Only top padding, no horizontal so child fills width */
     display: flex;
     flex-direction: column;
@@ -1095,9 +1095,9 @@ body {
 .app-footer {
     flex-shrink: 0;
     text-align: center;
-    padding: 1rem 2rem;
+    padding: 0.4rem 2rem;
     color: var(--text-secondary);
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     border-top: 1px solid var(--border-color);
 }
 
@@ -2123,7 +2123,7 @@ body {
                     <div class="brand">
                         <span class="material-icons-round logo-icon">restaurant_menu</span>
                         <div class="header-left">
-                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.2</small></h1>
+                            <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.3</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
                         </div>
                         <div class="nav-group" style="margin-left: 1rem;">
@@ -2270,7 +2270,7 @@ body {
                     </div>
                     <div class="modal-body">
                         <div style="margin-bottom: 1rem;">
-                            <strong>Aktuell:</strong> <span id="version-current">v1.6.2</span>
+                            <strong>Aktuell:</strong> <span id="version-current">v1.6.3</span>
                         </div>
                         <div class="dev-toggle">
                             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -2309,7 +2309,7 @@ body {
             </main>
 
             <footer class="app-footer">
-                <p>Bessa Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span></p>
+                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufis-Kitchen</p>
             </footer>
         </div>`;
     }
@@ -4138,7 +4138,7 @@ body {
 
     // Periodic update check (runs on init + every hour)
     async function checkForUpdates() {
-        const currentVersion = 'v1.6.2';
+        const currentVersion = 'v1.6.3';
         const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
         try {
@@ -4179,7 +4179,7 @@ body {
         const modal = document.getElementById('version-modal');
         const container = document.getElementById('version-list-container');
         const devToggle = document.getElementById('dev-mode-toggle');
-        const currentVersion = 'v1.6.2';
+        const currentVersion = 'v1.6.3';
 
         if (!modal) return;
         modal.classList.remove('hidden');

@@ -268,7 +268,7 @@
             </main>
 
             <footer class="app-footer">
-                <p>Bessa Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span></p>
+                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufis-Kitchen</p>
             </footer>
         </div>`;
     }

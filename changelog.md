@@ -1,3 +1,6 @@
+## v1.6.3 (2026-03-05)
+- ✨ **Chore**: Slogan im Footer aktualisiert ("Jetzt Bessa Einfach! • Knapp-Kantine Wrapper • 2026 by Kaufis-Kitchen") und Footer-Höhe für mehr Platzierung optimiert.
+
 ## v1.6.2 (2026-03-05)
 - ✨ **Feature**: Wochentags-Header (Montag, Dienstag etc.) scrollen nun als "Sticky Header" mit und bleiben am oberen Bildschirmrand haften.
   - Das Layout clippt scrollende Speisen ordentlich darunter weg.
