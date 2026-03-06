@@ -303,26 +303,30 @@ ls -la "$DIST_DIR/"
 # === 4. Run build-time tests ===
 echo ""
 echo "=== Running Logic Tests ==="
-node "$SCRIPT_DIR/test_logic.js"
+timeout 15s node "$SCRIPT_DIR/test_logic.js"
 LOGIC_EXIT=$?
 if [ $LOGIC_EXIT -ne 0 ]; then
-    echo "❌ Logic tests FAILED! See above for details."
+    echo "❌ Logic tests FAILED or TIMED OUT (Exit: $LOGIC_EXIT)! See above for details."
     exit 1
 fi
 
 echo "=== Running DOM Interaction Tests ==="
-node "$SCRIPT_DIR/tests/test_dom.js"
+timeout 15s node "$SCRIPT_DIR/tests/test_dom.js"
 DOM_EXIT=$?
 if [ $DOM_EXIT -ne 0 ]; then
-    echo "❌ DOM UI tests FAILED! Regressions detected."
+    echo "❌ DOM UI tests FAILED or TIMED OUT (Exit: $DOM_EXIT)! Regressions detected."
+    # Ensure playwright processes are killed if they leak
+    pkill -f playwright || true
+    pkill -f "node.*test_dom" || true
     exit 1
 fi
 
+
 echo "=== Running Build Tests ==="
-python3 "$SCRIPT_DIR/test_build.py"
+timeout 15s python3 "$SCRIPT_DIR/test_build.py"
 TEST_EXIT=$?
 if [ $TEST_EXIT -ne 0 ]; then
-    echo "❌ Build tests FAILED! See above for details."
+    echo "❌ Build tests FAILED or TIMED OUT (Exit: $TEST_EXIT)! See above for details."
     exit 1
 fi
 echo "✅ All build tests passed."

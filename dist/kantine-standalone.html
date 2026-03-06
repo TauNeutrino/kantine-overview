@@ -891,7 +891,6 @@ body {
     /* No opacity/filter here - fully visible */
     background: var(--bg-card);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #8b5cf6;
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
@@ -901,27 +900,27 @@ body {
 
 .menu-item.today-ordered {
     border: 2px solid #8b5cf6;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
-    animation: pulse-glow 3s infinite;
+    animation: pulse-glow-strong 3s infinite;
 }
 
-@keyframes pulse-glow {
+@keyframes pulse-glow-strong {
     0% {
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     }
 
     50% {
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
     }
 
     100% {
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     }
 }
 
@@ -2121,7 +2120,7 @@ body {
             <header class="app-header">
                 <div class="header-content">
                     <div class="brand">
-                        <span class="material-icons-round logo-icon">restaurant_menu</span>
+                        <img src="data:image/png;base64,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" alt="Logo" class="logo-img" style="height: 1.2em; width: 1.2em; object-fit: contain;">
                         <div class="header-left">
                             <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.4</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>

@@ -880,7 +880,6 @@ body {
     /* No opacity/filter here - fully visible */
     background: var(--bg-card);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #8b5cf6;
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
@@ -890,27 +889,27 @@ body {
 
 .menu-item.today-ordered {
     border: 2px solid #8b5cf6;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
     border-radius: 8px;
     padding: 1rem;
     margin: 0 -1rem 1.5rem -1rem;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
-    animation: pulse-glow 3s infinite;
+    animation: pulse-glow-strong 3s infinite;
 }
 
-@keyframes pulse-glow {
+@keyframes pulse-glow-strong {
     0% {
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     }
 
     50% {
-        box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.8);
     }
 
     100% {
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     }
 }
 

@@ -41,20 +41,32 @@ const sandbox = {
     fetch: async (url) => {
         // Mock Version Check
         if (url.includes('version.txt')) {
-            return { ok: true, text: async () => 'v9.9.9' }; // Simulate new version
+            return { ok: true, text: async () => 'v9.9.9', json: async () => ({}) };
         }
         // Mock Changelog
         if (url.includes('changelog.md')) {
-            return { ok: true, text: async () => '## v9.9.9\n- Feature: Cool Stuff' };
+            return { ok: true, text: async () => '## v9.9.9\n- Feature: Cool Stuff', json: async () => ({}) };
         }
-        return { ok: false }; // Fail others to prevent huge cascades
+        // Mock GitHub Tags API
+        if (url.includes('api.github.com/') || url.includes('/tags')) {
+            return { ok: true, json: async () => [{ name: 'v9.9.9' }] };
+        }
+        // Mock Menu API
+        if (url.includes('/food-menu/menu/')) {
+            return { ok: true, json: async () => ({ dates: [], menu: {} }) };
+        }
+        // Mock Orders API
+        if (url.includes('/user/orders')) {
+            return { ok: true, json: async () => ({ results: [], count: 0 }) };
+        }
+        return { ok: false, status: 404, text: async () => '', json: async () => ({}) };
     },
     document: {
         body: createMockElement('body'),
         head: createMockElement('head'),
         createElement: (tag) => createMockElement(tag),
         querySelector: (sel) => {
-            if (sel === '.material-icons-round.logo-icon') {
+            if (sel === '.logo-img' || sel === '.material-icons-round.logo-icon') {
                 const el = createMockElement('last-updated-icon-mock');
                 // Mock legacy prop for specific test check if needed, 
                 // but our generic mock handles replaceWith hook
