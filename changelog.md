@@ -1,3 +1,6 @@
+## v1.6.8 (2026-03-06)
+- ⚡ **Performance**: Das JavaScript für das Kantinen-Bookmarklet wird nun beim Build-Prozess (via Terser) minimiert, was die Länge der injizierten URL spürbar reduziert.
+
 ## v1.6.7 (2026-03-06)
 - 🎨 **Style**: Das neue Header-Logo (`favicon_base.png`) wird nun konsequent auf 40x40px generiert und gerendert.
 

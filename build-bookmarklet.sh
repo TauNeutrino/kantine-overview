@@ -99,15 +99,20 @@ echo "✅ Standalone HTML: $DIST_DIR/kantine-standalone.html"
 # Escape CSS for embedding in JS string
 CSS_ESCAPED=$(echo "$CSS_CONTENT" | sed "s/'/\\\\'/g" | tr '\n' ' ' | sed 's/  */ /g')
 
-# Build bookmarklet payload
+# Create a minified version for the injected bookmarklet payloads
+echo "Minifying JS with Terser..."
+TEMP_JS=$(mktemp)
+echo "$JS_CONTENT" > "$TEMP_JS"
+JS_MINIFIED=$(npx -y terser "$TEMP_JS" --compress --mangle)
+rm -f "$TEMP_JS"
+
 cat > "$DIST_DIR/bookmarklet-payload.js" << PAYLOADEOF
-(function(){
+javascript:(function(){
 if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
-var s=document.createElement('style');
-s.textContent='${CSS_ESCAPED}';
-document.head.appendChild(s);
+var s=document.createElement('style');s.textContent='${CSS_ESCAPED}';document.head.appendChild(s);
+// Inject JS logic
 var sc=document.createElement('script');
-sc.textContent=$(echo "$JS_CONTENT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo "$JS_CONTENT" | sed 's/\\/\\\\/g' | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g' | tr '\n' ' ' | sed 's/^/"/' | sed 's/$/"/');
+sc.textContent=$(echo "$JS_MINIFIED" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))" 2>/dev/null || echo "$JS_MINIFIED" | sed 's/\\/\\\\/g' | sed "s/'/\\\\'/g" | sed 's/"/\\\\"/g' | tr '\n' ' ' | sed 's/^/"/' | sed 's/$/"/');
 document.head.appendChild(sc);
 })();
 PAYLOADEOF
@@ -239,12 +244,11 @@ fi
 
 # Embed the bookmarklet URL inline
 echo "document.getElementById('bookmarklet-link').href = " >> "$DIST_DIR/install.html"
-echo "$JS_CONTENT" | python3 -c "
+echo "$JS_MINIFIED" | python3 -c "
 import sys, json, urllib.parse
 
 # 1. Read JS and Replace VERSION + Favicon
-js_template = sys.stdin.read()
-js = js_template.replace('{{VERSION}}', '$VERSION').replace('{{FAVICON_DATA_URI}}', '$FAVICON_URL')
+js = sys.stdin.read()
 
 # 2. Prepare CSS for injection via createElement('style')
 css = open('$CSS_FILE').read().replace('\n', ' ').replace('  ', ' ')
