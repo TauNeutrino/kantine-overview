@@ -1,3 +1,6 @@
+## v1.6.6 (2026-03-06)
+- 🎨 **Style**: Den Schatten und den hervorstehenden Karten-Effekt für bestellte Menüs an vergangenen Tagen komplett entfernt - verbleiben nun visuell flach und unaufdringlich wie nicht-bestellte Menüs.
+
 ## v1.6.5 (2026-03-06)
 - ✨ **Feature**: Das `restaurant_menu` Icon im Header wurde durch das neue `favicon_base.png` Logo ersetzt, passend zur Textgröße skaliert.
 - 🎨 **Style**: Violette Umrahmung (Bestellt-Markierung) an vergangenen Tagen entfernt, um den Fokus auf aktuelle und zukünftige Bestellungen zu lenken.
