@@ -28,13 +28,13 @@ if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
 # Generate favicon.png from favicon_base.png if base exists
 FAVICON_BASE="$SCRIPT_DIR/favicon_base.png"
 if [ -f "$FAVICON_BASE" ]; then
-    echo "Generating 32x32 favicon.png from favicon_base.png..."
+    echo "Generating 40x40 favicon.png from favicon_base.png..."
     python3 -c "
 import sys
 from PIL import Image
 try:
     img = Image.open('$FAVICON_BASE')
-    img_resized = img.resize((32, 32), Image.Resampling.LANCZOS)
+    img_resized = img.resize((40, 40), Image.Resampling.LANCZOS)
     img_resized.save('$FAVICON_FILE')
 except Exception as e:
     print('Favicon generation error:', e)
@@ -161,7 +161,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 
     <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <img src="$FAVICON_URL" alt="Logo" style="width: 38px; height: 38px;"> 
+            <img src="$FAVICON_URL" alt="Logo" style="width: 40px; height: 40px;"> 
             Kantine Wrapper 
             <span style="font-size:0.5em; opacity:0.6; font-weight:400; margin-left:5px;">$VERSION</span>
         </h1>

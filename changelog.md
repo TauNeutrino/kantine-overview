@@ -1,3 +1,6 @@
+## v1.6.7 (2026-03-06)
+- 🎨 **Style**: Das neue Header-Logo (`favicon_base.png`) wird nun konsequent auf 40x40px generiert und gerendert.
+
 ## v1.6.6 (2026-03-06)
 - 🎨 **Style**: Den Schatten und den hervorstehenden Karten-Effekt für bestellte Menüs an vergangenen Tagen komplett entfernt - verbleiben nun visuell flach und unaufdringlich wie nicht-bestellte Menüs.
 
