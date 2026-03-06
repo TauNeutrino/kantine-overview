@@ -1,3 +1,8 @@
+## v1.6.5 (2026-03-06)
+- ✨ **Feature**: Das `restaurant_menu` Icon im Header wurde durch das neue `favicon_base.png` Logo ersetzt, passend zur Textgröße skaliert.
+- 🎨 **Style**: Violette Umrahmung (Bestellt-Markierung) an vergangenen Tagen entfernt, um den Fokus auf aktuelle und zukünftige Bestellungen zu lenken.
+- 🎨 **Style**: Der Glow-Effekt für am heutigen Tag bestellte Menüs wurde intensiviert.
+
 ## v1.6.4 (2026-03-05)
 - ✨ **Feature**: Sprach-Lexikon (DE/EN) massiv erweitert um österreichische Begriffe (Nockerl, Fleckerl, Topfen, Mohn, Most etc.) und gängige Tippfehler aus dem Bessa-System (trukey, coffe, oveb etc.).
 - 🧹 **Cleanup**: Sprach-Lexikon dedupliziert und alphabetisch sortiert für bessere Performance und Wartbarkeit.
