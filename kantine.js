@@ -80,7 +80,7 @@
             <header class="app-header">
                 <div class="header-content">
                     <div class="brand">
-                        <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 40px; width: 40px; object-fit: contain;">
+                        <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 1.2em; width: 1.2em; object-fit: contain;">
                         <div class="header-left">
                             <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
                             <div id="last-updated-subtitle" class="subtitle"></div>
@@ -268,7 +268,7 @@
             </main>
 
             <footer class="app-footer">
-                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufis-Kitchen</p>
+                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufi 😃👍 mit Hilfe von KI 🤖</p>
             </footer>
         </div>`;
     }
