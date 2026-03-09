@@ -14,7 +14,7 @@
     // === Constants ===
     const API_BASE = 'https://api.bessa.app/v1';
     const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
-    const CLIENT_VERSION = '1.7.0_prod/2026-01-26';
+    const CLIENT_VERSION = 'v1.6.10';
     const VENUE_ID = 591;
     const MENU_ID = 7;
     const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -691,7 +691,7 @@
                         const existingOrder = localCache[existingOrderIndex];
                         // If order exists and wasn't updated since our cache, we've reached the point 
                         // where everything older is already correctly cached.
-                        // order.updated is an ISO string like "2025-02-18T10:30:15.123456Z"
+                        // order.updated is an ISO string like "2026-03-09T18:30:15.123456Z"
                         if (existingOrder.updated === order.updated && existingOrder.order_state === order.order_state) {
                             deltaComplete = true;
                             break;
@@ -1099,11 +1099,7 @@
         }
 
         const lastUpdated = new Date(lastUpdatedStr);
-        const diffMs = Date.now() - lastUpdated.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        if (diffMins < 1) timeStr = 'gerade eben';
-        else if (diffMins < 60) timeStr = `vor ${diffMins} Min.`;
-        else timeStr = `vor ${Math.floor(diffMins / 60)} Std.`;
+        timeStr = getRelativeTime(lastUpdated);
 
         bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
@@ -1231,6 +1227,8 @@
                 await new Promise(r => setTimeout(r, 200));
             }
         }
+        // Update timestamp after successful polling cycle
+        updateLastUpdatedTime(new Date().toISOString());
     }
 
     // === Highlight Management ===
@@ -1567,6 +1565,7 @@
         const subtitle = document.getElementById('last-updated-subtitle');
         if (!isoTimestamp) return;
         lastUpdatedTimestamp = isoTimestamp;
+        localStorage.setItem('kantine_last_updated', isoTimestamp); // Persist for session-over-tab consistency
         try {
             const date = new Date(isoTimestamp);
             const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
@@ -1579,7 +1578,10 @@
         // Auto-refresh relative time every minute
         if (!lastUpdatedIntervalId) {
             lastUpdatedIntervalId = setInterval(() => {
-                if (lastUpdatedTimestamp) updateLastUpdatedTime(lastUpdatedTimestamp);
+                if (lastUpdatedTimestamp) {
+                    updateLastUpdatedTime(lastUpdatedTimestamp);
+                    updateAlarmBell(); // Ensure bell icon title (tooltip) also refreshes
+                }
             }, 60 * 1000);
         }
     }
@@ -2380,7 +2382,7 @@
     // === Language Filter (FR-100) ===
     // DE stems for fallback language detection
     const DE_STEMS = [
-        'apfel', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
+        'apfel', 'achtung', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
         'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
         'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
         'gemüse', 'gewürz', 'gratin', 'grieß', 'gulasch', 'gurke', 'himbeer', 'honig', 'huhn', 'hähnchen',
@@ -2422,8 +2424,8 @@
         if (!text) return { de: '', en: '', raw: '' };
 
         const raw = text;
-        // Formatting: add • for new lines, using the forgiving regex
-        let formattedRaw = text.replace(/(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?=\S)/g, '($1)\n• ');
+        // Formatting: add • for new lines, avoiding dots before slashes
+        let formattedRaw = text.replace(/(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?=\S)(?!\s*\/)/g, '($1)\n• ');
         if (!formattedRaw.startsWith('• ')) {
             formattedRaw = '• ' + formattedRaw;
         }
@@ -2479,10 +2481,11 @@
 
                 const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en) + capitalBonus;
 
-                // Strict condition! The assumed German part must actually look German
+                // Mandatory check: The assumed English part must actually look reasonably like English (or at least more so than the right part)
+                const leftLooksEnglish = (leftScore.en > leftScore.de) || (leftScore.en > 0);
                 const rightLooksGerman = (rightScore.de + capitalBonus) > rightScore.en;
 
-                if (rightLooksGerman && score > maxScore) {
+                if (leftLooksEnglish && rightLooksGerman && score > maxScore) {
                     maxScore = score;
                     bestK = k;
                 }
@@ -2497,60 +2500,81 @@
             return { enPart: fragment, nextDe: '' };
         }
 
-        // NEW LOGIC: We no longer split by slash if the slash is part of a missing-parenthesis allergen like /ACGL)
-        const parts = text.split(/\s*\/\s*(?![A-Z,]+\))/);
+        // Match courses: Any text followed by an allergen marker "(...)" but NOT if followed by a slash.
+        const allergenRegex = /(.*?)(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?!\s*[/])/g;
+        let match;
+        const rawCourses = [];
+        let lastScanIndex = 0;
 
-        // Sanity check: max 3 courses means max 3 slashes → max 4 parts
-        if (parts.length > 4) {
-            return { de: formattedRaw, en: '', raw: formattedRaw };
+        while ((match = allergenRegex.exec(text)) !== null) {
+            if (match.index > lastScanIndex) {
+                rawCourses.push(text.substring(lastScanIndex, match.index).trim());
+            }
+            rawCourses.push(match[0].trim());
+            lastScanIndex = allergenRegex.lastIndex;
+        }
+        if (lastScanIndex < text.length) {
+            rawCourses.push(text.substring(lastScanIndex).trim());
+        }
+        if (rawCourses.length === 0 && text.trim() !== '') {
+            rawCourses.push(text.trim());
         }
 
         const deParts = [];
         const enParts = [];
 
-        // Part 0 is ALWAYS German (beginning of the menu item)
-        deParts.push(parts[0].trim());
+        // 2. Process each course individually
+        for (let course of rawCourses) {
+            let courseMatch = course.match(/(.*?)(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*$/);
+            let courseText = course;
+            let allergenTxt = "";
+            let allergenCode = "";
 
-        // Matches e.g., "(GLM)" OR "/GLM)" OR " GLM)" with trailing spaces
-        const allergenRegex = /(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*/;
+            if (courseMatch) {
+                courseText = courseMatch[1].trim();
+                allergenCode = courseMatch[2];
+                allergenTxt = ` (${allergenCode})`;
+            }
 
-        for (let i = 1; i < parts.length; i++) {
-            const fragment = parts[i].trim();
-            const match = fragment.match(allergenRegex);
+            // A) Split by slash if present
+            const slashParts = courseText.split(/\s*\/\s*(?![A-Z,]+$)/);
 
-            if (match) {
-                const allergenEnd = match.index + match[0].length;
-                const enPart = fragment.substring(0, match.index).trim();
-                const allergenCode = match[1];
-                const nextDe = fragment.substring(allergenEnd).trim();
+            if (slashParts.length >= 2) {
+                // Potential DE / EN pair
+                const deCandidate = slashParts[0].trim();
+                let enCandidate = slashParts.slice(1).join(' / ').trim();
 
-                enParts.push(enPart + '(' + allergenCode + ')');
-                if (deParts.length > 0) {
-                    deParts[deParts.length - 1] = deParts[deParts.length - 1] + '(' + allergenCode + ')';
-                }
+                // Check for nested German in English part (e.g. "Pumpkin cream Achtung...")
+                const nestedSplit = heuristicSplitEnDe(enCandidate);
+                if (nestedSplit.nextDe) {
+                    // Transition back to German found!
+                    deParts.push(deCandidate + allergenTxt);
+                    enParts.push(nestedSplit.enPart + allergenTxt);
 
-                if (nextDe) {
-                    deParts.push(nextDe);
+                    // Push the nested German part as a new standalone course (fallback to itself)
+                    const nestedDe = nestedSplit.nextDe + allergenTxt;
+                    deParts.push(nestedDe);
+                    enParts.push(nestedDe);
+                } else {
+                    // Happy path: standard DE / EN
+                    // Avoid double allergens if they were on both sides already
+                    const enFinal = enCandidate + allergenTxt;
+                    const deFinal = deCandidate.includes(allergenTxt.trim()) ? deCandidate : (deCandidate + allergenTxt);
+
+                    deParts.push(deFinal);
+                    enParts.push(enFinal);
                 }
             } else {
-                // No allergen code found! Need to heuristically split "EN DE"
-                const split = heuristicSplitEnDe(fragment);
-                enParts.push(split.enPart);
-                if (split.nextDe) {
-                    deParts.push(split.nextDe);
+                // B) No slash found: Either missing translation or "EN DE" mixed
+                const heuristicSplit = heuristicSplitEnDe(courseText);
+                if (heuristicSplit.nextDe) {
+                    enParts.push(heuristicSplit.enPart + allergenTxt);
+                    deParts.push(heuristicSplit.nextDe + allergenTxt);
+                } else {
+                    // Fallback: Use same chunk for both
+                    deParts.push(courseText + allergenTxt);
+                    enParts.push(courseText + allergenTxt);
                 }
-            }
-        }
-
-        // FIX FOR SINGLE-LANGUAGE COURSES OR MISSING EN
-        if (parts.length === 1 && enParts.length === 0) {
-            enParts.push(deParts[0]);
-        }
-
-        // Mirror untranslated DE courses to EN (e.g. Dessert)
-        if (deParts.length > enParts.length) {
-            for (let i = enParts.length; i < deParts.length; i++) {
-                enParts.push(deParts[i]);
             }
         }
 

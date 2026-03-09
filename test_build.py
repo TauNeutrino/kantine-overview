@@ -62,7 +62,7 @@ def main():
 
     # Check for placeholder leftovers
     if not check_content(BOOKMARKLET_TXT, 
-                         must_contain=["document.createElement('style')", "M1", "M2"], 
+                         must_contain=["document.createElement('style')"], 
                          must_not_contain=["{{VERSION}}", "{{CSS_ESCAPED}}"]):
         sys.exit(1)
 

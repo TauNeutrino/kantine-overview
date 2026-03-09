@@ -1,3 +1,12 @@
+## v1.6.10 (2026-03-09)
+- **Feature**: Robuste Kurs-Erkennung in zweisprachigen Menüs ([FR-121](REQUIREMENTS.md#FR-121)).
+- **Fix**: Verhindert das Verschieben von Gängen bei fehlenden englischen Übersetzungen.
+- **Improved**: Heuristik-Split erkennt nun zuverlässiger den Übergang von Englisch zurück zu Deutsch (z.B. bei "Achtung"-Hinweisen)
+
+## v1.6.9 (2026-03-09)
+- 🐛 **Bugfix**: Fehlerhafte Zeitangabe beim Bell-Icon ("vor 291h") behoben. Der Tooltip wird nun minütlich aktualisiert und nach jeder Menü-Prüfung korrekt neu gesetzt.
+- 🔄 **Refactor**: Zeitstempel-Management für die letzte Aktualisierung vereinheitlicht und im `localStorage` persistiert.
+
 ## v1.6.8 (2026-03-06)
 - ⚡ **Performance**: Das JavaScript für das Kantinen-Bookmarklet wird nun beim Build-Prozess (via Terser) minimiert, was die Länge der injizierten URL spürbar reduziert.
 

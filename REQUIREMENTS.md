@@ -59,10 +59,11 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-082 | Das System muss beim erstmaligen Laden die Betriebssystem-Präferenz für das Farbschema berücksichtigen. | Niedrig | v1.0.1 |
 | **Header UI & Navigation** | | | |
 | FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
-| FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv aber kein Menü verfügbar, Grün=Mindestens ein Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.5.0 (Update v1.4.10) |
+| FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv aber kein Menü verfügbar, Grün=Mindestens ein Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.6.9 (Update v1.5.0) |
 | FR-092 | Solange Menüdaten für die Nächste Woche verfügbar sind, aber noch keine Bestellungen getätigt wurden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Nach der ersten Bestellung muss die Hervorhebung automatisch erlöschen. Zusätzlich muss beim erstmaligen Erscheinen der Daten ein einmaliger Toast-Hinweis angezeigt werden. | Mittel | v1.6.0 (Update v1.4.21) |
 | **Sprachfilter** | | | |
 | FR-120 | Das System muss zweisprachige Menübeschreibungen (Deutsch/Englisch) erkennen und dem Benutzer erlauben, via UI-Toggle zwischen DE, EN und ALL (beide Sprachen) zu wechseln. Die Sprachpräferenz muss persistent gespeichert werden. Allergen-Codes müssen in allen Modi angezeigt werden. | Mittel | v1.6.0 |
+| FR-121 | Das System muss bei fehlenden Übersetzungen in zweisprachigen Menüs robust reagieren. Wenn ein Gang nur in einer Sprache vorliegt, muss dieser Teil für beide Sprachansichten herangezogen werden, um die Konsistenz der Ganganzahl zu gewährleisten. | Mittel | v1.7.0 |
 | **Benutzer-Feedback** | | | |
 | FR-095 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
 | FR-096 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |

@@ -102,7 +102,8 @@ const sandbox = {
 try {
     vm.createContext(sandbox);
     // Execute the code
-    vm.runInContext(code, sandbox);
+    const instrumentedCode = code.replace(/\n\}\)\(\);/, '  window.splitLanguage = splitLanguage;\n})();');
+    vm.runInContext(instrumentedCode, sandbox);
 
 
     // Regex Check: update icon appended to header
@@ -133,6 +134,7 @@ try {
     }
     console.log("✅ Static Analysis Passed: All GitHub Release Management functions found.");
 
+
     // Check dynamic logic usage
     // Note: Since we mock fetch to fail for menu data, the app might perform error handling.
     // We just want to ensure it doesn't CRASH (exit code) and that our specific feature logic ran.
@@ -144,6 +146,51 @@ try {
         // Since static analysis passed, we are somewhat confident.
         console.log("⚠️ Dynamic Check Skipped (Active execution verification relies on async/timing).");
     }
+
+    // --- Split Language Logic Test ---
+    console.log("--- Testing splitLanguage Logic ---");
+    const testCases = [
+        {
+            input: "Kürbiscremesuppe / Pumpkin cream (A) Achtung Änderung Frisches Grillhendl mit Semmel (A) Kuchen / Cake (ACGHO)",
+            expectedDeCourses: 3,
+            expectedEnCourses: 3
+        },
+        {
+            input: "Schweinsbraten (M) / Roast pork (M)",
+            expectedDeCourses: 1,
+            expectedEnCourses: 1
+        },
+        {
+            input: "Tagessuppe (L)  / Daily soup (L)",
+            expectedDeCourses: 1,
+            expectedEnCourses: 1
+        },
+        {
+            input: "Nur Deutsch (A)",
+            expectedDeCourses: 1,
+            expectedEnCourses: 1
+        }
+    ];
+
+    // We can extract splitLanguage or getLocalizedText if they are in global scope,
+    // but they are inside the IIFE. We can instead check if the parsed data has the same number of courses visually.
+    // We can evaluate a function in the sandbox to do the splitting
+    for (const tc of testCases) {
+        const result = sandbox.window.splitLanguage(tc.input);
+
+        const deGange = result.de.split('•').filter(x => x.trim()).length;
+        const enGange = result.en.split('•').filter(x => x.trim()).length;
+
+        if (deGange !== tc.expectedDeCourses || enGange !== tc.expectedEnCourses || deGange !== enGange) {
+            console.error(`❌ splitLanguage Test Failed for "${tc.input}"`);
+            console.error(`   Expected EN/DE: ${tc.expectedEnCourses}/${tc.expectedDeCourses}`);
+            console.error(`   Got EN/DE: ${enGange}/${deGange}`);
+            console.error(`   DE: ${result.de}`);
+            console.error(`   EN: ${result.en}`);
+            process.exit(1);
+        }
+    }
+    console.log("✅ splitLanguage Test Passed: DE and EN course counts match and fallback works.");
 
     console.log("✅ Syntax Check Passed: Code executed in sandbox.");
 
