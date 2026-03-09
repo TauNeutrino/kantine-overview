@@ -14,7 +14,7 @@
     // === Constants ===
     const API_BASE = 'https://api.bessa.app/v1';
     const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
-    const CLIENT_VERSION = 'v1.6.10';
+    const CLIENT_VERSION = 'v1.6.11';
     const VENUE_ID = 591;
     const MENU_ID = 7;
     const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
@@ -1091,11 +1091,11 @@
             if (anyAvailable) break;
         }
 
-        let lastUpdatedStr = localStorage.getItem('kantine_last_updated');
+        let lastUpdatedStr = localStorage.getItem('kantine_last_checked');
         let timeStr = 'gerade eben'; // Fallback instead of Unbekannt
         if (!lastUpdatedStr) {
             lastUpdatedStr = new Date().toISOString();
-            localStorage.setItem('kantine_last_updated', lastUpdatedStr);
+            localStorage.setItem('kantine_last_checked', lastUpdatedStr);
         }
 
         const lastUpdated = new Date(lastUpdatedStr);
@@ -1227,8 +1227,9 @@
                 await new Promise(r => setTimeout(r, 200));
             }
         }
-        // Update timestamp after successful polling cycle
-        updateLastUpdatedTime(new Date().toISOString());
+        // Update ONLY the polling status timestamp (Bell Tooltip)
+        localStorage.setItem('kantine_last_checked', new Date().toISOString());
+        updateAlarmBell();
     }
 
     // === Highlight Management ===
@@ -1565,7 +1566,8 @@
         const subtitle = document.getElementById('last-updated-subtitle');
         if (!isoTimestamp) return;
         lastUpdatedTimestamp = isoTimestamp;
-        localStorage.setItem('kantine_last_updated', isoTimestamp); // Persist for session-over-tab consistency
+        localStorage.setItem('kantine_last_updated', isoTimestamp);
+        localStorage.setItem('kantine_last_checked', isoTimestamp); // Also update bell on full refresh
         try {
             const date = new Date(isoTimestamp);
             const timeStr = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });

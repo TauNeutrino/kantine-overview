@@ -1,3 +1,7 @@
+## v1.6.11 (2026-03-09)
+- 🔄 **Refactor**: Trennung der Zeitstempel für die Hauptaktualisierung (Header) und die Benachrichtigungsprüfung (Bell-Icon). Das Polling aktualisiert nun nicht mehr fälschlicherweise die "Aktualisiert am"-Zeit im Header.
+- 🏷️ **Metadata**: Version auf v1.6.11 angehoben.
+
 ## v1.6.10 (2026-03-09)
 - **Feature**: Robuste Kurs-Erkennung in zweisprachigen Menüs ([FR-121](REQUIREMENTS.md#FR-121)).
 - **Fix**: Verhindert das Verschieben von Gängen bei fehlenden englischen Übersetzungen.
