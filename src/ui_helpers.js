@@ -516,12 +516,12 @@ export function openVersionMenu() {
 
                 let action = '';
                 if (!isCurrent) {
-                    action = `<a href="${v.url}" target="_blank" class="install-link" title="${v.tag} installieren">Installieren</a>`;
+                    action = `<a href="${escapeHtml(v.url)}" target="_blank" class="install-link" title="${escapeHtml(v.tag)} installieren">Installieren</a>`;
                 }
 
                 li.innerHTML = `
                     <div class="version-info">
-                        <strong>${v.tag}</strong>
+                        <strong>${escapeHtml(v.tag)}</strong>
                         ${badge}
                     </div>
                     ${action}
@@ -554,7 +554,7 @@ export function openVersionMenu() {
             }
 
         } catch (e) {
-            container.innerHTML = `<p style="color:#e94560;">Fehler: ${e.message}</p>`;
+            container.innerHTML = `<p style="color:#e94560;">Fehler: ${escapeHtml(e.message)}</p>`;
         }
     }
 
@@ -661,7 +661,7 @@ export function showErrorModal(title, htmlContent, btnText, url) {
             <div class="modal-header">
                 <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
                     <span class="material-icons-round">signal_wifi_off</span>
-                    ${title}
+                    ${escapeHtml(title)}
                 </h2>
             </div>
             <div style="padding: 20px;">
@@ -682,7 +682,7 @@ export function showErrorModal(title, htmlContent, btnText, url) {
                         justify-content: center;
                         transition: transform 0.1s;
                     ">
-                        ${btnText}
+                        ${escapeHtml(btnText)}
                         <span class="material-icons-round">open_in_new</span>
                     </button>
                 </div>
