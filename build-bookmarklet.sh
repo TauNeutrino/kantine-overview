@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DIST_DIR="$SCRIPT_DIR/dist"
 CSS_FILE="$SCRIPT_DIR/style.css"
-JS_FILE="$SCRIPT_DIR/kantine.js"
+JS_FILE="$SCRIPT_DIR/dist/kantine.bundle.js"
 FAVICON_FILE="$SCRIPT_DIR/favicon.png"
 
 # === VERSION ===
