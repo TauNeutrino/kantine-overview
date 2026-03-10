@@ -352,7 +352,8 @@ body {
 }
 
 /* Refresh button animation */
-#btn-refresh.refreshing .material-icons-round {
+#btn-refresh.refreshing .material-icons-round,
+#alarm-bell.refreshing .material-icons-round {
     animation: rotate 1s linear infinite;
 }
 

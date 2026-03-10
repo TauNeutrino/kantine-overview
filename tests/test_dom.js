@@ -112,7 +112,9 @@ const testCode = `
         alarmBtn.classList.add('hidden');
         if (!document.getElementById('alarm-bell').className.includes('hidden')) throw new Error("Bell should be hidden");
 
-        console.log("✅ Alarm Bell Test Passed");
+        // Test Click Refresh
+        alarmBtn.click();
+        console.log("✅ Alarm Bell Test (Click) Passed");
 
         console.log("--- Testing Highlights Modal ---");
         // First, verify initial state

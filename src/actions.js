@@ -439,53 +439,61 @@ export async function refreshFlaggedItems() {
     }
 
     let updated = false;
-    for (const dateStr of datesToFetch) {
-        try {
-            const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
-                headers: apiHeaders(token)
-            });
-            if (!resp.ok) continue;
-            const data = await resp.json();
-            const menuGroups = data.results || [];
-            let dayItems = [];
-            for (const group of menuGroups) {
-                if (group.items && Array.isArray(group.items)) {
-                    dayItems = dayItems.concat(group.items);
-                }
-            }
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) bellBtn.classList.add('refreshing');
 
-            for (let week of allWeeks) {
-                if (!week.days) continue;
-                let dayObj = week.days.find(d => d.date === dateStr);
-                if (dayObj) {
-                    dayObj.items = dayItems.map(item => {
-                        const isUnlimited = item.amount_tracking === false;
-                        const hasStock = parseInt(item.available_amount) > 0;
-                        return {
-                            id: `${dateStr}_${item.id}`,
-                            articleId: item.id,
-                            name: item.name || 'Unknown',
-                            description: item.description || '',
-                            price: parseFloat(item.price) || 0,
-                            available: isUnlimited || hasStock,
-                            availableAmount: parseInt(item.available_amount) || 0,
-                            amountTracking: item.amount_tracking !== false
-                        };
-                    });
-                    updated = true;
+    try {
+        for (const dateStr of datesToFetch) {
+            try {
+                const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+                    headers: apiHeaders(token)
+                });
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                const menuGroups = data.results || [];
+                let dayItems = [];
+                for (const group of menuGroups) {
+                    if (group.items && Array.isArray(group.items)) {
+                        dayItems = dayItems.concat(group.items);
+                    }
                 }
+
+                for (let week of allWeeks) {
+                    if (!week.days) continue;
+                    let dayObj = week.days.find(d => d.date === dateStr);
+                    if (dayObj) {
+                        dayObj.items = dayItems.map(item => {
+                            const isUnlimited = item.amount_tracking === false;
+                            const hasStock = parseInt(item.available_amount) > 0;
+                            return {
+                                id: `${dateStr}_${item.id}`,
+                                articleId: item.id,
+                                name: item.name || 'Unknown',
+                                description: item.description || '',
+                                price: parseFloat(item.price) || 0,
+                                available: isUnlimited || hasStock,
+                                availableAmount: parseInt(item.available_amount) || 0,
+                                amountTracking: item.amount_tracking !== false
+                            };
+                        });
+                        updated = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Error refreshing flag date', dateStr, e);
             }
-        } catch (e) {
-            console.error('Error refreshing flag date', dateStr, e);
         }
-    }
 
-    if (updated) {
-        saveMenuCache();
-        updateLastUpdatedTime(new Date().toISOString());
-        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
-        updateAlarmBell();
-        renderVisibleWeeks();
+        if (updated) {
+            saveMenuCache();
+            localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
+            updateAlarmBell();
+            renderVisibleWeeks();
+        }
+        
+        showToast(`${userFlags.size} ${userFlags.size === 1 ? 'Menü' : 'Menüs'} geprüft`, 'info');
+    } finally {
+        if (bellBtn) bellBtn.classList.remove('refreshing');
     }
 }
 

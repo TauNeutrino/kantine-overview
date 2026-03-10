@@ -363,7 +363,8 @@ body {
 }
 
 /* Refresh button animation */
-#btn-refresh.refreshing .material-icons-round {
+#btn-refresh.refreshing .material-icons-round,
+#alarm-bell.refreshing .material-icons-round {
     animation: rotate 1s linear infinite;
 }
 
@@ -2036,6 +2037,7 @@ body {
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A0: () => (/* binding */ refreshFlaggedItems),
 /* harmony export */   Aq: () => (/* binding */ fetchFullOrderHistory),
 /* harmony export */   BM: () => (/* binding */ checkHighlight),
 /* harmony export */   Et: () => (/* binding */ stopPolling),
@@ -2053,7 +2055,7 @@ body {
 /* harmony export */   oL: () => (/* binding */ addHighlightTag),
 /* harmony export */   wH: () => (/* binding */ placeOrder)
 /* harmony export */ });
-/* unused harmony exports renderHistory, saveFlags, refreshFlaggedItems, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
+/* unused harmony exports renderHistory, saveFlags, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -2074,7 +2076,6 @@ function updateAuthUI() {
             if (akita) {
                 const parsed = JSON.parse(akita);
                 if (parsed.auth && parsed.auth.token) {
-                    console.log('Found existing Bessa session!');
                     (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAuthToken */ .O5)(parsed.auth.token);
                     localStorage.setItem('kantine_authToken', parsed.auth.token);
 
@@ -2135,7 +2136,6 @@ async function fetchOrders() {
                 }
             }
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setOrderMap */ .di)(newOrderMap);
-            console.log(`Fetched ${results.length} orders, mapped active ones.`);
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateNextWeekBadge */ .gJ)();
         }
@@ -2502,52 +2502,61 @@ async function refreshFlaggedItems() {
     }
 
     let updated = false;
-    for (const dateStr of datesToFetch) {
-        try {
-            const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
-                headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
-            });
-            if (!resp.ok) continue;
-            const data = await resp.json();
-            const menuGroups = data.results || [];
-            let dayItems = [];
-            for (const group of menuGroups) {
-                if (group.items && Array.isArray(group.items)) {
-                    dayItems = dayItems.concat(group.items);
-                }
-            }
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) bellBtn.classList.add('refreshing');
 
-            for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
-                if (!week.days) continue;
-                let dayObj = week.days.find(d => d.date === dateStr);
-                if (dayObj) {
-                    dayObj.items = dayItems.map(item => {
-                        const isUnlimited = item.amount_tracking === false;
-                        const hasStock = parseInt(item.available_amount) > 0;
-                        return {
-                            id: `${dateStr}_${item.id}`,
-                            articleId: item.id,
-                            name: item.name || 'Unknown',
-                            description: item.description || '',
-                            price: parseFloat(item.price) || 0,
-                            available: isUnlimited || hasStock,
-                            availableAmount: parseInt(item.available_amount) || 0,
-                            amountTracking: item.amount_tracking !== false
-                        };
-                    });
-                    updated = true;
+    try {
+        for (const dateStr of datesToFetch) {
+            try {
+                const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
+                    headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
+                });
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                const menuGroups = data.results || [];
+                let dayItems = [];
+                for (const group of menuGroups) {
+                    if (group.items && Array.isArray(group.items)) {
+                        dayItems = dayItems.concat(group.items);
+                    }
                 }
+
+                for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
+                    if (!week.days) continue;
+                    let dayObj = week.days.find(d => d.date === dateStr);
+                    if (dayObj) {
+                        dayObj.items = dayItems.map(item => {
+                            const isUnlimited = item.amount_tracking === false;
+                            const hasStock = parseInt(item.available_amount) > 0;
+                            return {
+                                id: `${dateStr}_${item.id}`,
+                                articleId: item.id,
+                                name: item.name || 'Unknown',
+                                description: item.description || '',
+                                price: parseFloat(item.price) || 0,
+                                available: isUnlimited || hasStock,
+                                availableAmount: parseInt(item.available_amount) || 0,
+                                amountTracking: item.amount_tracking !== false
+                            };
+                        });
+                        updated = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Error refreshing flag date', dateStr, e);
             }
-        } catch (e) {
-            console.error('Error refreshing flag date', dateStr, e);
         }
-    }
 
-    if (updated) {
-        saveMenuCache();
-        updateLastUpdatedTime(new Date().toISOString());
-        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
-        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+        if (updated) {
+            saveMenuCache();
+            localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+        }
+        
+        showToast(`${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 1 ? 'Menü' : 'Menüs'} geprüft`, 'info');
+    } finally {
+        if (bellBtn) bellBtn.classList.remove('refreshing');
     }
 }
 
@@ -2607,20 +2616,17 @@ function startPolling() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8) return;
     if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
     (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setPollIntervalId */ .cc)(setInterval(() => pollFlaggedItems(), _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .POLL_INTERVAL_MS */ .fv));
-    console.log('Polling started (every 5 min)');
 }
 
 function stopPolling() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8) {
         clearInterval(_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8);
         (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setPollIntervalId */ .cc)(null);
-        console.log('Polling stopped');
     }
 }
 
 async function pollFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0 || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
-    console.log(`Polling ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} flagged items...`);
 
     for (const flagId of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY) {
         const [date, articleIdStr] = flagId.split('_');
@@ -2661,7 +2667,7 @@ async function pollFlaggedItems() {
             await new Promise(r => setTimeout(r, 200));
         }
     }
-    localStorage.setItem('kantine_last_checked', new Date().toISOString());
+    localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
     (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
 }
 
@@ -2728,12 +2734,10 @@ function loadMenuCache() {
     try {
         const cached = localStorage.getItem(CACHE_KEY);
         const cachedTs = localStorage.getItem(CACHE_TS_KEY);
-        console.log(`[Cache] localStorage: key=${!!cached} (${cached ? cached.length : 0} chars), ts=${cachedTs}`);
         if (cached) {
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAllWeeks */ .tn)(JSON.parse(cached));
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentWeekNumber */ .Xt)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getISOWeek */ .sn)(new Date()));
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentYear */ .pK)(new Date().getFullYear());
-            console.log(`[Cache] Parsed ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.length} weeks:`, _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.map(w => `KW${w.weekNumber}/${w.year} (${(w.days || []).length} days)`));
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateNextWeekBadge */ .gJ)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
@@ -2751,12 +2755,8 @@ function loadMenuCache() {
                         });
                     });
                 });
-                const res = Array.from(uniqueMenus).join('\n\n');
-                console.log("=== GEFUNDENE MENÜ-TEXTE (" + uniqueMenus.size + ") ===");
-                console.log(res);
             } catch (e) { }
 
-            console.log('Loaded menu from cache');
             return true;
         }
     } catch (e) {
@@ -2768,14 +2768,11 @@ function loadMenuCache() {
 function isCacheFresh() {
     const cachedTs = localStorage.getItem(CACHE_TS_KEY);
     if (!cachedTs) {
-        console.log('[Cache] No timestamp found');
         return false;
     }
 
     const ageMs = Date.now() - new Date(cachedTs).getTime();
-    const ageMin = Math.round(ageMs / 60000);
     if (ageMs > 60 * 60 * 1000) {
-        console.log(`[Cache] Stale: ${ageMin}min old (max 60)`);
         return false;
     }
 
@@ -2783,7 +2780,6 @@ function isCacheFresh() {
     const thisYear = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getWeekYear */ .Ao)(new Date());
     const hasCurrentWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.some(w => w.weekNumber === thisWeek && w.year === thisYear && w.days && w.days.length > 0);
 
-    console.log(`[Cache] Age: ${ageMin}min, looking for KW${thisWeek}/${thisYear}, found: ${hasCurrentWeek}`);
     return hasCurrentWeek;
 }
 
@@ -2828,48 +2824,51 @@ async function loadMenuDataFromAPI() {
         const allDays = [];
         let completed = 0;
 
-        for (const dateObj of availableDates) {
-            const dateStr = dateObj.date;
-            const pct = Math.round(((completed + 1) / totalDates) * 100);
-            progressFill.style.width = `${pct}%`;
-            progressPercent.textContent = `${pct}%`;
-            progressMessage.textContent = `Lade Menü für ${dateStr}...`;
+        const BATCH_SIZE = 5;
+        for (let i = 0; i < totalDates; i += BATCH_SIZE) {
+            const batch = availableDates.slice(i, i + BATCH_SIZE);
+            const results = await Promise.all(batch.map(async (dateObj) => {
+                const dateStr = dateObj.date;
+                let dayData = null;
+                try {
+                    const detailResp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
+                        headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
+                    });
 
-            try {
-                const detailResp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
-                    headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
-                });
-
-                if (detailResp.ok) {
-                    const detailData = await detailResp.json();
-                    if (completed === 0) {
-                        console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
-                    }
-                    const menuGroups = detailData.results || [];
-                    let dayItems = [];
-                    for (const group of menuGroups) {
-                        if (group.items && Array.isArray(group.items)) {
-                            dayItems = dayItems.concat(group.items);
+                    if (detailResp.ok) {
+                        const detailData = await detailResp.json();
+                        const menuGroups = detailData.results || [];
+                        let dayItems = [];
+                        for (const group of menuGroups) {
+                            if (group.items && Array.isArray(group.items)) {
+                                dayItems = dayItems.concat(group.items);
+                            }
+                        }
+                        if (dayItems.length > 0) {
+                            dayData = {
+                                date: dateStr,
+                                menu_items: dayItems,
+                                orders: dateObj.orders || []
+                            };
                         }
                     }
-                    if (dayItems.length > 0) {
-                        if (completed === 0) {
-                            console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
-                            console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
-                        }
-                        allDays.push({
-                            date: dateStr,
-                            menu_items: dayItems,
-                            orders: dateObj.orders || []
-                        });
-                    }
+                } catch (err) {
+                    console.error(`Failed to fetch details for ${dateStr}:`, err);
+                } finally {
+                    completed++;
+                    const pct = Math.round((completed / totalDates) * 100);
+                    progressFill.style.width = `${pct}%`;
+                    progressPercent.textContent = `${pct}%`;
+                    progressMessage.textContent = `Lade Menü für ${dateStr}...`;
                 }
-            } catch (err) {
-                console.error(`Failed to fetch details for ${dateStr}:`, err);
-            }
+                return dayData;
+            }));
 
-            completed++;
-            await new Promise(r => setTimeout(r, 100));
+            for (const result of results) {
+                if (result) {
+                    allDays.push(result);
+                }
+            }
         }
 
         const weeksMap = new Map();
@@ -2960,7 +2959,7 @@ async function loadMenuDataFromAPI() {
         Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 842)).then(uiHelpers => {
             uiHelpers.showErrorModal(
                 'Keine Verbindung',
-                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
+                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(error.message)}</small>`,
                 'Zur Original-Seite',
                 'https://web.bessa.app/knapp-kantine'
             );
@@ -3008,7 +3007,7 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
-    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
+    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(message)}</span>`;
     container.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => {
@@ -3223,7 +3222,7 @@ function updateNextWeekBadge() {
         }
 
         if (highlightCount > 0) {
-            badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
+            badge.insertAdjacentHTML('beforeend', `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`);
             badge.title += ` • ${highlightCount} Highlights gefunden`;
             badge.classList.add('has-highlights');
         }
@@ -3392,7 +3391,7 @@ function createDayCard(day) {
     header.className = 'card-header';
     const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
-    const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+    const badgesHtml = menuBadges.reduce((acc, code) => acc + `<span class="menu-code-badge">${code}</span>`, '');
 
     let headerClass = '';
     const hasAnyOrder = day.items && day.items.some(item => {
@@ -3508,7 +3507,7 @@ function createDayCard(day) {
 
         let tagsHtml = '';
         if (matchedTags.length > 0) {
-            const badges = matchedTags.map(t => `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`).join('');
+            const badges = matchedTags.reduce((acc, t) => acc + `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`, '');
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
@@ -3592,7 +3591,7 @@ async function fetchVersions(devMode) {
 }
 
 async function checkForUpdates() {
-    const currentVersion = 'v1.6.11';
+    const currentVersion = 'v1.6.14';
     const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
 
     try {
@@ -3604,11 +3603,8 @@ async function checkForUpdates() {
         }));
 
         const latest = versions[0].tag;
-        console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Latest [${latest}] (${devMode ? 'dev' : 'stable'})`);
 
         if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) return;
-
-        console.log(`[Kantine] Update verfügbar: ${latest}`);
 
         const headerTitle = document.querySelector('.header-left h1');
         if (headerTitle && !headerTitle.querySelector('.update-icon')) {
@@ -3630,7 +3626,7 @@ function openVersionMenu() {
     const modal = document.getElementById('version-modal');
     const container = document.getElementById('version-list-container');
     const devToggle = document.getElementById('dev-mode-toggle');
-    const currentVersion = 'v1.6.11';
+    const currentVersion = 'v1.6.14';
 
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -3666,12 +3662,12 @@ function openVersionMenu() {
 
                 let action = '';
                 if (!isCurrent) {
-                    action = `<a href="${v.url}" target="_blank" class="install-link" title="${v.tag} installieren">Installieren</a>`;
+                    action = `<a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.url)}" target="_blank" class="install-link" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren">Installieren</a>`;
                 }
 
                 li.innerHTML = `
                     <div class="version-info">
-                        <strong>${v.tag}</strong>
+                        <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
                         ${badge}
                     </div>
                     ${action}
@@ -3704,7 +3700,7 @@ function openVersionMenu() {
             }
 
         } catch (e) {
-            container.innerHTML = `<p style="color:#e94560;">Fehler: ${e.message}</p>`;
+            container.innerHTML = `<p style="color:#e94560;">Fehler: ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(e.message)}</p>`;
         }
     }
 
@@ -3811,7 +3807,7 @@ function showErrorModal(title, htmlContent, btnText, url) {
             <div class="modal-header">
                 <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
                     <span class="material-icons-round">signal_wifi_off</span>
-                    ${title}
+                    ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(title)}
                 </h2>
             </div>
             <div style="padding: 20px;">
@@ -3832,7 +3828,7 @@ function showErrorModal(title, htmlContent, btnText, url) {
                         justify-content: center;
                         transition: transform 0.1s;
                     ">
-                        ${btnText}
+                        ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(btnText)}
                         <span class="material-icons-round">open_in_new</span>
                     </button>
                 </div>
@@ -3882,15 +3878,21 @@ function updateAlarmBell() {
         if (anyAvailable) break;
     }
 
-    let lastUpdatedStr = localStorage.getItem('kantine_last_checked');
+    const lastCheckedStr = localStorage.getItem('kantine_last_checked');
+    const flaggedLastCheckedStr = localStorage.getItem('kantine_flagged_items_last_checked');
+
+    let latestTime = 0;
+    if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
+    if (flaggedLastCheckedStr) latestTime = Math.max(latestTime, new Date(flaggedLastCheckedStr).getTime());
+
     let timeStr = 'gerade eben';
-    if (!lastUpdatedStr) {
-        lastUpdatedStr = new Date().toISOString();
-        localStorage.setItem('kantine_last_checked', lastUpdatedStr);
+    if (latestTime === 0) {
+        const now = new Date().toISOString();
+        localStorage.setItem('kantine_last_checked', now);
+        latestTime = new Date(now).getTime();
     }
 
-    const lastUpdated = new Date(lastUpdatedStr);
-    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(lastUpdated);
+    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(new Date(latestTime));
 
     bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
@@ -4169,7 +4171,7 @@ function getLocalizedText(text) {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -4183,14 +4185,14 @@ function getLocalizedText(text) {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -4203,12 +4205,12 @@ function getLocalizedText(text) {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -4249,7 +4251,7 @@ function injectUI() {
                 <div class="brand">
                     <img src="data:image/png;base64,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" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.11</small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.6.14</small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -4395,7 +4397,7 @@ function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">v1.6.11</span>
+                        <strong>Aktuell:</strong> <span id="version-current">v1.6.14</span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -4613,6 +4615,13 @@ function bindEvents() {
         (0,actions/* loadMenuDataFromAPI */.m9)();
     });
 
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) {
+        bellBtn.addEventListener('click', () => {
+            (0,actions/* refreshFlaggedItems */.A0)();
+        });
+    }
+
     btnLoginOpen.addEventListener('click', () => {
         loginModal.classList.remove('hidden');
         document.getElementById('login-error').classList.add('hidden');
@@ -4708,9 +4717,7 @@ function bindEvents() {
 
 
 
-if (window.__KANTINE_LOADED) {
-    console.log("Kantine Wrapper already loaded.");
-} else {
+if (!window.__KANTINE_LOADED) {
     window.__KANTINE_LOADED = true;
 
     injectUI();
@@ -4722,10 +4729,7 @@ if (window.__KANTINE_LOADED) {
     if (hadCache) {
         document.getElementById('loading').classList.add('hidden');
         if (!(0,actions/* isCacheFresh */.VL)()) {
-            console.log('Cache stale or incomplete – refreshing from API');
             (0,actions/* loadMenuDataFromAPI */.m9)();
-        } else {
-            console.log('Cache fresh & complete – skipping API refresh');
         }
     } else {
         (0,actions/* loadMenuDataFromAPI */.m9)();
@@ -4737,8 +4741,6 @@ if (window.__KANTINE_LOADED) {
 
     (0,ui_helpers/* checkForUpdates */.Ux)();
     setInterval(ui_helpers/* checkForUpdates */.Ux, 60 * 60 * 1000);
-
-    console.log('Kantine Wrapper loaded ✅');
 }
 
 /******/ })()

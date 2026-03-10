@@ -6,6 +6,7 @@
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A0: () => (/* binding */ refreshFlaggedItems),
 /* harmony export */   Aq: () => (/* binding */ fetchFullOrderHistory),
 /* harmony export */   BM: () => (/* binding */ checkHighlight),
 /* harmony export */   Et: () => (/* binding */ stopPolling),
@@ -23,7 +24,7 @@
 /* harmony export */   oL: () => (/* binding */ addHighlightTag),
 /* harmony export */   wH: () => (/* binding */ placeOrder)
 /* harmony export */ });
-/* unused harmony exports renderHistory, saveFlags, refreshFlaggedItems, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
+/* unused harmony exports renderHistory, saveFlags, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -470,53 +471,61 @@ async function refreshFlaggedItems() {
     }
 
     let updated = false;
-    for (const dateStr of datesToFetch) {
-        try {
-            const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
-                headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
-            });
-            if (!resp.ok) continue;
-            const data = await resp.json();
-            const menuGroups = data.results || [];
-            let dayItems = [];
-            for (const group of menuGroups) {
-                if (group.items && Array.isArray(group.items)) {
-                    dayItems = dayItems.concat(group.items);
-                }
-            }
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) bellBtn.classList.add('refreshing');
 
-            for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
-                if (!week.days) continue;
-                let dayObj = week.days.find(d => d.date === dateStr);
-                if (dayObj) {
-                    dayObj.items = dayItems.map(item => {
-                        const isUnlimited = item.amount_tracking === false;
-                        const hasStock = parseInt(item.available_amount) > 0;
-                        return {
-                            id: `${dateStr}_${item.id}`,
-                            articleId: item.id,
-                            name: item.name || 'Unknown',
-                            description: item.description || '',
-                            price: parseFloat(item.price) || 0,
-                            available: isUnlimited || hasStock,
-                            availableAmount: parseInt(item.available_amount) || 0,
-                            amountTracking: item.amount_tracking !== false
-                        };
-                    });
-                    updated = true;
+    try {
+        for (const dateStr of datesToFetch) {
+            try {
+                const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
+                    headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
+                });
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                const menuGroups = data.results || [];
+                let dayItems = [];
+                for (const group of menuGroups) {
+                    if (group.items && Array.isArray(group.items)) {
+                        dayItems = dayItems.concat(group.items);
+                    }
                 }
+
+                for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
+                    if (!week.days) continue;
+                    let dayObj = week.days.find(d => d.date === dateStr);
+                    if (dayObj) {
+                        dayObj.items = dayItems.map(item => {
+                            const isUnlimited = item.amount_tracking === false;
+                            const hasStock = parseInt(item.available_amount) > 0;
+                            return {
+                                id: `${dateStr}_${item.id}`,
+                                articleId: item.id,
+                                name: item.name || 'Unknown',
+                                description: item.description || '',
+                                price: parseFloat(item.price) || 0,
+                                available: isUnlimited || hasStock,
+                                availableAmount: parseInt(item.available_amount) || 0,
+                                amountTracking: item.amount_tracking !== false
+                            };
+                        });
+                        updated = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Error refreshing flag date', dateStr, e);
             }
-        } catch (e) {
-            console.error('Error refreshing flag date', dateStr, e);
         }
-    }
 
-    if (updated) {
-        saveMenuCache();
-        updateLastUpdatedTime(new Date().toISOString());
-        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
-        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
-        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+        if (updated) {
+            saveMenuCache();
+            localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+        }
+        
+        showToast(`${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 1 ? 'Menü' : 'Menüs'} geprüft`, 'info');
+    } finally {
+        if (bellBtn) bellBtn.classList.remove('refreshing');
     }
 }
 
@@ -1351,7 +1360,7 @@ function createDayCard(day) {
     header.className = 'card-header';
     const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
-    const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+    const badgesHtml = menuBadges.reduce((acc, code) => acc + `<span class="menu-code-badge">${code}</span>`, '');
 
     let headerClass = '';
     const hasAnyOrder = day.items && day.items.some(item => {
@@ -1467,10 +1476,7 @@ function createDayCard(day) {
 
         let tagsHtml = '';
         if (matchedTags.length > 0) {
-            let badges = '';
-            for (const t of matchedTags) {
-                badges += `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`;
-            }
+            const badges = matchedTags.reduce((acc, t) => acc + `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`, '');
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
@@ -2134,7 +2140,7 @@ function getLocalizedText(text) {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -2148,14 +2154,14 @@ function getLocalizedText(text) {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -2168,12 +2174,12 @@ function getLocalizedText(text) {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -2577,6 +2583,13 @@ function bindEvents() {
         }
         (0,actions/* loadMenuDataFromAPI */.m9)();
     });
+
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) {
+        bellBtn.addEventListener('click', () => {
+            (0,actions/* refreshFlaggedItems */.A0)();
+        });
+    }
 
     btnLoginOpen.addEventListener('click', () => {
         loginModal.classList.remove('hidden');

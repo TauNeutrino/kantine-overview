@@ -1,3 +1,11 @@
+## v1.6.14 (2026-03-10)
+- 🐛 **Bugfix**: Die globale "Aktualisiert am"-Zeit im Header wird bei einer manuellen Prüfung der geflaggten Menüs nicht mehr zurückgesetzt.
+
+## v1.6.13 (2026-03-10)
+- ✨ **Feature**: Manueller Refresh der geflaggten Menüs durch Klick auf das Alarm-Icon im Header ([FR-093](REQUIREMENTS.md#FR-093)).
+- 🔄 **UI**: Visuelle Rückmeldung während der Prüfung durch Rotation des Icons.
+- 🔔 **Notification**: Toast-Benachrichtigung zeigt die Anzahl der geprüften Menüs an.
+
 ## v1.6.12 (2026-03-10)
 - 🔄 **Refactor**: Modularisierung von `kantine.js` in ES6-Module (`api.js`, `state.js`, `utils.js`, `ui.js`, etc.).
 - 📦 **Build**: Integration von Webpack in den Build-Prozess zur Unterstützung der modularen Struktur.

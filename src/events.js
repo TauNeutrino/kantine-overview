@@ -1,5 +1,5 @@
 import { displayMode, langMode, authToken, currentUser, orderMap, userFlags, pollIntervalId, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
-import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList } from './actions.js';
+import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu } from './ui_helpers.js';
 import { API_BASE, GUEST_TOKEN } from './constants.js';
 import { apiHeaders } from './api.js';
@@ -161,6 +161,13 @@ export function bindEvents() {
         }
         loadMenuDataFromAPI();
     });
+
+    const bellBtn = document.getElementById('alarm-bell');
+    if (bellBtn) {
+        bellBtn.addEventListener('click', () => {
+            refreshFlaggedItems();
+        });
+    }
 
     btnLoginOpen.addEventListener('click', () => {
         loginModal.classList.remove('hidden');
