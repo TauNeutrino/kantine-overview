@@ -241,87 +241,154 @@ export function renderHistory(orders) {
         });
     });
 
+    content.innerHTML = '';
     const sortedYears = Object.keys(groups).sort((a, b) => b - a);
-    let html = '';
 
     sortedYears.forEach(yKey => {
         const yearGroup = groups[yKey];
-        html += `<div class="history-year-group">
-            <h2 class="history-year-header">${yearGroup.year}</h2>`;
+        const yearGroupDiv = document.createElement('div');
+        yearGroupDiv.className = 'history-year-group';
+
+        const yearHeader = document.createElement('h2');
+        yearHeader.className = 'history-year-header';
+        yearHeader.textContent = yearGroup.year;
+        yearGroupDiv.appendChild(yearHeader);
 
         const sortedMonths = Object.keys(yearGroup.months).sort((a, b) => b.localeCompare(a));
 
         sortedMonths.forEach(mKey => {
             const monthGroup = yearGroup.months[mKey];
 
-            html += `<div class="history-month-group">
-                <div class="history-month-header" tabindex="0" role="button" aria-expanded="false" title="Klicken, um die Bestellungen für diesen Monat ein-/auszublenden">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <span>${monthGroup.name}</span>
-                        <div class="history-month-summary">
-                            <span>${monthGroup.count} Bestellungen &bull; <strong>€${monthGroup.total.toFixed(2)}</strong></span>
-                        </div>
-                    </div>
-                    <span class="material-icons-round">expand_more</span>
-                </div>
-                <div class="history-month-content">`;
+            const monthGroupDiv = document.createElement('div');
+            monthGroupDiv.className = 'history-month-group';
+
+            const monthHeader = document.createElement('div');
+            monthHeader.className = 'history-month-header';
+            monthHeader.setAttribute('tabindex', '0');
+            monthHeader.setAttribute('role', 'button');
+            monthHeader.setAttribute('aria-expanded', 'false');
+            monthHeader.setAttribute('title', 'Klicken, um die Bestellungen für diesen Monat ein-/auszublenden');
+
+            const monthHeaderContent = document.createElement('div');
+            monthHeaderContent.style.display = 'flex';
+            monthHeaderContent.style.flexDirection = 'column';
+            monthHeaderContent.style.gap = '4px';
+
+            const monthNameSpan = document.createElement('span');
+            monthNameSpan.textContent = monthGroup.name;
+            monthHeaderContent.appendChild(monthNameSpan);
+
+            const monthSummary = document.createElement('div');
+            monthSummary.className = 'history-month-summary';
+
+            const monthSummarySpan = document.createElement('span');
+            monthSummarySpan.innerHTML = `${monthGroup.count} Bestellungen &bull; <strong>€${monthGroup.total.toFixed(2)}</strong>`;
+            monthSummary.appendChild(monthSummarySpan);
+
+            monthHeaderContent.appendChild(monthSummary);
+            monthHeader.appendChild(monthHeaderContent);
+
+            const expandIcon = document.createElement('span');
+            expandIcon.className = 'material-icons-round';
+            expandIcon.textContent = 'expand_more';
+            monthHeader.appendChild(expandIcon);
+
+            monthHeader.addEventListener('click', () => {
+                const parentGroup = monthHeader.parentElement;
+                const isOpen = parentGroup.classList.contains('open');
+
+                if (isOpen) {
+                    parentGroup.classList.remove('open');
+                    monthHeader.setAttribute('aria-expanded', 'false');
+                } else {
+                    parentGroup.classList.add('open');
+                    monthHeader.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            monthGroupDiv.appendChild(monthHeader);
+
+            const monthContentDiv = document.createElement('div');
+            monthContentDiv.className = 'history-month-content';
 
             const sortedKWs = Object.keys(monthGroup.weeks).sort((a, b) => parseInt(b) - parseInt(a));
 
             sortedKWs.forEach(kw => {
                 const week = monthGroup.weeks[kw];
-                html += `<div class="history-week-group">
-                    <div class="history-week-header">
-                        <strong>${week.label}</strong>
-                        <span>${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong></span>
-                    </div>`;
+                const weekGroupDiv = document.createElement('div');
+                weekGroupDiv.className = 'history-week-group';
+
+                const weekHeader = document.createElement('div');
+                weekHeader.className = 'history-week-header';
+
+                const weekLabel = document.createElement('strong');
+                weekLabel.textContent = week.label;
+                weekHeader.appendChild(weekLabel);
+
+                const weekSummary = document.createElement('span');
+                weekSummary.innerHTML = `${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong>`;
+                weekHeader.appendChild(weekSummary);
+
+                weekGroupDiv.appendChild(weekHeader);
 
                 week.items.forEach(item => {
                     const dateObj = new Date(item.date);
                     const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
 
-                    let statusBadge = '';
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
                     if (item.state === 9) {
-                        statusBadge = '<span class="history-item-status">Storniert</span>';
-                    } else if (item.state === 8) {
-                        statusBadge = '<span class="history-item-status">Abgeschlossen</span>';
-                    } else {
-                        statusBadge = '<span class="history-item-status">Übertragen</span>';
+                        historyItem.classList.add('history-item-cancelled');
                     }
 
-                    html += `
-                    <div class="history-item ${item.state === 9 ? 'history-item-cancelled' : ''}">
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${dayStr}</div>
-                        <div class="history-item-details">
-                            <span class="history-item-name">${escapeHtml(item.name)}</span>
-                            <div>${statusBadge}</div>
-                        </div>
-                        <div class="history-item-price ${item.state === 9 ? 'history-item-price-cancelled' : ''}">€${item.price.toFixed(2)}</div>
-                    </div>`;
+                    const dateDiv = document.createElement('div');
+                    dateDiv.style.fontSize = '0.85rem';
+                    dateDiv.style.color = 'var(--text-secondary)';
+                    dateDiv.textContent = dayStr;
+                    historyItem.appendChild(dateDiv);
+
+                    const detailsDiv = document.createElement('div');
+                    detailsDiv.className = 'history-item-details';
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'history-item-name';
+                    nameSpan.textContent = item.name;
+                    detailsDiv.appendChild(nameSpan);
+
+                    const statusDiv = document.createElement('div');
+                    const statusSpan = document.createElement('span');
+                    statusSpan.className = 'history-item-status';
+                    if (item.state === 9) {
+                        statusSpan.textContent = 'Storniert';
+                    } else if (item.state === 8) {
+                        statusSpan.textContent = 'Abgeschlossen';
+                    } else {
+                        statusSpan.textContent = 'Übertragen';
+                    }
+                    statusDiv.appendChild(statusSpan);
+                    detailsDiv.appendChild(statusDiv);
+
+                    historyItem.appendChild(detailsDiv);
+
+                    const priceDiv = document.createElement('div');
+                    priceDiv.className = 'history-item-price';
+                    if (item.state === 9) {
+                        priceDiv.classList.add('history-item-price-cancelled');
+                    }
+                    priceDiv.textContent = `€${item.price.toFixed(2)}`;
+                    historyItem.appendChild(priceDiv);
+
+                    weekGroupDiv.appendChild(historyItem);
                 });
-                html += `</div>`;
+
+                monthContentDiv.appendChild(weekGroupDiv);
             });
-            html += `</div></div>`;
+
+            monthGroupDiv.appendChild(monthContentDiv);
+            yearGroupDiv.appendChild(monthGroupDiv);
         });
-        html += `</div>`;
-    });
 
-    content.innerHTML = html;
-
-    const monthHeaders = content.querySelectorAll('.history-month-header');
-    monthHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const parentGroup = header.parentElement;
-            const isOpen = parentGroup.classList.contains('open');
-
-            if (isOpen) {
-                parentGroup.classList.remove('open');
-                header.setAttribute('aria-expanded', 'false');
-            } else {
-                parentGroup.classList.add('open');
-                header.setAttribute('aria-expanded', 'true');
-            }
-        });
+        content.appendChild(yearGroupDiv);
     });
 }
 
