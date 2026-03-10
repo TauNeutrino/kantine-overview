@@ -5,7 +5,7 @@ const path = require('path');
 console.log("=== Running Logic Unit Tests ===");
 
 // 1. Load Source Code
-const jsPath = path.join(__dirname, 'kantine.js');
+const jsPath = path.join(__dirname, 'dist', 'kantine.bundle.js');
 const code = fs.readFileSync(jsPath, 'utf8');
 
 // Generic Mock Element
@@ -52,8 +52,8 @@ const sandbox = {
             return { ok: true, json: async () => [{ name: 'v9.9.9' }] };
         }
         // Mock Menu API
-        if (url.includes('/food-menu/menu/')) {
-            return { ok: true, json: async () => ({ dates: [], menu: {} }) };
+        if (url.includes('/venues/') && url.includes('/menu/')) {
+            return { ok: true, json: async () => ({ dates: [], menu: {}, results: [] }) };
         }
         // Mock Orders API
         if (url.includes('/user/orders')) {
@@ -102,8 +102,12 @@ const sandbox = {
 try {
     vm.createContext(sandbox);
     // Execute the code
-    const instrumentedCode = code.replace(/\n\}\)\(\);/, '  window.splitLanguage = splitLanguage;\n})();');
-    vm.runInContext(instrumentedCode, sandbox);
+    vm.runInContext(code, sandbox);
+    // Execute module to get function reference, since IIFE creates private scope
+    // For test_logic.js we need to evaluate the raw utils.js code to test splitLanguage directly
+    const utilsCode = require('fs').readFileSync(require('path').join(__dirname, 'src', 'utils.js'), 'utf8');
+    const cleanedUtilsCode = utilsCode.replace(/export /g, '').replace(/import .*? from .*?;/g, '');
+    vm.runInContext(cleanedUtilsCode, sandbox);
 
 
     // Regex Check: update icon appended to header
@@ -176,7 +180,7 @@ try {
     // but they are inside the IIFE. We can instead check if the parsed data has the same number of courses visually.
     // We can evaluate a function in the sandbox to do the splitting
     for (const tc of testCases) {
-        const result = sandbox.window.splitLanguage(tc.input);
+        const result = sandbox.splitLanguage(tc.input);
 
         const deGange = result.de.split('•').filter(x => x.trim()).length;
         const enGange = result.en.split('•').filter(x => x.trim()).length;
