@@ -358,7 +358,10 @@ export function createDayCard(day) {
 
         let tagsHtml = '';
         if (matchedTags.length > 0) {
-            const badges = matchedTags.map(t => `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${escapeHtml(t)}</span>`).join('');
+            let badges = '';
+            for (const t of matchedTags) {
+                badges += `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${escapeHtml(t)}</span>`;
+            }
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
