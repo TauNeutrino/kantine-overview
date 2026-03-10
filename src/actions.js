@@ -899,7 +899,7 @@ export async function loadMenuDataFromAPI() {
         import('./ui_helpers.js').then(uiHelpers => {
             uiHelpers.showErrorModal(
                 'Keine Verbindung',
-                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
+                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${escapeHtml(error.message)}</small>`,
                 'Zur Original-Seite',
                 'https://web.bessa.app/knapp-kantine'
             );
@@ -947,7 +947,7 @@ export function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
-    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
+    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${escapeHtml(message)}</span>`;
     container.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => {
