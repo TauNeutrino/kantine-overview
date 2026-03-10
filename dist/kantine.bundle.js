@@ -44,7 +44,6 @@ function updateAuthUI() {
             if (akita) {
                 const parsed = JSON.parse(akita);
                 if (parsed.auth && parsed.auth.token) {
-                    console.log('Found existing Bessa session!');
                     (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAuthToken */ .O5)(parsed.auth.token);
                     localStorage.setItem('kantine_authToken', parsed.auth.token);
 
@@ -105,7 +104,6 @@ async function fetchOrders() {
                 }
             }
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setOrderMap */ .di)(newOrderMap);
-            console.log(`Fetched ${results.length} orders, mapped active ones.`);
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateNextWeekBadge */ .gJ)();
         }
@@ -577,20 +575,17 @@ function startPolling() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8) return;
     if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
     (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setPollIntervalId */ .cc)(setInterval(() => pollFlaggedItems(), _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .POLL_INTERVAL_MS */ .fv));
-    console.log('Polling started (every 5 min)');
 }
 
 function stopPolling() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8) {
         clearInterval(_state_js__WEBPACK_IMPORTED_MODULE_0__/* .pollIntervalId */ .K8);
         (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setPollIntervalId */ .cc)(null);
-        console.log('Polling stopped');
     }
 }
 
 async function pollFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0 || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
-    console.log(`Polling ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} flagged items...`);
 
     for (const flagId of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY) {
         const [date, articleIdStr] = flagId.split('_');
@@ -698,12 +693,10 @@ function loadMenuCache() {
     try {
         const cached = localStorage.getItem(CACHE_KEY);
         const cachedTs = localStorage.getItem(CACHE_TS_KEY);
-        console.log(`[Cache] localStorage: key=${!!cached} (${cached ? cached.length : 0} chars), ts=${cachedTs}`);
         if (cached) {
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAllWeeks */ .tn)(JSON.parse(cached));
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentWeekNumber */ .Xt)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getISOWeek */ .sn)(new Date()));
             (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentYear */ .pK)(new Date().getFullYear());
-            console.log(`[Cache] Parsed ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.length} weeks:`, _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.map(w => `KW${w.weekNumber}/${w.year} (${(w.days || []).length} days)`));
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateNextWeekBadge */ .gJ)();
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
@@ -721,12 +714,8 @@ function loadMenuCache() {
                         });
                     });
                 });
-                const res = Array.from(uniqueMenus).join('\n\n');
-                console.log("=== GEFUNDENE MENÜ-TEXTE (" + uniqueMenus.size + ") ===");
-                console.log(res);
             } catch (e) { }
 
-            console.log('Loaded menu from cache');
             return true;
         }
     } catch (e) {
@@ -738,14 +727,11 @@ function loadMenuCache() {
 function isCacheFresh() {
     const cachedTs = localStorage.getItem(CACHE_TS_KEY);
     if (!cachedTs) {
-        console.log('[Cache] No timestamp found');
         return false;
     }
 
     const ageMs = Date.now() - new Date(cachedTs).getTime();
-    const ageMin = Math.round(ageMs / 60000);
     if (ageMs > 60 * 60 * 1000) {
-        console.log(`[Cache] Stale: ${ageMin}min old (max 60)`);
         return false;
     }
 
@@ -753,7 +739,6 @@ function isCacheFresh() {
     const thisYear = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getWeekYear */ .Ao)(new Date());
     const hasCurrentWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.some(w => w.weekNumber === thisWeek && w.year === thisYear && w.days && w.days.length > 0);
 
-    console.log(`[Cache] Age: ${ageMin}min, looking for KW${thisWeek}/${thisYear}, found: ${hasCurrentWeek}`);
     return hasCurrentWeek;
 }
 
@@ -812,9 +797,6 @@ async function loadMenuDataFromAPI() {
 
                 if (detailResp.ok) {
                     const detailData = await detailResp.json();
-                    if (completed === 0) {
-                        console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
-                    }
                     const menuGroups = detailData.results || [];
                     let dayItems = [];
                     for (const group of menuGroups) {
@@ -823,10 +805,6 @@ async function loadMenuDataFromAPI() {
                         }
                     }
                     if (dayItems.length > 0) {
-                        if (completed === 0) {
-                            console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
-                            console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
-                        }
                         allDays.push({
                             date: dateStr,
                             menu_items: dayItems,
@@ -930,7 +908,7 @@ async function loadMenuDataFromAPI() {
         Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 842)).then(uiHelpers => {
             uiHelpers.showErrorModal(
                 'Keine Verbindung',
-                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${error.message}</small>`,
+                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(error.message)}</small>`,
                 'Zur Original-Seite',
                 'https://web.bessa.app/knapp-kantine'
             );
@@ -978,7 +956,7 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
-    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${message}</span>`;
+    toast.innerHTML = `<span class="material-icons-round">${icon}</span><span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(message)}</span>`;
     container.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('show'));
     setTimeout(() => {
@@ -1193,7 +1171,7 @@ function updateNextWeekBadge() {
         }
 
         if (highlightCount > 0) {
-            badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
+            badge.insertAdjacentHTML('beforeend', `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`);
             badge.title += ` • ${highlightCount} Highlights gefunden`;
             badge.classList.add('has-highlights');
         }
@@ -1478,7 +1456,10 @@ function createDayCard(day) {
 
         let tagsHtml = '';
         if (matchedTags.length > 0) {
-            const badges = matchedTags.map(t => `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`).join('');
+            let badges = '';
+            for (const t of matchedTags) {
+                badges += `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`;
+            }
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
@@ -1574,11 +1555,8 @@ async function checkForUpdates() {
         }));
 
         const latest = versions[0].tag;
-        console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Latest [${latest}] (${devMode ? 'dev' : 'stable'})`);
 
         if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) return;
-
-        console.log(`[Kantine] Update verfügbar: ${latest}`);
 
         const headerTitle = document.querySelector('.header-left h1');
         if (headerTitle && !headerTitle.querySelector('.update-icon')) {
@@ -1636,12 +1614,12 @@ function openVersionMenu() {
 
                 let action = '';
                 if (!isCurrent) {
-                    action = `<a href="${v.url}" target="_blank" class="install-link" title="${v.tag} installieren">Installieren</a>`;
+                    action = `<a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.url)}" target="_blank" class="install-link" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren">Installieren</a>`;
                 }
 
                 li.innerHTML = `
                     <div class="version-info">
-                        <strong>${v.tag}</strong>
+                        <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
                         ${badge}
                     </div>
                     ${action}
@@ -1674,7 +1652,7 @@ function openVersionMenu() {
             }
 
         } catch (e) {
-            container.innerHTML = `<p style="color:#e94560;">Fehler: ${e.message}</p>`;
+            container.innerHTML = `<p style="color:#e94560;">Fehler: ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(e.message)}</p>`;
         }
     }
 
@@ -1781,7 +1759,7 @@ function showErrorModal(title, htmlContent, btnText, url) {
             <div class="modal-header">
                 <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
                     <span class="material-icons-round">signal_wifi_off</span>
-                    ${title}
+                    ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(title)}
                 </h2>
             </div>
             <div style="padding: 20px;">
@@ -1802,7 +1780,7 @@ function showErrorModal(title, htmlContent, btnText, url) {
                         justify-content: center;
                         transition: transform 0.1s;
                     ">
-                        ${btnText}
+                        ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(btnText)}
                         <span class="material-icons-round">open_in_new</span>
                     </button>
                 </div>
@@ -2678,9 +2656,7 @@ function bindEvents() {
 
 
 
-if (window.__KANTINE_LOADED) {
-    console.log("Kantine Wrapper already loaded.");
-} else {
+if (!window.__KANTINE_LOADED) {
     window.__KANTINE_LOADED = true;
 
     injectUI();
@@ -2692,10 +2668,7 @@ if (window.__KANTINE_LOADED) {
     if (hadCache) {
         document.getElementById('loading').classList.add('hidden');
         if (!(0,actions/* isCacheFresh */.VL)()) {
-            console.log('Cache stale or incomplete – refreshing from API');
             (0,actions/* loadMenuDataFromAPI */.m9)();
-        } else {
-            console.log('Cache fresh & complete – skipping API refresh');
         }
     } else {
         (0,actions/* loadMenuDataFromAPI */.m9)();
@@ -2707,8 +2680,6 @@ if (window.__KANTINE_LOADED) {
 
     (0,ui_helpers/* checkForUpdates */.Ux)();
     setInterval(ui_helpers/* checkForUpdates */.Ux, 60 * 60 * 1000);
-
-    console.log('Kantine Wrapper loaded ✅');
 }
 
 /******/ })()
