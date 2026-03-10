@@ -13,7 +13,6 @@ export function updateAuthUI() {
             if (akita) {
                 const parsed = JSON.parse(akita);
                 if (parsed.auth && parsed.auth.token) {
-                    console.log('Found existing Bessa session!');
                     setAuthToken(parsed.auth.token);
                     localStorage.setItem('kantine_authToken', parsed.auth.token);
 
@@ -74,7 +73,6 @@ export async function fetchOrders() {
                 }
             }
             setOrderMap(newOrderMap);
-            console.log(`Fetched ${results.length} orders, mapped active ones.`);
             renderVisibleWeeks();
             updateNextWeekBadge();
         }
@@ -546,20 +544,17 @@ export function startPolling() {
     if (pollIntervalId) return;
     if (!authToken) return;
     setPollIntervalId(setInterval(() => pollFlaggedItems(), POLL_INTERVAL_MS));
-    console.log('Polling started (every 5 min)');
 }
 
 export function stopPolling() {
     if (pollIntervalId) {
         clearInterval(pollIntervalId);
         setPollIntervalId(null);
-        console.log('Polling stopped');
     }
 }
 
 export async function pollFlaggedItems() {
     if (userFlags.size === 0 || !authToken) return;
-    console.log(`Polling ${userFlags.size} flagged items...`);
 
     for (const flagId of userFlags) {
         const [date, articleIdStr] = flagId.split('_');
@@ -667,12 +662,10 @@ export function loadMenuCache() {
     try {
         const cached = localStorage.getItem(CACHE_KEY);
         const cachedTs = localStorage.getItem(CACHE_TS_KEY);
-        console.log(`[Cache] localStorage: key=${!!cached} (${cached ? cached.length : 0} chars), ts=${cachedTs}`);
         if (cached) {
             setAllWeeks(JSON.parse(cached));
             setCurrentWeekNumber(getISOWeek(new Date()));
             setCurrentYear(new Date().getFullYear());
-            console.log(`[Cache] Parsed ${allWeeks.length} weeks:`, allWeeks.map(w => `KW${w.weekNumber}/${w.year} (${(w.days || []).length} days)`));
             renderVisibleWeeks();
             updateNextWeekBadge();
             updateAlarmBell();
@@ -690,12 +683,8 @@ export function loadMenuCache() {
                         });
                     });
                 });
-                const res = Array.from(uniqueMenus).join('\n\n');
-                console.log("=== GEFUNDENE MENÜ-TEXTE (" + uniqueMenus.size + ") ===");
-                console.log(res);
             } catch (e) { }
 
-            console.log('Loaded menu from cache');
             return true;
         }
     } catch (e) {
@@ -707,14 +696,11 @@ export function loadMenuCache() {
 export function isCacheFresh() {
     const cachedTs = localStorage.getItem(CACHE_TS_KEY);
     if (!cachedTs) {
-        console.log('[Cache] No timestamp found');
         return false;
     }
 
     const ageMs = Date.now() - new Date(cachedTs).getTime();
-    const ageMin = Math.round(ageMs / 60000);
     if (ageMs > 60 * 60 * 1000) {
-        console.log(`[Cache] Stale: ${ageMin}min old (max 60)`);
         return false;
     }
 
@@ -722,7 +708,6 @@ export function isCacheFresh() {
     const thisYear = getWeekYear(new Date());
     const hasCurrentWeek = allWeeks.some(w => w.weekNumber === thisWeek && w.year === thisYear && w.days && w.days.length > 0);
 
-    console.log(`[Cache] Age: ${ageMin}min, looking for KW${thisWeek}/${thisYear}, found: ${hasCurrentWeek}`);
     return hasCurrentWeek;
 }
 
@@ -781,9 +766,6 @@ export async function loadMenuDataFromAPI() {
 
                 if (detailResp.ok) {
                     const detailData = await detailResp.json();
-                    if (completed === 0) {
-                        console.log('[Kantine Debug] Raw API response for', dateStr, ':', JSON.stringify(detailData).substring(0, 2000));
-                    }
                     const menuGroups = detailData.results || [];
                     let dayItems = [];
                     for (const group of menuGroups) {
@@ -792,10 +774,6 @@ export async function loadMenuDataFromAPI() {
                         }
                     }
                     if (dayItems.length > 0) {
-                        if (completed === 0) {
-                            console.log('[Kantine Debug] First item keys:', Object.keys(dayItems[0]));
-                            console.log('[Kantine Debug] First item:', JSON.stringify(dayItems[0]).substring(0, 500));
-                        }
                         allDays.push({
                             date: dateStr,
                             menu_items: dayItems,

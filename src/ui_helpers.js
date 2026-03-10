@@ -454,11 +454,8 @@ export async function checkForUpdates() {
         }));
 
         const latest = versions[0].tag;
-        console.log(`[Kantine] Version Check: Local [${currentVersion}] vs Latest [${latest}] (${devMode ? 'dev' : 'stable'})`);
 
         if (!isNewer(latest, currentVersion)) return;
-
-        console.log(`[Kantine] Update verfügbar: ${latest}`);
 
         const headerTitle = document.querySelector('.header-left h1');
         if (headerTitle && !headerTitle.querySelector('.update-icon')) {
