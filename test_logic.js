@@ -102,7 +102,7 @@ const sandbox = {
 try {
     vm.createContext(sandbox);
     // Execute the code
-    const instrumentedCode = code.replace(/\n\}\)\(\);/, '  window.splitLanguage = splitLanguage;\n})();');
+    const instrumentedCode = code.replace(/\n\}\)\(\);/, '  window.splitLanguage = splitLanguage;\n  window.getLocalizedText = getLocalizedText;\n  window.setLangMode = (val) => langMode = val;\n})();');
     vm.runInContext(instrumentedCode, sandbox);
 
 
@@ -191,6 +191,49 @@ try {
         }
     }
     console.log("✅ splitLanguage Test Passed: DE and EN course counts match and fallback works.");
+
+    // --- getLocalizedText Test ---
+    console.log("--- Testing getLocalizedText Logic ---");
+    const localizationTestCases = [
+        {
+            input: "Schweinsbraten (M) / Roast pork (M)",
+            modes: {
+                'all': "Schweinsbraten (M) / Roast pork (M)",
+                'de': "• Schweinsbraten (M)",
+                'en': "• Roast pork (M)"
+            }
+        },
+        {
+            input: "Nur Deutsch (A)",
+            modes: {
+                'all': "Nur Deutsch (A)",
+                'de': "• Nur Deutsch (A)",
+                'en': "• Nur Deutsch (A)" // Fallback to raw if EN not found by split
+            }
+        },
+        {
+            input: "",
+            modes: {
+                'all': "",
+                'de': "",
+                'en': ""
+            }
+        }
+    ];
+
+    for (const tc of localizationTestCases) {
+        for (const [mode, expected] of Object.entries(tc.modes)) {
+            sandbox.window.setLangMode(mode);
+            const result = sandbox.window.getLocalizedText(tc.input);
+            if (result.trim() !== expected.trim()) {
+                console.error(`❌ getLocalizedText Test Failed for "${tc.input}" in mode "${mode}"`);
+                console.error(`   Expected: "${expected}"`);
+                console.error(`   Got:      "${result}"`);
+                process.exit(1);
+            }
+        }
+    }
+    console.log("✅ getLocalizedText Test Passed: All language modes return expected results.");
 
     console.log("✅ Syntax Check Passed: Code executed in sandbox.");
 
