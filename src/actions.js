@@ -752,41 +752,51 @@ export async function loadMenuDataFromAPI() {
         const allDays = [];
         let completed = 0;
 
-        for (const dateObj of availableDates) {
-            const dateStr = dateObj.date;
-            const pct = Math.round(((completed + 1) / totalDates) * 100);
-            progressFill.style.width = `${pct}%`;
-            progressPercent.textContent = `${pct}%`;
-            progressMessage.textContent = `Lade Menü für ${dateStr}...`;
+        const BATCH_SIZE = 5;
+        for (let i = 0; i < totalDates; i += BATCH_SIZE) {
+            const batch = availableDates.slice(i, i + BATCH_SIZE);
+            const results = await Promise.all(batch.map(async (dateObj) => {
+                const dateStr = dateObj.date;
+                let dayData = null;
+                try {
+                    const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+                        headers: apiHeaders(token)
+                    });
 
-            try {
-                const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
-                    headers: apiHeaders(token)
-                });
-
-                if (detailResp.ok) {
-                    const detailData = await detailResp.json();
-                    const menuGroups = detailData.results || [];
-                    let dayItems = [];
-                    for (const group of menuGroups) {
-                        if (group.items && Array.isArray(group.items)) {
-                            dayItems = dayItems.concat(group.items);
+                    if (detailResp.ok) {
+                        const detailData = await detailResp.json();
+                        const menuGroups = detailData.results || [];
+                        let dayItems = [];
+                        for (const group of menuGroups) {
+                            if (group.items && Array.isArray(group.items)) {
+                                dayItems = dayItems.concat(group.items);
+                            }
+                        }
+                        if (dayItems.length > 0) {
+                            dayData = {
+                                date: dateStr,
+                                menu_items: dayItems,
+                                orders: dateObj.orders || []
+                            };
                         }
                     }
-                    if (dayItems.length > 0) {
-                        allDays.push({
-                            date: dateStr,
-                            menu_items: dayItems,
-                            orders: dateObj.orders || []
-                        });
-                    }
+                } catch (err) {
+                    console.error(`Failed to fetch details for ${dateStr}:`, err);
+                } finally {
+                    completed++;
+                    const pct = Math.round((completed / totalDates) * 100);
+                    progressFill.style.width = `${pct}%`;
+                    progressPercent.textContent = `${pct}%`;
+                    progressMessage.textContent = `Lade Menü für ${dateStr}...`;
                 }
-            } catch (err) {
-                console.error(`Failed to fetch details for ${dateStr}:`, err);
-            }
+                return dayData;
+            }));
 
-            completed++;
-            await new Promise(r => setTimeout(r, 100));
+            for (const result of results) {
+                if (result) {
+                    allDays.push(result);
+                }
+            }
         }
 
         const weeksMap = new Map();
