@@ -242,7 +242,7 @@ export function createDayCard(day) {
     header.className = 'card-header';
     const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
 
-    const badgesHtml = menuBadges.map(code => `<span class="menu-code-badge">${code}</span>`).join('');
+    const badgesHtml = menuBadges.reduce((acc, code) => acc + `<span class="menu-code-badge">${code}</span>`, '');
 
     let headerClass = '';
     const hasAnyOrder = day.items && day.items.some(item => {
@@ -358,10 +358,7 @@ export function createDayCard(day) {
 
         let tagsHtml = '';
         if (matchedTags.length > 0) {
-            let badges = '';
-            for (const t of matchedTags) {
-                badges += `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${escapeHtml(t)}</span>`;
-            }
+            const badges = matchedTags.reduce((acc, t) => acc + `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${escapeHtml(t)}</span>`, '');
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
