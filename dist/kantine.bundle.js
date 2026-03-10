@@ -514,6 +514,7 @@ async function refreshFlaggedItems() {
     if (updated) {
         saveMenuCache();
         updateLastUpdatedTime(new Date().toISOString());
+        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
         (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
         (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
     }
@@ -626,7 +627,7 @@ async function pollFlaggedItems() {
             await new Promise(r => setTimeout(r, 200));
         }
     }
-    localStorage.setItem('kantine_last_checked', new Date().toISOString());
+    localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
     (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
 }
 
@@ -1840,15 +1841,21 @@ function updateAlarmBell() {
         if (anyAvailable) break;
     }
 
-    let lastUpdatedStr = localStorage.getItem('kantine_last_checked');
+    const lastCheckedStr = localStorage.getItem('kantine_last_checked');
+    const flaggedLastCheckedStr = localStorage.getItem('kantine_flagged_items_last_checked');
+
+    let latestTime = 0;
+    if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
+    if (flaggedLastCheckedStr) latestTime = Math.max(latestTime, new Date(flaggedLastCheckedStr).getTime());
+
     let timeStr = 'gerade eben';
-    if (!lastUpdatedStr) {
-        lastUpdatedStr = new Date().toISOString();
-        localStorage.setItem('kantine_last_checked', lastUpdatedStr);
+    if (latestTime === 0) {
+        const now = new Date().toISOString();
+        localStorage.setItem('kantine_last_checked', now);
+        latestTime = new Date(now).getTime();
     }
 
-    const lastUpdated = new Date(lastUpdatedStr);
-    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(lastUpdated);
+    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(new Date(latestTime));
 
     bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 

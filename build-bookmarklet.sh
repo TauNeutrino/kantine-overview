@@ -21,6 +21,12 @@ mkdir -p "$DIST_DIR"
 
 echo "=== Kantine Bookmarklet Builder ($VERSION) ==="
 
+# Ensure npm dependencies are installed and run Webpack to build the bundle
+echo "Running npm install to ensure dependencies..."
+npm install --silent
+echo "Running webpack..."
+npx webpack
+
 # Check files exist
 if [ ! -f "$CSS_FILE" ]; then echo "ERROR: $CSS_FILE not found"; exit 1; fi
 if [ ! -f "$JS_FILE" ]; then echo "ERROR: $JS_FILE not found"; exit 1; fi
