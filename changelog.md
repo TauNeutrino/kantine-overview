@@ -1,3 +1,16 @@
+## v1.6.12 (2026-03-10)
+- 🔄 **Refactor**: Modularisierung von `kantine.js` in ES6-Module (`api.js`, `state.js`, `utils.js`, `ui.js`, etc.).
+- 📦 **Build**: Integration von Webpack in den Build-Prozess zur Unterstützung der modularen Struktur.
+- 🛡️ **Security**: XSS-Schutz durch Escaping dynamischer Inhalte in `innerHTML`.
+- ⚡ **Performance**:
+    - Optimierte Tag-Badge-Generierung und UI-Render-Loops (Verwendung von `reduce`).
+    - Nutzung von `insertAdjacentHTML` statt `innerHTML` für effizienteres Rendering.
+    - Batch-Fetching von `availableDates` zur Reduzierung der API-Calls.
+    - Performance-Fixes in `ui_helpers.js`.
+- 🧪 **Testing**: Unit-Tests für GitHub API-Header Generierung hinzugefügt.
+- 🧹 **Cleanup**: Entfernung verwaister `console.log` Statements.
+- 🐛 **Bugfix**: Korrektur des Tooltips beim Alarm-Icon (Polling-Zeit vs. globale Aktualisierungszeit).
+
 ## v1.6.11 (2026-03-09)
 - 🔄 **Refactor**: Trennung der Zeitstempel für die Hauptaktualisierung (Header) und die Benachrichtigungsprüfung (Bell-Icon). Das Polling aktualisiert nun nicht mehr fälschlicherweise die "Aktualisiert am"-Zeit im Header.
 - 🏷️ **Metadata**: Version auf v1.6.11 angehoben.
