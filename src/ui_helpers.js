@@ -73,7 +73,7 @@ export function updateNextWeekBadge() {
         }
 
         if (highlightCount > 0) {
-            badge.innerHTML += `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`;
+            badge.insertAdjacentHTML('beforeend', `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`);
             badge.title += ` • ${highlightCount} Highlights gefunden`;
             badge.classList.add('has-highlights');
         }
