@@ -483,6 +483,7 @@ export async function refreshFlaggedItems() {
     if (updated) {
         saveMenuCache();
         updateLastUpdatedTime(new Date().toISOString());
+        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
         updateAlarmBell();
         renderVisibleWeeks();
     }
@@ -595,7 +596,7 @@ export async function pollFlaggedItems() {
             await new Promise(r => setTimeout(r, 200));
         }
     }
-    localStorage.setItem('kantine_last_checked', new Date().toISOString());
+    localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
     updateAlarmBell();
 }
 

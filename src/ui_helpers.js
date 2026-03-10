@@ -732,15 +732,21 @@ export function updateAlarmBell() {
         if (anyAvailable) break;
     }
 
-    let lastUpdatedStr = localStorage.getItem('kantine_last_checked');
+    const lastCheckedStr = localStorage.getItem('kantine_last_checked');
+    const flaggedLastCheckedStr = localStorage.getItem('kantine_flagged_items_last_checked');
+
+    let latestTime = 0;
+    if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
+    if (flaggedLastCheckedStr) latestTime = Math.max(latestTime, new Date(flaggedLastCheckedStr).getTime());
+
     let timeStr = 'gerade eben';
-    if (!lastUpdatedStr) {
-        lastUpdatedStr = new Date().toISOString();
-        localStorage.setItem('kantine_last_checked', lastUpdatedStr);
+    if (latestTime === 0) {
+        const now = new Date().toISOString();
+        localStorage.setItem('kantine_last_checked', now);
+        latestTime = new Date(now).getTime();
     }
 
-    const lastUpdated = new Date(lastUpdatedStr);
-    timeStr = getRelativeTime(lastUpdated);
+    timeStr = getRelativeTime(new Date(latestTime));
 
     bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
 
