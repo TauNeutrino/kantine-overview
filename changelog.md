@@ -1,4 +1,6 @@
-## v1.6.18 (2026-03-11)
+## v1.6.19 (2026-03-11)
+- 🎨 **UX**: Grid-Layout & Glow Overlap Fix – Die Karten-Inhalte wurden auf ein sauberes Grid-Gap-Modell umgestellt (`row-gap: 1.5rem`). Dies verhindert technische Überlappungen von Menü-Items und stellt sicher, dass Glow-Effekte (Bestellt, Highlight) alle Inhalte korrekt umschließen. Manuelle Abstände wurden bereinigt.
+
 - 🎨 **UX**: Glow-Styling angepasst – Die farblichen Hervorhebungen (Bestellt, Highlight, Flagged) wurden so korrigiert, dass sie nicht mehr bis an den Kartenrand reichen, sondern innerhalb des Karten-Bodys mit entsprechendem Seitenabstand angezeigt werden.
 
 - 🎨 **UX**: Fix Card Content Overflow – In der 5-Tage-Ansicht (Landscape) auf schmalen Bildschirmen umbrechen die Status-Badges und Buttons jetzt korrekt in eine neue Zeile, statt über den Kartenrand hinauszuragen. Das Karten-Padding wurde für Desktop-Ansichten optimiert.

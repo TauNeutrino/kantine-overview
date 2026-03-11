@@ -829,7 +829,7 @@ body {
 
 .days-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 0.5rem;
     flex: 1;
     overflow-y: auto;
@@ -883,7 +883,9 @@ body {
     box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 0 1.5rem 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -930,7 +932,8 @@ body {
 .card-body {
     padding: 1.25rem;
     display: grid;
-    grid-template-rows: auto;
+    grid-template-columns: 1fr;
+    row-gap: 1.5rem;
     align-content: start;
 }
 
@@ -954,9 +957,9 @@ body {
 
 /* Menu Items */
 .menu-item {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    /* Spacing now handled by .card-body grid gap */
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-item:last-child {
@@ -1287,6 +1290,7 @@ body {
     .card-body {
         padding: 1rem 0.75rem;
     }
+
     .item-header {
         gap: 0.5rem;
     }
@@ -1333,7 +1337,9 @@ body {
     box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 0 1.5rem 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -1360,7 +1366,9 @@ body {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 0 1.5rem 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -1531,7 +1539,9 @@ body {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 0 1.5rem 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--bg-card);
     position: relative;
     z-index: 5;

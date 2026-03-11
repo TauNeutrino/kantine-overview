@@ -1136,7 +1136,7 @@ const API_BASE = 'https://api.bessa.app/v1';
 const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
 
 /** The client version injected into every API request header. */
-const CLIENT_VERSION = 'v1.6.18';
+const CLIENT_VERSION = 'v1.6.19';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
