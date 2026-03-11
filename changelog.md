@@ -1,4 +1,6 @@
-## v1.6.16 (2026-03-11)
+## v1.6.17 (2026-03-11)
+- 🎨 **UX**: Fix Card Content Overflow – In der 5-Tage-Ansicht (Landscape) auf schmalen Bildschirmen umbrechen die Status-Badges und Buttons jetzt korrekt in eine neue Zeile, statt über den Kartenrand hinauszuragen. Das Karten-Padding wurde für Desktop-Ansichten optimiert.
+
 - 🧹 **Wartbarkeit**: Alle verbliebenen hardcodierten deutschen UI-Strings in `actions.js` via `t()` übersetzt (Progress-Texte, Fehler-Labels, 'Angemeldet', 'Hintergrund-Synchronisation').
 - 🔑 **Wartbarkeit**: Alle `localStorage`-Schlüssel in einheitliches `LS`-Objekt in `constants.js` zentralisiert. Alle Quelldateien verwenden jetzt `LS.*` statt Rohstrings.
 - 🛡️ **Robustheit**: `setLangMode()` und `setDisplayMode()` in `state.js` prüfen jetzt Eingabewerte – ungültige Werte werden verworfen und protokolliert.
