@@ -883,7 +883,7 @@ body {
     box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 -1rem 1.5rem -1rem;
+    margin: 0 0 1.5rem 0;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -1333,7 +1333,7 @@ body {
     box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 -1rem 1.5rem -1rem;
+    margin: 0 0 1.5rem 0;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -1360,7 +1360,7 @@ body {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 -1rem 1.5rem -1rem;
+    margin: 0 0 1.5rem 0;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
@@ -1531,7 +1531,7 @@ body {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
     border-radius: 8px;
     padding: 1rem;
-    margin: 0 -1rem 1.5rem -1rem;
+    margin: 0 0 1.5rem 0;
     background: var(--bg-card);
     position: relative;
     z-index: 5;
