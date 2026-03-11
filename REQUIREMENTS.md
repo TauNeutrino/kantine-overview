@@ -45,7 +45,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-050 | Das System muss vor Bestellschluss einen visuell hervorgehobenen Countdown anzeigen. | Mittel | v1.1.0 |
 | **Menü-Flagging & Benachrichtigungen** | | | |
 | FR-060 | Authentifizierte Benutzer müssen ausverkaufte Menüs zur Beobachtung markieren können ("flaggen"). | Mittel | v1.0.1 |
-| FR-061 | Das System muss geflaggte Menüs periodisch auf Verfügbarkeitsänderungen prüfen. | Mittel | v1.0.1 |
+| FR-061 | Das System muss geflaggte Menüs periodisch auf Verfügbarkeitsänderungen prüfen. Dabei dürfen ausschließlich die geflaggten Artikel aktualisiert werden – nicht sämtliche Menüs des betroffenen Tages. | Mittel | v1.0.1 (Update v1.7.0) |
 | FR-062 | Bei Statusänderung eines geflaggten Menüs auf „verfügbar" muss der Benutzer benachrichtigt werden (In-App + Systembenachrichtigung). | Mittel | v1.0.1 |
 | FR-063 | Geflaggte Menüs müssen im UI visuell hervorgehoben werden (gelber Glow bei ausverkauft, grüner Glow bei verfügbar). | Mittel | v1.0.1 |
 | FR-064 | Wenn die Bestell-Cutoff-Zeit erreicht ist, muss das System ein Flag automatisch entfernen. | Mittel | v1.0.1 |
@@ -60,16 +60,17 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Header UI & Navigation** | | | |
 | FR-090 | Die Hauptnavigation (Wochen-Toggles) muss linksbündig neben dem App-Titel positioniert sein. | Niedrig | v1.5.0 |
 | FR-091 | Ein dynamisches Alarm-Icon im Header muss den Überwachungsstatus geflaggter Menüs anzeigen (Gelb=Überwachung aktiv aber kein Menü verfügbar, Grün=Mindestens ein Menü verfügbar, Versteckt=keine Flags). Der Tooltip muss den Zeitpunkt der letzten Prüfung als relativen String (z.B. "vor 4 Min.") enthalten. | Mittel | v1.6.11 (Update v1.5.0) |
-| FR-092 | Solange Menüdaten für die Nächste Woche verfügbar sind, aber noch keine Bestellungen getätigt wurden, muss der entsprechende Navigation-Button animiert und farblich (Gelb) hervorgehoben werden. Nach der ersten Bestellung muss die Hervorhebung automatisch erlöschen. Zusätzlich muss beim erstmaligen Erscheinen der Daten ein einmaliger Toast-Hinweis angezeigt werden. | Mittel | v1.6.0 (Update v1.4.21) |
+| FR-092 | Solange bestellbare Menüs für nächste Woche vorhanden sind, aber noch keine Bestellungen getätigt wurden (Prüfung Montag–Donnerstag; Freitag ist ausgenommen), muss der entsprechende Navigation-Button animiert und farblich hervorgehoben werden. Nach der ersten Bestellung muss die Hervorhebung erlöschen. Zusätzlich muss beim erstmaligen Erscheinen der Daten ein einmaliger Toast-Hinweis angezeigt werden. | Mittel | v1.6.0 (Update v1.7.0) |
 | FR-093 | Das System muss dem Benutzer ermöglichen, durch Klicken auf das Alarm-Icon im Header eine manuelle Prüfung der geflaggten Menüs auszulösen. Während der Prüfung muss das Icon visuell animiert sein (Rotation). Nach Abschluss der Prüfung muss eine Toast-Nachricht mit der Anzahl der geprüften Menüs angezeigt werden. | Mittel | v1.6.13 |
 | **Sprachfilter** | | | |
 | FR-120 | Das System muss zweisprachige Menübeschreibungen (Deutsch/Englisch) erkennen und dem Benutzer erlauben, via UI-Toggle zwischen DE, EN und ALL (beide Sprachen) zu wechseln. Die Sprachpräferenz muss persistent gespeichert werden. Allergen-Codes müssen in allen Modi angezeigt werden. | Mittel | v1.6.0 |
 | FR-121 | Das System muss bei fehlenden Übersetzungen in zweisprachigen Menüs robust reagieren. Wenn ein Gang nur in einer Sprache vorliegt, muss dieser Teil für beide Sprachansichten herangezogen werden, um die Konsistenz der Ganganzahl zu gewährleisten. | Mittel | v1.6.10 |
+| FR-122 | Bei Auswahl von EN muss die gesamte Benutzeroberfläche (Buttons, Tooltips, Modale, Status-Badges) auf Englisch umgestellt werden. Bei DE oder ALL verbleibt die GUI auf Deutsch. | Mittel | v1.7.0 |
 | **Benutzer-Feedback** | | | |
 | FR-095 | Alle benutzerrelevanten Aktionen (Bestellung, Stornierung, Fehler) müssen durch nicht-blockierende Benachrichtigungen (Toasts) bestätigt werden. | Mittel | v1.0.1 |
 | FR-096 | Bei einem Verbindungsfehler muss ein Fehlerdialog mit Fallback-Link zur Originalseite angezeigt werden. | Mittel | v1.0.1 |
 | **Nächste-Woche-Badge** | | | |
-| FR-100 | Die Navigation zur nächsten Woche muss ein Badge anzeigen, das den Überblick über den Bestellstatus der kommenden Woche visualisiert (bestellt / bestellbar / gesamt). | Niedrig | v1.0.1 |
+| FR-100 | Die Navigation zur nächsten Woche muss einen Tooltip anzeigen, der den Überblick über den Bestellstatus der kommenden Woche visualisiert (bestellt / bestellbar / gesamt). Die Zahlen-Badges sind ausgeblendet. | Niedrig | v1.0.1 (Update v1.7.0) |
 | **Update-Management** | | | |
 | FR-110 | Das System muss periodisch prüfen, ob eine neuere Version verfügbar ist. | Niedrig | v1.0.3 |
 | FR-111 | Bei Verfügbarkeit einer neueren Version muss ein diskreter Indikator im Header angezeigt werden. | Niedrig | v1.0.3 |
@@ -90,7 +91,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Sicherheit** | NFR-004 | Auth-Tokens müssen sitzungsbasiert gespeichert werden und bei Schließen des Browsers verfallen. | sessionStorage |
 | **Benutzbarkeit** | NFR-005 | Die Oberfläche muss auf mobilen Geräten fehlerfrei nutzbar sein. | Viewports ab 320px Breite |
 | **Benutzbarkeit** | NFR-006 | Alle interaktiven Elemente müssen Tooltips oder Hilfetexte bieten. | 100% Coverage |
-| **Benutzbarkeit** | NFR-007 | Die Benutzeroberfläche muss vollständig in deutscher Sprache sein. | Vollständige Lokalisierung |
+| **Benutzbarkeit** | NFR-007 | Die Benutzeroberfläche muss standardmäßig in Deutsch sein. Bei aktivem EN-Modus muss die gesamte GUI auf Englisch umgestellt werden. | Vollständige Lokalisierung (DE default / EN on demand) |
 | **Wartbarkeit** | NFR-008 | Die Build-Artefakte müssen durch automatisierte Tests validiert werden. | Build-Tests + Logik-Tests + DOM-Tests |
 
 ## 4. Technische Randbedingungen

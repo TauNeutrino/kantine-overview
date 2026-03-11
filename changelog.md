@@ -1,3 +1,17 @@
+## v1.6.16 (2026-03-11)
+- 🧹 **Wartbarkeit**: Alle verbliebenen hardcodierten deutschen UI-Strings in `actions.js` via `t()` übersetzt (Progress-Texte, Fehler-Labels, 'Angemeldet', 'Hintergrund-Synchronisation').
+- 🔑 **Wartbarkeit**: Alle `localStorage`-Schlüssel in einheitliches `LS`-Objekt in `constants.js` zentralisiert. Alle Quelldateien verwenden jetzt `LS.*` statt Rohstrings.
+- 🛡️ **Robustheit**: `setLangMode()` und `setDisplayMode()` in `state.js` prüfen jetzt Eingabewerte – ungültige Werte werden verworfen und protokolliert.
+- 📝 **Kodierung**: JSDoc für `ui.js` und `injectUI()` ergänzt.
+
+- 🐛 **Bugfix**: Geprüfte Menüs (`refreshFlaggedItems`) aktualisieren jetzt nur noch die tatsächlich geflaggten Artikel – nicht mehr alle Menüs des betroffenen Tages ([Bug 1]).
+- 🐛 **Bugfix**: Beim Öffnen des Highlights-Modals werden bestehende Tags sofort angezeigt, auch ohne vorherige Neueingabe ([Bug 2]).
+- 🎨 **UX**: Die Zahlen-Badges im „Nächste Woche"-Button wurden entfernt. Die Bestellübersicht (bestellt / bestellbar / gesamt + Highlights) ist jetzt als Tooltip abrufbar ([FR-100 Update]).
+- 🌍 **Feature**: Bei Auswahl von EN wird die gesamte Benutzeroberfläche auf Englisch umgestellt (Buttons, Tooltips, Modals, Status-Badges, Wochentage, Bestellhistorie). DE und ALL behalten Deutsch bei ([FR-122]).
+- ✨ **Feature**: Das Glühen des „Nächste Woche"-Buttons wird jetzt nur noch ausgelöst, wenn für Montag–Donnerstag bestellbare Menüs ohne bestehende Bestellung vorhanden sind. Freitag ist von dieser Prüfung ausgenommen ([FR-092 Update]).
+- 🧹 **Wartbarkeit**: Code-Qualitätsprüfung aller Quelldateien – JSDoc-Kommentare ergänzt, Erklärungen für komplexe Logikblöcke hinzugefügt.
+- 📦 **Neu**: `src/i18n.js` – Zentrales Übersetzungsmodul für alle statischen UI-Labels (DE/EN).
+
 ## v1.6.14 (2026-03-10)
 - 🐛 **Bugfix**: Die globale "Aktualisiert am"-Zeit im Header wird bei einer manuellen Prüfung der geflaggten Menüs nicht mehr zurückgesetzt.
 

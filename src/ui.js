@@ -1,5 +1,15 @@
+/**
+ * UI injection module.
+ * Renders the full Kantine Wrapper HTML skeleton into the current page,
+ * including fonts, icon stylesheet, favicon, and all modal/panel containers.
+ * Must be called before bindEvents() and any state-rendering logic.
+ */
 import { langMode } from './state.js';
 
+/**
+ * Injects the full application HTML into the current tab.
+ * Idempotent in conjunction with the __KANTINE_LOADED guard in index.js.
+ */
 export function injectUI() {
     document.title = 'Kantine Weekly Menu';
 

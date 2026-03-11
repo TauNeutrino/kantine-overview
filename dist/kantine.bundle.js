@@ -30,6 +30,8 @@
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(842);
+/* harmony import */ var _i18n_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(646);
+
 
 
 
@@ -46,13 +48,13 @@ function updateAuthUI() {
                 const parsed = JSON.parse(akita);
                 if (parsed.auth && parsed.auth.token) {
                     (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAuthToken */ .O5)(parsed.auth.token);
-                    localStorage.setItem('kantine_authToken', parsed.auth.token);
+                    localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.AUTH_TOKEN, parsed.auth.token);
 
                     if (parsed.auth.user) {
                         (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentUser */ .lt)(parsed.auth.user.id || 'unknown');
-                        localStorage.setItem('kantine_currentUser', parsed.auth.user.id || 'unknown');
-                        if (parsed.auth.user.firstName) localStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
-                        if (parsed.auth.user.lastName) localStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
+                        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.CURRENT_USER, parsed.auth.user.id || 'unknown');
+                        if (parsed.auth.user.firstName) localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.FIRST_NAME, parsed.auth.user.firstName);
+                        if (parsed.auth.user.lastName) localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_NAME, parsed.auth.user.lastName);
                     }
                 }
             }
@@ -61,9 +63,9 @@ function updateAuthUI() {
         }
     }
 
-    (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAuthToken */ .O5)(localStorage.getItem('kantine_authToken'));
-    (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentUser */ .lt)(localStorage.getItem('kantine_currentUser'));
-    const firstName = localStorage.getItem('kantine_firstName');
+    (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setAuthToken */ .O5)(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.AUTH_TOKEN));
+    (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setCurrentUser */ .lt)(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.CURRENT_USER));
+    const firstName = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.FIRST_NAME);
     const btnLoginOpen = document.getElementById('btn-login-open');
     const userInfo = document.getElementById('user-info');
     const userIdDisplay = document.getElementById('user-id-display');
@@ -71,7 +73,7 @@ function updateAuthUI() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) {
         btnLoginOpen.classList.add('hidden');
         userInfo.classList.remove('hidden');
-        userIdDisplay.textContent = firstName || (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny ? `User ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny}` : 'Angemeldet');
+        userIdDisplay.textContent = firstName || (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny ? `User ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny}` : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('loggedIn'));
         fetchOrders();
     } else {
         btnLoginOpen.classList.remove('hidden');
@@ -123,7 +125,7 @@ async function fetchFullOrderHistory() {
     if (fullOrderHistoryCache) {
         localCache = fullOrderHistoryCache;
     } else {
-        const ls = localStorage.getItem('kantine_history_cache');
+        const ls = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.HISTORY_CACHE);
         if (ls) {
             try {
                 localCache = JSON.parse(ls);
@@ -146,7 +148,7 @@ async function fetchFullOrderHistory() {
     }
 
     progressFill.style.width = '0%';
-    progressText.textContent = localCache.length > 0 ? 'Suche nach neuen Bestellungen...' : 'Lade Bestellhistorie...';
+    progressText.textContent = localCache.length > 0 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingDelta') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingFull');
     if (localCache.length > 0) historyLoading.classList.remove('hidden');
 
     let nextUrl = localCache.length > 0
@@ -187,12 +189,12 @@ async function fetchFullOrderHistory() {
                 if (totalCount > 0) {
                     const pct = Math.round((fetchedOrders.length / totalCount) * 100);
                     progressFill.style.width = `${pct}%`;
-                    progressText.textContent = `Lade Bestellung ${fetchedOrders.length} von ${totalCount}...`;
+                    progressText.textContent = `${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingItem')} ${fetchedOrders.length} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingOf')} ${totalCount}...`;
                 } else {
-                    progressText.textContent = `Lade Bestellung ${fetchedOrders.length}...`;
+                    progressText.textContent = `${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingItem')} ${fetchedOrders.length}...`;
                 }
             } else if (!deltaComplete) {
-                progressText.textContent = `${fetchedOrders.length} neue/geänderte Bestellungen gefunden...`;
+                progressText.textContent = `${fetchedOrders.length} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadingNew')}`;
             }
 
             nextUrl = deltaComplete ? null : data.next;
@@ -208,7 +210,7 @@ async function fetchFullOrderHistory() {
 
             fullOrderHistoryCache = mergedOrders;
             try {
-                localStorage.setItem('kantine_history_cache', JSON.stringify(mergedOrders));
+                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.HISTORY_CACHE, JSON.stringify(mergedOrders));
             } catch (e) {
                 console.warn('History cache write error', e);
             }
@@ -217,9 +219,9 @@ async function fetchFullOrderHistory() {
     } catch (error) {
         console.error('Error in history sync:', error);
         if (localCache.length === 0) {
-            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">Fehler beim Laden der Historie.</p>`;
+            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyLoadError')}</p>`;
         } else {
-            showToast('Hintergrund-Synchronisation fehlgeschlagen', 'error');
+            showToast((0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('bgSyncFailed'), 'error');
         }
     } finally {
         historyLoading.classList.add('hidden');
@@ -229,7 +231,7 @@ async function fetchFullOrderHistory() {
 function renderHistory(orders) {
     const content = document.getElementById('history-content');
     if (!orders || orders.length === 0) {
-        content.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Keine Bestellungen gefunden.</p>';
+        content.innerHTML = `<p style="text-align:center;color:var(--text-secondary);padding:20px;">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noOrders')}</p>`;
         return;
     }
 
@@ -240,7 +242,8 @@ function renderHistory(orders) {
         const y = d.getFullYear();
         const m = d.getMonth();
         const monthKey = `${y}-${m.toString().padStart(2, '0')}`;
-        const monthName = d.toLocaleString('de-AT', { month: 'long' });
+        const uiLocale = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'en-US' : 'de-AT';
+        const monthName = d.toLocaleString(uiLocale, { month: 'long' });
 
         const kw = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getISOWeek */ .sn)(d);
 
@@ -251,7 +254,7 @@ function renderHistory(orders) {
             groups[y].months[monthKey] = { name: monthName, year: y, monthIndex: m, count: 0, total: 0, weeks: {} };
         }
         if (!groups[y].months[monthKey].weeks[kw]) {
-            groups[y].months[monthKey].weeks[kw] = { label: `KW ${kw}`, items: [], count: 0, total: 0 };
+            groups[y].months[monthKey].weeks[kw] = { label: _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? `CW ${kw}` : `KW ${kw}`, items: [], count: 0, total: 0 };
         }
 
         const items = order.items || [];
@@ -299,7 +302,7 @@ function renderHistory(orders) {
             monthHeader.setAttribute('tabindex', '0');
             monthHeader.setAttribute('role', 'button');
             monthHeader.setAttribute('aria-expanded', 'false');
-            monthHeader.setAttribute('title', 'Klicken, um die Bestellungen für diesen Monat ein-/auszublenden');
+            monthHeader.setAttribute('title', (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('historyMonthToggle'));
 
             const monthHeaderContent = document.createElement('div');
             monthHeaderContent.style.display = 'flex';
@@ -314,7 +317,7 @@ function renderHistory(orders) {
             monthSummary.className = 'history-month-summary';
 
             const monthSummarySpan = document.createElement('span');
-            monthSummarySpan.innerHTML = `${monthGroup.count} Bestellungen &bull; <strong>€${monthGroup.total.toFixed(2)}</strong>`;
+            monthSummarySpan.innerHTML = `${monthGroup.count} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orders')} &bull; <strong>€${monthGroup.total.toFixed(2)}</strong>`;
             monthSummary.appendChild(monthSummarySpan);
 
             monthHeaderContent.appendChild(monthSummary);
@@ -358,14 +361,15 @@ function renderHistory(orders) {
                 weekHeader.appendChild(weekLabel);
 
                 const weekSummary = document.createElement('span');
-                weekSummary.innerHTML = `${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong>`;
+                weekSummary.innerHTML = `${week.count} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orders')} &bull; <strong>€${week.total.toFixed(2)}</strong>`;
                 weekHeader.appendChild(weekSummary);
 
                 weekGroupDiv.appendChild(weekHeader);
 
                 week.items.forEach(item => {
                     const dateObj = new Date(item.date);
-                    const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                    const uiLocale = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'en-US' : 'de-AT';
+                    const dayStr = dateObj.toLocaleDateString(uiLocale, { weekday: 'short', day: '2-digit', month: '2-digit' });
 
                     const historyItem = document.createElement('div');
                     historyItem.className = 'history-item';
@@ -391,11 +395,11 @@ function renderHistory(orders) {
                     const statusSpan = document.createElement('span');
                     statusSpan.className = 'history-item-status';
                     if (item.state === 9) {
-                        statusSpan.textContent = 'Storniert';
+                        statusSpan.textContent = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('stateCancelled');
                     } else if (item.state === 8) {
-                        statusSpan.textContent = 'Abgeschlossen';
+                        statusSpan.textContent = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('stateCompleted');
                     } else {
-                        statusSpan.textContent = 'Übertragen';
+                        statusSpan.textContent = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('stateTransferred');
                     }
                     statusDiv.appendChild(statusSpan);
                     detailsDiv.appendChild(statusDiv);
@@ -482,7 +486,7 @@ async function placeOrder(date, articleId, name, price, description) {
         });
 
         if (response.ok || response.status === 201) {
-            showToast(`Bestellt: ${name}`, 'success');
+            showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
         } else {
@@ -510,7 +514,7 @@ async function cancelOrder(date, articleId, name) {
         });
 
         if (response.ok) {
-            showToast(`Storniert: ${name}`, 'success');
+            showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
         } else {
@@ -530,8 +534,9 @@ function saveFlags() {
 async function refreshFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0) return;
     const token = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX || _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GUEST_TOKEN */ .f9;
-    const datesToFetch = new Set();
 
+    // Collect unique dates that have flagged items
+    const datesToFetch = new Set();
     for (const flagId of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY) {
         const [dateStr] = flagId.split('_');
         datesToFetch.add(dateStr);
@@ -550,32 +555,37 @@ async function refreshFlaggedItems() {
                 if (!resp.ok) continue;
                 const data = await resp.json();
                 const menuGroups = data.results || [];
-                let dayItems = [];
+
+                // Build a lookup of fresh API items by article ID
+                const apiItemMap = new Map();
                 for (const group of menuGroups) {
                     if (group.items && Array.isArray(group.items)) {
-                        dayItems = dayItems.concat(group.items);
+                        for (const item of group.items) {
+                            apiItemMap.set(item.id, item);
+                        }
                     }
                 }
 
+                // Only update items that are actually flagged
                 for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
                     if (!week.days) continue;
-                    let dayObj = week.days.find(d => d.date === dateStr);
-                    if (dayObj) {
-                        dayObj.items = dayItems.map(item => {
-                            const isUnlimited = item.amount_tracking === false;
-                            const hasStock = parseInt(item.available_amount) > 0;
-                            return {
-                                id: `${dateStr}_${item.id}`,
-                                articleId: item.id,
-                                name: item.name || 'Unknown',
-                                description: item.description || '',
-                                price: parseFloat(item.price) || 0,
-                                available: isUnlimited || hasStock,
-                                availableAmount: parseInt(item.available_amount) || 0,
-                                amountTracking: item.amount_tracking !== false
-                            };
-                        });
-                        updated = true;
+                    const dayObj = week.days.find(d => d.date === dateStr);
+                    if (!dayObj || !dayObj.items) continue;
+
+                    for (let i = 0; i < dayObj.items.length; i++) {
+                        const existing = dayObj.items[i];
+                        const flagId = `${dateStr}_${existing.articleId}`;
+                        if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(flagId)) continue;
+
+                        const apiItem = apiItemMap.get(existing.articleId);
+                        if (apiItem) {
+                            const isUnlimited = apiItem.amount_tracking === false;
+                            const hasStock = parseInt(apiItem.available_amount) > 0;
+                            existing.available = isUnlimited || hasStock;
+                            existing.availableAmount = parseInt(apiItem.available_amount) || 0;
+                            existing.amountTracking = apiItem.amount_tracking !== false;
+                            updated = true;
+                        }
                     }
                 }
             } catch (e) {
@@ -585,12 +595,14 @@ async function refreshFlaggedItems() {
 
         if (updated) {
             saveMenuCache();
-            localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
-            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
-            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
         }
-        
-        showToast(`${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 1 ? 'Menü' : 'Menüs'} geprüft`, 'info');
+
+        // Always update the check timestamp and bell status
+        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
+        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
+        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+
+        showToast(`${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 1 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuSingular') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuPlural')} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuChecked')}`, 'info');
     } finally {
         if (bellBtn) bellBtn.classList.remove('refreshing');
     }
@@ -602,11 +614,11 @@ function toggleFlag(date, articleId, name, cutoff) {
     let flagAdded = false;
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(id)) {
         _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.delete(id);
-        showToast(`Flag entfernt für ${name}`, 'success');
+        showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagRemoved')} ${name}`, 'success');
     } else {
         _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.add(id);
         flagAdded = true;
-        showToast(`Benachrichtigung aktiviert für ${name}`, 'success');
+        showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagActivated')} ${name}`, 'success');
         if (Notification.permission === 'default') {
             Notification.requestPermission();
         }
@@ -1063,8 +1075,18 @@ function showToast(message, type = 'info') {
 /* harmony export */   O: () => (/* binding */ githubHeaders)
 /* harmony export */ });
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
+/**
+ * API header factories for the Bessa REST API and GitHub API.
+ * All fetch calls in the app route through these helpers to ensure
+ * consistent auth and versioning headers.
+ */
 
 
+/**
+ * Returns request headers for the Bessa REST API.
+ * @param {string|null} token - Auth token; falls back to GUEST_TOKEN if absent.
+ * @returns {Object} HTTP headers for fetch()
+ */
 function apiHeaders(token) {
     return {
         'Authorization': `Token ${token || _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GUEST_TOKEN */ .f9}`,
@@ -1074,6 +1096,11 @@ function apiHeaders(token) {
     };
 }
 
+/**
+ * Returns request headers for the GitHub REST API v3.
+ * Used for version checks and release listing.
+ * @returns {Object} HTTP headers for fetch()
+ */
 function githubHeaders() {
     return { 'Accept': 'application/vnd.github.v3+json' };
 }
@@ -1085,6 +1112,7 @@ function githubHeaders() {
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   LS: () => (/* binding */ LS),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
 /* harmony export */   d_: () => (/* binding */ INSTALLER_BASE),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
@@ -1095,16 +1123,375 @@ function githubHeaders() {
 /* harmony export */   tE: () => (/* binding */ API_BASE)
 /* harmony export */ });
 /* unused harmony export GITHUB_REPO */
-const API_BASE = 'https://api.bessa.app/v1';
-const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
-const CLIENT_VERSION = 'v1.6.11';
-const VENUE_ID = 591;
-const MENU_ID = 7;
-const POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+/**
+ * Application-wide constants.
+ * All API endpoints, IDs and timing parameters are centralized here
+ * to make changes easy and avoid magic numbers scattered across the codebase.
+ */
 
+/** Base URL for the Bessa REST API (v1). */
+const API_BASE = 'https://api.bessa.app/v1';
+
+/** Guest token for unauthenticated API calls (e.g. browsing the menu). */
+const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
+
+/** The client version injected into every API request header. */
+const CLIENT_VERSION = 'v1.6.16';
+
+/** Bessa venue ID for Knapp-Kantine. */
+const VENUE_ID = 591;
+
+/** Bessa menu ID for the weekly lunch menu. */
+const MENU_ID = 7;
+
+/** Polling interval for flagged-menu availability checks (5 minutes). */
+const POLL_INTERVAL_MS = 5 * 60 * 1000;
+
+/** GitHub repository identifier for update checks and release links. */
 const GITHUB_REPO = 'TauNeutrino/kantine-overview';
+
+/** GitHub REST API base URL for this repository. */
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
+
+/** Base URL for htmlpreview-hosted installer pages. */
 const INSTALLER_BASE = `https://htmlpreview.github.io/?https://github.com/${GITHUB_REPO}/blob`;
+
+/**
+ * Centralized localStorage key registry.
+ * Always use these constants instead of raw strings to avoid typos and ease renaming.
+ */
+const LS = {
+    AUTH_TOKEN:              'kantine_authToken',
+    CURRENT_USER:            'kantine_currentUser',
+    FIRST_NAME:              'kantine_firstName',
+    LAST_NAME:               'kantine_lastName',
+    LANG:                    'kantine_lang',
+    FLAGS:                   'kantine_flags',
+    FLAGGED_LAST_CHECKED:    'kantine_flagged_items_last_checked',
+    LAST_CHECKED:            'kantine_last_checked',
+    MENU_CACHE:              'kantine_menuCache',
+    MENU_CACHE_TS:           'kantine_menuCacheTs',
+    HISTORY_CACHE:           'kantine_history_cache',
+    HIGHLIGHT_TAGS:          'kantine_highlightTags',
+    LAST_UPDATED:            'kantine_last_updated',
+    VERSION_CACHE:           'kantine_version_cache',
+    DEV_MODE:                'kantine_dev_mode',
+};
+
+
+/***/ },
+
+/***/ 646
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   t: () => (/* binding */ t)
+/* harmony export */ });
+/* unused harmony export getUILang */
+/* unused harmony import specifier */ var langMode;
+/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
+/**
+ * Internationalization (i18n) module for the Kantine Wrapper UI.
+ * Provides translations for all static UI text based on the current language mode.
+ * German (de) is the default; English (en) is fully supported.
+ * When langMode is 'all', German labels are used for the GUI.
+ */
+
+
+const TRANSLATIONS = {
+    de: {
+        // Navigation
+        thisWeek: 'Diese Woche',
+        nextWeek: 'Nächste Woche',
+        nextWeekTooltipDefault: 'Menü nächster Woche anzeigen',
+        thisWeekTooltip: 'Menü dieser Woche anzeigen',
+
+        // Header
+        appTitle: 'Kantinen Übersicht',
+        updatedAt: 'Aktualisiert',
+        langTooltip: 'Sprache der Menübeschreibung',
+        weekLabel: 'Woche',
+
+        // Action buttons
+        refresh: 'Menüdaten neu laden',
+        history: 'Bestellhistorie',
+        highlights: 'Persönliche Highlights verwalten',
+        themeTooltip: 'Erscheinungsbild (Hell/Dunkel) wechseln',
+        login: 'Anmelden',
+        loginTooltip: 'Mit Bessa.app Account anmelden',
+        logout: 'Abmelden',
+        logoutTooltip: 'Von Bessa.app abmelden',
+
+        // Login modal
+        loginTitle: 'Login',
+        employeeId: 'Mitarbeiternummer',
+        employeeIdPlaceholder: 'z.B. 2041',
+        employeeIdHelp: 'Deine offizielle Knapp Mitarbeiternummer.',
+        password: 'Passwort',
+        passwordPlaceholder: 'Bessa Passwort',
+        passwordHelp: 'Das Passwort für deinen Bessa Account.',
+        loginButton: 'Einloggen',
+        loggingIn: 'Wird eingeloggt...',
+
+        // Highlights modal
+        highlightsTitle: 'Meine Highlights',
+        highlightsDesc: 'Markiere Menüs automatisch, wenn sie diese Schlagwörter enthalten.',
+        tagInputPlaceholder: 'z.B. Schnitzel, Vegetarisch...',
+        tagInputTooltip: 'Neues Schlagwort zum Hervorheben eingeben',
+        addTag: 'Hinzufügen',
+        addTagTooltip: 'Schlagwort zur Liste hinzufügen',
+        removeTagTooltip: 'Schlagwort entfernen',
+
+        // History modal
+        historyTitle: 'Bestellhistorie',
+        loadingHistory: 'Lade Historie...',
+        noOrders: 'Keine Bestellungen gefunden.',
+        orders: 'Bestellungen',
+        historyMonthToggle: 'Klicken, um die Bestellungen für diesen Monat ein-/auszublenden',
+
+        // Menu item labels
+        available: 'Verfügbar',
+        soldOut: 'Ausverkauft',
+        ordered: 'Bestellt',
+        orderButton: 'Bestellen',
+        orderAgainTooltip: 'nochmal bestellen',
+        orderTooltip: 'bestellen',
+        cancelOrder: 'Bestellung stornieren',
+        cancelOneOrder: 'Eine Bestellung stornieren',
+        flagActivate: 'Benachrichtigen wenn verfügbar',
+        flagDeactivate: 'Benachrichtigung deaktivieren',
+
+        // Alarm bell
+        alarmTooltipNone: 'Keine beobachteten Menüs',
+        alarmLastChecked: 'Zuletzt geprüft',
+
+        // Version modal
+        versionsTitle: '📦 Versionen',
+        currentVersion: 'Aktuell',
+        devModeLabel: 'Dev-Mode (alle Tags anzeigen)',
+        loadingVersions: 'Lade Versionen...',
+        noVersions: 'Keine Versionen gefunden.',
+        installed: '✓ Installiert',
+        newVersion: '⬆ Neu!',
+        installLink: 'Installieren',
+        reportBug: 'Fehler melden',
+        reportBugTooltip: 'Melde einen Fehler auf GitHub',
+        featureRequest: 'Feature vorschlagen',
+        featureRequestTooltip: 'Schlage ein neues Feature auf GitHub vor',
+        clearCache: 'Lokalen Cache leeren',
+        clearCacheTooltip: 'Löscht alle lokalen Daten & erzwingt einen Neuladen',
+        clearCacheConfirm: 'Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.',
+        versionMenuTooltip: 'Klick für Versionsmenü',
+
+        // Progress modal
+        progressTitle: 'Menüdaten aktualisieren',
+        progressInit: 'Initialisierung...',
+
+        // Empty state
+        noMenuData: 'Keine Menüdaten für KW',
+        noMenuDataHint: 'Versuchen Sie eine andere Woche oder schauen Sie später vorbei.',
+
+        // Weekly cost
+        costLabel: 'Gesamt',
+
+        // Countdown
+        orderDeadline: 'Bestellschluss',
+
+        // Toast messages
+        flagRemoved: 'Flag entfernt für',
+        flagActivated: 'Benachrichtigung aktiviert für',
+        menuChecked: 'geprüft',
+        menuSingular: 'Menü',
+        menuPlural: 'Menüs',
+        newMenuDataAvailable: 'Neue Menüdaten für nächste Woche verfügbar!',
+        orderSuccess: 'Bestellt',
+        cancelSuccess: 'Storniert',
+        bgSyncFailed: 'Hintergrund-Synchronisation fehlgeschlagen',
+        historyLoadError: 'Fehler beim Laden der Historie.',
+        historyLoadingFull: 'Lade Bestellhistorie...',
+        historyLoadingDelta: 'Suche nach neuen Bestellungen...',
+        historyLoadingItem: 'Lade Bestellung',
+        historyLoadingOf: 'von',
+        historyLoadingNew: 'neue/geänderte Bestellungen gefunden...',
+
+        // Badge tooltip parts
+        badgeOrdered: 'bestellt',
+        badgeOrderable: 'bestellbar',
+        badgeTotal: 'gesamt',
+        badgeHighlights: 'Highlights gefunden',
+
+        // History item states
+        stateCancelled: 'Storniert',
+        stateCompleted: 'Abgeschlossen',
+        stateTransferred: 'Übertragen',
+
+        // Close button
+        close: 'Schließen',
+
+        // Error modal
+        noConnection: 'Keine Verbindung',
+        toOriginalPage: 'Zur Original-Seite',
+
+        // Misc
+        loggedIn: 'Angemeldet',
+    },
+    en: {
+        // Navigation
+        thisWeek: 'This Week',
+        nextWeek: 'Next Week',
+        nextWeekTooltipDefault: 'Show next week\'s menu',
+        thisWeekTooltip: 'Show this week\'s menu',
+
+        // Header
+        appTitle: 'Canteen Overview',
+        updatedAt: 'Updated',
+        langTooltip: 'Menu description language',
+        weekLabel: 'Week',
+
+        // Action buttons
+        refresh: 'Reload menu data',
+        history: 'Order history',
+        highlights: 'Manage personal highlights',
+        themeTooltip: 'Toggle appearance (Light/Dark)',
+        login: 'Sign in',
+        loginTooltip: 'Sign in with Bessa.app account',
+        logout: 'Sign out',
+        logoutTooltip: 'Sign out from Bessa.app',
+
+        // Login modal
+        loginTitle: 'Login',
+        employeeId: 'Employee ID',
+        employeeIdPlaceholder: 'e.g. 2041',
+        employeeIdHelp: 'Your official Knapp employee number.',
+        password: 'Password',
+        passwordPlaceholder: 'Bessa password',
+        passwordHelp: 'The password for your Bessa account.',
+        loginButton: 'Log in',
+        loggingIn: 'Logging in...',
+
+        // Highlights modal
+        highlightsTitle: 'My Highlights',
+        highlightsDesc: 'Automatically highlight menus containing these keywords.',
+        tagInputPlaceholder: 'e.g. Schnitzel, Vegetarian...',
+        tagInputTooltip: 'Enter new keyword to highlight',
+        addTag: 'Add',
+        addTagTooltip: 'Add keyword to list',
+        removeTagTooltip: 'Remove keyword',
+
+        // History modal
+        historyTitle: 'Order History',
+        loadingHistory: 'Loading history...',
+        noOrders: 'No orders found.',
+        orders: 'Orders',
+        historyMonthToggle: 'Click to expand/collapse orders for this month',
+
+        // Menu item labels
+        available: 'Available',
+        soldOut: 'Sold out',
+        ordered: 'Ordered',
+        orderButton: 'Order',
+        orderAgainTooltip: 'order again',
+        orderTooltip: 'order',
+        cancelOrder: 'Cancel order',
+        cancelOneOrder: 'Cancel one order',
+        flagActivate: 'Notify when available',
+        flagDeactivate: 'Deactivate notification',
+
+        // Alarm bell
+        alarmTooltipNone: 'No flagged menus',
+        alarmLastChecked: 'Last checked',
+
+        // Version modal
+        versionsTitle: '📦 Versions',
+        currentVersion: 'Current',
+        devModeLabel: 'Dev mode (show all tags)',
+        loadingVersions: 'Loading versions...',
+        noVersions: 'No versions found.',
+        installed: '✓ Installed',
+        newVersion: '⬆ New!',
+        installLink: 'Install',
+        reportBug: 'Report a bug',
+        reportBugTooltip: 'Report a bug on GitHub',
+        featureRequest: 'Request a feature',
+        featureRequestTooltip: 'Suggest a new feature on GitHub',
+        clearCache: 'Clear local cache',
+        clearCacheTooltip: 'Deletes all local data & forces a reload',
+        clearCacheConfirm: 'Do you really want to delete all local data (including login session, cache, and settings)? The page will reload afterwards.',
+        versionMenuTooltip: 'Click for version menu',
+
+        // Progress modal
+        progressTitle: 'Updating menu data',
+        progressInit: 'Initializing...',
+
+        // Empty state
+        noMenuData: 'No menu data for CW',
+        noMenuDataHint: 'Try another week or check back later.',
+
+        // Weekly cost
+        costLabel: 'Total',
+
+        // Countdown
+        orderDeadline: 'Order deadline',
+
+        // Toast messages
+        flagRemoved: 'Flag removed for',
+        flagActivated: 'Notification activated for',
+        menuChecked: 'checked',
+        menuSingular: 'menu',
+        menuPlural: 'menus',
+        newMenuDataAvailable: 'New menu data available for next week!',
+        orderSuccess: 'Ordered',
+        cancelSuccess: 'Cancelled',
+        bgSyncFailed: 'Background synchronisation failed',
+        historyLoadError: 'Error loading history.',
+        historyLoadingFull: 'Loading order history...',
+        historyLoadingDelta: 'Checking for new orders...',
+        historyLoadingItem: 'Loading order',
+        historyLoadingOf: 'of',
+        historyLoadingNew: 'new/updated orders found...',
+
+        // Badge tooltip parts
+        badgeOrdered: 'ordered',
+        badgeOrderable: 'orderable',
+        badgeTotal: 'total',
+        badgeHighlights: 'highlights found',
+
+        // History item states
+        stateCancelled: 'Cancelled',
+        stateCompleted: 'Completed',
+        stateTransferred: 'Transferred',
+
+        // Close button
+        close: 'Close',
+
+        // Error modal
+        noConnection: 'No connection',
+        toOriginalPage: 'Go to original page',
+
+        // Misc
+        loggedIn: 'Logged in',
+    }
+};
+
+/**
+ * Returns the translated string for the given key.
+ * Uses the current langMode (en = English, anything else = German).
+ * Falls back to German if a key is missing in the target language.
+ * @param {string} key - Translation key
+ * @returns {string} Translated text
+ */
+function t(key) {
+    const lang = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'en' : 'de';
+    return TRANSLATIONS[lang][key] || TRANSLATIONS['de'][key] || key;
+}
+
+/**
+ * Returns the effective UI language code ('en' or 'de').
+ * 'all' mode uses German for the GUI.
+ */
+function getUILang() {
+    return langMode === 'en' ? 'en' : 'de';
+}
 
 
 /***/ },
@@ -1137,31 +1524,49 @@ const INSTALLER_BASE = `https://htmlpreview.github.io/?https://github.com/${GITH
 /* harmony export */ });
 /* unused harmony export setUserFlags */
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(413);
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(521);
+
 
 
 let allWeeks = [];
 let currentWeekNumber = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getISOWeek */ .sn)(new Date());
 let currentYear = new Date().getFullYear();
 let displayMode = 'this-week';
-let authToken = localStorage.getItem('kantine_authToken');
-let currentUser = localStorage.getItem('kantine_currentUser');
+let authToken = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.AUTH_TOKEN);
+let currentUser = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.CURRENT_USER);
 let orderMap = new Map();
-let userFlags = new Set(JSON.parse(localStorage.getItem('kantine_flags') || '[]'));
+let userFlags = new Set(JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.FLAGS) || '[]'));
 let pollIntervalId = null;
-let langMode = localStorage.getItem('kantine_lang') || 'de';
-let highlightTags = JSON.parse(localStorage.getItem('kantine_highlightTags') || '[]');
+let langMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.LANG) || 'de';
+let highlightTags = JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.HIGHLIGHT_TAGS) || '[]');
 
 function setAllWeeks(weeks) { allWeeks = weeks; }
 function setCurrentWeekNumber(week) { currentWeekNumber = week; }
 function setCurrentYear(year) { currentYear = year; }
-function setDisplayMode(mode) { displayMode = mode; }
 function setAuthToken(token) { authToken = token; }
 function setCurrentUser(user) { currentUser = user; }
 function setOrderMap(map) { orderMap = map; }
 function setUserFlags(flags) { userFlags = flags; }
 function setPollIntervalId(id) { pollIntervalId = id; }
-function setLangMode(lang) { langMode = lang; }
 function setHighlightTags(tags) { highlightTags = tags; }
+
+/** Only 'this-week' and 'next-week' are valid display modes. */
+function setDisplayMode(mode) {
+    if (mode !== 'this-week' && mode !== 'next-week') {
+        console.warn(`[state] Invalid displayMode: "${mode}". Ignoring.`);
+        return;
+    }
+    displayMode = mode;
+}
+
+/** Only 'de', 'en', and 'all' are valid language modes. */
+function setLangMode(lang) {
+    if (!['de', 'en', 'all'].includes(lang)) {
+        console.warn(`[state] Invalid langMode: "${lang}". Ignoring.`);
+        return;
+    }
+    langMode = lang;
+}
 
 
 /***/ },
@@ -1183,12 +1588,19 @@ function setHighlightTags(tags) { highlightTags = tags; }
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(367);
+/* harmony import */ var _i18n_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(646);
 
 
 
 
 
 
+
+/**
+ * Updates the "Next Week" button tooltip and glow state.
+ * Tooltip shows order status summary and highlight count.
+ * Glow activates only if Mon-Thu have orderable menus without orders (Friday exempt).
+ */
 function updateNextWeekBadge() {
     const btnNextWeek = document.getElementById('btn-next-week');
     let nextWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT + 1;
@@ -1199,7 +1611,7 @@ function updateNextWeekBadge() {
     let totalDataCount = 0;
     let orderableCount = 0;
     let daysWithOrders = 0;
-    let daysWithOrderableAndNoOrder = 0;
+    let monThuOrderableNoOrder = 0;
 
     if (nextWeekData && nextWeekData.days) {
         nextWeekData.days.forEach(day => {
@@ -1216,34 +1628,22 @@ function updateNextWeekBadge() {
                 });
 
                 if (hasOrder) daysWithOrders++;
-                if (isOrderable && !hasOrder) daysWithOrderableAndNoOrder++;
+
+                // Feature 5: Only Mon(1)-Thu(4) count for glow logic, Friday(5) is exempt
+                const dayOfWeek = new Date(day.date).getDay();
+                if (dayOfWeek >= 1 && dayOfWeek <= 4 && isOrderable && !hasOrder) {
+                    monThuOrderableNoOrder++;
+                }
             }
         });
     }
 
-    let badge = btnNextWeek.querySelector('.nav-badge');
+    // Remove any old visible badge element (Feature 3: numbers hidden)
+    const existingBadge = btnNextWeek.querySelector('.nav-badge');
+    if (existingBadge) existingBadge.remove();
+
     if (totalDataCount > 0) {
-        if (!badge) {
-            badge = document.createElement('span');
-            badge.className = 'nav-badge';
-            btnNextWeek.appendChild(badge);
-        }
-
-        badge.title = `${daysWithOrders} bestellt / ${orderableCount} bestellbar / ${totalDataCount} gesamt`;
-        badge.innerHTML = `<span class="ordered">${daysWithOrders}</span><span class="separator">/</span><span class="orderable">${orderableCount}</span><span class="separator">/</span><span class="total">${totalDataCount}</span>`;
-
-        badge.classList.remove('badge-violet', 'badge-green', 'badge-red', 'badge-blue');
-
-        if (daysWithOrders > 0 && daysWithOrderableAndNoOrder === 0) {
-            badge.classList.add('badge-violet');
-        } else if (daysWithOrderableAndNoOrder > 0) {
-            badge.classList.add('badge-green');
-        } else if (orderableCount === 0) {
-            badge.classList.add('badge-red');
-        } else {
-            badge.classList.add('badge-blue');
-        }
-
+        // Count highlight menus in next week
         let highlightCount = 0;
         if (nextWeekData && nextWeekData.days) {
             nextWeekData.days.forEach(day => {
@@ -1257,25 +1657,27 @@ function updateNextWeekBadge() {
             });
         }
 
+        // Feature 3: All info goes to button tooltip instead of visible badge
+        let tooltipParts = [`${daysWithOrders} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrdered')} / ${orderableCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrderable')} / ${totalDataCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeTotal')}`];
         if (highlightCount > 0) {
-            badge.insertAdjacentHTML('beforeend', `<span class="highlight-count" title="${highlightCount} Highlight Menüs">(${highlightCount})</span>`);
-            badge.title += ` • ${highlightCount} Highlights gefunden`;
-            badge.classList.add('has-highlights');
+            tooltipParts.push(`${highlightCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeHighlights')}`);
         }
+        btnNextWeek.title = tooltipParts.join(' • ');
 
-        if (daysWithOrders === 0) {
+        // Feature 5: Glow only if Mon-Thu have orderable days without existing orders
+        if (monThuOrderableNoOrder > 0) {
             btnNextWeek.classList.add('new-week-available');
             const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
             if (!localStorage.getItem(storageKey)) {
                 localStorage.setItem(storageKey, 'true');
-                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .showToast */ .P0)('Neue Menüdaten für nächste Woche verfügbar!', 'info');
+                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .showToast */ .P0)((0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'), 'info');
             }
         } else {
             btnNextWeek.classList.remove('new-week-available');
         }
-
-    } else if (badge) {
-        badge.remove();
+    } else {
+        btnNextWeek.title = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeekTooltipDefault');
+        btnNextWeek.classList.remove('new-week-available');
     }
 }
 
@@ -1296,7 +1698,7 @@ function updateWeeklyCost(days) {
 
     const costDisplay = document.getElementById('weekly-cost-display');
     if (totalCost > 0) {
-        costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>Gesamt: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
+        costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('costLabel')}: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
         costDisplay.classList.remove('hidden');
     } else {
         costDisplay.classList.add('hidden');
@@ -1325,8 +1727,8 @@ function renderVisibleWeeks() {
     if (daysInTargetWeek.length === 0) {
         menuContainer.innerHTML = `
             <div class="empty-state">
-                <p>Keine Menüdaten für KW ${targetWeek} (${targetYear}) verfügbar.</p>
-                <small>Versuchen Sie eine andere Woche oder schauen Sie später vorbei.</small>
+                <p>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuData')} ${targetWeek} (${targetYear}).</p>
+                <small>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuDataHint')}</small>
             </div>`;
         document.getElementById('weekly-cost-display').classList.add('hidden');
         return;
@@ -1335,10 +1737,10 @@ function renderVisibleWeeks() {
     updateWeeklyCost(daysInTargetWeek);
 
     const headerWeekInfo = document.getElementById('header-week-info');
-    const weekTitle = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'this-week' ? 'Diese Woche' : 'Nächste Woche';
+    const weekTitle = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'this-week' ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('thisWeek') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeek');
     headerWeekInfo.innerHTML = `
         <div class="header-week-title">${weekTitle}</div>
-        <div class="header-week-subtitle">Week ${targetWeek} • ${targetYear}</div>`;
+        <div class="header-week-subtitle">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('weekLabel')} ${targetWeek} • ${targetYear}</div>`;
 
     const grid = document.createElement('div');
     grid.className = 'days-grid';
@@ -1487,16 +1889,16 @@ function createDayCard(day) {
         let statusBadge = '';
         if (item.available) {
             statusBadge = item.amountTracking
-                ? `<span class="badge available">Verfügbar (${item.availableAmount})</span>`
-                : `<span class="badge available">Verfügbar</span>`;
+                ? `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`
+                : `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
         } else {
-            statusBadge = `<span class="badge sold-out">Ausverkauft</span>`;
+            statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
         }
 
         let orderedBadge = '';
         if (orderCount > 0) {
             const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
-            orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> Bestellt${countBadge}</span>`;
+            orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('ordered')}${countBadge}</span>`;
             itemEl.classList.add('ordered');
             if (new Date(day.date).toDateString() === now.toDateString()) {
                 itemEl.classList.add('today-ordered');
@@ -1521,22 +1923,22 @@ function createDayCard(day) {
         if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX && !isPastCutoff) {
             const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
             const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
-            const flagTitle = isFlagged ? 'Benachrichtigung deaktivieren' : 'Benachrichtigen wenn verfügbar';
+            const flagTitle = isFlagged ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagDeactivate') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagActivate');
             if (!item.available || isFlagged) {
                 flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
             }
 
             if (item.available) {
                 if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} nochmal bestellen"><span class="material-icons-round">add</span></button>`;
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
                 } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} bestellen"><span class="material-icons-round">add_shopping_cart</span> Bestellen</button>`;
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
                 }
             }
 
             if (orderCount > 0) {
                 const cancelIcon = orderCount === 1 ? 'close' : 'remove';
-                const cancelTitle = orderCount === 1 ? 'Bestellung stornieren' : 'Eine Bestellung stornieren';
+                const cancelTitle = orderCount === 1 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOrder') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOneOrder');
                 cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
             }
         }
@@ -1628,13 +2030,13 @@ async function fetchVersions(devMode) {
 
 async function checkForUpdates() {
     const currentVersion = '{{VERSION}}';
-    const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
+    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
 
     try {
         const versions = await fetchVersions(devMode);
         if (!versions.length) return;
 
-        localStorage.setItem('kantine_version_cache', JSON.stringify({
+        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
             timestamp: Date.now(), devMode, versions
         }));
 
@@ -1670,7 +2072,7 @@ function openVersionMenu() {
     const cur = document.getElementById('version-current');
     if (cur) cur.textContent = currentVersion;
 
-    const devMode = localStorage.getItem('kantine_dev_mode') === 'true';
+    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
     devToggle.checked = devMode;
 
     async function loadVersions(forceRefresh) {
@@ -1713,7 +2115,7 @@ function openVersionMenu() {
         }
 
         try {
-            const cachedRaw = localStorage.getItem('kantine_version_cache');
+            const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
             let cached = null;
             if (cachedRaw) {
                 try { cached = JSON.parse(cachedRaw); } catch (e) { }
@@ -1729,7 +2131,7 @@ function openVersionMenu() {
             const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
 
             if (liveVersionsStr !== cachedVersionsStr) {
-                localStorage.setItem('kantine_version_cache', JSON.stringify({
+                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
                     timestamp: Date.now(), devMode: dm, versions: liveVersions
                 }));
                 renderVersionsList(liveVersions);
@@ -1743,8 +2145,8 @@ function openVersionMenu() {
     loadVersions(false);
 
     devToggle.onchange = () => {
-        localStorage.setItem('kantine_dev_mode', devToggle.checked);
-        localStorage.removeItem('kantine_version_cache');
+        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, devToggle.checked);
+        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
         loadVersions(true);
     };
 }
@@ -1800,7 +2202,7 @@ function updateCountdown() {
         headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
     }
 
-    countdownEl.innerHTML = `<span>Bestellschluss:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
+    countdownEl.innerHTML = `<span>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderDeadline')}:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
 
     if (diff < 3600000) {
         countdownEl.classList.add('urgent');
@@ -1914,8 +2316,8 @@ function updateAlarmBell() {
         if (anyAvailable) break;
     }
 
-    const lastCheckedStr = localStorage.getItem('kantine_last_checked');
-    const flaggedLastCheckedStr = localStorage.getItem('kantine_flagged_items_last_checked');
+    const lastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED);
+    const flaggedLastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.FLAGGED_LAST_CHECKED);
 
     let latestTime = 0;
     if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
@@ -1924,13 +2326,13 @@ function updateAlarmBell() {
     let timeStr = 'gerade eben';
     if (latestTime === 0) {
         const now = new Date().toISOString();
-        localStorage.setItem('kantine_last_checked', now);
+        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED, now);
         latestTime = new Date(now).getTime();
     }
 
     timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(new Date(latestTime));
 
-    bellBtn.title = `Zuletzt geprüft: ${timeStr}`;
+    bellBtn.title = `${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('alarmLastChecked')}: ${timeStr}`;
 
     if (anyAvailable) {
         bellIcon.style.color = '#10b981';
@@ -1974,7 +2376,14 @@ function getWeekYear(d) {
     return date.getFullYear();
 }
 
+/**
+ * Translates an English day name to the UI language.
+ * Returns German by default; returns English when langMode is 'en'.
+ * @param {string} englishDay - Day name in English (e.g. 'Monday')
+ * @returns {string} Translated day name
+ */
 function translateDay(englishDay) {
+    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en') return englishDay;
     const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
     return map[englishDay] || englishDay;
 }
@@ -2253,8 +2662,18 @@ var __webpack_exports__ = {};
 // EXTERNAL MODULE: ./src/state.js
 var state = __webpack_require__(901);
 ;// ./src/ui.js
+/**
+ * UI injection module.
+ * Renders the full Kantine Wrapper HTML skeleton into the current page,
+ * including fonts, icon stylesheet, favicon, and all modal/panel containers.
+ * Must be called before bindEvents() and any state-rendering logic.
+ */
 
 
+/**
+ * Injects the full application HTML into the current tab.
+ * Idempotent in conjunction with the __KANTINE_LOADED guard in index.js.
+ */
 function injectUI() {
     document.title = 'Kantine Weekly Menu';
 
@@ -2486,12 +2905,109 @@ var ui_helpers = __webpack_require__(842);
 var constants = __webpack_require__(521);
 // EXTERNAL MODULE: ./src/api.js
 var api = __webpack_require__(672);
+// EXTERNAL MODULE: ./src/i18n.js
+var i18n = __webpack_require__(646);
 ;// ./src/events.js
 
 
 
 
 
+
+
+/**
+ * Updates all static UI labels/tooltips to match the current language.
+ * Called when the user switches the language toggle.
+ */
+function updateUILanguage() {
+    // Navigation buttons
+    const btnThisWeek = document.getElementById('btn-this-week');
+    const btnNextWeek = document.getElementById('btn-next-week');
+    if (btnThisWeek) {
+        btnThisWeek.textContent = (0,i18n.t)('thisWeek');
+        btnThisWeek.title = (0,i18n.t)('thisWeekTooltip');
+    }
+    if (btnNextWeek) {
+        btnNextWeek.textContent = (0,i18n.t)('nextWeek');
+        // Tooltip will be re-set by updateNextWeekBadge()
+    }
+
+    // Header title
+    const appTitle = document.querySelector('.header-left h1');
+    if (appTitle) {
+        const versionTag = appTitle.querySelector('.version-tag');
+        const updateIcon = appTitle.querySelector('.update-icon');
+        appTitle.textContent = (0,i18n.t)('appTitle') + ' ';
+        if (versionTag) appTitle.appendChild(versionTag);
+        if (updateIcon) appTitle.appendChild(updateIcon);
+    }
+
+    // Action button tooltips
+    const btnRefresh = document.getElementById('btn-refresh');
+    if (btnRefresh) btnRefresh.setAttribute('aria-label', (0,i18n.t)('refresh'));
+    if (btnRefresh) btnRefresh.title = (0,i18n.t)('refresh');
+
+    const btnHistory = document.getElementById('btn-history');
+    if (btnHistory) btnHistory.setAttribute('aria-label', (0,i18n.t)('history'));
+    if (btnHistory) btnHistory.title = (0,i18n.t)('history');
+
+    const btnHighlights = document.getElementById('btn-highlights');
+    if (btnHighlights) btnHighlights.setAttribute('aria-label', (0,i18n.t)('highlights'));
+    if (btnHighlights) btnHighlights.title = (0,i18n.t)('highlights');
+
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.title = (0,i18n.t)('themeTooltip');
+
+    // Login/Logout
+    const btnLoginOpen = document.getElementById('btn-login-open');
+    if (btnLoginOpen) {
+        btnLoginOpen.title = (0,i18n.t)('loginTooltip');
+        const loginText = btnLoginOpen.querySelector('span:last-child');
+        if (loginText && !loginText.classList.contains('material-icons-round')) {
+            loginText.textContent = (0,i18n.t)('login');
+        }
+    }
+
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) btnLogout.title = (0,i18n.t)('logoutTooltip');
+
+    // Language toggle tooltip
+    const langToggle = document.getElementById('lang-toggle');
+    if (langToggle) langToggle.title = (0,i18n.t)('langTooltip');
+
+    // Modal headers
+    const highlightsHeader = document.querySelector('#highlights-modal .modal-header h2');
+    if (highlightsHeader) highlightsHeader.textContent = (0,i18n.t)('highlightsTitle');
+    const highlightsDesc = document.querySelector('#highlights-modal .modal-body > p');
+    if (highlightsDesc) highlightsDesc.textContent = (0,i18n.t)('highlightsDesc');
+    const tagInput = document.getElementById('tag-input');
+    if (tagInput) {
+        tagInput.placeholder = (0,i18n.t)('tagInputPlaceholder');
+        tagInput.title = (0,i18n.t)('tagInputTooltip');
+    }
+    const btnAddTag = document.getElementById('btn-add-tag');
+    if (btnAddTag) {
+        btnAddTag.textContent = (0,i18n.t)('addTag');
+        btnAddTag.title = (0,i18n.t)('addTagTooltip');
+    }
+
+    const historyHeader = document.querySelector('#history-modal .modal-header h2');
+    if (historyHeader) historyHeader.textContent = (0,i18n.t)('historyTitle');
+
+    const loginHeader = document.querySelector('#login-modal .modal-header h2');
+    if (loginHeader) loginHeader.textContent = (0,i18n.t)('loginTitle');
+
+    // Alarm bell
+    const alarmBell = document.getElementById('alarm-bell');
+    if (alarmBell && state/* userFlags */.BY.size === 0) {
+        alarmBell.title = (0,i18n.t)('alarmTooltipNone');
+    }
+
+    // Re-render dynamic parts that may use t()
+    (0,ui_helpers/* renderVisibleWeeks */.OR)();
+    (0,ui_helpers/* updateNextWeekBadge */.gJ)();
+    (0,ui_helpers/* updateAlarmBell */.Mb)();
+}
 
 function bindEvents() {
     const btnThisWeek = document.getElementById('btn-this-week');
@@ -2517,15 +3033,16 @@ function bindEvents() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             (0,state/* setLangMode */.UD)(btn.dataset.lang);
-            localStorage.setItem('kantine_lang', btn.dataset.lang);
+            localStorage.setItem(constants.LS.LANG, btn.dataset.lang);
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            (0,ui_helpers/* renderVisibleWeeks */.OR)();
+            updateUILanguage();
         });
     });
 
     if (btnHighlights) {
         btnHighlights.addEventListener('click', () => {
+            (0,actions/* renderTagsList */.Y1)();
             highlightsModal.classList.remove('hidden');
         });
     }
@@ -2696,8 +3213,8 @@ function bindEvents() {
             if (response.ok) {
                 (0,state/* setAuthToken */.O5)(data.key);
                 (0,state/* setCurrentUser */.lt)(employeeId);
-                localStorage.setItem('kantine_authToken', data.key);
-                localStorage.setItem('kantine_currentUser', employeeId);
+                localStorage.setItem(constants.LS.AUTH_TOKEN, data.key);
+                localStorage.setItem(constants.LS.CURRENT_USER, employeeId);
 
                 try {
                     const userResp = await fetch(`${constants/* API_BASE */.tE}/auth/user/`, {
@@ -2705,8 +3222,8 @@ function bindEvents() {
                     });
                     if (userResp.ok) {
                         const userData = await userResp.json();
-                        if (userData.first_name) localStorage.setItem('kantine_firstName', userData.first_name);
-                        if (userData.last_name) localStorage.setItem('kantine_lastName', userData.last_name);
+                        if (userData.first_name) localStorage.setItem(constants.LS.FIRST_NAME, userData.first_name);
+                        if (userData.last_name) localStorage.setItem(constants.LS.LAST_NAME, userData.last_name);
                     }
                 } catch (err) {
                     console.error('Failed to fetch user info:', err);
@@ -2733,10 +3250,10 @@ function bindEvents() {
     });
 
     btnLogout.addEventListener('click', () => {
-        localStorage.removeItem('kantine_authToken');
-        localStorage.removeItem('kantine_currentUser');
-        localStorage.removeItem('kantine_firstName');
-        localStorage.removeItem('kantine_lastName');
+        localStorage.removeItem(constants.LS.AUTH_TOKEN);
+        localStorage.removeItem(constants.LS.CURRENT_USER);
+        localStorage.removeItem(constants.LS.FIRST_NAME);
+        localStorage.removeItem(constants.LS.LAST_NAME);
         (0,state/* setAuthToken */.O5)(null);
         (0,state/* setCurrentUser */.lt)(null);
         (0,state/* setOrderMap */.di)(new Map());

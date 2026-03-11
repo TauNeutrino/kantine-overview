@@ -1,8 +1,103 @@
 import { displayMode, langMode, authToken, currentUser, orderMap, userFlags, pollIntervalId, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
-import { renderVisibleWeeks, openVersionMenu } from './ui_helpers.js';
-import { API_BASE, GUEST_TOKEN } from './constants.js';
+import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
+import { API_BASE, GUEST_TOKEN, LS } from './constants.js';
 import { apiHeaders } from './api.js';
+import { t } from './i18n.js';
+
+/**
+ * Updates all static UI labels/tooltips to match the current language.
+ * Called when the user switches the language toggle.
+ */
+function updateUILanguage() {
+    // Navigation buttons
+    const btnThisWeek = document.getElementById('btn-this-week');
+    const btnNextWeek = document.getElementById('btn-next-week');
+    if (btnThisWeek) {
+        btnThisWeek.textContent = t('thisWeek');
+        btnThisWeek.title = t('thisWeekTooltip');
+    }
+    if (btnNextWeek) {
+        btnNextWeek.textContent = t('nextWeek');
+        // Tooltip will be re-set by updateNextWeekBadge()
+    }
+
+    // Header title
+    const appTitle = document.querySelector('.header-left h1');
+    if (appTitle) {
+        const versionTag = appTitle.querySelector('.version-tag');
+        const updateIcon = appTitle.querySelector('.update-icon');
+        appTitle.textContent = t('appTitle') + ' ';
+        if (versionTag) appTitle.appendChild(versionTag);
+        if (updateIcon) appTitle.appendChild(updateIcon);
+    }
+
+    // Action button tooltips
+    const btnRefresh = document.getElementById('btn-refresh');
+    if (btnRefresh) btnRefresh.setAttribute('aria-label', t('refresh'));
+    if (btnRefresh) btnRefresh.title = t('refresh');
+
+    const btnHistory = document.getElementById('btn-history');
+    if (btnHistory) btnHistory.setAttribute('aria-label', t('history'));
+    if (btnHistory) btnHistory.title = t('history');
+
+    const btnHighlights = document.getElementById('btn-highlights');
+    if (btnHighlights) btnHighlights.setAttribute('aria-label', t('highlights'));
+    if (btnHighlights) btnHighlights.title = t('highlights');
+
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.title = t('themeTooltip');
+
+    // Login/Logout
+    const btnLoginOpen = document.getElementById('btn-login-open');
+    if (btnLoginOpen) {
+        btnLoginOpen.title = t('loginTooltip');
+        const loginText = btnLoginOpen.querySelector('span:last-child');
+        if (loginText && !loginText.classList.contains('material-icons-round')) {
+            loginText.textContent = t('login');
+        }
+    }
+
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) btnLogout.title = t('logoutTooltip');
+
+    // Language toggle tooltip
+    const langToggle = document.getElementById('lang-toggle');
+    if (langToggle) langToggle.title = t('langTooltip');
+
+    // Modal headers
+    const highlightsHeader = document.querySelector('#highlights-modal .modal-header h2');
+    if (highlightsHeader) highlightsHeader.textContent = t('highlightsTitle');
+    const highlightsDesc = document.querySelector('#highlights-modal .modal-body > p');
+    if (highlightsDesc) highlightsDesc.textContent = t('highlightsDesc');
+    const tagInput = document.getElementById('tag-input');
+    if (tagInput) {
+        tagInput.placeholder = t('tagInputPlaceholder');
+        tagInput.title = t('tagInputTooltip');
+    }
+    const btnAddTag = document.getElementById('btn-add-tag');
+    if (btnAddTag) {
+        btnAddTag.textContent = t('addTag');
+        btnAddTag.title = t('addTagTooltip');
+    }
+
+    const historyHeader = document.querySelector('#history-modal .modal-header h2');
+    if (historyHeader) historyHeader.textContent = t('historyTitle');
+
+    const loginHeader = document.querySelector('#login-modal .modal-header h2');
+    if (loginHeader) loginHeader.textContent = t('loginTitle');
+
+    // Alarm bell
+    const alarmBell = document.getElementById('alarm-bell');
+    if (alarmBell && userFlags.size === 0) {
+        alarmBell.title = t('alarmTooltipNone');
+    }
+
+    // Re-render dynamic parts that may use t()
+    renderVisibleWeeks();
+    updateNextWeekBadge();
+    updateAlarmBell();
+}
 
 export function bindEvents() {
     const btnThisWeek = document.getElementById('btn-this-week');
@@ -28,15 +123,16 @@ export function bindEvents() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             setLangMode(btn.dataset.lang);
-            localStorage.setItem('kantine_lang', btn.dataset.lang);
+            localStorage.setItem(LS.LANG, btn.dataset.lang);
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderVisibleWeeks();
+            updateUILanguage();
         });
     });
 
     if (btnHighlights) {
         btnHighlights.addEventListener('click', () => {
+            renderTagsList();
             highlightsModal.classList.remove('hidden');
         });
     }
@@ -207,8 +303,8 @@ export function bindEvents() {
             if (response.ok) {
                 setAuthToken(data.key);
                 setCurrentUser(employeeId);
-                localStorage.setItem('kantine_authToken', data.key);
-                localStorage.setItem('kantine_currentUser', employeeId);
+                localStorage.setItem(LS.AUTH_TOKEN, data.key);
+                localStorage.setItem(LS.CURRENT_USER, employeeId);
 
                 try {
                     const userResp = await fetch(`${API_BASE}/auth/user/`, {
@@ -216,8 +312,8 @@ export function bindEvents() {
                     });
                     if (userResp.ok) {
                         const userData = await userResp.json();
-                        if (userData.first_name) localStorage.setItem('kantine_firstName', userData.first_name);
-                        if (userData.last_name) localStorage.setItem('kantine_lastName', userData.last_name);
+                        if (userData.first_name) localStorage.setItem(LS.FIRST_NAME, userData.first_name);
+                        if (userData.last_name) localStorage.setItem(LS.LAST_NAME, userData.last_name);
                     }
                 } catch (err) {
                     console.error('Failed to fetch user info:', err);
@@ -244,10 +340,10 @@ export function bindEvents() {
     });
 
     btnLogout.addEventListener('click', () => {
-        localStorage.removeItem('kantine_authToken');
-        localStorage.removeItem('kantine_currentUser');
-        localStorage.removeItem('kantine_firstName');
-        localStorage.removeItem('kantine_lastName');
+        localStorage.removeItem(LS.AUTH_TOKEN);
+        localStorage.removeItem(LS.CURRENT_USER);
+        localStorage.removeItem(LS.FIRST_NAME);
+        localStorage.removeItem(LS.LAST_NAME);
         setAuthToken(null);
         setCurrentUser(null);
         setOrderMap(new Map());

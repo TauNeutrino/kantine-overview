@@ -14,7 +14,14 @@ export function getWeekYear(d) {
     return date.getFullYear();
 }
 
+/**
+ * Translates an English day name to the UI language.
+ * Returns German by default; returns English when langMode is 'en'.
+ * @param {string} englishDay - Day name in English (e.g. 'Monday')
+ * @returns {string} Translated day name
+ */
 export function translateDay(englishDay) {
+    if (langMode === 'en') return englishDay;
     const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
     return map[englishDay] || englishDay;
 }

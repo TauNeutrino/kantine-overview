@@ -1,8 +1,9 @@
 import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer } from './utils.js';
-import { API_BASE, GUEST_TOKEN, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION } from './constants.js';
+import { API_BASE, GUEST_TOKEN, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
 import { apiHeaders, githubHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
+import { t } from './i18n.js';
 
 let fullOrderHistoryCache = null;
 
@@ -14,13 +15,13 @@ export function updateAuthUI() {
                 const parsed = JSON.parse(akita);
                 if (parsed.auth && parsed.auth.token) {
                     setAuthToken(parsed.auth.token);
-                    localStorage.setItem('kantine_authToken', parsed.auth.token);
+                    localStorage.setItem(LS.AUTH_TOKEN, parsed.auth.token);
 
                     if (parsed.auth.user) {
                         setCurrentUser(parsed.auth.user.id || 'unknown');
-                        localStorage.setItem('kantine_currentUser', parsed.auth.user.id || 'unknown');
-                        if (parsed.auth.user.firstName) localStorage.setItem('kantine_firstName', parsed.auth.user.firstName);
-                        if (parsed.auth.user.lastName) localStorage.setItem('kantine_lastName', parsed.auth.user.lastName);
+                        localStorage.setItem(LS.CURRENT_USER, parsed.auth.user.id || 'unknown');
+                        if (parsed.auth.user.firstName) localStorage.setItem(LS.FIRST_NAME, parsed.auth.user.firstName);
+                        if (parsed.auth.user.lastName) localStorage.setItem(LS.LAST_NAME, parsed.auth.user.lastName);
                     }
                 }
             }
@@ -29,9 +30,9 @@ export function updateAuthUI() {
         }
     }
 
-    setAuthToken(localStorage.getItem('kantine_authToken'));
-    setCurrentUser(localStorage.getItem('kantine_currentUser'));
-    const firstName = localStorage.getItem('kantine_firstName');
+    setAuthToken(localStorage.getItem(LS.AUTH_TOKEN));
+    setCurrentUser(localStorage.getItem(LS.CURRENT_USER));
+    const firstName = localStorage.getItem(LS.FIRST_NAME);
     const btnLoginOpen = document.getElementById('btn-login-open');
     const userInfo = document.getElementById('user-info');
     const userIdDisplay = document.getElementById('user-id-display');
@@ -39,7 +40,7 @@ export function updateAuthUI() {
     if (authToken) {
         btnLoginOpen.classList.add('hidden');
         userInfo.classList.remove('hidden');
-        userIdDisplay.textContent = firstName || (currentUser ? `User ${currentUser}` : 'Angemeldet');
+        userIdDisplay.textContent = firstName || (currentUser ? `User ${currentUser}` : t('loggedIn'));
         fetchOrders();
     } else {
         btnLoginOpen.classList.remove('hidden');
@@ -91,7 +92,7 @@ export async function fetchFullOrderHistory() {
     if (fullOrderHistoryCache) {
         localCache = fullOrderHistoryCache;
     } else {
-        const ls = localStorage.getItem('kantine_history_cache');
+        const ls = localStorage.getItem(LS.HISTORY_CACHE);
         if (ls) {
             try {
                 localCache = JSON.parse(ls);
@@ -114,7 +115,7 @@ export async function fetchFullOrderHistory() {
     }
 
     progressFill.style.width = '0%';
-    progressText.textContent = localCache.length > 0 ? 'Suche nach neuen Bestellungen...' : 'Lade Bestellhistorie...';
+    progressText.textContent = localCache.length > 0 ? t('historyLoadingDelta') : t('historyLoadingFull');
     if (localCache.length > 0) historyLoading.classList.remove('hidden');
 
     let nextUrl = localCache.length > 0
@@ -155,12 +156,12 @@ export async function fetchFullOrderHistory() {
                 if (totalCount > 0) {
                     const pct = Math.round((fetchedOrders.length / totalCount) * 100);
                     progressFill.style.width = `${pct}%`;
-                    progressText.textContent = `Lade Bestellung ${fetchedOrders.length} von ${totalCount}...`;
+                    progressText.textContent = `${t('historyLoadingItem')} ${fetchedOrders.length} ${t('historyLoadingOf')} ${totalCount}...`;
                 } else {
-                    progressText.textContent = `Lade Bestellung ${fetchedOrders.length}...`;
+                    progressText.textContent = `${t('historyLoadingItem')} ${fetchedOrders.length}...`;
                 }
             } else if (!deltaComplete) {
-                progressText.textContent = `${fetchedOrders.length} neue/geänderte Bestellungen gefunden...`;
+                progressText.textContent = `${fetchedOrders.length} ${t('historyLoadingNew')}`;
             }
 
             nextUrl = deltaComplete ? null : data.next;
@@ -176,7 +177,7 @@ export async function fetchFullOrderHistory() {
 
             fullOrderHistoryCache = mergedOrders;
             try {
-                localStorage.setItem('kantine_history_cache', JSON.stringify(mergedOrders));
+                localStorage.setItem(LS.HISTORY_CACHE, JSON.stringify(mergedOrders));
             } catch (e) {
                 console.warn('History cache write error', e);
             }
@@ -185,9 +186,9 @@ export async function fetchFullOrderHistory() {
     } catch (error) {
         console.error('Error in history sync:', error);
         if (localCache.length === 0) {
-            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">Fehler beim Laden der Historie.</p>`;
+            historyContent.innerHTML = `<p style="color:var(--error-color);text-align:center;">${t('historyLoadError')}</p>`;
         } else {
-            showToast('Hintergrund-Synchronisation fehlgeschlagen', 'error');
+            showToast(t('bgSyncFailed'), 'error');
         }
     } finally {
         historyLoading.classList.add('hidden');
@@ -197,7 +198,7 @@ export async function fetchFullOrderHistory() {
 export function renderHistory(orders) {
     const content = document.getElementById('history-content');
     if (!orders || orders.length === 0) {
-        content.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Keine Bestellungen gefunden.</p>';
+        content.innerHTML = `<p style="text-align:center;color:var(--text-secondary);padding:20px;">${t('noOrders')}</p>`;
         return;
     }
 
@@ -208,7 +209,8 @@ export function renderHistory(orders) {
         const y = d.getFullYear();
         const m = d.getMonth();
         const monthKey = `${y}-${m.toString().padStart(2, '0')}`;
-        const monthName = d.toLocaleString('de-AT', { month: 'long' });
+        const uiLocale = langMode === 'en' ? 'en-US' : 'de-AT';
+        const monthName = d.toLocaleString(uiLocale, { month: 'long' });
 
         const kw = getISOWeek(d);
 
@@ -219,7 +221,7 @@ export function renderHistory(orders) {
             groups[y].months[monthKey] = { name: monthName, year: y, monthIndex: m, count: 0, total: 0, weeks: {} };
         }
         if (!groups[y].months[monthKey].weeks[kw]) {
-            groups[y].months[monthKey].weeks[kw] = { label: `KW ${kw}`, items: [], count: 0, total: 0 };
+            groups[y].months[monthKey].weeks[kw] = { label: langMode === 'en' ? `CW ${kw}` : `KW ${kw}`, items: [], count: 0, total: 0 };
         }
 
         const items = order.items || [];
@@ -267,7 +269,7 @@ export function renderHistory(orders) {
             monthHeader.setAttribute('tabindex', '0');
             monthHeader.setAttribute('role', 'button');
             monthHeader.setAttribute('aria-expanded', 'false');
-            monthHeader.setAttribute('title', 'Klicken, um die Bestellungen für diesen Monat ein-/auszublenden');
+            monthHeader.setAttribute('title', t('historyMonthToggle'));
 
             const monthHeaderContent = document.createElement('div');
             monthHeaderContent.style.display = 'flex';
@@ -282,7 +284,7 @@ export function renderHistory(orders) {
             monthSummary.className = 'history-month-summary';
 
             const monthSummarySpan = document.createElement('span');
-            monthSummarySpan.innerHTML = `${monthGroup.count} Bestellungen &bull; <strong>€${monthGroup.total.toFixed(2)}</strong>`;
+            monthSummarySpan.innerHTML = `${monthGroup.count} ${t('orders')} &bull; <strong>€${monthGroup.total.toFixed(2)}</strong>`;
             monthSummary.appendChild(monthSummarySpan);
 
             monthHeaderContent.appendChild(monthSummary);
@@ -326,14 +328,15 @@ export function renderHistory(orders) {
                 weekHeader.appendChild(weekLabel);
 
                 const weekSummary = document.createElement('span');
-                weekSummary.innerHTML = `${week.count} Bestellungen &bull; <strong>€${week.total.toFixed(2)}</strong>`;
+                weekSummary.innerHTML = `${week.count} ${t('orders')} &bull; <strong>€${week.total.toFixed(2)}</strong>`;
                 weekHeader.appendChild(weekSummary);
 
                 weekGroupDiv.appendChild(weekHeader);
 
                 week.items.forEach(item => {
                     const dateObj = new Date(item.date);
-                    const dayStr = dateObj.toLocaleDateString('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit' });
+                    const uiLocale = langMode === 'en' ? 'en-US' : 'de-AT';
+                    const dayStr = dateObj.toLocaleDateString(uiLocale, { weekday: 'short', day: '2-digit', month: '2-digit' });
 
                     const historyItem = document.createElement('div');
                     historyItem.className = 'history-item';
@@ -359,11 +362,11 @@ export function renderHistory(orders) {
                     const statusSpan = document.createElement('span');
                     statusSpan.className = 'history-item-status';
                     if (item.state === 9) {
-                        statusSpan.textContent = 'Storniert';
+                        statusSpan.textContent = t('stateCancelled');
                     } else if (item.state === 8) {
-                        statusSpan.textContent = 'Abgeschlossen';
+                        statusSpan.textContent = t('stateCompleted');
                     } else {
-                        statusSpan.textContent = 'Übertragen';
+                        statusSpan.textContent = t('stateTransferred');
                     }
                     statusDiv.appendChild(statusSpan);
                     detailsDiv.appendChild(statusDiv);
@@ -450,7 +453,7 @@ export async function placeOrder(date, articleId, name, price, description) {
         });
 
         if (response.ok || response.status === 201) {
-            showToast(`Bestellt: ${name}`, 'success');
+            showToast(`${t('orderSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
         } else {
@@ -478,7 +481,7 @@ export async function cancelOrder(date, articleId, name) {
         });
 
         if (response.ok) {
-            showToast(`Storniert: ${name}`, 'success');
+            showToast(`${t('cancelSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
         } else {
@@ -498,8 +501,9 @@ export function saveFlags() {
 export async function refreshFlaggedItems() {
     if (userFlags.size === 0) return;
     const token = authToken || GUEST_TOKEN;
-    const datesToFetch = new Set();
 
+    // Collect unique dates that have flagged items
+    const datesToFetch = new Set();
     for (const flagId of userFlags) {
         const [dateStr] = flagId.split('_');
         datesToFetch.add(dateStr);
@@ -518,32 +522,37 @@ export async function refreshFlaggedItems() {
                 if (!resp.ok) continue;
                 const data = await resp.json();
                 const menuGroups = data.results || [];
-                let dayItems = [];
+
+                // Build a lookup of fresh API items by article ID
+                const apiItemMap = new Map();
                 for (const group of menuGroups) {
                     if (group.items && Array.isArray(group.items)) {
-                        dayItems = dayItems.concat(group.items);
+                        for (const item of group.items) {
+                            apiItemMap.set(item.id, item);
+                        }
                     }
                 }
 
+                // Only update items that are actually flagged
                 for (let week of allWeeks) {
                     if (!week.days) continue;
-                    let dayObj = week.days.find(d => d.date === dateStr);
-                    if (dayObj) {
-                        dayObj.items = dayItems.map(item => {
-                            const isUnlimited = item.amount_tracking === false;
-                            const hasStock = parseInt(item.available_amount) > 0;
-                            return {
-                                id: `${dateStr}_${item.id}`,
-                                articleId: item.id,
-                                name: item.name || 'Unknown',
-                                description: item.description || '',
-                                price: parseFloat(item.price) || 0,
-                                available: isUnlimited || hasStock,
-                                availableAmount: parseInt(item.available_amount) || 0,
-                                amountTracking: item.amount_tracking !== false
-                            };
-                        });
-                        updated = true;
+                    const dayObj = week.days.find(d => d.date === dateStr);
+                    if (!dayObj || !dayObj.items) continue;
+
+                    for (let i = 0; i < dayObj.items.length; i++) {
+                        const existing = dayObj.items[i];
+                        const flagId = `${dateStr}_${existing.articleId}`;
+                        if (!userFlags.has(flagId)) continue;
+
+                        const apiItem = apiItemMap.get(existing.articleId);
+                        if (apiItem) {
+                            const isUnlimited = apiItem.amount_tracking === false;
+                            const hasStock = parseInt(apiItem.available_amount) > 0;
+                            existing.available = isUnlimited || hasStock;
+                            existing.availableAmount = parseInt(apiItem.available_amount) || 0;
+                            existing.amountTracking = apiItem.amount_tracking !== false;
+                            updated = true;
+                        }
                     }
                 }
             } catch (e) {
@@ -553,12 +562,14 @@ export async function refreshFlaggedItems() {
 
         if (updated) {
             saveMenuCache();
-            localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
-            updateAlarmBell();
-            renderVisibleWeeks();
         }
-        
-        showToast(`${userFlags.size} ${userFlags.size === 1 ? 'Menü' : 'Menüs'} geprüft`, 'info');
+
+        // Always update the check timestamp and bell status
+        localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
+        updateAlarmBell();
+        renderVisibleWeeks();
+
+        showToast(`${userFlags.size} ${userFlags.size === 1 ? t('menuSingular') : t('menuPlural')} ${t('menuChecked')}`, 'info');
     } finally {
         if (bellBtn) bellBtn.classList.remove('refreshing');
     }
@@ -570,11 +581,11 @@ export function toggleFlag(date, articleId, name, cutoff) {
     let flagAdded = false;
     if (userFlags.has(id)) {
         userFlags.delete(id);
-        showToast(`Flag entfernt für ${name}`, 'success');
+        showToast(`${t('flagRemoved')} ${name}`, 'success');
     } else {
         userFlags.add(id);
         flagAdded = true;
-        showToast(`Benachrichtigung aktiviert für ${name}`, 'success');
+        showToast(`${t('flagActivated')} ${name}`, 'success');
         if (Notification.permission === 'default') {
             Notification.requestPermission();
         }
