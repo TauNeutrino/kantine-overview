@@ -3,20 +3,23 @@
  * All fetch calls in the app route through these helpers to ensure
  * consistent auth and versioning headers.
  */
-import { API_BASE, GUEST_TOKEN, CLIENT_VERSION } from './constants.js';
+import { API_BASE, CLIENT_VERSION } from './constants.js';
 
 /**
  * Returns request headers for the Bessa REST API.
- * @param {string|null} token - Auth token; falls back to GUEST_TOKEN if absent.
+ * @param {string|null} token - Auth token.
  * @returns {Object} HTTP headers for fetch()
  */
 export function apiHeaders(token) {
-    return {
-        'Authorization': `Token ${token || GUEST_TOKEN}`,
+    const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-Client-Version': CLIENT_VERSION
     };
+    if (token) {
+        headers['Authorization'] = `Token ${token}`;
+    }
+    return headers;
 }
 
 /**

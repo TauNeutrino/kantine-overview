@@ -1,3 +1,12 @@
+## v1.7.1 (2026-03-12)
+- 🛡️ **Security**: Kritischer Security-Fix und Härtung:
+  - **XSS-Schutz**: `innerHTML` durch `textContent` in `renderTagsList` (Actions) und `showErrorModal` (UI-Helpers) ersetzt.
+  - **XSS-Schutz**: Dynamische Kartenelemente in `createDayCard` validiert.
+  - **Input-Validierung**: Neue Schlagwörter werden nun auf Länge (2-20 Zeichen) und erlaubte Zeichen (Alphanumerisch + Food-Sonderzeichen) geprüft.
+  - **GUEST_TOKEN**: Der hardcodierte Gast-Token wurde komplett aus dem Code entfernt. Nicht-eingeloggte Nutzer haben keinen API-Zugriff mehr (Sicherheitsbestimmung).
+  - **Auth-Guards**: API-Funktionen (`loadMenuDataFromAPI`, `refreshFlaggedItems`) prüfen nun explizit auf vorhandene Authentifizierung vor dem Fetch.
+- 🛡️ **Tech**: Sicherheits-Test-Suite `tests/test_security.js` implementiert.
+
 ## v1.6.25 (2026-03-12)
 - ⚡ **Performance**: Debounced Resize-Listener hinzugefügt. Die Höhen-Synchronisierung der Menü-Karten wird nun auch bei Viewport-Änderungen (z.B. Fenster-Skalierung oder Orientierungswechsel) automatisch und effizient ausgeführt.
 - 🧹 **Tech**: `debounce` Utility-Funktion in `utils.js` ergänzt.

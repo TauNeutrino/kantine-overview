@@ -533,7 +533,12 @@ function saveFlags() {
 
 async function refreshFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0) return;
-    const token = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX || _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GUEST_TOKEN */ .f9;
+    const token = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX;
+    if (!token) {
+        const bellBtn = document.getElementById('alarm-bell');
+        if (bellBtn) bellBtn.classList.remove('refreshing');
+        return;
+    }
 
     // Collect unique dates that have flagged items
     const datesToFetch = new Set();
@@ -726,14 +731,26 @@ function saveHighlightTags() {
 }
 
 function addHighlightTag(tag) {
-    tag = tag.trim().toLowerCase();
-    if (tag && !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .highlightTags */ .yz.includes(tag)) {
-        const newTags = [..._state_js__WEBPACK_IMPORTED_MODULE_0__/* .highlightTags */ .yz, tag];
-        (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setHighlightTags */ .iw)(newTags);
-        saveHighlightTags();
-        return true;
+    if (!tag) return false;
+    tag = tag.trim();
+    if (tag.length < 2) {
+        showToast('Tag muss mindestens 2 Zeichen lang sein.', 'error');
+        return false;
     }
-    return false;
+    if (tag.length > 20) {
+        showToast('Tag darf maximal 20 Zeichen lang sein.', 'error');
+        return false;
+    }
+    // Only allow alphanumeric characters, spaces and common special chars for food
+    if (!/^[a-zA-Z0-9äöüÄÖÜß\s\-\.]+$/.test(tag)) {
+        showToast('Ungültige Zeichen im Tag.', 'error');
+        return false;
+    }
+    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .highlightTags */ .yz.includes(tag)) return false;
+    const newTags = [..._state_js__WEBPACK_IMPORTED_MODULE_0__/* .highlightTags */ .yz, tag];
+    (0,_state_js__WEBPACK_IMPORTED_MODULE_0__/* .setHighlightTags */ .iw)(newTags);
+    saveHighlightTags();
+    return true;
 }
 
 function removeHighlightTag(tag) {
@@ -744,19 +761,26 @@ function removeHighlightTag(tag) {
 
 function renderTagsList() {
     const list = document.getElementById('tags-list');
-    list.innerHTML = '';
+    if (!list) return;
+    list.innerHTML = ''; // Clear existing content
     _state_js__WEBPACK_IMPORTED_MODULE_0__/* .highlightTags */ .yz.forEach(tag => {
         const badge = document.createElement('span');
         badge.className = 'tag-badge';
-        badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}" title="Schlagwort entfernen">&times;</span>`;
-        list.appendChild(badge);
-    });
-
-    list.querySelectorAll('.tag-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            removeHighlightTag(e.target.dataset.tag);
+        
+        const label = document.createElement('span');
+        label.textContent = tag;
+        badge.appendChild(label);
+        
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'tag-remove';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.title = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('removeTagTooltip') || 'Entfernen';
+        removeBtn.onclick = () => {
+            removeHighlightTag(tag);
             renderTagsList();
-        });
+        };
+        badge.appendChild(removeBtn);
+        list.appendChild(badge);
     });
 }
 
@@ -840,7 +864,11 @@ async function loadMenuDataFromAPI() {
 
     loading.classList.remove('hidden');
 
-    const token = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX || _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GUEST_TOKEN */ .f9;
+    const token = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX;
+    if (!token) {
+        loading.classList.add('hidden');
+        return;
+    }
 
     try {
         progressModal.classList.remove('hidden');
@@ -1007,7 +1035,8 @@ async function loadMenuDataFromAPI() {
         Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 842)).then(uiHelpers => {
             uiHelpers.showErrorModal(
                 'Keine Verbindung',
-                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(error.message)}</small>`,
+                'Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.',
+                error.message,
                 'Zur Original-Seite',
                 'https://web.bessa.app/knapp-kantine'
             );
@@ -1084,16 +1113,19 @@ function showToast(message, type = 'info') {
 
 /**
  * Returns request headers for the Bessa REST API.
- * @param {string|null} token - Auth token; falls back to GUEST_TOKEN if absent.
+ * @param {string|null} token - Auth token.
  * @returns {Object} HTTP headers for fetch()
  */
 function apiHeaders(token) {
-    return {
-        'Authorization': `Token ${token || _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GUEST_TOKEN */ .f9}`,
+    const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-Client-Version': _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .CLIENT_VERSION */ .fZ
     };
+    if (token) {
+        headers['Authorization'] = `Token ${token}`;
+    }
+    return headers;
 }
 
 /**
@@ -1116,7 +1148,6 @@ function githubHeaders() {
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
 /* harmony export */   d_: () => (/* binding */ INSTALLER_BASE),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
-/* harmony export */   f9: () => (/* binding */ GUEST_TOKEN),
 /* harmony export */   fZ: () => (/* binding */ CLIENT_VERSION),
 /* harmony export */   fv: () => (/* binding */ POLL_INTERVAL_MS),
 /* harmony export */   pe: () => (/* binding */ GITHUB_API),
@@ -1132,11 +1163,8 @@ function githubHeaders() {
 /** Base URL for the Bessa REST API (v1). */
 const API_BASE = 'https://api.bessa.app/v1';
 
-/** Guest token for unauthenticated API calls (e.g. browsing the menu). */
-const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
-
 /** The client version injected into every API request header. */
-const CLIENT_VERSION = 'v1.6.19';
+const CLIENT_VERSION = 'v1.7.1';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -2222,56 +2250,79 @@ function removeCountdown() {
 setInterval(updateCountdown, 60000);
 setTimeout(updateCountdown, 1000);
 
-function showErrorModal(title, htmlContent, btnText, url) {
+function showErrorModal(title, message, details, btnText, url) {
     const modalId = 'error-modal';
     let modal = document.getElementById(modalId);
     if (modal) modal.remove();
 
     modal = document.createElement('div');
     modal.id = modalId;
-    modal.className = 'modal hidden';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
-                    <span class="material-icons-round">signal_wifi_off</span>
-                    ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(title)}
-                </h2>
-            </div>
-            <div style="padding: 20px;">
-                <p style="margin-bottom: 15px; color: var(--text-primary);">${htmlContent}</p>
-                <div style="margin-top: 20px; display: flex; justify-content: center;">
-                    <button id="btn-error-redirect" style="
-                        background-color: var(--accent-color);
-                        color: white;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        border: none;
-                        font-weight: 600;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        width: 100%;
-                        justify-content: center;
-                        transition: transform 0.1s;
-                    ">
-                        ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(btnText)}
-                        <span class="material-icons-round">open_in_new</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+    modal.className = 'modal'; // Removed hidden because we are showing it now
+    
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    const h2 = document.createElement('h2');
+    h2.style.cssText = 'color: var(--error-color); display: flex; align-items: center; gap: 10px;';
+    
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = 'signal_wifi_off';
+    h2.appendChild(icon);
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    h2.appendChild(titleSpan);
+    
+    header.appendChild(h2);
+    content.appendChild(header);
+    
+    const body = document.createElement('div');
+    body.style.padding = '20px';
+    
+    const p = document.createElement('p');
+    p.style.cssText = 'margin-bottom: 15px; color: var(--text-primary);';
+    p.textContent = message;
+    body.appendChild(p);
+    
+    if (details) {
+        const small = document.createElement('small');
+        small.style.cssText = 'display: block; margin-top: 10px; color: var(--text-secondary);';
+        small.textContent = details;
+        body.appendChild(small);
+    }
+    
+    const footer = document.createElement('div');
+    footer.style.cssText = 'margin-top: 20px; display: flex; justify-content: center;';
+    
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+        background-color: var(--accent-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
     `;
+    btn.textContent = btnText || 'Zur Original-Seite';
+    btn.onclick = () => {
+        window.open(url || 'https://web.bessa.app/knapp-kantine', '_blank');
+        modal.classList.add('hidden');
+    };
+    
+    footer.appendChild(btn);
+    body.appendChild(footer);
+    content.appendChild(body);
+    modal.appendChild(content);
     document.body.appendChild(modal);
-
-    document.getElementById('btn-error-redirect').addEventListener('click', () => {
-        window.location.href = url;
-    });
-
-    requestAnimationFrame(() => {
-        modal.classList.remove('hidden');
-    });
 }
 
 function updateAlarmBell() {
@@ -3227,7 +3278,7 @@ function bindEvents() {
             const email = `knapp-${employeeId}@bessa.app`;
             const response = await fetch(`${constants/* API_BASE */.tE}/auth/login/`, {
                 method: 'POST',
-                headers: (0,api/* apiHeaders */.H)(constants/* GUEST_TOKEN */.f9),
+                headers: (0,api/* apiHeaders */.H)(constants.GUEST_TOKEN),
                 body: JSON.stringify({ email, password })
             });
 

@@ -88,7 +88,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | **Performance** | NFR-001 | Die Darstellung bereits gecachter Daten muss ohne spürbare Verzögerung erfolgen. | < 200 ms (UI-Rendering) |
 | **Performance** | NFR-002 | Das Polling für geflaggte Menüs darf die reguläre Nutzung nicht beeinträchtigen. | Intervall ≥ 5 Minuten |
 | **Sicherheit** | NFR-003 | Es dürfen keine Zugangsdaten dauerhaft gespeichert werden. | 0 (keine persistente Speicherung von Passwörtern) |
-| **Sicherheit** | NFR-004 | Auth-Tokens müssen sitzungsbasiert gespeichert werden und bei Schließen des Browsers verfallen. | sessionStorage |
+| **Sicherheit** | NFR-004 | Auth-Tokens werden persistent gespeichert, um eine dauerhafte Anmeldung zu ermöglichen. | localStorage |
 | **Benutzbarkeit** | NFR-005 | Die Oberfläche muss auf mobilen Geräten fehlerfrei nutzbar sein. | Viewports ab 320px Breite |
 | **Benutzbarkeit** | NFR-006 | Alle interaktiven Elemente müssen Tooltips oder Hilfetexte bieten. | 100% Coverage |
 | **Benutzbarkeit** | NFR-007 | Die Benutzeroberfläche muss standardmäßig in Deutsch sein. Bei aktivem EN-Modus muss die gesamte GUI auf Englisch umgestellt werden. | Vollständige Lokalisierung (DE default / EN on demand) |
@@ -97,7 +97,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 ## 4. Technische Randbedingungen
 *   **Deployment**: Das System wird als Bookmarklet ausgeliefert, das auf der Bessa-Webseite ausgeführt wird.
 *   **Datenquelle**: Direkte Integration mit der Bessa REST-API (`api.bessa.app/v1`).
-*   **Datenhaltung**: Clientseitig via `localStorage` (Menü-Cache, Flags, Highlights, Theme) und `sessionStorage` (Auth-Token).
+*   **Datenhaltung**: Clientseitig via `localStorage` (Menü-Cache, Flags, Highlights, Theme, Auth-Token).
 *   **Build**: Bash-basiertes Build-Script, das Bookmarklet-URL, Standalone-HTML und Installer-Seite generiert.
 *   **Versionierung**: SemVer, verwaltet über GitHub Releases/Tags.
 *   **Tests**: Python-basierte Build-Tests (`python3`) + Node.js-basierte Logik-Tests + Node.js-basierte DOM-Interaktionstests (JSDOM).

@@ -45,12 +45,11 @@ try {
         throw new Error(`Expected Authorization header 'Token ${token}', but got '${headersWithToken['Authorization']}'`);
     }
 
-    // Test without token (should use GUEST_TOKEN)
+    // Test without token (should NOT have Authorization header)
     const headersWithoutToken = sandbox.apiHeaders();
     console.log("Without token:", JSON.stringify(headersWithoutToken));
-    const guestToken = vm.runInContext('GUEST_TOKEN', sandbox);
-    if (headersWithoutToken['Authorization'] !== `Token ${guestToken}`) {
-        throw new Error(`Expected Authorization header 'Token ${guestToken}', but got '${headersWithoutToken['Authorization']}'`);
+    if (headersWithoutToken['Authorization']) {
+        throw new Error(`Expected NO Authorization header when token is missing, but got '${headersWithoutToken['Authorization']}'`);
     }
 
     if (headersWithoutToken['Accept'] !== 'application/json') {

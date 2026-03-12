@@ -632,56 +632,79 @@ export function removeCountdown() {
 setInterval(updateCountdown, 60000);
 setTimeout(updateCountdown, 1000);
 
-export function showErrorModal(title, htmlContent, btnText, url) {
+export function showErrorModal(title, message, details, btnText, url) {
     const modalId = 'error-modal';
     let modal = document.getElementById(modalId);
     if (modal) modal.remove();
 
     modal = document.createElement('div');
     modal.id = modalId;
-    modal.className = 'modal hidden';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color: var(--error-color); display: flex; align-items: center; gap: 10px;">
-                    <span class="material-icons-round">signal_wifi_off</span>
-                    ${escapeHtml(title)}
-                </h2>
-            </div>
-            <div style="padding: 20px;">
-                <p style="margin-bottom: 15px; color: var(--text-primary);">${htmlContent}</p>
-                <div style="margin-top: 20px; display: flex; justify-content: center;">
-                    <button id="btn-error-redirect" style="
-                        background-color: var(--accent-color);
-                        color: white;
-                        padding: 12px 24px;
-                        border-radius: 8px;
-                        border: none;
-                        font-weight: 600;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        width: 100%;
-                        justify-content: center;
-                        transition: transform 0.1s;
-                    ">
-                        ${escapeHtml(btnText)}
-                        <span class="material-icons-round">open_in_new</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+    modal.className = 'modal'; // Removed hidden because we are showing it now
+    
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    const h2 = document.createElement('h2');
+    h2.style.cssText = 'color: var(--error-color); display: flex; align-items: center; gap: 10px;';
+    
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = 'signal_wifi_off';
+    h2.appendChild(icon);
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    h2.appendChild(titleSpan);
+    
+    header.appendChild(h2);
+    content.appendChild(header);
+    
+    const body = document.createElement('div');
+    body.style.padding = '20px';
+    
+    const p = document.createElement('p');
+    p.style.cssText = 'margin-bottom: 15px; color: var(--text-primary);';
+    p.textContent = message;
+    body.appendChild(p);
+    
+    if (details) {
+        const small = document.createElement('small');
+        small.style.cssText = 'display: block; margin-top: 10px; color: var(--text-secondary);';
+        small.textContent = details;
+        body.appendChild(small);
+    }
+    
+    const footer = document.createElement('div');
+    footer.style.cssText = 'margin-top: 20px; display: flex; justify-content: center;';
+    
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+        background-color: var(--accent-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
     `;
+    btn.textContent = btnText || 'Zur Original-Seite';
+    btn.onclick = () => {
+        window.open(url || 'https://web.bessa.app/knapp-kantine', '_blank');
+        modal.classList.add('hidden');
+    };
+    
+    footer.appendChild(btn);
+    body.appendChild(footer);
+    content.appendChild(body);
+    modal.appendChild(content);
     document.body.appendChild(modal);
-
-    document.getElementById('btn-error-redirect').addEventListener('click', () => {
-        window.location.href = url;
-    });
-
-    requestAnimationFrame(() => {
-        modal.classList.remove('hidden');
-    });
 }
 
 export function updateAlarmBell() {

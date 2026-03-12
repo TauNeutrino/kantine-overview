@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer } from './utils.js';
-import { API_BASE, GUEST_TOKEN, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
+import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
 import { apiHeaders, githubHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
 import { t } from './i18n.js';
@@ -500,7 +500,12 @@ export function saveFlags() {
 
 export async function refreshFlaggedItems() {
     if (userFlags.size === 0) return;
-    const token = authToken || GUEST_TOKEN;
+    const token = authToken;
+    if (!token) {
+        const bellBtn = document.getElementById('alarm-bell');
+        if (bellBtn) bellBtn.classList.remove('refreshing');
+        return;
+    }
 
     // Collect unique dates that have flagged items
     const datesToFetch = new Set();
@@ -693,14 +698,26 @@ export function saveHighlightTags() {
 }
 
 export function addHighlightTag(tag) {
-    tag = tag.trim().toLowerCase();
-    if (tag && !highlightTags.includes(tag)) {
-        const newTags = [...highlightTags, tag];
-        setHighlightTags(newTags);
-        saveHighlightTags();
-        return true;
+    if (!tag) return false;
+    tag = tag.trim();
+    if (tag.length < 2) {
+        showToast('Tag muss mindestens 2 Zeichen lang sein.', 'error');
+        return false;
     }
-    return false;
+    if (tag.length > 20) {
+        showToast('Tag darf maximal 20 Zeichen lang sein.', 'error');
+        return false;
+    }
+    // Only allow alphanumeric characters, spaces and common special chars for food
+    if (!/^[a-zA-Z0-9äöüÄÖÜß\s\-\.]+$/.test(tag)) {
+        showToast('Ungültige Zeichen im Tag.', 'error');
+        return false;
+    }
+    if (highlightTags.includes(tag)) return false;
+    const newTags = [...highlightTags, tag];
+    setHighlightTags(newTags);
+    saveHighlightTags();
+    return true;
 }
 
 export function removeHighlightTag(tag) {
@@ -711,19 +728,26 @@ export function removeHighlightTag(tag) {
 
 export function renderTagsList() {
     const list = document.getElementById('tags-list');
-    list.innerHTML = '';
+    if (!list) return;
+    list.innerHTML = ''; // Clear existing content
     highlightTags.forEach(tag => {
         const badge = document.createElement('span');
         badge.className = 'tag-badge';
-        badge.innerHTML = `${tag} <span class="tag-remove" data-tag="${tag}" title="Schlagwort entfernen">&times;</span>`;
-        list.appendChild(badge);
-    });
-
-    list.querySelectorAll('.tag-remove').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            removeHighlightTag(e.target.dataset.tag);
+        
+        const label = document.createElement('span');
+        label.textContent = tag;
+        badge.appendChild(label);
+        
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'tag-remove';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.title = t('removeTagTooltip') || 'Entfernen';
+        removeBtn.onclick = () => {
+            removeHighlightTag(tag);
             renderTagsList();
-        });
+        };
+        badge.appendChild(removeBtn);
+        list.appendChild(badge);
     });
 }
 
@@ -807,7 +831,11 @@ export async function loadMenuDataFromAPI() {
 
     loading.classList.remove('hidden');
 
-    const token = authToken || GUEST_TOKEN;
+    const token = authToken;
+    if (!token) {
+        loading.classList.add('hidden');
+        return;
+    }
 
     try {
         progressModal.classList.remove('hidden');
@@ -974,7 +1002,8 @@ export async function loadMenuDataFromAPI() {
         import('./ui_helpers.js').then(uiHelpers => {
             uiHelpers.showErrorModal(
                 'Keine Verbindung',
-                `Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.<br><br><small style="color:var(--text-secondary)">${escapeHtml(error.message)}</small>`,
+                'Die Menüdaten konnten nicht geladen werden. Möglicherweise besteht keine Verbindung zur API oder zur Bessa-Webseite.',
+                error.message,
                 'Zur Original-Seite',
                 'https://web.bessa.app/knapp-kantine'
             );

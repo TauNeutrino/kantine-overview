@@ -7,11 +7,8 @@
 /** Base URL for the Bessa REST API (v1). */
 export const API_BASE = 'https://api.bessa.app/v1';
 
-/** Guest token for unauthenticated API calls (e.g. browsing the menu). */
-export const GUEST_TOKEN = 'c3418725e95a9f90e3645cbc846b4d67c7c66131';
-
 /** The client version injected into every API request header. */
-export const CLIENT_VERSION = 'v1.6.19';
+export const CLIENT_VERSION = 'v1.7.1';
 
 /** Bessa venue ID for Knapp-Kantine. */
 export const VENUE_ID = 591;
