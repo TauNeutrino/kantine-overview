@@ -1,3 +1,10 @@
+## v1.6.25 (2026-03-12)
+- ⚡ **Performance**: Debounced Resize-Listener hinzugefügt. Die Höhen-Synchronisierung der Menü-Karten wird nun auch bei Viewport-Änderungen (z.B. Fenster-Skalierung oder Orientierungswechsel) automatisch und effizient ausgeführt.
+- 🧹 **Tech**: `debounce` Utility-Funktion in `utils.js` ergänzt.
+
+## v1.6.24 (2026-03-12)
+- ⚡ **Performance**: Layout Thrashing in `syncMenuItemHeights` behoben. Durch Batch-Verarbeitung von DOM-Lese- und Schreibvorgängen wurde die Rendering-Effizienz beim Wochenwechsel verbessert.
+
 ## v1.6.23 (2026-03-12)
 - 🎨 **UI**: Umfassende UI-Verbesserungen umgesetzt:
   - **Glassmorphism**: Header-Hintergrundtransparenz auf 72% reduziert (war 90%) – der Blur-Effekt ist nun beim Scrollen sichtbar.

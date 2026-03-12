@@ -1578,9 +1578,10 @@ function setLangMode(lang) {
 /* harmony export */   OR: () => (/* binding */ renderVisibleWeeks),
 /* harmony export */   Ux: () => (/* binding */ checkForUpdates),
 /* harmony export */   gJ: () => (/* binding */ updateNextWeekBadge),
-/* harmony export */   showErrorModal: () => (/* binding */ showErrorModal)
+/* harmony export */   showErrorModal: () => (/* binding */ showErrorModal),
+/* harmony export */   wy: () => (/* binding */ syncMenuItemHeights)
 /* harmony export */ });
-/* unused harmony exports syncMenuItemHeights, createDayCard, fetchVersions, updateCountdown, removeCountdown */
+/* unused harmony exports createDayCard, fetchVersions, updateCountdown, removeCountdown */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -1738,23 +1739,39 @@ function renderVisibleWeeks() {
 function syncMenuItemHeights(grid) {
     const cards = grid.querySelectorAll('.menu-card');
     if (cards.length === 0) return;
+
+    // 1. Gather all menu-item groups (rows) across cards
+    const itemRows = [];
     let maxItems = 0;
-    cards.forEach(card => {
-        maxItems = Math.max(maxItems, card.querySelectorAll('.menu-item').length);
+
+    const cardItems = Array.from(cards).map(card => {
+        const items = Array.from(card.querySelectorAll('.menu-item'));
+        maxItems = Math.max(maxItems, items.length);
+        return items;
     });
+
     for (let i = 0; i < maxItems; i++) {
-        let maxHeight = 0;
-        const itemsAtPos = [];
-        cards.forEach(card => {
-            const items = card.querySelectorAll('.menu-item');
-            if (items[i]) {
-                items[i].style.height = 'auto';
-                maxHeight = Math.max(maxHeight, items[i].offsetHeight);
-                itemsAtPos.push(items[i]);
-            }
-        });
-        itemsAtPos.forEach(item => { item.style.height = `${maxHeight}px`; });
+        // Collect i-th item from each card (forming a "row")
+        itemRows[i] = cardItems.map(items => items[i]).filter(item => !!item);
     }
+
+    // 2. Batch Reset (Write phase) - clear old heights to let them flow naturally
+    itemRows.flat().forEach(item => {
+        item.style.height = 'auto';
+    });
+
+    // 3. Batch Read (Read phase) - measure all heights in one pass to avoid layout thrashing
+    const rowMaxHeights = itemRows.map(row => {
+        return Math.max(...row.map(item => item.offsetHeight));
+    });
+
+    // 4. Batch Apply (Write phase) - set synchronized heights
+    itemRows.forEach((row, i) => {
+        const height = `${rowMaxHeights[i]}px`;
+        row.forEach(item => {
+            item.style.height = height;
+        });
+    });
 }
 
 function createDayCard(day) {
@@ -2329,6 +2346,7 @@ function updateAlarmBell() {
 /* harmony export */   U4: () => (/* binding */ isNewer),
 /* harmony export */   ZD: () => (/* binding */ escapeHtml),
 /* harmony export */   gs: () => (/* binding */ getRelativeTime),
+/* harmony export */   sg: () => (/* binding */ debounce),
 /* harmony export */   sn: () => (/* binding */ getISOWeek)
 /* harmony export */ });
 /* unused harmony export splitLanguage */
@@ -2580,6 +2598,18 @@ function getLocalizedText(text) {
     const split = splitLanguage(text);
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en') return split.en || split.raw;
     return split.de || split.raw;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
 
@@ -2884,7 +2914,10 @@ var constants = __webpack_require__(521);
 var api = __webpack_require__(672);
 // EXTERNAL MODULE: ./src/i18n.js
 var i18n = __webpack_require__(646);
+// EXTERNAL MODULE: ./src/utils.js
+var utils = __webpack_require__(413);
 ;// ./src/events.js
+
 
 
 
@@ -3251,6 +3284,12 @@ function bindEvents() {
         (0,actions/* updateAuthUI */.i_)();
         (0,ui_helpers/* renderVisibleWeeks */.OR)();
     });
+
+    // Sync heights on window resize (FR-Performance)
+    window.addEventListener('resize', (0,utils/* debounce */.sg)(() => {
+        const grid = document.querySelector('.days-grid');
+        if (grid) (0,ui_helpers/* syncMenuItemHeights */.wy)(grid);
+    }, 150));
 }
 
 ;// ./src/index.js

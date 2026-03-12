@@ -149,23 +149,39 @@ export function renderVisibleWeeks() {
 export function syncMenuItemHeights(grid) {
     const cards = grid.querySelectorAll('.menu-card');
     if (cards.length === 0) return;
+
+    // 1. Gather all menu-item groups (rows) across cards
+    const itemRows = [];
     let maxItems = 0;
-    cards.forEach(card => {
-        maxItems = Math.max(maxItems, card.querySelectorAll('.menu-item').length);
+
+    const cardItems = Array.from(cards).map(card => {
+        const items = Array.from(card.querySelectorAll('.menu-item'));
+        maxItems = Math.max(maxItems, items.length);
+        return items;
     });
+
     for (let i = 0; i < maxItems; i++) {
-        let maxHeight = 0;
-        const itemsAtPos = [];
-        cards.forEach(card => {
-            const items = card.querySelectorAll('.menu-item');
-            if (items[i]) {
-                items[i].style.height = 'auto';
-                maxHeight = Math.max(maxHeight, items[i].offsetHeight);
-                itemsAtPos.push(items[i]);
-            }
-        });
-        itemsAtPos.forEach(item => { item.style.height = `${maxHeight}px`; });
+        // Collect i-th item from each card (forming a "row")
+        itemRows[i] = cardItems.map(items => items[i]).filter(item => !!item);
     }
+
+    // 2. Batch Reset (Write phase) - clear old heights to let them flow naturally
+    itemRows.flat().forEach(item => {
+        item.style.height = 'auto';
+    });
+
+    // 3. Batch Read (Read phase) - measure all heights in one pass to avoid layout thrashing
+    const rowMaxHeights = itemRows.map(row => {
+        return Math.max(...row.map(item => item.offsetHeight));
+    });
+
+    // 4. Batch Apply (Write phase) - set synchronized heights
+    itemRows.forEach((row, i) => {
+        const height = `${rowMaxHeights[i]}px`;
+        row.forEach(item => {
+            item.style.height = height;
+        });
+    });
 }
 
 export function createDayCard(day) {

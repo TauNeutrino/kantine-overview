@@ -246,3 +246,15 @@ export function getLocalizedText(text) {
     if (langMode === 'en') return split.en || split.raw;
     return split.de || split.raw;
 }
+
+export function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}

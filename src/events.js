@@ -1,9 +1,10 @@
 import { displayMode, langMode, authToken, currentUser, orderMap, userFlags, pollIntervalId, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
-import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
+import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
 import { API_BASE, GUEST_TOKEN, LS } from './constants.js';
 import { apiHeaders } from './api.js';
 import { t } from './i18n.js';
+import { debounce } from './utils.js';
 
 /**
  * Updates all static UI labels/tooltips to match the current language.
@@ -364,4 +365,10 @@ export function bindEvents() {
         updateAuthUI();
         renderVisibleWeeks();
     });
+
+    // Sync heights on window resize (FR-Performance)
+    window.addEventListener('resize', debounce(() => {
+        const grid = document.querySelector('.days-grid');
+        if (grid) syncMenuItemHeights(grid);
+    }, 150));
 }
