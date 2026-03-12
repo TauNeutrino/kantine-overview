@@ -8,12 +8,15 @@ console.log("=== Running API Unit Tests ===");
 const apiPath = path.join(__dirname, '..', 'src', 'api.js');
 const constantsPath = path.join(__dirname, '..', 'src', 'constants.js');
 
+// Load version from version.txt for placeholder replacement
+const versionSnippet = fs.readFileSync(path.join(__dirname, '..', 'version.txt'), 'utf8').trim();
+
 let apiCode = fs.readFileSync(apiPath, 'utf8');
 let constantsCode = fs.readFileSync(constantsPath, 'utf8');
 
 // Strip exports and imports for VM
 apiCode = apiCode.replace(/export /g, '').replace(/import .*? from .*?;/g, '');
-constantsCode = constantsCode.replace(/export /g, '');
+constantsCode = constantsCode.replace(/export /g, '').replace(/{{VERSION}}/g, versionSnippet);
 
 // 2. Setup Mock Environment
 const sandbox = {

@@ -47,8 +47,13 @@ const createMockElement = (id = 'mock') => {
         },
         value: '',
         style: { cssText: '', display: '' },
-        addEventListener: () => { },
-        removeEventListener: () => { },
+        _listeners: {},
+        addEventListener: function(type, cb) { 
+            this._listeners[type] = cb; 
+            // Also assign to on[type] for easier testing
+            this['on' + type] = cb;
+        },
+        removeEventListener: function(type) { delete this._listeners[type]; },
         appendChild: function(child) { 
             if (this.id === 'tags-list' || this.id === 'toast-container') {
                 // Check children for XSS
@@ -73,17 +78,46 @@ const createMockElement = (id = 'mock') => {
 const sandbox = {
     console: console,
     document: {
+        _elements: {},
         body: createMockElement('body'),
+        documentElement: createMockElement('html'),
         createElement: (tag) => createMockElement(tag),
-        getElementById: (id) => createMockElement(id),
+        getElementById: function(id) {
+            if (!this._elements[id]) this._elements[id] = createMockElement(id);
+            return this._elements[id];
+        },
         querySelector: (sel) => createMockElement(sel),
+        querySelectorAll: (sel) => [createMockElement(sel)],
     },
-    localStorage: {
+    localStorage: new Proxy({
         _data: {},
         getItem: function(key) { return this._data[key] || null; },
         setItem: function(key, val) { this._data[key] = String(val); },
-        removeItem: function(key) { delete this._data[key]; }
-    },
+        removeItem: function(key) { delete this._data[key]; },
+        clear: function() { this._data = {}; }
+    }, {
+        get(target, prop) {
+            if (prop in target) return target[prop];
+            return target._data[prop] || null;
+        },
+        set(target, prop, value) {
+            if (prop === '_data') { target._data = value; return true; }
+            target._data[prop] = String(value);
+            return true;
+        },
+        deleteProperty(target, prop) {
+            delete target._data[prop];
+            return true;
+        },
+        ownKeys(target) {
+            return Object.keys(target._data);
+        },
+        getOwnPropertyDescriptor(target, prop) {
+            if (prop in target._data) {
+                return { enumerable: true, configurable: true, value: target._data[prop], writable: true };
+            }
+        }
+    }),
     fetch: () => Promise.reject(new Error('Network error')),
     setTimeout: (cb) => cb(),
     setInterval: () => { },
@@ -93,7 +127,10 @@ const sandbox = {
     window: { 
         location: { href: '' },
         open: () => {},
-        crypto: { randomUUID: () => '1234' }
+        crypto: { randomUUID: () => '1234' },
+        matchMedia: () => ({ matches: false }),
+        addEventListener: function(type, cb) { this['on' + type] = cb; },
+        confirm: () => true
     },
     crypto: { randomUUID: () => '1234' }
 };
@@ -104,8 +141,11 @@ const files = [
     '../src/constants.js',
     '../src/api.js',
     '../src/ui_helpers.js',
-    '../src/actions.js'
+    '../src/actions.js',
+    '../src/events.js'
 ];
+
+const versionSnippet = fs.readFileSync(path.join(__dirname, '..', 'version.txt'), 'utf8').trim();
 
 vm.createContext(sandbox);
 
@@ -118,6 +158,8 @@ function loadFile(relPath) {
         // We handle dependencies manually in this narrow test context
         return `// ${match}`;
     });
+    // Replace version placeholder
+    code = code.replace(/{{VERSION}}/g, versionSnippet);
     return code;
 }
 
@@ -127,6 +169,7 @@ vm.runInContext(`
     var currentUser = null;
     var orderMap = new Map();
     var userFlags = new Set();
+    var pollIntervalId = null;
     var highlightTags = [];
     var allWeeks = [];
     var currentWeekNumber = 1;
@@ -141,6 +184,9 @@ vm.runInContext(`
     function setAllWeeks(v) { allWeeks = v; }
     function setCurrentWeekNumber(v) { currentWeekNumber = v; }
     function setCurrentYear(v) { currentYear = v; }
+    function setOrderMap(v) { orderMap = v; }
+    function setUserFlags(v) { userFlags = v; }
+    function setPollIntervalId(v) { pollIntervalId = v; }
 `, sandbox);
 
 files.forEach(f => vm.runInContext(loadFile(f), sandbox));
@@ -148,6 +194,8 @@ files.forEach(f => vm.runInContext(loadFile(f), sandbox));
 // i18n mock
 vm.runInContext(`
     function t(key) { return key; }
+    // Initialize events
+    bindEvents();
 `, sandbox);
 
 async function runTests() {
@@ -224,6 +272,30 @@ async function runTests() {
         process.exit(1);
     }
     console.log("✅ PASS: Auth guards prevented unauthenticated API calls.");
+
+    console.log("--- Test 6: Secure Logout (FR-006) ---");
+    sandbox.localStorage.setItem('kantine_token', 'secret');
+    sandbox.localStorage.setItem('kantine_history', 'orders');
+    sandbox.localStorage.setItem('other_app_data', 'keep_me');
+    
+    // Trigger logout
+    const btnLogout = sandbox.document.getElementById('btn-logout');
+    if (btnLogout.onclick) {
+        btnLogout.onclick();
+    } else {
+        console.error("❌ FAIL: Logout button has no click listener!");
+        process.exit(1);
+    }
+    
+    if (sandbox.localStorage.getItem('kantine_token') || sandbox.localStorage.getItem('kantine_history')) {
+        console.error("❌ FAIL: Logout did not clear all kantine_ keys!");
+        process.exit(1);
+    }
+    if (sandbox.localStorage.getItem('other_app_data') !== 'keep_me') {
+        console.error("❌ FAIL: Logout cleared non-kantine keys!");
+        process.exit(1);
+    }
+    console.log("✅ PASS: Secure logout cleared all app-related data while preserving other data.");
 
     console.log("\n✨ ALL SECURITY TESTS PASSED! ✨");
 }

@@ -1164,7 +1164,7 @@ function githubHeaders() {
 const API_BASE = 'https://api.bessa.app/v1';
 
 /** The client version injected into every API request header. */
-const CLIENT_VERSION = 'v1.7.1';
+const CLIENT_VERSION = '{{VERSION}}';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -3278,7 +3278,7 @@ function bindEvents() {
             const email = `knapp-${employeeId}@bessa.app`;
             const response = await fetch(`${constants/* API_BASE */.tE}/auth/login/`, {
                 method: 'POST',
-                headers: (0,api/* apiHeaders */.H)(constants.GUEST_TOKEN),
+                headers: (0,api/* apiHeaders */.H)(),
                 body: JSON.stringify({ email, password })
             });
 
@@ -3324,10 +3324,13 @@ function bindEvents() {
     });
 
     btnLogout.addEventListener('click', () => {
-        localStorage.removeItem(constants.LS.AUTH_TOKEN);
-        localStorage.removeItem(constants.LS.CURRENT_USER);
-        localStorage.removeItem(constants.LS.FIRST_NAME);
-        localStorage.removeItem(constants.LS.LAST_NAME);
+        // Secure Logout (FR-006): Clear all application-related data from localStorage
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('kantine_')) {
+                localStorage.removeItem(key);
+            }
+        });
+
         (0,state/* setAuthToken */.O5)(null);
         (0,state/* setCurrentUser */.lt)(null);
         (0,state/* setOrderMap */.di)(new Map());

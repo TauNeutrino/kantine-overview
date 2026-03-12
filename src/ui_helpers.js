@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText } from './utils.js';
-import { API_BASE, GUEST_TOKEN, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
+import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
 import { apiHeaders, githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight, loadMenuDataFromAPI } from './actions.js';
 import { t } from './i18n.js';

@@ -1,3 +1,8 @@
+## v1.7.2 (2026-03-12)
+- 🛡️ **Security**: Logout-Logik vervollständigt (FR-006). Beim Abmelden werden nun alle App-bezogenen Daten (inkl. Bestellhistorie, Cache und Einstellungen) aus dem `localStorage` gelöscht.
+- 🧹 **Cleanup**: Veraltete `GUEST_TOKEN` Rückstände in `events.js` und `ui_helpers.js` entfernt.
+- 🧪 **Testing**: Die Security-Test-Suite wurde um eine Verifikation der Logout-Datenlöschung erweitert.
+
 ## v1.7.1 (2026-03-12)
 - 🛡️ **Security**: Kritischer Security-Fix und Härtung:
   - **XSS-Schutz**: `innerHTML` durch `textContent` in `renderTagsList` (Actions) und `showErrorModal` (UI-Helpers) ersetzt.

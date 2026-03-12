@@ -17,7 +17,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-003 | Das System darf keine Zugangsdaten dauerhaft speichern. Die Authentifizierung muss sitzungsbasiert sein. | Hoch | v1.0.1 |
 | FR-004 | Dem Benutzer muss angezeigt werden, ob und als wer er angemeldet ist (Vorname, Name oder ID). | Mittel | v1.0.1 |
 | FR-005 | Nicht authentifizierte Benutzer müssen die Menüdaten einsehen können (eingeschränkter Lesezugriff). | Mittel | v1.0.1 |
-| FR-006 | Das System muss eine explizite Logout-Funktion bereitstellen, die alle sitzungsbezogenen Daten entfernt. | Mittel | v1.0.1 |
+| FR-006 | Das System muss eine explizite Logout-Funktion bereitstellen, die alle sitzungsbezogenen Daten entfernt. | Mittel | v1.0.1 (Update v1.7.2) |
 | **Menüanzeige** | | | |
 | FR-010 | Das System muss dem Benutzer alle verfügbaren Tagesmenüs einer Woche gleichzeitig in einer Übersicht darstellen. | Hoch | v1.0.1 |
 | FR-011 | Das System muss dem Benutzer die Navigation zwischen der aktuellen und der kommenden Woche ermöglichen. | Mittel | v1.0.1 |

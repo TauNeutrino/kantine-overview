@@ -1,7 +1,7 @@
 import { displayMode, langMode, authToken, currentUser, orderMap, userFlags, pollIntervalId, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
-import { API_BASE, GUEST_TOKEN, LS } from './constants.js';
+import { API_BASE, LS } from './constants.js';
 import { apiHeaders } from './api.js';
 import { t } from './i18n.js';
 import { debounce } from './utils.js';
@@ -308,7 +308,7 @@ export function bindEvents() {
             const email = `knapp-${employeeId}@bessa.app`;
             const response = await fetch(`${API_BASE}/auth/login/`, {
                 method: 'POST',
-                headers: apiHeaders(GUEST_TOKEN),
+                headers: apiHeaders(),
                 body: JSON.stringify({ email, password })
             });
 
@@ -354,10 +354,13 @@ export function bindEvents() {
     });
 
     btnLogout.addEventListener('click', () => {
-        localStorage.removeItem(LS.AUTH_TOKEN);
-        localStorage.removeItem(LS.CURRENT_USER);
-        localStorage.removeItem(LS.FIRST_NAME);
-        localStorage.removeItem(LS.LAST_NAME);
+        // Secure Logout (FR-006): Clear all application-related data from localStorage
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('kantine_')) {
+                localStorage.removeItem(key);
+            }
+        });
+
         setAuthToken(null);
         setCurrentUser(null);
         setOrderMap(new Map());
