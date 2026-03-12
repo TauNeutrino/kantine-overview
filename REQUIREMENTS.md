@@ -39,7 +39,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-032 | Nach Bestellschluss (Cutoff-Zeit) dürfen keine neuen Bestellungen oder Stornierungen für diesen Tag möglich sein. | Hoch | v1.0.1 |
 | FR-033 | Es muss möglich sein, dasselbe Menü mehrfach zu bestellen. Bei Mehrfachbestellungen muss die Anzahl angezeigt werden. | Niedrig | v1.0.1 |
 | **Kostentransparenz & Bestellhistorie** | | | |
-| FR-040 | Das System muss die Gesamtkosten aller Bestellungen einer Woche automatisch berechnen und anzeigen. | Mittel | v1.1.0 |
+| ~~FR-040~~ | ~~Das System muss die Gesamtkosten aller Bestellungen einer Woche automatisch berechnen und anzeigen.~~ | ~~Mittel~~ | ~~v1.1.0~~ (Obsolet: Display entfernt auf User-Wunsch) |
 | FR-041 | Das System muss dem Benutzer eine Bestellhistorie (gruppiert nach Monat und KW) mit Fortschrittsanzeige auf Abruf in einem Modal bereitstellen. Die Historie muss über ein lokales Delta-Caching verfügen, um Ladezeiten zu minimieren. | Mittel | v1.4.0 (Update v1.4.7) |
 | **Bestell-Countdown** | | | |
 | FR-050 | Das System muss vor Bestellschluss einen visuell hervorgehobenen Countdown anzeigen. | Mittel | v1.1.0 |
@@ -63,7 +63,7 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-092 | Solange bestellbare Menüs für nächste Woche vorhanden sind, aber noch keine Bestellungen getätigt wurden (Prüfung Montag–Donnerstag; Freitag ist ausgenommen), muss der entsprechende Navigation-Button animiert und farblich hervorgehoben werden. Nach der ersten Bestellung muss die Hervorhebung erlöschen. Zusätzlich muss beim erstmaligen Erscheinen der Daten ein einmaliger Toast-Hinweis angezeigt werden. | Mittel | v1.6.0 (Update v1.7.0) |
 | FR-093 | Das System muss dem Benutzer ermöglichen, durch Klicken auf das Alarm-Icon im Header eine manuelle Prüfung der geflaggten Menüs auszulösen. Während der Prüfung muss das Icon visuell animiert sein (Rotation). Nach Abschluss der Prüfung muss eine Toast-Nachricht mit der Anzahl der geprüften Menüs angezeigt werden. | Mittel | v1.6.13 |
 | **Sprachfilter** | | | |
-| FR-120 | Das System muss zweisprachige Menübeschreibungen (Deutsch/Englisch) erkennen und dem Benutzer erlauben, via UI-Toggle zwischen DE, EN und ALL (beide Sprachen) zu wechseln. Die Sprachpräferenz muss persistent gespeichert werden. Allergen-Codes müssen in allen Modi angezeigt werden. | Mittel | v1.6.0 |
+| FR-120 | Das System muss zweisprachige Menübeschreibungen (Deutsch/Englisch) erkennen und dem Benutzer erlauben, via UI-Dropdown (Icon mit Label) zwischen DE, EN und ALL (beide Sprachen) zu wechseln. Die Sprachpräferenz muss persistent gespeichert werden. Allergen-Codes müssen in allen Modi angezeigt werden. | Mittel | v1.6.0 (Update v1.6.21) |
 | FR-121 | Das System muss bei fehlenden Übersetzungen in zweisprachigen Menüs robust reagieren. Wenn ein Gang nur in einer Sprache vorliegt, muss dieser Teil für beide Sprachansichten herangezogen werden, um die Konsistenz der Ganganzahl zu gewährleisten. | Mittel | v1.6.10 |
 | FR-122 | Bei Auswahl von EN muss die gesamte Benutzeroberfläche (Buttons, Tooltips, Modale, Status-Badges) auf Englisch umgestellt werden. Bei DE oder ALL verbleibt die GUI auf Deutsch. | Mittel | v1.7.0 |
 | **Benutzer-Feedback** | | | |

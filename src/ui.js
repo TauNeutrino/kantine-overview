@@ -54,13 +54,7 @@ export function injectUI() {
                     </button>
                 </div>
                 <div class="header-center-wrapper">
-                    <div id="lang-toggle" class="lang-toggle" title="Sprache der Menübeschreibung">
-                        <button class="lang-btn${langMode === 'de' ? ' active' : ''}" data-lang="de">DE</button>
-                        <button class="lang-btn${langMode === 'en' ? ' active' : ''}" data-lang="en">EN</button>
-                        <button class="lang-btn${langMode === 'all' ? ' active' : ''}" data-lang="all">ALL</button>
-                    </div>
                     <div id="header-week-info" class="header-week-info"></div>
-                    <div id="weekly-cost-display" class="weekly-cost hidden"></div>
                 </div>
                 <div class="controls">
                     <button id="btn-refresh" class="icon-btn" aria-label="Menüdaten aktualisieren" title="Menüdaten neu laden">
@@ -75,6 +69,16 @@ export function injectUI() {
                     <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme" title="Erscheinungsbild (Hell/Dunkel) wechseln">
                         <span class="material-icons-round theme-icon">light_mode</span>
                     </button>
+                    <div id="lang-toggle" class="lang-toggle-dropdown" title="Sprache der Menübeschreibung">
+                        <button id="btn-lang-toggle" class="icon-btn" aria-label="Sprache wählen" title="Sprache der Menübeschreibung">
+                            <span class="material-icons-round">translate</span>
+                        </button>
+                        <div id="lang-dropdown" class="lang-dropdown-menu hidden">
+                            <button class="lang-btn${langMode === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
+                            <button class="lang-btn${langMode === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
+                            <button class="lang-btn${langMode === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
+                        </div>
+                    </div>
                     <button id="btn-login-open" class="user-badge-btn icon-btn-small" title="Mit Bessa.app Account anmelden">
                         <span class="material-icons-round">login</span>
                         <span>Anmelden</span>

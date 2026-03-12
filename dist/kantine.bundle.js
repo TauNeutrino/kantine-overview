@@ -1292,7 +1292,6 @@ const TRANSLATIONS = {
         noMenuDataHint: 'Versuchen Sie eine andere Woche oder schauen Sie später vorbei.',
 
         // Weekly cost
-        costLabel: 'Gesamt',
 
         // Countdown
         orderDeadline: 'Bestellschluss',
@@ -1428,7 +1427,6 @@ const TRANSLATIONS = {
         noMenuDataHint: 'Try another week or check back later.',
 
         // Weekly cost
-        costLabel: 'Total',
 
         // Countdown
         orderDeadline: 'Order deadline',
@@ -1582,7 +1580,7 @@ function setLangMode(lang) {
 /* harmony export */   gJ: () => (/* binding */ updateNextWeekBadge),
 /* harmony export */   showErrorModal: () => (/* binding */ showErrorModal)
 /* harmony export */ });
-/* unused harmony exports updateWeeklyCost, syncMenuItemHeights, createDayCard, fetchVersions, updateCountdown, removeCountdown */
+/* unused harmony exports syncMenuItemHeights, createDayCard, fetchVersions, updateCountdown, removeCountdown */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -1681,29 +1679,6 @@ function updateNextWeekBadge() {
     }
 }
 
-function updateWeeklyCost(days) {
-    let totalCost = 0;
-    if (days && days.length > 0) {
-        days.forEach(day => {
-            if (day.items) {
-                day.items.forEach(item => {
-                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-                    const key = `${day.date}_${articleId}`;
-                    const orders = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(key) || [];
-                    if (orders.length > 0) totalCost += item.price * orders.length;
-                });
-            }
-        });
-    }
-
-    const costDisplay = document.getElementById('weekly-cost-display');
-    if (totalCost > 0) {
-        costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('costLabel')}: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
-        costDisplay.classList.remove('hidden');
-    } else {
-        costDisplay.classList.add('hidden');
-    }
-}
 
 function renderVisibleWeeks() {
     const menuContainer = document.getElementById('menu-container');
@@ -1730,11 +1705,9 @@ function renderVisibleWeeks() {
                 <p>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuData')} ${targetWeek} (${targetYear}).</p>
                 <small>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuDataHint')}</small>
             </div>`;
-        document.getElementById('weekly-cost-display').classList.add('hidden');
         return;
     }
 
-    updateWeeklyCost(daysInTargetWeek);
 
     const headerWeekInfo = document.getElementById('header-week-info');
     const weekTitle = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'this-week' ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('thisWeek') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeek');
@@ -2718,13 +2691,7 @@ function injectUI() {
                     </button>
                 </div>
                 <div class="header-center-wrapper">
-                    <div id="lang-toggle" class="lang-toggle" title="Sprache der Menübeschreibung">
-                        <button class="lang-btn${state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">DE</button>
-                        <button class="lang-btn${state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">EN</button>
-                        <button class="lang-btn${state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">ALL</button>
-                    </div>
                     <div id="header-week-info" class="header-week-info"></div>
-                    <div id="weekly-cost-display" class="weekly-cost hidden"></div>
                 </div>
                 <div class="controls">
                     <button id="btn-refresh" class="icon-btn" aria-label="Menüdaten aktualisieren" title="Menüdaten neu laden">
@@ -2739,6 +2706,16 @@ function injectUI() {
                     <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme" title="Erscheinungsbild (Hell/Dunkel) wechseln">
                         <span class="material-icons-round theme-icon">light_mode</span>
                     </button>
+                    <div id="lang-toggle" class="lang-toggle-dropdown" title="Sprache der Menübeschreibung">
+                        <button id="btn-lang-toggle" class="icon-btn" aria-label="Sprache wählen" title="Sprache der Menübeschreibung">
+                            <span class="material-icons-round">translate</span>
+                        </button>
+                        <div id="lang-dropdown" class="lang-dropdown-menu hidden">
+                            <button class="lang-btn${state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
+                            <button class="lang-btn${state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
+                            <button class="lang-btn${state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
+                        </div>
+                    </div>
                     <button id="btn-login-open" class="user-badge-btn icon-btn-small" title="Mit Bessa.app Account anmelden">
                         <span class="material-icons-round">login</span>
                         <span>Anmelden</span>
@@ -3030,12 +3007,22 @@ function bindEvents() {
     const historyModal = document.getElementById('history-modal');
     const btnHistoryClose = document.getElementById('btn-history-close');
 
+    const btnLangToggle = document.getElementById('btn-lang-toggle');
+    const langDropdown = document.getElementById('lang-dropdown');
+    if (btnLangToggle && langDropdown) {
+        btnLangToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdown.classList.toggle('hidden');
+        });
+    }
+
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             (0,state/* setLangMode */.UD)(btn.dataset.lang);
             localStorage.setItem(constants.LS.LANG, btn.dataset.lang);
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            if (langDropdown) langDropdown.classList.add('hidden');
             updateUILanguage();
         });
     });
@@ -3069,6 +3056,9 @@ function bindEvents() {
     window.addEventListener('click', (e) => {
         if (e.target === historyModal) historyModal.classList.add('hidden');
         if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
+        if (langDropdown && !langDropdown.classList.contains('hidden') && !e.target.closest('#lang-toggle')) {
+            langDropdown.classList.add('hidden');
+        }
     });
 
     const versionTag = document.querySelector('.version-tag');

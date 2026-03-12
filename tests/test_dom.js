@@ -63,9 +63,14 @@ const html = `
     <button id="btn-next-week">Next Week</button>
 
     <!-- Mocks for Language Toggle -->
-    <button class="lang-btn" data-lang="de">DE</button>
-    <button class="lang-btn" data-lang="en">EN</button>
-    <button class="lang-btn" data-lang="all">ALL</button>
+    <div id="lang-toggle">
+        <button id="btn-lang-toggle"><span class="material-icons-round">translate</span></button>
+        <div id="lang-dropdown" class="hidden">
+            <button class="lang-btn" data-lang="de">🇦🇹 DE</button>
+            <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+            <button class="lang-btn" data-lang="all">🌐 ALL</button>
+        </div>
+    </div>
     
     <button id="btn-refresh">Refresh</button>
     <button id="btn-logout">Logout</button>

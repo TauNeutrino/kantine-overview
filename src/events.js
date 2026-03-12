@@ -120,12 +120,22 @@ export function bindEvents() {
     const historyModal = document.getElementById('history-modal');
     const btnHistoryClose = document.getElementById('btn-history-close');
 
+    const btnLangToggle = document.getElementById('btn-lang-toggle');
+    const langDropdown = document.getElementById('lang-dropdown');
+    if (btnLangToggle && langDropdown) {
+        btnLangToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdown.classList.toggle('hidden');
+        });
+    }
+
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             setLangMode(btn.dataset.lang);
             localStorage.setItem(LS.LANG, btn.dataset.lang);
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            if (langDropdown) langDropdown.classList.add('hidden');
             updateUILanguage();
         });
     });
@@ -159,6 +169,9 @@ export function bindEvents() {
     window.addEventListener('click', (e) => {
         if (e.target === historyModal) historyModal.classList.add('hidden');
         if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
+        if (langDropdown && !langDropdown.classList.contains('hidden') && !e.target.closest('#lang-toggle')) {
+            langDropdown.classList.add('hidden');
+        }
     });
 
     const versionTag = document.querySelector('.version-tag');

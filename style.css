@@ -404,23 +404,6 @@ body {
     font-weight: 500;
 }
 
-.weekly-cost {
-    background-color: rgba(59, 130, 246, 0.1);
-    /* Blue tint */
-    color: var(--accent-color);
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-.weekly-cost .material-icons-round {
-    font-size: 18px;
-}
 
 /* Container - flex column, full width so child scrollbar is at edge */
 .container {
@@ -468,6 +451,64 @@ body {
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
+}
+
+/* Language Toggle */
+.lang-toggle-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#btn-lang-toggle {
+    padding: 0;
+    min-width: 42px;
+}
+
+.lang-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 1001;
+    min-width: 120px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: modalSlide 0.2s ease-out;
+}
+
+.lang-dropdown-menu .lang-btn {
+    background: none;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.lang-dropdown-menu .lang-btn:hover {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-color);
+}
+
+.lang-dropdown-menu .lang-btn.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent-color);
+    font-weight: 700;
 }
 
 .icon-btn-small {
@@ -829,7 +870,7 @@ body {
 
 .days-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 0.5rem;
     flex: 1;
     overflow-y: auto;

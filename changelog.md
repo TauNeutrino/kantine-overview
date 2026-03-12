@@ -1,3 +1,12 @@
+## v1.6.22 (2026-03-12)
+- 🧹 **UX Cleanup**: Text-Label am Sprachumschalter entfernt. Der Button zeigt nun nur noch das `translate`-Icon an, was die Controls-Bar ruhiger macht.
+
+## v1.6.21 (2026-03-12)
+- ✨ **Feature**: Sprachumschaltung Redesign – Die Sprachwahl (DE/EN/ALL) wurde von der Header-Mitte in den rechten Controls-Bereich verschoben. Sie ist nun als Icon-Dropdown mit aktueller Status-Anzeige (z.B. "DE") verfügbar. Für die deutsche Sprache wird die 🇦🇹 Flagge verwendet.
+
+## v1.6.20 (2026-03-12)
+- 🧹 **Cleanup**: Wochenkosten-Anzeige entfernt (Weekly Cost Display) – Auf User-Wunsch wurde die Anzeige der wöchentlichen Gesamtkosten im Header entfernt, um die UI zu entschlacken. FR-040 als obsolet markiert.
+
 ## v1.6.19 (2026-03-11)
 - 🎨 **UX**: Grid-Layout & Glow Overlap Fix – Die Karten-Inhalte wurden auf ein sauberes Grid-Gap-Modell umgestellt (`row-gap: 1.5rem`). Dies verhindert technische Überlappungen von Menü-Items und stellt sicher, dass Glow-Effekte (Bestellt, Highlight) alle Inhalte korrekt umschließen. Manuelle Abstände wurden bereinigt.
 

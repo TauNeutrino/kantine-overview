@@ -100,7 +100,6 @@ const TRANSLATIONS = {
         noMenuDataHint: 'Versuchen Sie eine andere Woche oder schauen Sie später vorbei.',
 
         // Weekly cost
-        costLabel: 'Gesamt',
 
         // Countdown
         orderDeadline: 'Bestellschluss',
@@ -236,7 +235,6 @@ const TRANSLATIONS = {
         noMenuDataHint: 'Try another week or check back later.',
 
         // Weekly cost
-        costLabel: 'Total',
 
         // Countdown
         orderDeadline: 'Order deadline',

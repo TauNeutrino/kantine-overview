@@ -90,29 +90,6 @@ export function updateNextWeekBadge() {
     }
 }
 
-export function updateWeeklyCost(days) {
-    let totalCost = 0;
-    if (days && days.length > 0) {
-        days.forEach(day => {
-            if (day.items) {
-                day.items.forEach(item => {
-                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-                    const key = `${day.date}_${articleId}`;
-                    const orders = orderMap.get(key) || [];
-                    if (orders.length > 0) totalCost += item.price * orders.length;
-                });
-            }
-        });
-    }
-
-    const costDisplay = document.getElementById('weekly-cost-display');
-    if (totalCost > 0) {
-        costDisplay.innerHTML = `<span class="material-icons-round">shopping_bag</span> <span>${t('costLabel')}: ${totalCost.toFixed(2).replace('.', ',')} €</span>`;
-        costDisplay.classList.remove('hidden');
-    } else {
-        costDisplay.classList.add('hidden');
-    }
-}
 
 export function renderVisibleWeeks() {
     const menuContainer = document.getElementById('menu-container');
@@ -139,11 +116,9 @@ export function renderVisibleWeeks() {
                 <p>${t('noMenuData')} ${targetWeek} (${targetYear}).</p>
                 <small>${t('noMenuDataHint')}</small>
             </div>`;
-        document.getElementById('weekly-cost-display').classList.add('hidden');
         return;
     }
 
-    updateWeeklyCost(daysInTargetWeek);
 
     const headerWeekInfo = document.getElementById('header-week-info');
     const weekTitle = displayMode === 'this-week' ? t('thisWeek') : t('nextWeek');
