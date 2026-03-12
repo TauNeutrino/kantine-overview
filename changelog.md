@@ -1,3 +1,16 @@
+## v1.6.23 (2026-03-12)
+- 🎨 **UI**: Umfassende UI-Verbesserungen umgesetzt:
+  - **Glassmorphism**: Header-Hintergrundtransparenz auf 72% reduziert (war 90%) – der Blur-Effekt ist nun beim Scrollen sichtbar.
+  - **Dark-Mode Kontrast**: `--bg-card` abgedunkelt (`#283548`), `--border-color` leicht aufgehellt (`#526377`) – bessere Trennung zwischen Body und Card.
+  - **Accent-Color**: Im Light-Mode von Slate-900 (fast schwarz) auf Blue-600 (`#2563eb`) geändert – klarer sichtbarer Akzent.
+  - **Typography**: `.item-desc` `line-height` auf 1.5 (body-konsistent), `.day-date` kleiner und dezenter (0.8rem, opacity 0.75), `.item-name` leicht reduziert (0.95rem).
+  - **Item-Separator**: Subtile Trennlinie zwischen Menü-Items in der Tageskarte.
+  - **Badge-Konsistenz**: Alle Badges (`badge`, `tag-badge-small`) auf `border-radius: 6px` vereinheitlicht.
+  - **A11y – Reduced Motion**: `@media (prefers-reduced-motion: reduce)` deaktiviert alle dekorativen Puls-/Glow-Animationen für Motion-sensitive Nutzer.
+  - **A11y – Focus-Visible**: Globaler `:focus-visible` Outline-Ring (2px, accent-color) für Tastaturnavigation.
+  - **Active-States**: `:active` Feedback (`scale(0.97)`) für Bestell-, Storno- und Flag-Buttons.
+  - **Mobile Breakpoint**: Von 600px auf 768px erweitert (deckt Tablets ab); Grid-Deklaration explizit gesetzt um Browser-Override-Bug zu vermeiden.
+
 ## v1.6.22 (2026-03-12)
 - 🧹 **UX Cleanup**: Text-Label am Sprachumschalter entfernt. Der Button zeigt nun nur noch das `translate`-Icon an, was die Controls-Bar ruhiger macht.
 

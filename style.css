@@ -6,8 +6,8 @@
     --text-primary: #334155;
     /* Slate 700 */
     --text-secondary: #64748b;
-    --accent-color: #0f172a;
-    /* Slate 900 (High contrast) */
+    --accent-color: #2563eb;
+    /* Blue 600 – visible accent, distinguishable from text */
     --border-color: #cbd5e1;
     /* Slate 300 */
     --banner-bg: #e2e8f0;
@@ -15,7 +15,8 @@
     --success-color: #059669;
     --error-color: #dc2626;
     --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-    --header-bg: rgba(255, 255, 255, 0.9);
+    /* Reduced opacity for visible glassmorphism blur effect */
+    --header-bg: rgba(255, 255, 255, 0.72);
     --header-border: 1px solid rgba(203, 213, 225, 0.6);
 }
 
@@ -23,19 +24,20 @@
     /* Premium Slate/Gray-Blue Palette - Dark Mode */
     --bg-body: #1e293b;
     /* Deep Slate Gray (Requested) */
-    --bg-card: #334155;
-    /* Slate 700 */
+    --bg-card: #283548;
+    /* Darker than Slate 700 → more layer contrast vs bg-body */
     --text-primary: #f8fafc;
     /* Slate 50 */
     --text-secondary: #cbd5e1;
     /* Slate 300 */
     --accent-color: #60a5fa;
     /* Blue 400 */
-    --border-color: #475569;
-    /* Slate 600 */
+    --border-color: #526377;
+    /* Slightly lighter → visible border on darker card bg */
     --banner-bg: #475569;
     --banner-text: #e2e8f0;
-    --header-bg: rgba(30, 41, 59, 0.9);
+    /* Reduced opacity for visible glassmorphism blur effect */
+    --header-bg: rgba(30, 41, 59, 0.72);
     --header-border: 1px solid rgba(71, 85, 105, 0.6);
     --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
 }
@@ -984,8 +986,11 @@ body {
 }
 
 .day-date {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    font-weight: 400;
     color: var(--text-secondary);
+    opacity: 0.75;
+    /* Visually subordinate to day-name */
 }
 
 
@@ -1001,6 +1006,9 @@ body {
     /* Spacing now handled by .card-body grid gap */
     display: flex;
     flex-direction: column;
+    /* Subtle separator between items */
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.25rem;
 }
 
 .menu-item:last-child {
@@ -1020,7 +1028,8 @@ body {
 .item-name {
     font-weight: 600;
     color: var(--text-primary);
-    font-size: 1rem;
+    font-size: 0.95rem;
+    /* Slightly smaller to reduce visual competition with day header */
 }
 
 .item-price {
@@ -1032,7 +1041,8 @@ body {
 .item-desc {
     font-size: 0.875rem;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.5;
+    /* Consistent with body line-height */
     margin-bottom: 0.75rem;
     white-space: pre-wrap;
 }
@@ -1059,7 +1069,8 @@ body {
     height: 24px;
     font-size: 0.75rem;
     padding: 0 10px;
-    border-radius: 4px;
+    border-radius: 6px;
+    /* Unified radius matching buttons and tag-badge-small */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1153,6 +1164,11 @@ body {
     transform: translateY(-1px);
 }
 
+.btn-order:active:not(:disabled) {
+    transform: scale(0.97);
+    filter: brightness(0.95);
+}
+
 .btn-order:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -1194,6 +1210,11 @@ body {
 .btn-cancel:hover:not(:disabled) {
     filter: brightness(1.15);
     transform: translateY(-1px);
+}
+
+.btn-cancel:active:not(:disabled) {
+    transform: scale(0.97);
+    filter: brightness(0.95);
 }
 
 .btn-cancel:disabled {
@@ -1275,9 +1296,12 @@ body {
 }
 
 /* === Mobile Responsiveness === */
-@media (max-width: 600px) {
+/* 768px covers tablets (e.g. iPad Mini); 600px was too narrow-only */
+@media (max-width: 768px) {
     .header-content {
-        flex-direction: column;
+        display: grid;
+        /* Ensure grid is active, prevents flex-only fallback */
+        grid-template-columns: 1fr;
         gap: 1rem;
         padding: 0.75rem;
     }
@@ -1300,8 +1324,9 @@ body {
     }
 
     .days-grid {
+        display: grid;
+        /* Explicit grid declaration to prevent flex-context override */
         grid-template-columns: 1fr;
-        /* Force single column */
     }
 
     .main-content {
@@ -1337,6 +1362,32 @@ body {
     }
 }
 
+/* === Accessibility: Respect prefers-reduced-motion === */
+@media (prefers-reduced-motion: reduce) {
+    /* Disable all decorative pulse/glow animations */
+    .menu-item.today-ordered,
+    .menu-item.flagged-sold-out,
+    .menu-item.flagged-available,
+    .menu-item.highlight-glow,
+    .nav-btn.new-week-available,
+    .update-icon,
+    #order-countdown.urgent {
+        animation: none;
+    }
+
+    /* Keep functional animations (modal slide, spinner) */
+    .toast {
+        transition: none;
+    }
+}
+
+/* === Focus Visibility (A11y: Keyboard Navigation) === */
+:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
 /* === Flagging & Notification Styles === */
 
 .btn-flag {
@@ -1366,6 +1417,10 @@ body {
     background: rgba(234, 179, 8, 0.1);
     color: #eab308;
     border-color: #eab308;
+}
+
+.btn-flag:active {
+    transform: scale(0.97);
 }
 
 .btn-flag .material-icons-round {
@@ -1716,7 +1771,8 @@ body {
     align-items: center;
     font-size: 0.7rem;
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: 6px;
+    /* Unified with .badge and button border-radius */
     background: rgba(59, 130, 246, 0.15);
     color: #60a5fa;
     border: 1px solid rgba(59, 130, 246, 0.3);
