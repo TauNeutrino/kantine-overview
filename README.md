@@ -1,88 +1,70 @@
-# Kantine Wrapper Bookmarklet 
+# 🍽️ Kantine Wrapper Bookmarklet
 
-Ein intelligentes Bookmarklet für die Mitarbeiter-Kantine der Bessa App. Dieses Skript erweitert die Standardansicht um eine **Wochenübersicht**, Kostenkontrolle und verbesserte Usability.
+Ein hochmoderner Wrapper für die [Bessa Knapp-Kantine](https://web.bessa.app/knapp-kantine). Dieses Projekt transformiert Standard-API-Daten in eine effiziente Wochenansicht mit Fokus auf Usability und Performance.
 
-## 🚀 Features
+---
 
-*   **Wochenübersicht:** Zeigt alle Tage der aktuellen Woche auf einen Blick.
-*   **Bestell-Countdown:** ⏳ Roter Alarm 1h vor Bestellschluss.
-*   **Smart Highlights:** 🌟 Markiere deine Favoriten (z.B. "Schnitzel", "Vegetarisch").
-*   **Bestellstatus:** Farbige Indikatoren für bestellte Menüs.
-*   **Kostenkontrolle:** 💰 Summiert automatisch den Gesamtpreis der Woche.
-*   **Bestellhistorie:** 📜 Gruppiert nach Monat & KW mit inkrementellem Delta-Cache.
-*   **Session Reuse:** 🔑 Nutzt automatisch eine bestehende Login-Session.
-*   **Menu Badges:** 🏷️ Zeigt Menü-Codes (M1, M2+) direkt im Header.
-*   **Menü-Flagging:** 🔔 Ausverkaufte Menüs beobachten und bei Verfügbarkeit benachrichtigt werden.
-*   **Version-Menü:** 📦 Versionsliste mit Installer-Links, Dev-Mode Toggle und Downgrade-Support.
-*   **Cache leeren:** 🗑️ Lokalen Cache mit einem Klick bereinigen (im Version-Menü).
-*   **Favicon:** 🍽️ Eigenes Icon für die Lesezeichenleiste.
-*   **Changelog:** Übersicht über neue Funktionen direkt im Installer.
+## 🏗️ System-Architektur
 
-## 📦 Installation
+Das Projekt nutzt eine modulare **ES6-Architektur**, die per Webpack gebündelt und als Bookmarklet injiziert wird.
 
-1.  Öffne die Datei `dist/install.html` in deinem Browser.
-2.  Ziehe den blauen Button **"Kantine Wrapper"** in deine Lesezeichen-Leiste.
-3.  Fertig!
+### 🧩 Modul-Verantwortlichkeiten
+- **[index.js](file:///config/kantine-wrapper/src/index.js)**: Entry Point. Steuert die Initialisierung und das Polling.
+- **[state.js](file:///config/kantine-wrapper/src/state.js)**: Zentrales State-Management (Singleton).
+- **[actions.js](file:///config/kantine-wrapper/src/actions.js)**: Business Logic (API-Calls, Cache-Management, Flagging-Logik).
+- **[ui.js](file:///config/kantine-wrapper/src/ui.js)** & **[ui_helpers.js](file:///config/kantine-wrapper/src/ui_helpers.js)**: Rendering-Logik und dynamische Komponenten (Tageskarten, Toasts).
+- **[events.js](file:///config/kantine-wrapper/src/events.js)**: Zentrales Event-Handling für alle Interaktionen.
+- **[i18n.js](file:///config/kantine-wrapper/src/i18n.js)**: Lokalisierung (DE/EN).
+- **[api.js](file:///config/kantine-wrapper/src/api.js)**, **[constants.js](file:///config/kantine-wrapper/src/constants.js)** & **[utils.js](file:///config/kantine-wrapper/src/utils.js)**: Infrastruktur, Konstanten und Hilfsfunktionen.
 
-## 🍽️ Nutzung
-
-1.  Navigiere zu [https://web.bessa.app/knapp-kantine](https://web.bessa.app/knapp-kantine).
-2.  Klicke auf das **"Kantine Wrapper"** Lesezeichen.
-3.  Die Seite wird neu geladen und zeigt das erweiterte Menü. (Bei vorhandenem Login entfällt die Anmeldung).
-
-## 🛠️ Entwicklung
-
-### Voraussetzungen
-*   Node.js (für Build- und Test-Scripts)
-*   Python 3 (für Build-Tests)
-*   Bash (für `build-bookmarklet.sh`)
-
-### Projektstruktur
-
-#### Quelldateien
-| Datei | Beschreibung |
-|-------|-------------|
-| `kantine.js` | Haupt-Quellcode des Bookmarklets (UI, API-Logik, Rendering). |
-| `style.css` | Komplettes Design (CSS mit Light/Dark Mode). |
-| `favicon.svg` | Favicon für die Installer-Seite (Dreieck + Gabel & Messer). |
-| `mock-data.js` | Mock-Fetch-Interceptor mit realistischen Dummy-Menüdaten für Standalone-Tests. |
-| `build-bookmarklet.sh` | Build-Skript – erzeugt alle `dist/`-Artefakte und führt alle Tests aus. |
-| `release.sh` | Release-Skript – Commit, Tag, Push zu allen Remotes. |
-| `version.txt` | Aktuelle Versionsnummer (SemVer). |
-| `changelog.md` | Änderungshistorie aller Versionen. |
-| `REQUIREMENTS.md` | System Requirements Specification (SRS). |
-
-#### Tests
-| Datei | Beschreibung |
-|-------|-------------|
-| `test_logic.js` | Logik-Unit-Tests (statische Analyse, Syntax-Check, Sandbox-Ausführung). |
-| `tests/test_dom.js` | DOM-Interaktionstests via JSDOM (prüft Event-Listener-Bindung aller UI-Komponenten). |
-| `test_build.py` | Build-Artefakt-Validierung (Existenz, Inhalt). |
-
-#### `dist/` – Build-Artefakte
-| Datei | Beschreibung |
-|-------|-------------|
-| `bookmarklet.txt` | Die rohe Bookmarklet-URL (`javascript:...`). Enthält CSS + JS als selbstextrahierendes IIFE. Kann direkt als Lesezeichen-URL eingefügt werden. |
-| `bookmarklet-payload.js` | Der entpackte Bookmarklet-Payload (JS). Erstellt `<style>` + `<script>` Elemente und injiziert sie in die Seite. Nützlich zum Debuggen. |
-| `install.html` | Installer-Seite mit Drag & Drop Button, Favicon, Anleitung, Feature-Liste und Changelog. Kann lokal oder gehostet geöffnet werden. |
-| `kantine-standalone.html` | Eigenständige HTML-Datei mit eingebettetem CSS + JS + **Mock-Daten**. Lädt automatisch Dummy-Menüs für UI-Tests ohne API-Zugriff. |
-
-### Build
-Um Änderungen an `kantine.js` oder `style.css` wirksam zu machen, führe den Build aus:
-
-```bash
-./build-bookmarklet.sh
+### 🔄 Datenfluss & Cache
+```mermaid
+graph TD
+    A[Bessa API] -->|Fetch| B[actions.js]
+    B -->|Update| C[state.js]
+    C -->|Trigger| D[ui_helpers.js]
+    D -->|Render| E[Browser DOM]
+    B -->|Persist| F[LocalStorage]
+    F -->|Rehydrate| C
 ```
+**Instant UI Strategy**: Daten werden beim Start sofort aus dem `localStorage` gerendert, während im Hintergrund ein Silent-Refresh die Aktualität sicherstellt.
 
-### Release
-Erstellt einen Git-Tag, committet Build-Artefakte und pusht zu allen Remotes:
+---
 
-```bash
-./release.sh
-```
+## ⚙️ Build & Distribution Pipeline
 
-## ⚠️ Hinweis
-Dieses Projekt enthält zum überwiegenden Teil **KI-generierten Code**. Der Code wurde mithilfe von KI-Assistenten erstellt, überprüft und iterativ verfeinert.
+1.  **Bundling**: Webpack fasst alle Module in `kantine.bundle.js` zusammen.
+2.  **Veredelung**: `build-bookmarklet.sh` injiziert Versionen/Favicons und minimiert den Code via **Terser**.
+3.  **Deployment**: Erzeugung der `javascript:` Bookmarklet-URL und der `install.html`.
 
-## 📝 Lizenz
-Internes Tool.
+---
+
+## 🧠 Kern-Features & Entscheidungen
+
+- **Warum ein Bookmarklet?** Keine Installation erforderlich; nutzt die bestehende Browser-Session des Nutzers.
+- **Smart Highlights**: Substring-Matching markiert Favoriten (z.B. "Schnitzel") automatisch.
+- **Order History**: Nutzt **Delta-Caching**, um nur neue Bestellungen nachzuladen und die API-Last zu minimieren.
+- **Flagging System**: Erlaubt die Überwachung ausverkaufter Menüs mit automatischer In-App Benachrichtigung bei Verfügbarkeit.
+
+---
+
+## 🛡️ Sicherheit & Datenschutz
+
+- **Authentifizierung**: Der Wrapper versucht primär, bestehende Sitzungen („Session Harvesting“) der Bessa-Seite (`AkitaStores`) zu erkennen.
+- **Login-Fallback**: Falls keine aktive Sitzung gefunden wird, bietet der Wrapper einen Login-Dialog ([FR-001](file:///config/kantine-wrapper/REQUIREMENTS.md#FR-001)).
+- **Passwort-Handling**: **Passwörter werden niemals gespeichert.** Sie werden verschlüsselt an die offizielle Bessa-API übertragen. Nur der resultierende `authToken` wird für die Dauer der Sitzung im `localStorage` persistiert.
+- **Transparenz**: Alle Aktionen, die Kosten verursachen (Bestellungen), erfordern eine bewusste Nutzerinteraktion.
+
+---
+
+## 🧪 Entwicklung & Verifizierung
+
+- **Standalone Mode**: `dist/kantine-standalone.html` nutzt `mock-data.js` für UI-Tests ohne API.
+- **Automatisierte Tests**: 
+  - `node test_logic.js` (Logik)
+  - `node tests/test_dom.js` (UI-Interaktionen via JSDOM)
+  - `pytest` (Build-Integrität)
+
+---
+
+*Powered by Kaufis-Kitchen & AI Support.*

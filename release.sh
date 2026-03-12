@@ -44,16 +44,10 @@ else
 fi
 
 echo ""
-echo "=== Pushing to remotes ==="
-# Determine remote targets: Assume 'origin' for primary, optionally 'github'
+echo "=== Pushing to origin ==="
+# Pushing HEAD and the version tag
 git push origin HEAD
 git push origin --force tag "$VERSION"
-
-# If a remote named 'github' exists, push branch and tags there too
-if git remote | grep -q "^github$"; then
-    git push github HEAD
-    git push github --force tag "$VERSION"
-fi
 
 echo "🎉 Successfully released version $VERSION!"
 exit 0
