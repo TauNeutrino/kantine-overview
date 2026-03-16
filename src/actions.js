@@ -856,7 +856,7 @@ export async function loadMenuDataFromAPI() {
                         let dayItems = [];
                         for (const group of menuGroups) {
                             if (group.items && Array.isArray(group.items)) {
-                                dayItems = dayItems.concat(group.items);
+                                dayItems.push(...group.items);
                             }
                         }
                         if (dayItems.length > 0) {
