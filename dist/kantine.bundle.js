@@ -917,7 +917,7 @@ async function loadMenuDataFromAPI() {
                         let dayItems = [];
                         for (const group of menuGroups) {
                             if (group.items && Array.isArray(group.items)) {
-                                dayItems = dayItems.concat(group.items);
+                                dayItems.push(...group.items);
                             }
                         }
                         if (dayItems.length > 0) {
@@ -2438,11 +2438,20 @@ function escapeHtml(text) {
 
 function isNewer(remote, local) {
     if (!remote || !local) return false;
-    const r = remote.replace(/^v/, '').split('.').map(Number);
-    const l = local.replace(/^v/, '').split('.').map(Number);
-    for (let i = 0; i < Math.max(r.length, l.length); i++) {
-        if ((r[i] || 0) > (l[i] || 0)) return true;
-        if ((r[i] || 0) < (l[i] || 0)) return false;
+    if (remote === local) return false;
+
+    let rStart = remote.charCodeAt(0) === 118 /* 'v' */ ? 1 : 0;
+    let lStart = local.charCodeAt(0) === 118 /* 'v' */ ? 1 : 0;
+
+    const rParts = remote.substring(rStart).split('.');
+    const lParts = local.substring(lStart).split('.');
+
+    const len = Math.max(rParts.length, lParts.length);
+    for (let i = 0; i < len; i++) {
+        const rVal = parseInt(rParts[i] || '0', 10);
+        const lVal = parseInt(lParts[i] || '0', 10);
+        if (rVal > lVal) return true;
+        if (rVal < lVal) return false;
     }
     return false;
 }
