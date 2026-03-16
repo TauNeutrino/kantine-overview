@@ -3,7 +3,7 @@
  * All fetch calls in the app route through these helpers to ensure
  * consistent auth and versioning headers.
  */
-import { API_BASE, GUEST_TOKEN, CLIENT_VERSION } from './constants.js';
+import { GUEST_TOKEN, CLIENT_VERSION } from './constants.js';
 
 /**
  * Returns request headers for the Bessa REST API.
