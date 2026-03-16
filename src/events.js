@@ -1,7 +1,7 @@
 import { displayMode, authToken, userFlags, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
-import { API_BASE, GUEST_TOKEN, LS } from './constants.js';
+import { API_BASE, LS } from './constants.js';
 import { apiHeaders } from './api.js';
 import { t } from './i18n.js';
 
@@ -294,7 +294,7 @@ export function bindEvents() {
             const email = `knapp-${employeeId}@bessa.app`;
             const response = await fetch(`${API_BASE}/auth/login/`, {
                 method: 'POST',
-                headers: apiHeaders(GUEST_TOKEN),
+                headers: apiHeaders(null),
                 body: JSON.stringify({ email, password })
             });
 

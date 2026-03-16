@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, langMode, setAuthToken, setCurrentUser, setOrderMap, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
 import { getISOWeek, getWeekYear, escapeHtml, getRelativeTime } from './utils.js';
-import { API_BASE, GUEST_TOKEN, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, LS } from './constants.js';
+import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, LS } from './constants.js';
 import { apiHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
 import { t } from './i18n.js';
@@ -500,7 +500,6 @@ export function saveFlags() {
 
 export async function refreshFlaggedItems() {
     if (userFlags.size === 0) return;
-    const token = authToken || GUEST_TOKEN;
 
     // Collect unique dates that have flagged items
     const datesToFetch = new Set();
@@ -517,7 +516,7 @@ export async function refreshFlaggedItems() {
         for (const dateStr of datesToFetch) {
             try {
                 const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
-                    headers: apiHeaders(token)
+                    headers: apiHeaders(authToken)
                 });
                 if (!resp.ok) continue;
                 const data = await resp.json();
@@ -807,8 +806,6 @@ export async function loadMenuDataFromAPI() {
 
     loading.classList.remove('hidden');
 
-    const token = authToken || GUEST_TOKEN;
-
     try {
         progressModal.classList.remove('hidden');
         progressMessage.textContent = 'Hole verfügbare Daten...';
@@ -816,7 +813,7 @@ export async function loadMenuDataFromAPI() {
         progressPercent.textContent = '0%';
 
         const datesResponse = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/dates/`, {
-            headers: apiHeaders(token)
+            headers: apiHeaders(authToken)
         });
 
         if (!datesResponse.ok) throw new Error(`Failed to fetch dates: ${datesResponse.status}`);
@@ -847,7 +844,7 @@ export async function loadMenuDataFromAPI() {
                 let dayData = null;
                 try {
                     const detailResp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
-                        headers: apiHeaders(token)
+                        headers: apiHeaders(authToken)
                     });
 
                     if (detailResp.ok) {
