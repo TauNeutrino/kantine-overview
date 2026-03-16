@@ -38,6 +38,7 @@ const createMockElement = (id = 'mock') => ({
 // 2. Setup Mock Environment
 const sandbox = {
     console: console,
+    langMode: 'de',
     fetch: async (url) => {
         // Mock Version Check
         if (url.includes('version.txt')) {
@@ -195,6 +196,89 @@ try {
         }
     }
     console.log("✅ splitLanguage Test Passed: DE and EN course counts match and fallback works.");
+
+    // --- escapeHtml Logic Test ---
+    console.log("--- Testing escapeHtml Logic (Contract-based) ---");
+    const originalCreateElement = sandbox.document.createElement;
+    let createdTag = '';
+    let textContentSet = '';
+
+    // Override createElement to verify the contract without reimplementing browser logic
+    sandbox.document.createElement = (tag) => {
+        createdTag = tag;
+        return {
+            set textContent(val) { textContentSet = val; },
+            get innerHTML() { return 'mock-escaped:' + textContentSet; }
+        };
+    };
+
+    try {
+        const input = '<b>Test</b>';
+        const result = sandbox.escapeHtml(input);
+
+        if (createdTag !== 'div') {
+            throw new Error(`escapeHtml should create a 'div', but created '${createdTag}'`);
+        }
+        if (textContentSet !== input) {
+            throw new Error(`escapeHtml should set textContent to '${input}', but set it to '${textContentSet}'`);
+        }
+        if (result !== 'mock-escaped:' + input) {
+            throw new Error(`escapeHtml should return the innerHTML of the created element`);
+        }
+
+        // Test with empty/null
+        sandbox.escapeHtml(null);
+        if (textContentSet !== '') {
+            throw new Error(`escapeHtml(null) should set textContent to empty string`);
+        }
+
+        console.log("✅ escapeHtml Test Passed: Verified DOM contract interaction.");
+    } finally {
+        sandbox.document.createElement = originalCreateElement;
+    }
+
+    // --- translateDay Logic Test ---
+    console.log("--- Testing translateDay Logic ---");
+    const originalLangMode = sandbox.langMode;
+    try {
+        sandbox.langMode = 'de';
+        if (sandbox.translateDay('Monday') !== 'Montag') throw new Error('translateDay(Monday) should be Montag in DE');
+        if (sandbox.translateDay('Friday') !== 'Freitag') throw new Error('translateDay(Friday) should be Freitag in DE');
+        if (sandbox.translateDay('Unknown') !== 'Unknown') throw new Error('translateDay should return input for unknown day');
+
+        sandbox.langMode = 'en';
+        if (sandbox.translateDay('Monday') !== 'Monday') throw new Error('translateDay(Monday) should be Monday in EN');
+        console.log("✅ translateDay Test Passed.");
+    } finally {
+        sandbox.langMode = originalLangMode;
+    }
+
+    // --- getLocalizedText Logic Test ---
+    console.log("--- Testing getLocalizedText Logic ---");
+    const testMenu = "Suppe / Soup";
+    const originalLangModeLoc = sandbox.langMode;
+    try {
+        sandbox.langMode = 'de';
+        let localizedDe = sandbox.getLocalizedText(testMenu);
+        if (!localizedDe.includes('Suppe')) {
+            throw new Error(`getLocalizedText (DE) failed: expected to include 'Suppe', got '${localizedDe}'`);
+        }
+
+        sandbox.langMode = 'en';
+        let localizedEn = sandbox.getLocalizedText(testMenu);
+        if (!localizedEn.includes('Soup')) {
+            throw new Error(`getLocalizedText (EN) failed: expected to include 'Soup', got '${localizedEn}'`);
+        }
+
+        sandbox.langMode = 'all';
+        let localizedAll = sandbox.getLocalizedText(testMenu);
+        if (localizedAll !== testMenu) {
+            throw new Error(`getLocalizedText (ALL) failed: expected '${testMenu}', got '${localizedAll}'`);
+        }
+        console.log("✅ getLocalizedText Test Passed.");
+    } finally {
+        sandbox.langMode = originalLangModeLoc;
+    }
 
     console.log("✅ Syntax Check Passed: Code executed in sandbox.");
 
