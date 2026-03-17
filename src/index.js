@@ -5,6 +5,12 @@ import { checkForUpdates } from './ui_helpers.js';
 import { authToken } from './state.js';
 
 if (!window.__KANTINE_LOADED) {
+    if (window.location.hostname !== 'web.bessa.app' && window.location.hostname !== '') {
+        window.location.href = 'https://web.bessa.app/knapp-kantine';
+        // We throw an error to halt further execution of the script
+        throw new Error('Redirecting to the correct domain...');
+    }
+
     window.__KANTINE_LOADED = true;
 
     injectUI();
