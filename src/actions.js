@@ -125,6 +125,7 @@ export async function fetchFullOrderHistory() {
     let totalCount = 0;
     let requiresFullFetch = localCache.length === 0;
     let deltaComplete = false;
+    const cacheMap = new Map(localCache.map(o => [o.id, o]));
 
     try {
         while (nextUrl && !deltaComplete) {
@@ -140,10 +141,9 @@ export async function fetchFullOrderHistory() {
             const results = data.results || [];
 
             for (const order of results) {
-                const existingOrderIndex = localCache.findIndex(cached => cached.id === order.id);
+                const existingOrder = cacheMap.get(order.id);
 
-                if (!requiresFullFetch && existingOrderIndex !== -1) {
-                    const existingOrder = localCache[existingOrderIndex];
+                if (!requiresFullFetch && existingOrder) {
                     if (existingOrder.updated === order.updated && existingOrder.order_state === order.order_state) {
                         deltaComplete = true;
                         break;
