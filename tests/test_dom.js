@@ -86,7 +86,7 @@ const jsCode = fs.readFileSync('dist/kantine.bundle.js', 'utf8')
     .replace('window.location.reload();', 'window.__RELOAD_CALLED = true;');
 
 log("Instantiating JSDOM...");
-const dom = new JSDOM(html, { runScripts: "dangerously", url: "http://localhost/" });
+const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://web.bessa.app/" });
 log("JSDOM dom created...");
 global.window = dom.window;
 global.document = window.document;

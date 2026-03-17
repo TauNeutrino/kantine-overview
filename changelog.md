@@ -1,3 +1,7 @@
+## v1.7.3 (2026-03-17)
+- 🛠️ **Build**: Build-Fehler in den DOM-Tests behoben (JSDOM-Domain-Check).
+- 🏷️ **Metadata**: Version auf v1.7.3 angehoben.
+
 ## v1.7.2 (2026-03-12)
 - 🛡️ **Security**: Logout-Logik vervollständigt (FR-006). Beim Abmelden werden nun alle App-bezogenen Daten (inkl. Bestellhistorie, Cache und Einstellungen) aus dem `localStorage` gelöscht.
 - 🧹 **Cleanup**: Veraltete `GUEST_TOKEN` Rückstände in `events.js` und `ui_helpers.js` entfernt.
