@@ -519,12 +519,12 @@ export async function refreshFlaggedItems() {
     if (bellBtn) bellBtn.classList.add('refreshing');
 
     try {
-        for (const dateStr of datesToFetch) {
+        await Promise.all(Array.from(datesToFetch).map(async (dateStr) => {
             try {
                 const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
                     headers: apiHeaders(token)
                 });
-                if (!resp.ok) continue;
+                if (!resp.ok) return;
                 const data = await resp.json();
                 const menuGroups = data.results || [];
 
@@ -563,7 +563,7 @@ export async function refreshFlaggedItems() {
             } catch (e) {
                 console.error('Error refreshing flag date', dateStr, e);
             }
-        }
+        }));
 
         if (updated) {
             saveMenuCache();
@@ -648,45 +648,63 @@ export function stopPolling() {
 export async function pollFlaggedItems() {
     if (userFlags.size === 0 || !authToken) return;
 
+    const flagsByDate = {};
     for (const flagId of userFlags) {
         const [date, articleIdStr] = flagId.split('_');
-        const articleId = parseInt(articleIdStr);
+        if (!flagsByDate[date]) flagsByDate[date] = [];
+        flagsByDate[date].push(parseInt(articleIdStr));
+    }
 
+    let needsReload = false;
+
+    await Promise.all(Object.entries(flagsByDate).map(async ([date, articleIds]) => {
         try {
             const response = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${date}/`, {
                 headers: apiHeaders(authToken)
             });
-            if (!response.ok) continue;
+            if (!response.ok) return;
 
             const data = await response.json();
             const groups = data.results || [];
-            let foundItem = null;
+
+            const apiItemMap = new Map();
             for (const group of groups) {
                 if (group.items) {
-                    foundItem = group.items.find(i => i.id === articleId || i.article === articleId);
-                    if (foundItem) break;
+                    for (const item of group.items) {
+                        const id = item.id;
+                        const art = item.article;
+                        if (id !== undefined && id !== null && !apiItemMap.has(id)) apiItemMap.set(id, item);
+                        if (art !== undefined && art !== null && !apiItemMap.has(art)) apiItemMap.set(art, item);
+                    }
                 }
             }
 
-            if (foundItem) {
-                const isAvailable = (foundItem.amount_tracking === false) || (parseInt(foundItem.available_amount) > 0);
-                if (isAvailable) {
-                    const itemName = foundItem.name || 'Unbekannt';
-                    showToast(`${itemName} ist jetzt verfügbar!`, 'success');
-                    if (Notification.permission === 'granted') {
-                        new Notification('Kantine Wrapper', {
-                            body: `${itemName} ist jetzt verfügbar!`,
-                            icon: '🍽️'
-                        });
+            for (const articleId of articleIds) {
+                const foundItem = apiItemMap.get(articleId);
+                if (foundItem) {
+                    const isAvailable = (foundItem.amount_tracking === false) || (parseInt(foundItem.available_amount) > 0);
+                    if (isAvailable) {
+                        const itemName = foundItem.name || 'Unbekannt';
+                        showToast(`${itemName} ist jetzt verfügbar!`, 'success');
+                        if (Notification.permission === 'granted') {
+                            new Notification('Kantine Wrapper', {
+                                body: `${itemName} ist jetzt verfügbar!`,
+                                icon: '🍽️'
+                            });
+                        }
+                        needsReload = true;
                     }
-                    loadMenuDataFromAPI();
                 }
             }
         } catch (err) {
-            console.error(`Poll error for ${flagId}:`, err);
-            await new Promise(r => setTimeout(r, 200));
+            console.error(`Poll error for date ${date}:`, err);
         }
+    }));
+
+    if (needsReload) {
+        loadMenuDataFromAPI();
     }
+
     localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
     updateAlarmBell();
 }
