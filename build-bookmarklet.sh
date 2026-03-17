@@ -312,6 +312,14 @@ ls -la "$DIST_DIR/"
 
 # === 4. Run build-time tests ===
 echo ""
+echo "=== Running Utility Unit Tests ==="
+timeout 15s node "$SCRIPT_DIR/tests/test_utils.js"
+UTIL_EXIT=$?
+if [ $UTIL_EXIT -ne 0 ]; then
+    echo "❌ Utility tests FAILED or TIMED OUT (Exit: $UTIL_EXIT)! See above for details."
+    exit 1
+fi
+
 echo "=== Running Logic Tests ==="
 timeout 15s node "$SCRIPT_DIR/test_logic.js"
 LOGIC_EXIT=$?
