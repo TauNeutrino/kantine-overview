@@ -1,6 +1,6 @@
-import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
-import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer } from './utils.js';
-import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, CLIENT_VERSION, LS } from './constants.js';
+import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
+import { getISOWeek, getWeekYear, escapeHtml, getRelativeTime, isNewer } from './utils.js';
+import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, LS } from './constants.js';
 import { apiHeaders, githubHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
 import { t } from './i18n.js';
@@ -800,19 +800,6 @@ export function loadMenuCache() {
             updateAlarmBell();
             if (cachedTs) updateLastUpdatedTime(cachedTs);
 
-            try {
-                const uniqueMenus = new Set();
-                allWeeks.forEach(w => {
-                    (w.days || []).forEach(d => {
-                        (d.items || []).forEach(item => {
-                            let text = (item.description || '').replace(/\s+/g, ' ').trim();
-                            if (text && text.includes(' / ')) {
-                                uniqueMenus.add(text);
-                            }
-                        });
-                    });
-                });
-            } catch (e) { }
 
             return true;
         }

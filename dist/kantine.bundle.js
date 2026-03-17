@@ -552,12 +552,12 @@ async function refreshFlaggedItems() {
     if (bellBtn) bellBtn.classList.add('refreshing');
 
     try {
-        for (const dateStr of datesToFetch) {
+        await Promise.all(Array.from(datesToFetch).map(async (dateStr) => {
             try {
                 const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
                     headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(token)
                 });
-                if (!resp.ok) continue;
+                if (!resp.ok) return;
                 const data = await resp.json();
                 const menuGroups = data.results || [];
 
@@ -596,7 +596,7 @@ async function refreshFlaggedItems() {
             } catch (e) {
                 console.error('Error refreshing flag date', dateStr, e);
             }
-        }
+        }));
 
         if (updated) {
             saveMenuCache();
@@ -681,45 +681,63 @@ function stopPolling() {
 async function pollFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0 || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
 
+    const flagsByDate = {};
     for (const flagId of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY) {
         const [date, articleIdStr] = flagId.split('_');
-        const articleId = parseInt(articleIdStr);
+        if (!flagsByDate[date]) flagsByDate[date] = [];
+        flagsByDate[date].push(parseInt(articleIdStr));
+    }
 
+    let needsReload = false;
+
+    await Promise.all(Object.entries(flagsByDate).map(async ([date, articleIds]) => {
         try {
             const response = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${date}/`, {
                 headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX)
             });
-            if (!response.ok) continue;
+            if (!response.ok) return;
 
             const data = await response.json();
             const groups = data.results || [];
-            let foundItem = null;
+
+            const apiItemMap = new Map();
             for (const group of groups) {
                 if (group.items) {
-                    foundItem = group.items.find(i => i.id === articleId || i.article === articleId);
-                    if (foundItem) break;
+                    for (const item of group.items) {
+                        const id = item.id;
+                        const art = item.article;
+                        if (id !== undefined && id !== null && !apiItemMap.has(id)) apiItemMap.set(id, item);
+                        if (art !== undefined && art !== null && !apiItemMap.has(art)) apiItemMap.set(art, item);
+                    }
                 }
             }
 
-            if (foundItem) {
-                const isAvailable = (foundItem.amount_tracking === false) || (parseInt(foundItem.available_amount) > 0);
-                if (isAvailable) {
-                    const itemName = foundItem.name || 'Unbekannt';
-                    showToast(`${itemName} ist jetzt verfügbar!`, 'success');
-                    if (Notification.permission === 'granted') {
-                        new Notification('Kantine Wrapper', {
-                            body: `${itemName} ist jetzt verfügbar!`,
-                            icon: '🍽️'
-                        });
+            for (const articleId of articleIds) {
+                const foundItem = apiItemMap.get(articleId);
+                if (foundItem) {
+                    const isAvailable = (foundItem.amount_tracking === false) || (parseInt(foundItem.available_amount) > 0);
+                    if (isAvailable) {
+                        const itemName = foundItem.name || 'Unbekannt';
+                        showToast(`${itemName} ist jetzt verfügbar!`, 'success');
+                        if (Notification.permission === 'granted') {
+                            new Notification('Kantine Wrapper', {
+                                body: `${itemName} ist jetzt verfügbar!`,
+                                icon: '🍽️'
+                            });
+                        }
+                        needsReload = true;
                     }
-                    loadMenuDataFromAPI();
                 }
             }
         } catch (err) {
-            console.error(`Poll error for ${flagId}:`, err);
-            await new Promise(r => setTimeout(r, 200));
+            console.error(`Poll error for date ${date}:`, err);
         }
+    }));
+
+    if (needsReload) {
+        loadMenuDataFromAPI();
     }
+
     localStorage.setItem('kantine_flagged_items_last_checked', new Date().toISOString());
     (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
 }
@@ -815,19 +833,6 @@ function loadMenuCache() {
             (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
             if (cachedTs) updateLastUpdatedTime(cachedTs);
 
-            try {
-                const uniqueMenus = new Set();
-                _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.forEach(w => {
-                    (w.days || []).forEach(d => {
-                        (d.items || []).forEach(item => {
-                            let text = (item.description || '').replace(/\s+/g, ' ').trim();
-                            if (text && text.includes(' / ')) {
-                                uniqueMenus.add(text);
-                            }
-                        });
-                    });
-                });
-            } catch (e) { }
 
             return true;
         }
@@ -2431,9 +2436,13 @@ function translateDay(englishDay) {
 }
 
 function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text || '';
-    return div.innerHTML;
+    if (!text) return '';
+    return text.toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function isNewer(remote, local) {
@@ -3069,7 +3078,7 @@ function updateUILanguage() {
 
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
-    if (alarmBell && state/* userFlags */.BY.size === 0) {
+    if (alarmBell && userFlags.size === 0) {
         alarmBell.title = (0,i18n.t)('alarmTooltipNone');
     }
 

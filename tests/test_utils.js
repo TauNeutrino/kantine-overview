@@ -73,7 +73,7 @@ assertEquals(sandbox.translateDay('Monday'), 'Monday', "Monday -> Monday (EN)");
 
 // --- Test escapeHtml ---
 console.log("Testing escapeHtml...");
-assertEquals(sandbox.escapeHtml('<b>Hi</b> & "bye"'), '&lt;b&gt;Hi&lt;/b&gt; &amp; "bye"', "HTML escaping");
+assertEquals(sandbox.escapeHtml('<b>Hi</b> & "bye"'), '&lt;b&gt;Hi&lt;/b&gt; &amp; &quot;bye&quot;', "HTML escaping");
 
 // --- Test isNewer ---
 console.log("Testing isNewer...");
