@@ -198,44 +198,24 @@ try {
     console.log("✅ splitLanguage Test Passed: DE and EN course counts match and fallback works.");
 
     // --- escapeHtml Logic Test ---
-    console.log("--- Testing escapeHtml Logic (Contract-based) ---");
-    const originalCreateElement = sandbox.document.createElement;
-    let createdTag = '';
-    let textContentSet = '';
+    console.log("--- Testing escapeHtml Logic ---");
+    const testCasesHtml = [
+        { input: '<b>Test</b>', expected: '&lt;b&gt;Test&lt;/b&gt;' },
+        { input: '"quoted"', expected: '&quot;quoted&quot;' },
+        { input: "'single'", expected: '&#039;single&#039;' },
+        { input: '&', expected: '&amp;' },
+        { input: null, expected: '' },
+        { input: undefined, expected: '' },
+        { input: 123, expected: '123' }
+    ];
 
-    // Override createElement to verify the contract without reimplementing browser logic
-    sandbox.document.createElement = (tag) => {
-        createdTag = tag;
-        return {
-            set textContent(val) { textContentSet = val; },
-            get innerHTML() { return 'mock-escaped:' + textContentSet; }
-        };
-    };
-
-    try {
-        const input = '<b>Test</b>';
+    for (const { input, expected } of testCasesHtml) {
         const result = sandbox.escapeHtml(input);
-
-        if (createdTag !== 'div') {
-            throw new Error(`escapeHtml should create a 'div', but created '${createdTag}'`);
+        if (result !== expected) {
+            throw new Error(`escapeHtml failed for "${input}": expected "${expected}", got "${result}"`);
         }
-        if (textContentSet !== input) {
-            throw new Error(`escapeHtml should set textContent to '${input}', but set it to '${textContentSet}'`);
-        }
-        if (result !== 'mock-escaped:' + input) {
-            throw new Error(`escapeHtml should return the innerHTML of the created element`);
-        }
-
-        // Test with empty/null
-        sandbox.escapeHtml(null);
-        if (textContentSet !== '') {
-            throw new Error(`escapeHtml(null) should set textContent to empty string`);
-        }
-
-        console.log("✅ escapeHtml Test Passed: Verified DOM contract interaction.");
-    } finally {
-        sandbox.document.createElement = originalCreateElement;
     }
+    console.log("✅ escapeHtml Test Passed: All entities correctly escaped.");
 
     // --- translateDay Logic Test ---
     console.log("--- Testing translateDay Logic ---");
