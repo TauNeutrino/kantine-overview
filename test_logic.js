@@ -86,7 +86,7 @@ const sandbox = {
     window: {
         matchMedia: () => ({ matches: false }),
         addEventListener: () => { },
-        location: { href: '' }
+        location: { href: '', hostname: 'web.bessa.app' }
     },
     localStorage: { getItem: () => "[]", setItem: () => { } },
     sessionStorage: { getItem: () => null, setItem: () => { } },
