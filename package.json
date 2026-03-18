@@ -3,5 +3,8 @@
     "jsdom": "^28.1.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "test": "node tests/test_utils.js && node tests/test_actions.js && node test_logic.js"
   }
 }
