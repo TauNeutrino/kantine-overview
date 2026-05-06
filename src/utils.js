@@ -68,7 +68,7 @@ export function getRelativeTime(date) {
 }
 
 // === Language Filter (FR-100) ===
-const DE_STEMS = [
+const DE_STEMS_LIST = [
     'apfel', 'achtung', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
     'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
     'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
@@ -84,7 +84,7 @@ const DE_STEMS = [
     'zur', 'zwiebel', 'öl'
 ];
 
-const EN_STEMS = [
+const EN_STEMS_LIST = [
     'almond', 'and', 'apple', 'asparagus', 'bacon', 'baked', 'ball', 'bean', 'beef', 'berry',
     'bread', 'breast', 'broccoli', 'bun', 'butter', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
     'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'chili', 'choco', 'chocolate', 'cider', 'cilantro',
@@ -99,6 +99,11 @@ const EN_STEMS = [
     'thyme', 'to', 'tofu', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
     'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
 ];
+
+const DE_STEMS = new Set(DE_STEMS_LIST);
+const EN_STEMS = new Set(EN_STEMS_LIST);
+const DE_STEMS_SORTED = [...DE_STEMS_LIST].sort((a, b) => b.length - a.length);
+const EN_STEMS_SORTED = [...EN_STEMS_LIST].sort((a, b) => b.length - a.length);
 
 export function splitLanguage(text) {
     if (!text) return { de: '', en: '', raw: '' };
@@ -116,11 +121,19 @@ export function splitLanguage(text) {
             if (w) {
                 let bestDeMatch = 0;
                 let bestEnMatch = 0;
-                if (DE_STEMS.includes(w)) bestDeMatch = w.length;
-                else DE_STEMS.forEach(s => { if (w.includes(s) && s.length > bestDeMatch) bestDeMatch = s.length; });
+                if (DE_STEMS.has(w)) {
+                    bestDeMatch = w.length;
+                } else {
+                    const match = DE_STEMS_SORTED.find(s => w.includes(s));
+                    if (match) bestDeMatch = match.length;
+                }
 
-                if (EN_STEMS.includes(w)) bestEnMatch = w.length;
-                else EN_STEMS.forEach(s => { if (w.includes(s) && s.length > bestEnMatch) bestEnMatch = s.length; });
+                if (EN_STEMS.has(w)) {
+                    bestEnMatch = w.length;
+                } else {
+                    const match = EN_STEMS_SORTED.find(s => w.includes(s));
+                    if (match) bestEnMatch = match.length;
+                }
 
                 if (bestDeMatch > 0) de += (bestDeMatch / w.length);
                 if (bestEnMatch > 0) en += (bestEnMatch / w.length);
