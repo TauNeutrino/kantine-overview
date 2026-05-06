@@ -100,6 +100,11 @@ const EN_STEMS = [
     'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
 ];
 
+const DE_STEMS_SET = new Set(DE_STEMS);
+const EN_STEMS_SET = new Set(EN_STEMS);
+const DE_REGEX = new RegExp([...DE_STEMS].sort((a, b) => b.length - a.length).join('|'), 'g');
+const EN_REGEX = new RegExp([...EN_STEMS].sort((a, b) => b.length - a.length).join('|'), 'g');
+
 export function splitLanguage(text) {
     if (!text) return { de: '', en: '', raw: '' };
 
@@ -116,11 +121,26 @@ export function splitLanguage(text) {
             if (w) {
                 let bestDeMatch = 0;
                 let bestEnMatch = 0;
-                if (DE_STEMS.includes(w)) bestDeMatch = w.length;
-                else DE_STEMS.forEach(s => { if (w.includes(s) && s.length > bestDeMatch) bestDeMatch = s.length; });
 
-                if (EN_STEMS.includes(w)) bestEnMatch = w.length;
-                else EN_STEMS.forEach(s => { if (w.includes(s) && s.length > bestEnMatch) bestEnMatch = s.length; });
+                if (DE_STEMS_SET.has(w)) {
+                    bestDeMatch = w.length;
+                } else {
+                    DE_REGEX.lastIndex = 0;
+                    let m;
+                    while ((m = DE_REGEX.exec(w)) !== null) {
+                        if (m[0].length > bestDeMatch) bestDeMatch = m[0].length;
+                    }
+                }
+
+                if (EN_STEMS_SET.has(w)) {
+                    bestEnMatch = w.length;
+                } else {
+                    EN_REGEX.lastIndex = 0;
+                    let m;
+                    while ((m = EN_REGEX.exec(w)) !== null) {
+                        if (m[0].length > bestEnMatch) bestEnMatch = m[0].length;
+                    }
+                }
 
                 if (bestDeMatch > 0) de += (bestDeMatch / w.length);
                 if (bestEnMatch > 0) en += (bestEnMatch / w.length);
