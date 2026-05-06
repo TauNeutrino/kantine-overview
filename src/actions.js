@@ -596,11 +596,12 @@ export function toggleFlag(date, articleId, name, cutoff) {
         }
     }
     saveFlags();
-    updateAlarmBell();
-    renderVisibleWeeks();
 
     if (flagAdded) {
         refreshFlaggedItems();
+    } else {
+        updateAlarmBell();
+        renderVisibleWeeks();
     }
 }
 
