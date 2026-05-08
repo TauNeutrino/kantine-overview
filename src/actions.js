@@ -125,7 +125,8 @@ export async function fetchFullOrderHistory() {
     let totalCount = 0;
     let requiresFullFetch = localCache.length === 0;
     let deltaComplete = false;
-    const cacheMap = new Map(localCache.map(o => [o.id, o]));
+    const cacheMap = new Map();
+    for (const o of localCache) cacheMap.set(o.id, o);
 
     try {
         while (nextUrl && !deltaComplete) {
@@ -168,7 +169,8 @@ export async function fetchFullOrderHistory() {
         }
 
         if (fetchedOrders.length > 0) {
-            const cacheMap = new Map(localCache.map(o => [o.id, o]));
+            const cacheMap = new Map();
+            for (const o of localCache) cacheMap.set(o.id, o);
             for (const order of fetchedOrders) {
                 cacheMap.set(order.id, order);
             }
