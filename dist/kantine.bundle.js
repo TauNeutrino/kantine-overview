@@ -158,6 +158,8 @@ async function fetchFullOrderHistory() {
     let totalCount = 0;
     let requiresFullFetch = localCache.length === 0;
     let deltaComplete = false;
+    const cacheMap = new Map();
+    for (const o of localCache) cacheMap.set(o.id, o);
 
     try {
         while (nextUrl && !deltaComplete) {
@@ -173,10 +175,9 @@ async function fetchFullOrderHistory() {
             const results = data.results || [];
 
             for (const order of results) {
-                const existingOrderIndex = localCache.findIndex(cached => cached.id === order.id);
+                const existingOrder = cacheMap.get(order.id);
 
-                if (!requiresFullFetch && existingOrderIndex !== -1) {
-                    const existingOrder = localCache[existingOrderIndex];
+                if (!requiresFullFetch && existingOrder) {
                     if (existingOrder.updated === order.updated && existingOrder.order_state === order.order_state) {
                         deltaComplete = true;
                         break;
@@ -201,7 +202,8 @@ async function fetchFullOrderHistory() {
         }
 
         if (fetchedOrders.length > 0) {
-            const cacheMap = new Map(localCache.map(o => [o.id, o]));
+            const cacheMap = new Map();
+            for (const o of localCache) cacheMap.set(o.id, o);
             for (const order of fetchedOrders) {
                 cacheMap.set(order.id, order);
             }
@@ -465,7 +467,7 @@ async function placeOrder(date, articleId, name, price, description) {
             venue: _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW,
             states: [],
             order_state: 1,
-            date: `${date}T10:30:00Z`,
+            date: `${date}T09:00:00.000Z`,
             payment_method: 'payroll',
             customer: {
                 first_name: userData.first_name,
@@ -473,7 +475,7 @@ async function placeOrder(date, articleId, name, price, description) {
                 email: userData.email,
                 newsletter: false
             },
-            preorder: true,
+            preorder: false,
             delivery_fee: 0,
             cash_box_table_name: null,
             take_away: false
@@ -629,11 +631,12 @@ function toggleFlag(date, articleId, name, cutoff) {
         }
     }
     saveFlags();
-    (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
-    (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
 
     if (flagAdded) {
         refreshFlaggedItems();
+    } else {
+        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
+        (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
     }
 }
 
@@ -2509,6 +2512,11 @@ const EN_STEMS = [
     'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
 ];
 
+const DE_SET = new Set(DE_STEMS);
+const EN_SET = new Set(EN_STEMS);
+const DE_REGEX = new RegExp(DE_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
+const EN_REGEX = new RegExp(EN_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
+
 function splitLanguage(text) {
     if (!text) return { de: '', en: '', raw: '' };
 
@@ -2525,11 +2533,17 @@ function splitLanguage(text) {
             if (w) {
                 let bestDeMatch = 0;
                 let bestEnMatch = 0;
-                if (DE_STEMS.includes(w)) bestDeMatch = w.length;
-                else DE_STEMS.forEach(s => { if (w.includes(s) && s.length > bestDeMatch) bestDeMatch = s.length; });
+                if (DE_SET.has(w)) bestDeMatch = w.length;
+                else {
+                    const deMatch = w.match(DE_REGEX);
+                    if (deMatch) deMatch.forEach(m => { if (m.length > bestDeMatch) bestDeMatch = m.length; });
+                }
 
-                if (EN_STEMS.includes(w)) bestEnMatch = w.length;
-                else EN_STEMS.forEach(s => { if (w.includes(s) && s.length > bestEnMatch) bestEnMatch = s.length; });
+                if (EN_SET.has(w)) bestEnMatch = w.length;
+                else {
+                    const enMatch = w.match(EN_REGEX);
+                    if (enMatch) enMatch.forEach(m => { if (m.length > bestEnMatch) bestEnMatch = m.length; });
+                }
 
                 if (bestDeMatch > 0) de += (bestDeMatch / w.length);
                 if (bestEnMatch > 0) en += (bestEnMatch / w.length);

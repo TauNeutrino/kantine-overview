@@ -377,8 +377,12 @@ paths:
                 date:
                   type: string
                   format: date-time
-                  description: Order date with pickup time (T10:00:00.000Z)
-                  example: "2026-02-13T10:00:00.000Z"
+                  description: |
+                    Order date with pickup time.
+                    IMPORTANT: The kitchen terminal STRICTLY expects "T09:00:00.000Z".
+                    Sending e.g. "T10:30:00Z" will result in a 201 Created from the API, 
+                    but the order will NOT show up in the canteen system.
+                  example: "2026-05-11T09:00:00.000Z"
                 payment_method:
                   type: string
                   example: "payroll"
@@ -395,6 +399,9 @@ paths:
                       type: boolean
                 preorder:
                   type: boolean
+                  description: |
+                    Must be false for regular daily orders to show up in the kitchen correctly.
+                    If set to true, the API accepts it, but the canteen system might filter it out.
                   example: false
                 delivery_fee:
                   type: number
