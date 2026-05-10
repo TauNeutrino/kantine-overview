@@ -1,3 +1,9 @@
+## v1.8.0 (2026-05-10)
+- 🐛 **Bugfix**: Kritischer Fehler bei der Bestellübermittlung behoben.
+  - Das Datumsformat (`date`) im Payload der `placeOrder`-Funktion wurde von `T10:30:00Z` auf `T09:00:00.000Z` geändert. Das Kantinen-Terminal verlangt strikt dieses Format inklusive Millisekunden, um die Bestellung für den Mittagstisch anzuzeigen.
+  - Das `preorder`-Flag wird nun standardmäßig als `false` (statt `true`) an die API übergeben, da Vorbestellungen sonst im Küchensystem gefiltert wurden, obwohl das Web-Backend sie akzeptiert hat.
+- 📝 **Docs**: OpenAPI Spezifikation (`bessa-openapi.yaml`) um die neuen Erkenntnisse bezüglich des Küchen-Terminals erweitert.
+
 ## v1.7.3 (2026-03-17)
 - 🛠️ **Build**: Build-Fehler in den DOM-Tests behoben (JSDOM-Domain-Check).
 - 🏷️ **Metadata**: Version auf v1.7.3 angehoben.
