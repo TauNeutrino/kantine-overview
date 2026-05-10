@@ -434,7 +434,7 @@ export async function placeOrder(date, articleId, name, price, description) {
             venue: VENUE_ID,
             states: [],
             order_state: 1,
-            date: `${date}T10:30:00Z`,
+            date: `${date}T09:00:00.000Z`,
             payment_method: 'payroll',
             customer: {
                 first_name: userData.first_name,
@@ -442,7 +442,7 @@ export async function placeOrder(date, articleId, name, price, description) {
                 email: userData.email,
                 newsletter: false
             },
-            preorder: true,
+            preorder: false,
             delivery_fee: 0,
             cash_box_table_name: null,
             take_away: false
