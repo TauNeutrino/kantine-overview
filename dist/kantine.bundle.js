@@ -1152,10 +1152,11 @@ function githubHeaders() {
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   IY: () => (/* binding */ RAW_INSTALLER_BASE),
 /* harmony export */   LS: () => (/* binding */ LS),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
-/* harmony export */   d_: () => (/* binding */ INSTALLER_BASE),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
+/* harmony export */   fK: () => (/* binding */ GITHUB_FILE_BASE),
 /* harmony export */   fZ: () => (/* binding */ CLIENT_VERSION),
 /* harmony export */   fv: () => (/* binding */ POLL_INTERVAL_MS),
 /* harmony export */   pe: () => (/* binding */ GITHUB_API),
@@ -1189,8 +1190,11 @@ const GITHUB_REPO = 'TauNeutrino/kantine-overview';
 /** GitHub REST API base URL for this repository. */
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
 
-/** Base URL for htmlpreview-hosted installer pages. */
-const INSTALLER_BASE = `https://htmlpreview.github.io/?https://github.com/${GITHUB_REPO}/blob`;
+/** Base URL for raw GitHub content (used to fetch installer HTML as blob). */
+const RAW_INSTALLER_BASE = `https://raw.githubusercontent.com/${GITHUB_REPO}/refs/tags`;
+
+/** Base URL for GitHub file browser link ("-> Github" button). */
+const GITHUB_FILE_BASE = `https://github.com/${GITHUB_REPO}/blob`;
 
 /**
  * Centralized localStorage key registry.
@@ -1617,7 +1621,7 @@ function setLangMode(lang) {
 /* harmony export */   showErrorModal: () => (/* binding */ showErrorModal),
 /* harmony export */   wy: () => (/* binding */ syncMenuItemHeights)
 /* harmony export */ });
-/* unused harmony exports createDayCard, fetchVersions, updateCountdown, removeCountdown */
+/* unused harmony exports createDayCard, fetchVersions, openInstallPage, updateCountdown, removeCountdown */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -2048,10 +2052,35 @@ async function fetchVersions(devMode) {
         return {
             tag,
             name: devMode ? tag : (item.name || tag),
-            url: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .INSTALLER_BASE */ .d_}/${tag}/dist/install.html`,
+            // Raw content URL: fetched as blob to bypass firewall blocking htmlpreview
+            rawUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .RAW_INSTALLER_BASE */ .IY}/${tag}/dist/install.html`,
+            // GitHub file browser URL: opened directly in new tab
+            githubUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_FILE_BASE */ .fK}/${tag}/dist/install.html`,
             body: item.body || ''
         };
     });
+}
+
+/**
+ * Fetches an install.html from raw GitHub content and opens it as a Blob URL.
+ * Falls back to opening the raw URL directly if fetch fails.
+ * @param {string} rawUrl - The raw.githubusercontent.com URL of the installer HTML.
+ */
+async function openInstallPage(rawUrl) {
+    try {
+        const resp = await fetch(rawUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const html = await resp.text();
+        const blob = new Blob([html], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        const win = window.open(blobUrl, '_blank');
+        if (!win) throw new Error('Popup blocked');
+        // Revoke blob URL after 5 minutes to free memory
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5 * 60 * 1000);
+    } catch (e) {
+        console.warn('[Kantine] Blob open failed, falling back to raw URL:', e);
+        window.open(rawUrl, '_blank');
+    }
 }
 
 async function checkForUpdates() {
@@ -2072,13 +2101,12 @@ async function checkForUpdates() {
 
         const headerTitle = document.querySelector('.header-left h1');
         if (headerTitle && !headerTitle.querySelector('.update-icon')) {
-            const icon = document.createElement('a');
+            const icon = document.createElement('span');
             icon.className = 'update-icon';
-            icon.href = versions[0].url;
-            icon.target = '_blank';
+            icon.role = 'button';
             icon.innerHTML = '🆕';
             icon.title = `Update: ${latest} — Klick zum Installieren`;
-            icon.style.cssText = 'margin-left:8px;font-size:1em;text-decoration:none;cursor:pointer;vertical-align:middle;';
+            icon.addEventListener('click', () => openInstallPage(versions[0].rawUrl));
             headerTitle.appendChild(icon);
         }
     } catch (e) {
@@ -2124,18 +2152,33 @@ function openVersionMenu() {
                 if (isCurrent) badge = '<span class="badge-current">✓ Installiert</span>';
                 else if (isNew) badge = '<span class="badge-new">⬆ Neu!</span>';
 
-                let action = '';
-                if (!isCurrent) {
-                    action = `<a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.url)}" target="_blank" class="install-link" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren">Installieren</a>`;
-                }
-
                 li.innerHTML = `
                     <div class="version-info">
                         <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
                         ${badge}
                     </div>
-                    ${action}
+                    ${!isCurrent ? `
+                    <div class="version-actions">
+                        <button class="btn-install-raw"
+                            data-raw-url="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.rawUrl)}"
+                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren (laedt Install-Seite aus GitHub Raw-Content)">
+                            Installieren
+                        </button>
+                        <a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.githubUrl)}" target="_blank" class="btn-github-link"
+                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} auf GitHub ansehen">
+                            &rarr; Github
+                        </a>
+                    </div>` : ''}
                 `;
+
+                // Attach click handler for Blob-based install
+                const installBtn = li.querySelector('.btn-install-raw');
+                if (installBtn) {
+                    installBtn.addEventListener('click', () => {
+                        openInstallPage(installBtn.dataset.rawUrl);
+                    });
+                }
+
                 list.appendChild(li);
             });
         }
