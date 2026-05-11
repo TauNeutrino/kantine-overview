@@ -1,3 +1,6 @@
+## v1.8.6 (2026-05-11)
+- 🐛 **Bugfix**: PayPal-Button mittels CSS-Scaling (0.9) eingepasst, um Clipping am unteren Rand zu verhindern, ohne die Footer-Höhe zu verändern.
+
 ## v1.8.5 (2026-05-11)
 - 🐛 **Bugfix**: Rechtes Footer-Padding erhöht, um Überlagerung der Spenden-Buttons durch den Scrollbalken zu verhindern.
 

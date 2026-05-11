@@ -1163,8 +1163,10 @@ body {
 #donate-button-container {
     display: flex;
     align-items: center;
-    height: 20px;
-    overflow: hidden;
+    height: 24px;
+    overflow: visible;
+    transform: scale(0.9);
+    transform-origin: right center;
 }
 
 /* === Order / Cancel Buttons (inline in status row) === */
