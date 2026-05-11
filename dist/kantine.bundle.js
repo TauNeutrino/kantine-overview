@@ -3026,7 +3026,7 @@ function injectUI() {
         <footer class="app-footer">
             <div class="footer-left">
                 <a href="https://ko-fi.com/O4O01ZCNJE" target="_blank" title="Unterstütze die Entwicklung auf Ko-fi">
-                    <img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" />
+                    <img height="24" style="border:0px;height:24px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" />
                 </a>
                 <div id="donate-button-container">
                     <div id="donate-button"></div>
