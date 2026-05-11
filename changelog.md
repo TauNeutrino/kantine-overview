@@ -1,3 +1,7 @@
+## v1.8.3 (2026-05-11)
+- 🎨 Spenden-Buttons (Ko-fi & PayPal) auf 24px Höhe verkleinert.
+- 📐 Footer-Layout optimiert und Padding reduziert für kompaktere Darstellung.
+
 ## v1.8.2 (2026-05-11)
 - ✨ Spenden-Buttons (Ko-fi & PayPal) im Footer hinzugefügt.
 - 🎨 Footer-Layout auf Flexbox umgestellt für bessere Desktop- & Mobile-Darstellung.
