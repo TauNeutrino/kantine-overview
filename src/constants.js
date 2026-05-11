@@ -25,8 +25,11 @@ export const GITHUB_REPO = 'TauNeutrino/kantine-overview';
 /** GitHub REST API base URL for this repository. */
 export const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
 
-/** Base URL for htmlpreview-hosted installer pages. */
-export const INSTALLER_BASE = `https://htmlpreview.github.io/?https://github.com/${GITHUB_REPO}/blob`;
+/** Base URL for raw GitHub content (used to fetch installer HTML as blob). */
+export const RAW_INSTALLER_BASE = `https://raw.githubusercontent.com/${GITHUB_REPO}/refs/tags`;
+
+/** Base URL for GitHub file browser link ("-> Github" button). */
+export const GITHUB_FILE_BASE = `https://github.com/${GITHUB_REPO}/blob`;
 
 /**
  * Centralized localStorage key registry.

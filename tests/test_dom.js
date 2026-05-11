@@ -168,6 +168,48 @@ const testCode = `
         if (!versionModal.classList.contains('hidden')) throw new Error("Version modal should close");
         console.log("✅ Version Modal Test Passed");
 
+        console.log("--- Testing Version List: Two-Button Layout ---");
+        // Simulate renderVersionsList with mock data
+        const versionContainer = document.getElementById('version-list-container');
+        versionContainer.innerHTML = '<ul class="version-list"></ul>';
+        const vList = versionContainer.querySelector('.version-list');
+
+        // Insert a version item as the code would (non-current version)
+        const mockLi = document.createElement('li');
+        mockLi.className = 'version-item';
+        mockLi.innerHTML = \`
+            <div class="version-info"><strong>v1.7.0</strong></div>
+            <div class="version-actions">
+                <button class="btn-install-raw" data-raw-url="https://raw.githubusercontent.com/TauNeutrino/kantine-overview/refs/tags/v1.7.0/dist/install.html"
+                    title="v1.7.0 installieren">Installieren</button>
+                <a href="https://github.com/TauNeutrino/kantine-overview/blob/v1.7.0/dist/install.html"
+                    target="_blank" class="btn-github-link" title="v1.7.0 auf GitHub ansehen">&rarr; Github</a>
+            </div>
+        \`;
+        vList.appendChild(mockLi);
+
+        // Verify: .btn-install-raw must exist (new layout)
+        const installBtn = versionContainer.querySelector('.btn-install-raw');
+        if (!installBtn) throw new Error("Version list: .btn-install-raw button not found");
+
+        // Verify: .btn-github-link must exist (new layout)
+        const githubLink = versionContainer.querySelector('.btn-github-link');
+        if (!githubLink) throw new Error("Version list: .btn-github-link not found");
+
+        // Verify: github link opens in new tab
+        if (githubLink.getAttribute('target') !== '_blank') throw new Error("Version list: .btn-github-link must have target=_blank");
+
+        // Verify: old .install-link no longer present
+        const oldLink = versionContainer.querySelector('.install-link');
+        if (oldLink) throw new Error("Version list: old .install-link element should not exist");
+
+        // Verify raw URL references raw.githubusercontent.com (not htmlpreview)
+        const rawUrl = installBtn.dataset.rawUrl;
+        if (!rawUrl || rawUrl.includes('htmlpreview')) throw new Error("Version list: rawUrl must not use htmlpreview: " + rawUrl);
+        if (!rawUrl.includes('raw.githubusercontent.com')) throw new Error("Version list: rawUrl must use raw.githubusercontent.com: " + rawUrl);
+
+        console.log("✅ Version List Two-Button Layout Test Passed");
+
         console.log("--- Testing Theme Toggle ---");
         const themeBtn = document.getElementById('theme-toggle');
         const initialTheme = document.documentElement.getAttribute('data-theme');

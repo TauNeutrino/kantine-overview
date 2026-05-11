@@ -1,3 +1,10 @@
+## v1.8.1 (2026-05-11)
+- 🔒 **Fix**: `htmlpreview.github.io`-Links wurden durch Firewalls geblockt. Installer-Seiten werden nun direkt aus dem GitHub Raw-Content (`raw.githubusercontent.com`) per Fetch geladen und als Blob-URL im Browser geöffnet – kein externer Proxy mehr nötig.
+- ✨ **UX**: Im Versions-Dialog ersetzt ein Zwei-Button-Layout den alten Einzel-Link:  
+  - **Installieren** – Lädt `install.html` via Blob aus GitHub Raw-Content und öffnet sie gerendert in einem neuen Tab.  
+  - **→ Github** – Öffnet die Datei direkt im GitHub Dateibrowser (neuer Tab).
+- 🔒 **Fix**: Das `🆕`-Update-Icon im Header verlinkt nun ebenfalls per Blob-Fetch statt über `htmlpreview`.
+
 ## v1.8.0 (2026-05-10)
 - 🐛 **Bugfix**: Kritischer Fehler bei der Bestellübermittlung behoben.
   - Das Datumsformat (`date`) im Payload der `placeOrder`-Funktion wurde von `T10:30:00Z` auf `T09:00:00.000Z` geändert. Das Kantinen-Terminal verlangt strikt dieses Format inklusive Millisekunden, um die Bestellung für den Mittagstisch anzuzeigen.

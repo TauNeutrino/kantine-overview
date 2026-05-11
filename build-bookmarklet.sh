@@ -260,9 +260,8 @@ js = sys.stdin.read()
 css = open('$CSS_FILE').read().replace('\n', ' ').replace('  ', ' ')
 escaped_css = css.replace('\\\\', '\\\\\\\\').replace(\"'\", \"\\\\'\").replace('\"', '\\\\\"')
 
-# 3. Update URL
-update_url = 'https://htmlpreview.github.io/?https://github.com/TauNeutrino/kantine-overview/blob/main/dist/install.html'
-js = js.replace('https://github.com/TauNeutrino/kantine-overview/raw/main/dist/install.html', update_url)
+# 3. Update URL (handled by constants.js and blob logic in ui_helpers.js)
+# No manual replacement needed anymore.
 
 # 4. Create Bookmarklet Code with CSS injection
 # Inject CSS via style element (same pattern as bookmarklet-payload.js)

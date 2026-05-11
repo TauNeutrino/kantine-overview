@@ -80,6 +80,8 @@ Das System umfasst die Darstellung von Menüplänen in einer Wochenübersicht, d
 | FR-115 | Das Versionsmenü muss Links zur Erstellung von Feature-Requests und Bug-Reports auf GitHub enthalten. | Niedrig | v1.4.4 |
 | FR-116 | Das Versionsmenü muss eine Funktion zum Leeren des lokalen Caches bereitstellen, um bei hartnäckigen Fehlern alle gespeicherten Daten bereinigen zu können. | Niedrig | v1.4.16 |
 | FR-117 | Die Installer-Seite muss ein eingebettetes Favicon bereitstellen, das beim Drag & Drop in die Lesezeichenleiste als Icon für das Bookmarklet übernommen wird. | Niedrig | v1.4.19 |
+| FR-118 | Das System muss Installer-Inhalte (`install.html`) direkt vom GitHub Raw-Content (`raw.githubusercontent.com`) laden und als Blob-URL im Browser öffnen, um Firewall-Blockaden (z.B. von `htmlpreview.github.io`) zu umgehen. | Mittel | v1.8.1 |
+| FR-119 | Das Versionsmenü muss für jede verfügbare Version zwei Aktionen anbieten: „Installieren" (löst Blob-URL-Generierung aus) und „-> Github" (direkter Link zum GitHub-Dateibrowser). | Niedrig | v1.8.1 |
 
 ## 3. Nicht-funktionale Anforderungen
 
