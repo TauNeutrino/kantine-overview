@@ -1,3 +1,6 @@
+## v1.8.5 (2026-05-11)
+- 🐛 **Bugfix**: Rechtes Footer-Padding erhöht, um Überlagerung der Spenden-Buttons durch den Scrollbalken zu verhindern.
+
 ## v1.8.4 (2026-05-11)
 - 📐 **Layout**: Spenden-Buttons (Ko-fi & PayPal) auf die rechte Seite des Footers verschoben.
 - 🎨 **UX**: Ko-fi Button weiter verkleinert (20px) für eine noch dezentere Integration.
