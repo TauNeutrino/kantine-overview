@@ -231,18 +231,18 @@ export function injectUI() {
         </main>
 
         <footer class="app-footer">
-            <div class="footer-left">
+            <div class="footer-left"></div>
+            <div class="footer-center">
+                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufi 😃👍 mit Hilfe von KI 🤖</p>
+            </div>
+            <div class="footer-right">
                 <a href="https://ko-fi.com/O4O01ZCNJE" target="_blank" title="Unterstütze die Entwicklung auf Ko-fi">
-                    <img height="24" style="border:0px;height:24px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" />
+                    <img height="20" style="border:0px;height:20px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" />
                 </a>
                 <div id="donate-button-container">
                     <div id="donate-button"></div>
                 </div>
             </div>
-            <div class="footer-center">
-                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufi 😃👍 mit Hilfe von KI 🤖</p>
-            </div>
-            <div class="footer-right" style="width: 140px;"></div> <!-- Spacer for balance -->
         </footer>
     </div>`;
     document.body.innerHTML = htmlContent;

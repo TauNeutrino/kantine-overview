@@ -1,3 +1,7 @@
+## v1.8.4 (2026-05-11)
+- 📐 **Layout**: Spenden-Buttons (Ko-fi & PayPal) auf die rechte Seite des Footers verschoben.
+- 🎨 **UX**: Ko-fi Button weiter verkleinert (20px) für eine noch dezentere Integration.
+
 ## v1.8.3 (2026-05-11)
 - 🎨 Spenden-Buttons (Ko-fi & PayPal) auf 24px Höhe verkleinert.
 - 📐 Footer-Layout optimiert und Padding reduziert für kompaktere Darstellung.
