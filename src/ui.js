@@ -231,8 +231,41 @@ export function injectUI() {
         </main>
 
         <footer class="app-footer">
-            <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufi 😃👍 mit Hilfe von KI 🤖</p>
+            <div class="footer-left">
+                <a href="https://ko-fi.com/O4O01ZCNJE" target="_blank" title="Unterstütze die Entwicklung auf Ko-fi">
+                    <img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" />
+                </a>
+                <div id="donate-button-container">
+                    <div id="donate-button"></div>
+                </div>
+            </div>
+            <div class="footer-center">
+                <p>Jetzt Bessa Einfach! &bull; Knapp-Kantine Wrapper &bull; <span id="current-year">${new Date().getFullYear()}</span> by Kaufi 😃👍 mit Hilfe von KI 🤖</p>
+            </div>
+            <div class="footer-right" style="width: 140px;"></div> <!-- Spacer for balance -->
         </footer>
     </div>`;
     document.body.innerHTML = htmlContent;
+
+    // Initialize PayPal Donation Button
+    if (!document.getElementById('paypal-sdk')) {
+        const script = document.createElement('script');
+        script.id = 'paypal-sdk';
+        script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
+        script.charset = "UTF-8";
+        script.onload = () => {
+            if (window.PayPal && PayPal.Donation) {
+                PayPal.Donation.Button({
+                    env: 'production',
+                    hosted_button_id: 'R5G9H9TFGQNUY',
+                    image: {
+                        src: 'https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif',
+                        alt: 'Donate with PayPal button',
+                        title: 'PayPal - The safer, easier way to pay online!',
+                    }
+                }).render('#donate-button');
+            }
+        };
+        document.body.appendChild(script);
+    }
 }

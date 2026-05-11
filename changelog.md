@@ -1,3 +1,7 @@
+## v1.8.2 (2026-05-11)
+- ✨ Spenden-Buttons (Ko-fi & PayPal) im Footer hinzugefügt.
+- 🎨 Footer-Layout auf Flexbox umgestellt für bessere Desktop- & Mobile-Darstellung.
+
 ## v1.8.1 (2026-05-11)
 - 🔒 **Fix**: `htmlpreview.github.io`-Links wurden durch Firewalls geblockt. Installer-Seiten werden nun direkt aus dem GitHub Raw-Content (`raw.githubusercontent.com`) per Fetch geladen und als Blob-URL im Browser geöffnet – kein externer Proxy mehr nötig.
 - ✨ **UX**: Im Versions-Dialog ersetzt ein Zwei-Button-Layout den alten Einzel-Link:  

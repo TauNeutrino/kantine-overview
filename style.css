@@ -1130,11 +1130,32 @@ body {
 /* Footer */
 .app-footer {
     flex-shrink: 0;
-    text-align: center;
-    padding: 0.4rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.5rem;
     color: var(--text-secondary);
     font-size: 0.8rem;
     border-top: 1px solid var(--border-color);
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-center {
+    flex-grow: 1;
+    text-align: center;
+}
+
+#donate-button-container {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
 }
 
 /* === Order / Cancel Buttons (inline in status row) === */
