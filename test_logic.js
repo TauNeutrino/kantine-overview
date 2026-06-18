@@ -260,6 +260,48 @@ try {
         sandbox.langMode = originalLangModeLoc;
     }
 
+    // --- Redirect on blob URL Logic Test ---
+    console.log("--- Testing Redirect on Blob URL ---");
+    const redirectSandbox = {
+        console: console,
+        document: {
+            body: createMockElement('body'),
+            head: createMockElement('head'),
+            createElement: (tag) => createMockElement(tag),
+            getElementById: (id) => createMockElement(id)
+        },
+        window: {
+            matchMedia: () => ({ matches: false }),
+            addEventListener: () => { },
+            location: { href: '', hostname: 'web.bessa.app', protocol: 'blob:' }
+        },
+        localStorage: { getItem: () => "[]", setItem: () => { } },
+        sessionStorage: { getItem: () => null, setItem: () => { } },
+        location: { href: '' },
+        setInterval: () => { },
+        setTimeout: (cb) => cb(),
+        requestAnimationFrame: (cb) => cb(),
+        Date: Date,
+        Notification: { permission: 'denied', requestPermission: () => { } }
+    };
+    vm.createContext(redirectSandbox);
+    let errorThrown = false;
+    try {
+        vm.runInContext(code, redirectSandbox);
+    } catch (err) {
+        errorThrown = true;
+        if (!err.message.includes('Redirecting to the correct domain')) {
+            throw new Error("Unexpected error thrown: " + err.message);
+        }
+    }
+    if (!errorThrown) {
+        throw new Error("Expected an error to halt execution during redirect, but none was thrown.");
+    }
+    if (redirectSandbox.window.location.href !== 'https://web.bessa.app/knapp-kantine') {
+        throw new Error("Redirect target is wrong: " + redirectSandbox.window.location.href);
+    }
+    console.log("✅ Redirect on Blob URL Test Passed.");
+
     console.log("✅ Syntax Check Passed: Code executed in sandbox.");
 
 } catch (e) {

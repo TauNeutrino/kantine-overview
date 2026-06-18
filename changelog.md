@@ -1,5 +1,9 @@
+## v1.8.8 (2026-06-18)
+- 🐛 **Bugfix**: Redirect-Prüfung bei Blob-URLs korrigiert. Wenn das Bookmarklet auf einer `blob:`-URL ausgeführt wird (z. B. auf der Installer-Seite), wird das Protokoll nun korrekt erkannt und leitet den Benutzer zuverlässig zu `https://web.bessa.app/knapp-kantine` weiter.
+
 ## v1.8.7 (2026-06-18)
 - 🐛 **Bugfix**: Hintergrundfarbe und Schriftart-Spezifität korrigiert. Der Body-Hintergrund der Wirtsseite (Klasse `.bg`) hat zuvor unseren Body-Hintergrund überschrieben, wodurch die Übersicht und die teiltransparente Titelleiste grau verfärbt wurden. Dies wird nun durch spezifischere Selektoren (`body, body.bg`) und `!important` behoben. Zudem wurde die Schriftart `Inter` wiederhergestellt und `#kantine-wrapper` erhielt eine explizite Hintergrundfarbe.
+
 
 ## v1.8.6 (2026-05-11)
 - 🐛 **Bugfix**: PayPal-Button mittels CSS-Scaling (0.9) eingepasst, um Clipping am unteren Rand zu verhindern, ohne die Footer-Höhe zu verändern.
