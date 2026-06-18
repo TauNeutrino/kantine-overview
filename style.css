@@ -48,9 +48,9 @@
     padding: 0;
 }
 
-body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: var(--bg-body);
+body, body.bg {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    background-color: var(--bg-body) !important;
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
     line-height: 1.5;
@@ -868,6 +868,7 @@ body {
     height: 100dvh;
     /* Dynamic viewport height for mobile browsers */
     overflow: hidden;
+    background-color: var(--bg-body);
 }
 
 .days-grid {

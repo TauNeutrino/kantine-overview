@@ -281,4 +281,20 @@ if (!dom.window.__TEST_PASSED) {
     throw new Error("Tests failed to reach completion inside JSDOM.");
 }
 
+console.log("--- Testing Background Specificity Fix (CSS) ---");
+const cssContent = fs.readFileSync('style.css', 'utf8');
+if (!cssContent.includes('body, body.bg')) {
+    throw new Error("CSS Fix: body.bg selector is missing");
+}
+if (!cssContent.includes('background-color: var(--bg-body) !important;')) {
+    throw new Error("CSS Fix: body.bg background-color !important is missing");
+}
+if (!cssContent.includes('font-family: \'Inter\', system-ui, -apple-system, sans-serif !important;')) {
+    throw new Error("CSS Fix: body.bg font-family !important is missing");
+}
+if (!/#kantine-wrapper\s*\{[^}]*background-color:\s*var\(--bg-body\)/.test(cssContent)) {
+    throw new Error("CSS Fix: #kantine-wrapper background-color is missing or incorrect");
+}
+console.log("✅ CSS Background Specificity Fix Test Passed");
+
 process.exit(0);
