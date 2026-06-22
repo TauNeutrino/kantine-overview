@@ -11,9 +11,9 @@ const sandbox = {
     console: console,
     localStorage: {
         _data: {},
-        getItem: function(key) { return this._data[key] || null; },
-        setItem: function(key, val) { this._data[key] = String(val); },
-        clear: function() { this._data = {}; }
+        getItem: function (key) { return this._data[key] || null; },
+        setItem: function (key, val) { this._data[key] = String(val); },
+        clear: function () { this._data = {}; }
     },
     // Avoid mutating the global Date object
     Date: class extends Date {
@@ -35,33 +35,33 @@ const sandbox = {
     // Mocks for dependencies
     document: {
         getElementById: () => ({
-            classList: { add: () => {}, remove: () => {} },
+            classList: { add: () => { }, remove: () => { } },
             style: {},
             textContent: ''
         }),
         createElement: () => ({
-            classList: { add: () => {} },
-            appendChild: () => {}
+            classList: { add: () => { } },
+            appendChild: () => { }
         }),
-        body: { appendChild: () => {} }
+        body: { appendChild: () => { } }
     },
-    setInterval: () => {},
-    clearInterval: () => {},
+    setInterval: () => { },
+    clearInterval: () => { },
     fetch: () => Promise.resolve({ ok: true, json: () => Promise.resolve({}) }),
-    Notification: { permission: 'denied', requestPermission: () => {} },
+    Notification: { permission: 'denied', requestPermission: () => { } },
     t: (key) => key,
-    showToast: () => {},
-    renderVisibleWeeks: () => {},
-    updateNextWeekBadge: () => {},
-    updateAlarmBell: () => {},
+    showToast: () => { },
+    renderVisibleWeeks: () => { },
+    updateNextWeekBadge: () => { },
+    updateAlarmBell: () => { },
     apiHeaders: () => ({}),
     escapeHtml: (t) => t,
     getRelativeTime: () => '',
     isNewer: () => false,
     authToken: 'mock-token',
     setAllWeeks: (w) => { sandbox.allWeeks = w; },
-    setCurrentWeekNumber: () => {},
-    setCurrentYear: () => {}
+    setCurrentWeekNumber: () => { },
+    setCurrentYear: () => { }
 };
 
 // 2. Load Source Code

@@ -24,7 +24,7 @@
 /* harmony export */   oL: () => (/* binding */ addHighlightTag),
 /* harmony export */   wH: () => (/* binding */ placeOrder)
 /* harmony export */ });
-/* unused harmony exports renderHistory, saveFlags, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
+/* unused harmony exports renderHistory, saveFlags, refreshMenuForDate, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
 /* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
@@ -490,7 +490,16 @@ async function placeOrder(date, articleId, name, price, description) {
         if (response.ok || response.status === 201) {
             showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
+            
+            const flagId = `${date}_${articleId}`;
+            if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(flagId)) {
+                _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.delete(flagId);
+                saveFlags();
+                (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateAlarmBell */ .Mb)();
+            }
+
             await fetchOrders();
+            await refreshMenuForDate(date);
         } else {
             const data = await response.json();
             showToast(`Fehler: ${data.detail || data.non_field_errors?.[0] || 'Bestellung fehlgeschlagen'}`, 'error');
@@ -519,6 +528,7 @@ async function cancelOrder(date, articleId, name) {
             showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
+            await refreshMenuForDate(date);
         } else {
             const data = await response.json();
             showToast(`Fehler: ${data.detail || 'Stornierung fehlgeschlagen'}`, 'error');
@@ -612,6 +622,58 @@ async function refreshFlaggedItems() {
         showToast(`${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size} ${_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 1 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuSingular') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuPlural')} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('menuChecked')}`, 'info');
     } finally {
         if (bellBtn) bellBtn.classList.remove('refreshing');
+    }
+}
+
+async function refreshMenuForDate(dateStr) {
+    if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
+    try {
+        const resp = await fetch(`${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .API_BASE */ .tE}/venues/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .VENUE_ID */ .eW}/menu/${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .MENU_ID */ .YU}/${dateStr}/`, {
+            headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .apiHeaders */ .H)(_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX)
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const menuGroups = data.results || [];
+        
+        const apiItemMap = new Map();
+        for (const group of menuGroups) {
+            if (group.items && Array.isArray(group.items)) {
+                for (const item of group.items) {
+                    apiItemMap.set(item.id, item);
+                }
+            }
+        }
+        
+        let updated = false;
+        for (let week of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
+            if (!week.days) continue;
+            const dayObj = week.days.find(d => d.date === dateStr);
+            if (!dayObj || !dayObj.items) continue;
+
+            for (let i = 0; i < dayObj.items.length; i++) {
+                const existing = dayObj.items[i];
+                const apiItem = apiItemMap.get(existing.articleId);
+                if (apiItem) {
+                    const isUnlimited = apiItem.amount_tracking === false;
+                    const hasStock = parseInt(apiItem.available_amount) > 0;
+                    if (existing.available !== (isUnlimited || hasStock) || 
+                        existing.availableAmount !== (parseInt(apiItem.available_amount) || 0)) {
+                        existing.available = isUnlimited || hasStock;
+                        existing.availableAmount = parseInt(apiItem.available_amount) || 0;
+                        existing.amountTracking = apiItem.amount_tracking !== false;
+                        updated = true;
+                    }
+                }
+            }
+        }
+        
+        if (updated) {
+            saveMenuCache();
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .renderVisibleWeeks */ .OR)();
+            (0,_ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__/* .updateNextWeekBadge */ .gJ)();
+        }
+    } catch (e) {
+        console.error('Error refreshing menu date', dateStr, e);
     }
 }
 
@@ -1960,9 +2022,9 @@ function createDayCard(day) {
 
             if (item.available) {
                 if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
                 } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
                 }
             }
 
@@ -1981,7 +2043,7 @@ function createDayCard(day) {
 
         itemEl.innerHTML = `
             <div class="item-header">
-                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span>
+                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))}</span>
                 <span class="item-price">${item.price.toFixed(2)} €</span>
             </div>
             <div class="item-status-row">
@@ -3168,7 +3230,7 @@ function updateUILanguage() {
 
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
-    if (alarmBell && userFlags.size === 0) {
+    if (alarmBell && state/* userFlags */.BY.size === 0) {
         alarmBell.title = (0,i18n.t)('alarmTooltipNone');
     }
 

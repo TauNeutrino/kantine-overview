@@ -457,7 +457,16 @@ export async function placeOrder(date, articleId, name, price, description) {
         if (response.ok || response.status === 201) {
             showToast(`${t('orderSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
+            
+            const flagId = `${date}_${articleId}`;
+            if (userFlags.has(flagId)) {
+                userFlags.delete(flagId);
+                saveFlags();
+                updateAlarmBell();
+            }
+
             await fetchOrders();
+            await refreshMenuForDate(date);
         } else {
             const data = await response.json();
             showToast(`Fehler: ${data.detail || data.non_field_errors?.[0] || 'Bestellung fehlgeschlagen'}`, 'error');
@@ -486,6 +495,7 @@ export async function cancelOrder(date, articleId, name) {
             showToast(`${t('cancelSuccess')}: ${name}`, 'success');
             fullOrderHistoryCache = null;
             await fetchOrders();
+            await refreshMenuForDate(date);
         } else {
             const data = await response.json();
             showToast(`Fehler: ${data.detail || 'Stornierung fehlgeschlagen'}`, 'error');
@@ -579,6 +589,58 @@ export async function refreshFlaggedItems() {
         showToast(`${userFlags.size} ${userFlags.size === 1 ? t('menuSingular') : t('menuPlural')} ${t('menuChecked')}`, 'info');
     } finally {
         if (bellBtn) bellBtn.classList.remove('refreshing');
+    }
+}
+
+export async function refreshMenuForDate(dateStr) {
+    if (!authToken) return;
+    try {
+        const resp = await fetch(`${API_BASE}/venues/${VENUE_ID}/menu/${MENU_ID}/${dateStr}/`, {
+            headers: apiHeaders(authToken)
+        });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const menuGroups = data.results || [];
+        
+        const apiItemMap = new Map();
+        for (const group of menuGroups) {
+            if (group.items && Array.isArray(group.items)) {
+                for (const item of group.items) {
+                    apiItemMap.set(item.id, item);
+                }
+            }
+        }
+        
+        let updated = false;
+        for (let week of allWeeks) {
+            if (!week.days) continue;
+            const dayObj = week.days.find(d => d.date === dateStr);
+            if (!dayObj || !dayObj.items) continue;
+
+            for (let i = 0; i < dayObj.items.length; i++) {
+                const existing = dayObj.items[i];
+                const apiItem = apiItemMap.get(existing.articleId);
+                if (apiItem) {
+                    const isUnlimited = apiItem.amount_tracking === false;
+                    const hasStock = parseInt(apiItem.available_amount) > 0;
+                    if (existing.available !== (isUnlimited || hasStock) || 
+                        existing.availableAmount !== (parseInt(apiItem.available_amount) || 0)) {
+                        existing.available = isUnlimited || hasStock;
+                        existing.availableAmount = parseInt(apiItem.available_amount) || 0;
+                        existing.amountTracking = apiItem.amount_tracking !== false;
+                        updated = true;
+                    }
+                }
+            }
+        }
+        
+        if (updated) {
+            saveMenuCache();
+            renderVisibleWeeks();
+            updateNextWeekBadge();
+        }
+    } catch (e) {
+        console.error('Error refreshing menu date', dateStr, e);
     }
 }
 

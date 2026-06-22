@@ -330,9 +330,9 @@ export function createDayCard(day) {
 
             if (item.available) {
                 if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} – ${t('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(getLocalizedText(item.name))} – ${t('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
                 } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(item.name)} – ${t('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${t('orderButton')}</button>`;
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${escapeHtml(item.name)}" data-price="${item.price}" data-desc="${escapeHtml(item.description || '')}" title="${escapeHtml(getLocalizedText(item.name))} – ${t('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${t('orderButton')}</button>`;
                 }
             }
 
@@ -351,7 +351,7 @@ export function createDayCard(day) {
 
         itemEl.innerHTML = `
             <div class="item-header">
-                <span class="item-name">${escapeHtml(item.name)}</span>
+                <span class="item-name">${escapeHtml(getLocalizedText(item.name))}</span>
                 <span class="item-price">${item.price.toFixed(2)} €</span>
             </div>
             <div class="item-status-row">

@@ -1,4 +1,4 @@
-import { displayMode, authToken, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
+import { displayMode, authToken, userFlags, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
 import { API_BASE, LS } from './constants.js';
