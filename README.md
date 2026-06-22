@@ -68,3 +68,10 @@ graph TD
 ---
 
 *Powered by Kaufis-Kitchen & AI Support.*
+
+## ?Y??? Design System
+
+Das UI-Kit und die Design-System-Dokumentation befinden sich im [docs/]-Ordner:
+- **[Design System Guide](docs/design-system.md)** (Markdown)
+- **[Interaktives UI Kit](docs/kantine-ui-kit.html)** (HTML-Preview)
+

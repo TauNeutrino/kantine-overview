@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="de" style="scroll-behavior: smooth;">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kantine Design System & UI Kit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    :root {
+      /* Base Slate/Gray-Blue Palette - Light Mode */
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
+      --text-primary: #334155;
+      --text-secondary: #64748b;
+      --accent-color: #2563eb;
+      --border-color: #cbd5e1;
+      --banner-bg: #e2e8f0;
+      --banner-text: #1e293b;
+      --success-color: #059669;
+      --error-color: #dc2626;
+      --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --header-bg: rgba(255, 255, 255, 0.72);
+      --header-border: 1px solid rgba(203, 213, 225, 0.6);
+      
+      /* UI Kit specific */
+      --kit-sidebar: #ffffff;
+      --kit-border: #e2e8f0;
+    }
+
+    [data-theme="dark"] {
+      /* Dark Mode overrides */
+      --bg-body: #1e293b;
+      --bg-card: #283548;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --accent-color: #60a5fa;
+      --border-color: #526377;
+      --banner-bg: #475569;
+      --banner-text: #e2e8f0;
+      --header-bg: rgba(30, 41, 59, 0.72);
+      --header-border: 1px solid rgba(71, 85, 105, 0.6);
+      --card-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+      
+      /* UI Kit specific */
+      --kit-sidebar: #0f172a;
+      --kit-border: #334155;
+    }
+
+    /* --- Animation & Motion Tokens --- */
+    :root {
+      --transition-smooth: 0.25s cubic-bezier(0.2, 0, 0, 1);
+      --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Accessibility: Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color var(--transition-smooth), color var(--transition-smooth);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Accessibility & Focus */
+    *:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    /* --- UI Kit Shell --- */
+    .kit-sidebar {
+      width: 280px;
+      background: var(--kit-sidebar);
+      border-right: 1px solid var(--kit-border);
+      padding: 2rem 1.5rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+      transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .kit-sidebar-header {
+      margin-bottom: 2.5rem;
+    }
+    .kit-brand { font-size: 1.25rem; font-weight: 700; color: var(--accent-color); display: flex; align-items: center; gap: 0.5rem; }
+    .kit-nav { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .kit-nav a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      display: block;
+      transition: background-color var(--transition-smooth), color var(--transition-smooth);
+    }
+    .kit-nav a:hover, .kit-nav a.active {
+      color: var(--text-primary);
+      background: rgba(100, 116, 139, 0.1);
+    }
+    
+    .kit-main {
+      flex: 1;
+      padding: 3rem 4rem;
+      max-width: 1200px;
+    }
+    .kit-section {
+      margin-bottom: 5rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .kit-section:last-child { border-bottom: none; }
+    .kit-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em;
+    }
+    .kit-subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .kit-grid { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .kit-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; box-shadow: var(--card-shadow); }
+
+    /* --- Theme Toggle --- */
+    .theme-toggle-wrapper {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--kit-border);
+    }
+    .btn-toggle-theme {
+      display: flex; align-items: center; gap: 0.5rem;
+      width: 100%; padding: 0.75rem; border-radius: 8px;
+      border: 1px solid var(--border-color); background: var(--bg-body);
+      color: var(--text-primary); font-weight: 600; cursor: pointer;
+      transition: background-color var(--transition-smooth), border-color var(--transition-smooth), color var(--transition-smooth);
+      font-family: inherit;
+    }
+    .btn-toggle-theme:hover { border-color: var(--accent-color); }
+
+    /* =========================================================
+       EXTRACTED COMPONENTS
+       ========================================================= */
+
+    /* Colors */
+    .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+    .color-swatch { border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); background: var(--bg-card); }
+    .color-preview { height: 80px; width: 100%; }
+    .color-meta { padding: 0.75rem; }
+    .color-name { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; display: block; }
+    .color-val { font-size: 0.75rem; color: var(--text-secondary); font-family: monospace; }
+
+    /* Typography */
+    .type-specimen { margin-bottom: 1.5rem; }
+    .type-specimen h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.025em; }
+    .type-specimen h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .type-specimen h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .type-specimen p { font-size: 1rem; color: var(--text-secondary); max-width: 60ch; }
+    .type-specimen.small { font-size: 0.85rem; color: var(--text-secondary); }
+
+    /* Buttons */
+    .component-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1.5rem; }
+    
+    .btn-primary {
+      background-color: var(--accent-color); color: white;
+      padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 600;
+      border: none; cursor: pointer; transition: transform var(--transition-smooth), filter var(--transition-smooth), box-shadow var(--transition-smooth);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: inherit;
+    }
+    .btn-primary:hover:not(:disabled) { filter: brightness(0.9); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .btn-order {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border: none; border-radius: 6px;
+      background: var(--success-color); color: white;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: transform var(--transition-smooth), filter var(--transition-smooth); font-family: inherit;
+    }
+    .btn-order:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-order:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    .btn-cancel {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 4px 6px; border: none; border-radius: 6px;
+      background: var(--error-color); color: white;
+      font-size: 0.75rem; cursor: pointer; transition: transform var(--transition-smooth), filter var(--transition-smooth); font-family: inherit;
+    }
+    .btn-cancel:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .user-badge-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; background: var(--bg-card);
+      border: 1px solid var(--border-color); border-radius: 20px;
+      font-size: 0.9rem; font-weight: 500; color: var(--text-primary); cursor: pointer; transition: background-color var(--transition-smooth), border-color var(--transition-smooth);
+    }
+    .user-badge-btn:hover { background: rgba(100, 116, 139, 0.1); border-color: var(--accent-color); }
+
+    /* Lang Toggle */
+    .lang-toggle {
+      display: inline-flex; border-radius: 6px; overflow: hidden;
+      border: 1px solid var(--border-color); background: var(--bg-card);
+    }
+    .lang-btn {
+      padding: 3px 10px; font-size: 0.7rem; font-weight: 600;
+      background: transparent; color: var(--text-secondary); border: none; cursor: pointer; transition: background-color var(--transition-smooth), color var(--transition-smooth);
+    }
+    .lang-btn.active { background: var(--accent-color); color: white; }
+
+    /* Badges */
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 24px; font-size: 0.75rem; padding: 0 10px; border-radius: 6px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+    }
+    .badge.available { background-color: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge.sold-out { background-color: rgba(239, 68, 68, 0.1); color: var(--error-color); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge.ordered { background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.2); gap: 4px; }
+    
+    .menu-code-badge {
+      font-size: 0.75rem; font-weight: 700; color: #8b5cf6;
+      background-color: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 2px 6px; border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Cards */
+    .menu-card {
+      background-color: var(--bg-card); border-radius: 12px;
+      border: 1px solid var(--border-color); box-shadow: var(--card-shadow);
+      display: flex; flex-direction: column; overflow: hidden; max-width: 320px;
+      width: 100%;
+    }
+    .card-header {
+      padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color);
+      display: flex; justify-content: space-between; align-items: baseline; background-color: var(--bg-card);
+    }
+    .card-body { padding: 1.25rem; display: grid; gap: 1.5rem; }
+    .day-name { font-size: 1.125rem; font-weight: 600; }
+    .day-date { font-size: 0.8rem; font-weight: 400; color: var(--text-secondary); }
+    
+    .menu-item { display: flex; flex-direction: column; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+    .menu-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; gap: 1rem; }
+    .item-name { font-weight: 600; font-size: 0.95rem; }
+    .item-price { font-weight: 700; color: var(--accent-color); }
+    .item-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; }
+    .item-status-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Special Menu States */
+    .menu-item.today-ordered {
+      border: 2px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+      border-radius: 8px; padding: 1rem; background: var(--bg-card);
+    }
+    .menu-item.flagged-available {
+      border: 2px solid var(--success-color); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+      border-radius: 8px; padding: 1rem; background: var(--bg-card);
+    }
+
+    /* Icons & Logo */
+    .icon-btn {
+      background: transparent; border: none; color: var(--text-secondary);
+      padding: 8px; border-radius: 50%; cursor: pointer; display: inline-flex;
+      align-items: center; justify-content: center; transition: background-color var(--transition-smooth), color var(--transition-smooth);
+    }
+    .icon-btn:hover { background-color: rgba(100, 116, 139, 0.1); color: var(--text-primary); }
+    
+    .update-icon {
+      background-color: var(--accent-color); color: white; border: none; border-radius: 50%;
+      width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 2px 5px rgba(37, 99, 235, 0.4); transition: transform var(--transition-bounce);
+      will-change: transform;
+    }
+    .update-icon .material-icons-round { font-size: 18px; }
+    .update-icon:hover { transform: rotate(180deg); }
+    
+    .logo-icon { font-size: 1.5rem; color: var(--accent-color); }
+
+    /* Day Header Status Colors */
+    .card-header.header-violet {
+        background-color: var(--bg-card);
+        background-image: linear-gradient(rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.15));
+        border-bottom: 2px solid #8b5cf6;
+    }
+    .card-header.header-green {
+        background-color: var(--bg-card);
+        background-image: linear-gradient(rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.15));
+        border-bottom: 2px solid var(--success-color);
+    }
+    .card-header.header-red {
+        background-color: var(--bg-card);
+        background-image: linear-gradient(rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.15));
+        border-bottom: 2px solid var(--error-color);
+    }
+    .card-header.header-violet .day-name,
+    .card-header.header-green .day-name,
+    .card-header.header-red .day-name {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* Forms */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
+    .form-group input {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
+      border-radius: 8px; background: var(--bg-body); color: var(--text-primary);
+      font-family: inherit; transition: border-color var(--transition-smooth);
+    }
+    .form-group input:focus { outline: none; border-color: var(--accent-color); }
+
+    /* Empty & Loading States */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 3rem 1.5rem; text-align: center; background: var(--bg-body);
+      border: 1px dashed var(--border-color); border-radius: 12px; height: 100%;
+    }
+    .empty-icon { font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; opacity: 0.5; }
+    .empty-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .empty-desc { font-size: 0.9rem; color: var(--text-secondary); max-width: 300px; margin-bottom: 1.5rem; line-height: 1.5; }
+    
+    .skeleton {
+      background-color: var(--border-color);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0.6;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+      transform: translateX(-100%);
+      animation: skeleton-shimmer 1.5s infinite;
+      will-change: transform;
+    }
+    [data-theme="dark"] .skeleton::after {
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%);
+    }
+    .skeleton-text { height: 1rem; margin-bottom: 0.5rem; width: 100%; }
+    .skeleton-text.short { width: 60%; }
+    .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+    @keyframes skeleton-shimmer {
+      100% { transform: translateX(100%); }
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .kit-sidebar { 
+        width: 100%; height: auto; position: relative; 
+        border-right: none; border-bottom: 1px solid var(--kit-border); 
+        padding: 1.5rem; display: flex; flex-direction: column; 
+      }
+      .kit-sidebar-header { margin-bottom: 1rem; }
+      .kit-nav { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
+      .kit-main { padding: 2rem 1.5rem; }
+      .theme-toggle-wrapper { margin-top: 1rem; padding-top: 1rem; }
+      .kit-grid { grid-template-columns: 1fr; }
+      .menu-card { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <aside class="kit-sidebar">
+    <div class="kit-sidebar-header">
+      <div class="kit-brand">
+        <span class="material-icons-round" aria-hidden="true">restaurant</span>
+        Kantine DS
+      </div>
+    </div>
+    <nav aria-label="Main Navigation">
+      <ul class="kit-nav">
+        <li><a href="#tokens" class="active">Design Tokens</a></li>
+        <li><a href="#typography">Typografie</a></li>
+        <li><a href="#iconography">Iconografie</a></li>
+        <li><a href="#logo">Logo</a></li>
+        <li><a href="#buttons">Buttons & Actions</a></li>
+        <li><a href="#badges">Badges & Status</a></li>
+        <li><a href="#cards">Menu Cards</a></li>
+        <li><a href="#modals">Modals & Popups</a></li>
+        <li><a href="#states">Zustände (States)</a></li>
+        <li><a href="#forms">Formulare</a></li>
+      </ul>
+    </nav>
+
+    <div class="theme-toggle-wrapper">
+      <button class="btn-toggle-theme" onclick="toggleTheme()" aria-label="Dark Mode umschalten">
+        <span class="material-icons-round" id="theme-icon" aria-hidden="true">dark_mode</span>
+        <span id="theme-label">Dark Mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="kit-main">
+    
+    <section class="kit-section" id="tokens">
+      <h2 class="kit-title">Design Tokens</h2>
+      <p class="kit-subtitle">Die grundlegenden semantischen Variablen der Anwendung.</p>
+      
+      <div class="color-grid">
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--bg-body);"></div>
+          <div class="color-meta">
+            <span class="color-name">Background Body</span>
+            <span class="color-val">--bg-body</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--bg-card); border-bottom: 1px solid var(--border-color)"></div>
+          <div class="color-meta">
+            <span class="color-name">Background Card</span>
+            <span class="color-val">--bg-card</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--accent-color);"></div>
+          <div class="color-meta">
+            <span class="color-name">Accent (Primary)</span>
+            <span class="color-val">--accent-color</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--success-color);"></div>
+          <div class="color-meta">
+            <span class="color-name">Success</span>
+            <span class="color-val">--success-color</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--error-color);"></div>
+          <div class="color-meta">
+            <span class="color-name">Error / Danger</span>
+            <span class="color-val">--error-color</span>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="color-grid">
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--text-primary);"></div>
+          <div class="color-meta">
+            <span class="color-name">Text Primary</span>
+            <span class="color-val">--text-primary</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--text-secondary);"></div>
+          <div class="color-meta">
+            <span class="color-name">Text Secondary</span>
+            <span class="color-val">--text-secondary</span>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-preview" style="background: var(--border-color);"></div>
+          <div class="color-meta">
+            <span class="color-name">Border</span>
+            <span class="color-val">--border-color</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="typography">
+      <h2 class="kit-title">Typografie</h2>
+      <p class="kit-subtitle">Inter (System Fallback), saubere Hierarchie, gute Lesbarkeit.</p>
+      
+      <div class="kit-panel">
+        <div class="type-specimen">
+          <h1>H1 Header Title</h1>
+          <p>Eingesetzt in Main Headers und .week-title.</p>
+        </div>
+        <div class="type-specimen">
+          <h2>H2 Sub-section Title</h2>
+          <p>Für Modals und Sektionsüberschriften.</p>
+        </div>
+        <div class="type-specimen">
+          <h3>H3 Card Day Title</h3>
+          <p>Für Menü-Tage (.day-name).</p>
+        </div>
+        <div class="type-specimen">
+          <p><strong>Body Text (16px / 1rem).</strong> Dies ist der Standard-Text für reguläre Beschreibungen, Labels und Standardabsätze. Die Line-Height beträgt 1.5 für optimale Lesbarkeit.</p>
+        </div>
+        <div class="type-specimen small">
+          <p>Small Text (14px / 0.875rem). Wird für sekundäre Beschreibungen (.item-desc), Untertitel und Metadaten verwendet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="iconography">
+      <h2 class="kit-title">Iconografie & Logo</h2>
+      <p class="kit-subtitle">Material Icons Round als Basis. Dedizierte Button-Styles für Icon-only Aktionen.</p>
+      
+      <div class="kit-panel">
+        <div class="component-row" style="align-items: flex-end; gap: 3rem;">
+          <div>
+            <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-secondary);">Logo (Icon-basiert)</h3>
+            <div class="kit-brand" style="font-size: 1.5rem; color: var(--text-primary);">
+              <span class="material-icons-round logo-icon" aria-hidden="true">restaurant</span>
+              Kantine
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; max-width: 150px;">Alternativ via <code>.logo-img</code> als Bilddatei.</p>
+          </div>
+          
+          <div>
+            <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-secondary);">Standard Icon-Btn (.icon-btn)</h3>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="icon-btn" aria-label="Aktualisieren"><span class="material-icons-round" aria-hidden="true">refresh</span></button>
+              <button class="icon-btn" aria-label="Benachrichtigungen"><span class="material-icons-round" aria-hidden="true">notifications</span></button>
+            </div>
+          </div>
+          
+          <div>
+            <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-secondary);">Update Icon (.update-icon)</h3>
+            <button class="update-icon" aria-label="Update starten"><span class="material-icons-round" aria-hidden="true">autorenew</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="logo">
+      <h2 class="kit-title">Logo</h2>
+      <p class="kit-subtitle">Das offizielle Firmen- und Kantinen-Logo. Symbolelemente: Teller (Bereitschaft), Gabel (Essen), Pfeil (Schnelligkeit) und gleichseitiges Dreieck (Firma).</p>
+      
+      <div class="kit-grid" style="gap: 2rem;">
+        <div class="kit-panel" style="text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          
+          <img src="mqoxp188-favicon_base.png" alt="Kantine Logo: Gabel, Teller, Pfeil und Dreieck" class="logo-img" style="width: 120px; height: 120px; margin-bottom: 1.5rem; border-radius: 12px; object-fit: contain;" />
+
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 600;">Originales Logo (PNG)</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Das offizielle favicon_base.png wird als Standard-Bildressource verwendet.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="buttons">
+      <h2 class="kit-title">Buttons & Actions</h2>
+      <p class="kit-subtitle">Interaktive Elemente, Calls to Action und Icon-Buttons.</p>
+      
+      <div class="kit-panel">
+        <div class="component-row">
+          <button class="btn-primary">Primary Login</button>
+          <button class="btn-primary" disabled>Disabled</button>
+        </div>
+        
+        <div class="component-row">
+          <button class="btn-order"><span class="material-icons-round" aria-hidden="true">add_shopping_cart</span> Bestellen</button>
+          <button class="btn-cancel"><span class="material-icons-round" aria-hidden="true">close</span> Stornieren</button>
+        </div>
+
+        <div class="component-row">
+          <button class="user-badge-btn"><span class="material-icons-round" aria-hidden="true">account_circle</span> Max Mustermann</button>
+        </div>
+
+        <div class="component-row">
+          <div class="lang-toggle" role="group" aria-label="Sprachauswahl">
+            <button class="lang-btn active" aria-pressed="true">DE</button>
+            <button class="lang-btn" aria-pressed="false">EN</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="badges">
+      <h2 class="kit-title">Badges & Status</h2>
+      <p class="kit-subtitle">Rückmeldungen, Labels und Kennzeichnungen für Menüs.</p>
+      
+      <div class="kit-panel">
+        <div class="component-row">
+          <span class="badge available">Verfügbar</span>
+          <span class="badge sold-out">Ausverkauft</span>
+          <span class="badge ordered"><span class="material-icons-round" aria-hidden="true">check_circle</span> Bestellt</span>
+        </div>
+        <div class="component-row">
+          <span class="menu-code-badge" aria-label="Menü Code A1">A1</span>
+          <span class="menu-code-badge" aria-label="Menü Code D3">D3</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="cards">
+      <h2 class="kit-title">Menu Cards & Items</h2>
+      <p class="kit-subtitle">Das Herzstück der Anwendung. Layout für Tageskarten und Menüpunkte.</p>
+      
+      <div class="kit-grid">
+        <!-- Standard Card -->
+        <article class="menu-card">
+          <header class="card-header">
+            <div class="day-header-left">
+              <span class="day-name">Montag</span>
+            </div>
+            <span class="day-date">12. Aug</span>
+          </header>
+          <div class="card-body">
+            <!-- Item 1 -->
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">Spaghetti Bolognese</span>
+                <span class="item-price">4,50 €</span>
+              </div>
+              <div class="item-desc">Rinderhackfleisch, Tomatensauce, frischer Parmesan.</div>
+              <div class="item-status-row">
+                <span class="menu-code-badge" aria-label="Code A1">A1</span>
+                <span class="badge available">Verfügbar</span>
+                <div style="flex:1"></div>
+                <button class="btn-order" aria-label="Spaghetti Bolognese bestellen"><span class="material-icons-round" aria-hidden="true">add_shopping_cart</span></button>
+              </div>
+            </div>
+            
+            <!-- Item 2 -->
+            <div class="menu-item">
+              <div class="item-header">
+                <span class="item-name">Veganer Wrap</span>
+                <span class="item-price">3,80 €</span>
+              </div>
+              <div class="item-desc">Falafel, Hummus, Salat, Tahini-Dressing.</div>
+              <div class="item-status-row">
+                <span class="menu-code-badge" aria-label="Code V1">V1</span>
+                <span class="badge sold-out">Ausverkauft</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Status Headers -->
+        <div style="grid-column: 1 / -1; margin-top: 1rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 600;">Wochentage je Bestellstatus</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Karten-Header ändern ihre Hintergrundfarbe (als leichter Gradient) und den unteren Rahmen abhängig vom Status der Bestellungen dieses Tages.
+            </p>
+        </div>
+        
+        <article class="menu-card" style="height: fit-content;">
+          <header class="card-header header-violet">
+            <div class="day-header-left">
+              <span class="day-name">Bestellt (Violet)</span>
+            </div>
+          </header>
+        </article>
+
+        <article class="menu-card" style="height: fit-content;">
+          <header class="card-header header-green">
+            <div class="day-header-left">
+              <span class="day-name">Offen (Green)</span>
+            </div>
+          </header>
+        </article>
+
+        <article class="menu-card" style="height: fit-content;">
+          <header class="card-header header-red">
+            <div class="day-header-left">
+              <span class="day-name">Dringend/Fehler (Red)</span>
+            </div>
+          </header>
+        </article>
+
+        <!-- Highlighted / Ordered Card Items -->
+        <article class="menu-card">
+          <header class="card-header header-violet">
+            <div class="day-header-left">
+              <span class="day-name">Dienstag</span>
+            </div>
+            <span class="day-date">13. Aug</span>
+          </header>
+          <div class="card-body">
+            <!-- Ordered Item (Pulse) -->
+            <div class="menu-item today-ordered">
+              <div class="item-header">
+                <span class="item-name">Hähnchencurry</span>
+                <span class="item-price">5,20 €</span>
+              </div>
+              <div class="item-desc">Mit Basmatireis und gerösteten Nüssen.</div>
+              <div class="item-status-row">
+                <span class="menu-code-badge" aria-label="Code M1">M1</span>
+                <span class="badge ordered"><span class="material-icons-round" aria-hidden="true">check_circle</span> Bestellt</span>
+                <div style="flex:1"></div>
+                <button class="btn-cancel" aria-label="Hähnchencurry stornieren"><span class="material-icons-round" aria-hidden="true">close</span></button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="kit-section" id="modals">
+      <h2 class="kit-title">Modals & Popups</h2>
+      <p class="kit-subtitle">Dialog-Fenster, Bestätigungen und Overlays im Glassmorphism-Stil.</p>
+      
+      <div class="kit-panel" style="position: relative; height: 350px; display: flex; align-items: center; justify-content: center; background: url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"2\" cy=\"2\" r=\"1\" fill=\"rgba(0,0,0,0.1)\"/></svg>'); overflow: hidden;">
+        
+        <!-- Backdrop Overlay (Simulated) -->
+        <div style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index: 1;"></div>
+        
+        <!-- Modal Component -->
+        <div role="dialog" aria-modal="true" aria-labelledby="modal-title" style="position: relative; z-index: 2; width: 100%; max-width: 420px; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); overflow: hidden; display: flex; flex-direction: column;">
+          <header style="padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="modal-title" style="font-size: 1.25rem; font-weight: 600;">Bestellung stornieren?</h3>
+            <button class="icon-btn" style="margin: -0.5rem -0.5rem 0 0;" aria-label="Schließen"><span class="material-icons-round" aria-hidden="true">close</span></button>
+          </header>
+          <div style="padding: 1.5rem; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5;">
+            Möchtest du das "Hähnchencurry" für Dienstag wirklich stornieren? Diese Aktion kann nicht rückgängig gemacht werden.
+          </div>
+          <footer style="padding: 1rem 1.5rem; background: var(--bg-body); border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button class="user-badge-btn" style="border: none; background: transparent; box-shadow: none;">Abbrechen</button>
+            <button class="btn-cancel">Stornieren bestätigen</button>
+          </footer>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="kit-section" id="states">
+      <h2 class="kit-title">Zustände (States)</h2>
+      <p class="kit-subtitle">Lade- und Leerzustände (Empty & Loading States).</p>
+      
+      <div class="kit-grid">
+        <!-- Skeleton Loading -->
+        <div class="kit-panel" aria-busy="true" aria-label="Menü lädt">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Ladezustand (Skeleton)</h3>
+          <div class="menu-item" style="border: none; padding: 0;">
+            <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+              <div class="skeleton skeleton-avatar"></div>
+              <div style="flex: 1;">
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text short"></div>
+              </div>
+            </div>
+            <div class="skeleton skeleton-text" style="height: 2.5rem; border-radius: 8px;"></div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="kit-panel">
+          <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--text-primary);">Leerzustand (Empty)</h3>
+          <div class="empty-state">
+            <span class="material-icons-round empty-icon" aria-hidden="true">no_meals</span>
+            <div class="empty-title">Keine Bestellungen</div>
+            <div class="empty-desc">Für diesen Tag wurden noch keine Speisen zur Verfügung gestellt.</div>
+            <button class="btn-primary" style="margin-top: 0.5rem;">Speiseplan aktualisieren</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="kit-section" id="forms">
+      <h2 class="kit-title">Formulare & Inputs</h2>
+      <p class="kit-subtitle">Eingabefelder für Login und Modals.</p>
+      
+      <div class="kit-panel" style="max-width: 400px;">
+        <div class="form-group">
+          <label for="username">Benutzername</label>
+          <input type="text" id="username" placeholder="z.B. max.muster" />
+        </div>
+        <div class="form-group">
+          <label for="password">Passwort</label>
+          <input type="password" id="password" aria-describedby="pwd-help" placeholder="••••••••" />
+          <span id="pwd-help" class="help-text" style="display: block; margin-top: 6px; font-size: 0.8rem; color: var(--text-secondary);">Mindestens 8 Zeichen</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Simple script to toggle theme for demonstration purposes
+    function toggleTheme() {
+      const html = document.documentElement;
+      const icon = document.getElementById('theme-icon');
+      const label = document.getElementById('theme-label');
+      
+      if (html.getAttribute('data-theme') === 'dark') {
+        html.removeAttribute('data-theme');
+        icon.textContent = 'dark_mode';
+        label.textContent = 'Dark Mode';
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        icon.textContent = 'light_mode';
+        label.textContent = 'Light Mode';
+      }
+    }
+
+    // Scroll active link handling
+    document.querySelectorAll('.kit-nav a').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.kit-nav a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
