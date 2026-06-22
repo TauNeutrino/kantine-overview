@@ -97,7 +97,7 @@ cat >> "$DIST_DIR/kantine-standalone.html" << HTMLEOF
 </html>
 HTMLEOF
 
-echo "✅ Standalone HTML: $DIST_DIR/kantine-standalone.html"
+echo "??? Standalone HTML: $DIST_DIR/kantine-standalone.html"
 
 # === 2. Build bookmarklet (JavaScript URL) ===
 # The bookmarklet injects CSS + JS into the current page
@@ -127,7 +127,7 @@ PAYLOADEOF
 BOOKMARKLET_RAW=$(cat "$DIST_DIR/bookmarklet-payload.js" | tr '\n' ' ' | sed 's/  */ /g')
 echo "javascript:${BOOKMARKLET_RAW}" > "$DIST_DIR/bookmarklet.txt"
 
-echo "✅ Bookmarklet URL: $DIST_DIR/bookmarklet.txt"
+echo "??? Bookmarklet URL: $DIST_DIR/bookmarklet.txt"
 
 # === 3. Create an easy-to-use HTML installer page ===
 cat > "$DIST_DIR/install.html" << INSTALLEOF
@@ -151,7 +151,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
         summary.styled-summary { padding: 15px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; user-select: none; }
         summary.styled-summary:hover { background: rgba(255,255,255,0.05); }
         summary.styled-summary::-webkit-details-marker { display: none; }
-        summary.styled-summary::after { content: '▼'; font-size: 0.8em; transition: transform 0.2s; }
+        summary.styled-summary::after { content: '???'; font-size: 0.8em; transition: transform 0.2s; }
         details.styled-details[open] summary.styled-summary::after { transform: rotate(180deg); transition: transform 0.2s; }
         .changelog-container { padding: 0 15px 15px 15px; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
@@ -181,8 +181,8 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     
     <!-- 1. BUTTON (Top Priority) -->
     <div class="card" style="text-align: center; border: 2px solid #029AA8;">
-        <p style="margin-bottom:15px; font-weight:bold;">👇 Diesen Button in die Lesezeichen-Leiste ziehen:</p>
-        <p><a class="bookmarklet" id="bookmarklet-link" href="#" onclick="event.preventDefault(); return false;" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">⏳ Wird generiert...</a></p>
+        <p style="margin-bottom:15px; font-weight:bold;">???? Diesen Button in die Lesezeichen-Leiste ziehen:</p>
+        <p><a class="bookmarklet" id="bookmarklet-link" href="#" onclick="event.preventDefault(); return false;" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">??? Wird generiert...</a></p>
     </div>
 
     <!-- 2. INSTRUCTIONS -->
@@ -197,19 +197,19 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
 
     <!-- 3. FEATURES -->
     <div class="card">
-    <h2>✨ Features</h2>
+    <h2>??? Features</h2>
     <ul>
-        <li>📅 <strong>Wochenübersicht:</strong> Die ganze Woche auf einen Blick.</li>
-        <li>⏳ <strong>Order Countdown:</strong> Roter Alarm 1h vor Bestellschluss.</li>
-        <li>🌟 <strong>Smart Highlights:</strong> Markiere deine Favoriten (z.B. "Schnitzel").</li>
-        <li>💰 <strong>Kostenkontrolle:</strong> Automatische Berechnung der Wochensumme.</li>
-        <li>🔑 <strong>Auto-Login:</strong> Nutzt deine bestehende Session.</li>
-        <li>🏷️ <strong>Badges & Status:</strong> Menü-Codes (M1, M2) und Bestellstatus direkt sichtbar.</li>
+        <li>???? <strong>Wochen??bersicht:</strong> Die ganze Woche auf einen Blick.</li>
+        <li>??? <strong>Order Countdown:</strong> Roter Alarm 1h vor Bestellschluss.</li>
+        <li>???? <strong>Smart Highlights:</strong> Markiere deine Favoriten (z.B. "Schnitzel").</li>
+        <li>???? <strong>Kostenkontrolle:</strong> Automatische Berechnung der Wochensumme.</li>
+        <li>???? <strong>Auto-Login:</strong> Nutzt deine bestehende Session.</li>
+        <li>??????? <strong>Badges & Status:</strong> Men??-Codes (M1, M2) und Bestellstatus direkt sichtbar.</li>
     </ul>
 
     <div style="margin-top: 30px; padding: 15px; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
-             <strong>⚠️ Haftungsausschluss:</strong><br>
-             Die Verwendung dieses Bookmarklets erfolgt auf eigene Verantwortung. Der Entwickler übernimmt keine Haftung für Schäden, Datenverlust oder ungewollte Bestellungen, die durch die Nutzung dieser Software entstehen.
+             <strong>?????? Haftungsausschluss:</strong><br>
+             Die Verwendung dieses Bookmarklets erfolgt auf eigene Verantwortung. Der Entwickler ??bernimmt keine Haftung f??r Sch??den, Datenverlust oder ungewollte Bestellungen, die durch die Nutzung dieser Software entstehen.
     </div>
     </div>
 
@@ -224,7 +224,7 @@ cat > "$DIST_DIR/install.html" << INSTALLEOF
     </div>
 
     <div style="text-align: center; margin-top: 40px; color: #5c6b7f; font-size: 0.8rem;">
-        <p>Powered by <strong>Kaufis-Kitchen</strong> 👨‍🍳</p>
+        <p>Powered by <strong>Kaufis-Kitchen</strong> ???????????</p>
     </div>
 
 
@@ -287,7 +287,7 @@ $CHANGELOG_HTML
 EOF
 
 cat >> "$DIST_DIR/install.html" << INSTALLEOF
-        // Dynamic favicon injection — setTimeout ensures it runs AFTER
+        // Dynamic favicon injection ??? setTimeout ensures it runs AFTER
         // htmlpreview.github.io's document.write() processing completes
         setTimeout(function() {
             document.querySelectorAll('link[rel*="icon"]').forEach(function(el) { el.remove(); });
@@ -303,7 +303,7 @@ cat >> "$DIST_DIR/install.html" << INSTALLEOF
 </html>
 INSTALLEOF
 
-echo "✅ Installer page: $DIST_DIR/install.html"
+echo "??? Installer page: $DIST_DIR/install.html"
 echo ""
 echo "=== Build Complete ==="
 echo "Files in $DIST_DIR:"
@@ -315,7 +315,7 @@ echo "=== Running Utility Unit Tests ==="
 timeout 15s node "$SCRIPT_DIR/tests/test_utils.js"
 UTIL_EXIT=$?
 if [ $UTIL_EXIT -ne 0 ]; then
-    echo "❌ Utility tests FAILED or TIMED OUT (Exit: $UTIL_EXIT)! See above for details."
+    echo "??? Utility tests FAILED or TIMED OUT (Exit: $UTIL_EXIT)! See above for details."
     exit 1
 fi
 
@@ -323,7 +323,7 @@ echo "=== Running Logic Tests ==="
 timeout 15s node "$SCRIPT_DIR/test_logic.js"
 LOGIC_EXIT=$?
 if [ $LOGIC_EXIT -ne 0 ]; then
-    echo "❌ Logic tests FAILED or TIMED OUT (Exit: $LOGIC_EXIT)! See above for details."
+    echo "??? Logic tests FAILED or TIMED OUT (Exit: $LOGIC_EXIT)! See above for details."
     exit 1
 fi
 
@@ -331,7 +331,7 @@ echo "=== Running DOM Interaction Tests ==="
 timeout 15s node "$SCRIPT_DIR/tests/test_dom.js"
 DOM_EXIT=$?
 if [ $DOM_EXIT -ne 0 ]; then
-    echo "❌ DOM UI tests FAILED or TIMED OUT (Exit: $DOM_EXIT)! Regressions detected."
+    echo "??? DOM UI tests FAILED or TIMED OUT (Exit: $DOM_EXIT)! Regressions detected."
     # Ensure playwright processes are killed if they leak
     pkill -f playwright || true
     pkill -f "node.*test_dom" || true
@@ -343,9 +343,8 @@ echo "=== Running Build Tests ==="
 timeout 15s python3 "$SCRIPT_DIR/test_build.py"
 TEST_EXIT=$?
 if [ $TEST_EXIT -ne 0 ]; then
-    echo "❌ Build tests FAILED or TIMED OUT (Exit: $TEST_EXIT)! See above for details."
+    echo "??? Build tests FAILED or TIMED OUT (Exit: $TEST_EXIT)! See above for details."
     exit 1
 fi
-echo "✅ All build tests passed."
-
+echo "??? All build tests passed."
 

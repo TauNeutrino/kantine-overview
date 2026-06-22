@@ -132,6 +132,12 @@ const testCases = [
         input: "Kürbiscremesuppe / Pumpkin cream (A) Achtung Änderung Frisches Grillhendl mit Semmel (A) Kuchen / Cake (ACGHO)",
         expectedDeCourses: 3,
         expectedEnCourses: 3
+    },
+    {
+        name: "Unpaired last segment (M6: Suppe/Soup Salat/Salad + Dessert)",
+        input: "Suppe / Soup Salat / Salad Dessert",
+        expectedDeCourses: 3,
+        expectedEnCourses: 3
     }
 ];
 
@@ -144,6 +150,34 @@ testCases.forEach(tc => {
     if (tc.expectedDeCourses !== undefined) assertEquals(countCourses(res.de), tc.expectedDeCourses, `${tc.name} (DE count)`);
     if (tc.expectedEnCourses !== undefined) assertEquals(countCourses(res.en), tc.expectedEnCourses, `${tc.name} (EN count)`);
 });
+
+// --- Edge case: false-split regression tests ---
+console.log("Testing false-split prevention...");
+
+// Pure German should stay together, not get split by heuristic
+const pureGerman = sandbox.splitLanguage("Schnitzel mit Pommes");
+assertEquals(pureGerman.de, '• Schnitzel mit Pommes', "Pure German stays together (DE)");
+assertEquals(pureGerman.en, '• Schnitzel mit Pommes', "Pure German stays together (EN)");
+
+// Pure English should NOT trigger a German split
+const pureEnglish = sandbox.splitLanguage("Chicken Curry with Rice");
+assertEquals(pureEnglish.de, '• Chicken Curry with Rice', "Pure English stays together (DE)");
+assertEquals(pureEnglish.en, '• Chicken Curry with Rice', "Pure English stays together (EN)");
+
+// International loan words should not cause false splits
+const mixedLoan = sandbox.splitLanguage("Currywurst mit Pommes");
+assertEquals(mixedLoan.de, '• Currywurst mit Pommes', "International loan words kept together (DE)");
+assertEquals(mixedLoan.en, '• Currywurst mit Pommes', "International loan words kept together (EN)");
+
+// English word that looks capitalized but is clearly English
+const englishOnly = sandbox.splitLanguage("Grilled Chicken Salad");
+assertEquals(englishOnly.de, '• Grilled Chicken Salad', "English only not split (DE)");
+assertEquals(englishOnly.en, '• Grilled Chicken Salad', "English only not split (EN)");
+
+// Multi-course pure German (regression test)
+const multiGerman = sandbox.splitLanguage("Schnitzel (A) Pommes (B) Salat (C)");
+assertEquals(multiGerman.de, '• Schnitzel (A)\n• Pommes (B)\n• Salat (C)', "Multi-course pure German (DE)");
+assertEquals(multiGerman.en, '• Schnitzel (A)\n• Pommes (B)\n• Salat (C)', "Multi-course pure German (EN)");
 
 // --- Test getLocalizedText ---
 console.log("Testing getLocalizedText...");

@@ -1997,7 +1997,8 @@ body {
 
 [data-theme="dark"] .dev-toggle input[type="checkbox"] {
     accent-color: #60a5fa;
-}    </style>
+}
+    </style>
 </head>
 <body>
     <script>
@@ -4233,9 +4234,9 @@ function createDayCard(day) {
 
             if (item.available) {
                 if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
                 } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
                 }
             }
 
@@ -4254,7 +4255,7 @@ function createDayCard(day) {
 
         itemEl.innerHTML = `
             <div class="item-header">
-                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))}</span>
+                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span>
                 <span class="item-price">${item.price.toFixed(2)} €</span>
             </div>
             <div class="item-status-row">
@@ -4357,7 +4358,7 @@ async function openInstallPage(rawUrl) {
 }
 
 async function checkForUpdates() {
-    const currentVersion = 'v1.8.9';
+    const currentVersion = '{{VERSION}}';
     const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
 
     try {
@@ -4391,7 +4392,7 @@ function openVersionMenu() {
     const modal = document.getElementById('version-modal');
     const container = document.getElementById('version-list-container');
     const devToggle = document.getElementById('dev-mode-toggle');
-    const currentVersion = 'v1.8.9';
+    const currentVersion = '{{VERSION}}';
 
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -4797,11 +4798,12 @@ function getRelativeTime(date) {
 
 // === Language Filter (FR-100) ===
 const DE_STEMS = [
-    'apfel', 'achtung', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
+    // Core German food nouns
+    'apfel', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
     'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
     'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
     'gemüse', 'gewürz', 'gratin', 'grieß', 'gulasch', 'gurke', 'himbeer', 'honig', 'huhn', 'hähnchen',
-    'jambalaya', 'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
+    'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
     'kraut', 'kräuter', 'kuchen', 'käse', 'kürbis', 'lauch', 'mandel', 'milch', 'mild', 'mit',
     'mohn', 'most', 'möhre', 'natur', 'nockerl', 'nudel', 'nuss', 'nuß', 'obst', 'oder',
     'olive', 'paprika', 'pfanne', 'pfannkuchen', 'pfeffer', 'pikant', 'pilz', 'plunder', 'püree', 'ragout',
@@ -4809,25 +4811,132 @@ const DE_STEMS = [
     'schnitte', 'schnitzel', 'schoko', 'schupf', 'schwein', 'sellerie', 'senf', 'sosse', 'soße', 'spargel',
     'spätzle', 'speck', 'spieß', 'spinat', 'steak', 'suppe', 'süß', 'tofu', 'tomate', 'topfen',
     'torte', 'trüffel', 'und', 'vanille', 'vogerl', 'vom', 'wien', 'wurst', 'zucchini', 'zum',
-    'zur', 'zwiebel', 'öl'
+    'zur', 'zwiebel', 'öl',
+    // Expanded: German participles & cooking methods
+    'paniert', 'gegrillt', 'geräuchert', 'frittiert', 'gedünstet', 'überbacken', 'gekocht', 'gefüllt',
+    'geschmort', 'garniert', 'mariniert', 'püriert', 'gewürzt', 'gesalzen', 'gehackt', 'gerieben',
+    'gewürfelt', 'passiert', 'gestreift', 'glasiert', 'gratiniert', 'pochiert', 'durchgebraten',
+    // Expanded: German meat & sausage
+    'bratwurst', 'currywurst', 'leberkäse', 'fleischkäse', 'puten', 'hack', 'frikadelle', 'bulette',
+    'klöß', 'würstchen', 'brühwurst', 'leberwurst', 'mettwurst', 'blutwurst', 'roulade',
+    'brustfilet', 'lenden', 'bauch', 'kotelett', 'schulter', 'nacken', 'haxe', 'eisbein',
+    // Expanded: German fish & seafood
+    'lachs', 'backfisch', 'seelachs', 'forelle', 'karpfen', 'zander', 'hecht', 'makrele', 'hering',
+    'kabeljau', 'scholle', 'rotbarsch', 'thunfisch', 'fischstäbchen',
+    // Expanded: German sides & starches
+    'pommes', 'bratkartoffel', 'röstkartoffel', 'schupfnudel', 'bandnudel', 'fingernudel',
+    'semmelknödel', 'kartoffelbrei', 'kartoffelpüree', 'kartoffelsalat', 'püree',
+    'reis', 'nudel', 'spaghetti', 'lasagne', 'tortellini', 'ravioli', 'gnocchi', 'polenta', 'risotto',
+    'spätzle', 'knödel',
+    // Expanded: German vegetables & legumes
+    'champignon', 'linsen', 'mais', 'erbsen', 'bohnen', 'kichererbse', 'schwarzwurzel',
+    'rotkohl', 'weißkohl', 'wirsing', 'mangold', 'fenchel', 'rettich', 'meerrettich', 'kren',
+    'spinat', 'blumenkohl', 'brokkoli', 'sellerie', 'spargel', 'pilz', 'zucchini', 'lauch',
+    'quark', 'schmand', 'buttermilch', 'dinkel', 'roggen', 'hafer', 'gerste',
+    'gurke', 'tomate', 'karotte', 'zwiebel', 'knoblauch', 'paprika', 'kürbis',
+    // Expanded: German food adjectives
+    'knusprig', 'saftig', 'deftig', 'würzig', 'herzhaft', 'cremig', 'sämig', 'fein',
+    'frisch', 'hausgemacht', 'handgemacht', 'selbstgemacht', 'gemischt', 'klassisch',
+    'bayerisch', 'fränkisch', 'steirisch', 'tiroler', 'salzburger', 'münchner',
+    'thüringer', 'wiener', 'griechisch', 'österreichisch', 'asiatisch', 'indisch',
+    'kalorienarm', 'fettreduziert', 'vegetarisch', 'vegan', 'regional', 'saisonal',
+    // Expanded: German herbs & seasoning
+    'dill', 'petersil', 'schnittlauch', 'majoran', 'thymian', 'rosmarin', 'lorbeer',
+    'basilikum', 'oregano', 'kümmel', 'anis', 'zimt', 'nelke', 'muskat',
+    'preiselbeer', 'apfelmus', 'ketchup', 'mayonnaise', 'mostrich', 'senf',
+    // Expanded: German meal structure
+    'portion', 'beilage', 'hauptgericht', 'vorspeise', 'nachspeise', 'nachtisch',
+    'stück', 'teller', 'schale', 'becher', 'flasche', 'glas', 'suppe', 'salat',
+    // Expanded: German-specific compounds
+    'rind', 'schwein', 'huhn', 'puten', 'lamm', 'kalb', 'wild', 'hirsch', 'reh',
+    'frikassee', 'ragout', 'gulasch', 'eintopf', 'braten', 'roulade', 'geschnetzeltes',
+    'rahm', 'sahne', 'schmand', 'topfen', 'quark', 'käse', 'milch',
+    // Expanded: German desserts & baked goods
+    'kuchen', 'torte', 'strudel', 'baiser', 'mousse', 'sorbet', 'pudding',
+    'palatschinke', 'grieß', 'striezel', 'kipferl', 'buchtel', 'germknödel',
+    'schoko', 'nuss', 'mandel', 'marzipan', 'nougat',
+    // Expanded: Common German words in menus
+    'achtung', 'hinweis', 'allergen', 'kennzeichnung', 'auslobung', 'enthält',
+    'älter', 'aktuell', 'täglich', 'wöchentlich', 'monatlich',
+    // Expanded: Austrian/German food words & compounds
+    'punsch', 'würfel', 'gebäck', 'weiß', 'schöberl', 'würstel',
+    'blätter', 'brösel', 'gröstl', 'erdäpfel', 'schmarren',
+    'hühner', 'müsli', 'jäger', 'rüben', 'kernöl', 'laibchen',
+    'soja', 'erdnuss', 'pizza', 'grün', 'königsberg', 'thailänd',
+    // Expanded: German ASCII words (no umlaut, common in Bessa data)
+    'spaetzle', 'frittaten', 'semmel', 'kohlrabi', 'melanzani',
+    'ananas', 'bananen', 'zitronen', 'saure', 'einlage', 'buchstaben',
+    'klein', 'rucola', 'cous', 'mini', 'lasagna', 'creme', 'kokos',
+    'auf', 'von', 'menü',
+    'gebacken', 'gelb', 'klar', 'orangen', 'garnelen', 'graupen',
 ];
 
 const EN_STEMS = [
     'almond', 'and', 'apple', 'asparagus', 'bacon', 'baked', 'ball', 'bean', 'beef', 'berry',
-    'bread', 'breast', 'broccoli', 'bun', 'butter', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
-    'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'chili', 'choco', 'chocolate', 'cider', 'cilantro',
-    'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dessert', 'dip', 'dumpling', 'egg',
-    'eggplant', 'filet', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash', 'gratin',
+    'bread', 'breast', 'broccoli', 'bun', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
+    'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'choco', 'chocolate', 'cider', 'cilantro',
+    'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dumpling', 'egg',
+    'eggplant', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash',
     'ham', 'herb', 'honey', 'hot', 'ice', 'jambalaya', 'leek', 'leg', 'mash', 'meat',
-    'mexican', 'mild', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
-    'olive', 'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
-    'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'ragout', 'raspberry', 'rice', 'roast', 'roll',
-    'salad', 'salami', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
-    'spice', 'spicy', 'spinach', 'steak', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
-    'thyme', 'to', 'tofu', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
-    'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
+    'mexican', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
+    'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
+    'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'raspberry', 'rice', 'roast', 'roll',
+    'salad', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
+    'spice', 'spicy', 'spinach', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
+    'thyme', 'to', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
+    'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt',
+    // Expanded: English cooking methods
+    'grilled', 'roasted', 'smoked', 'steamed', 'poached', 'braised', 'stuffed', 'breaded',
+    'ground', 'minced', 'sliced', 'diced', 'chopped', 'mashed', 'whipped', 'seasoned',
+    'barbecued', 'charred', 'seared', 'toasted', 'broiled', 'blanched', 'scrambled',
+    // Expanded: English food descriptors
+    'crispy', 'crunchy', 'creamy', 'fluffy', 'tender', 'juicy', 'flavorful', 'savory',
+    'zesty', 'tangy', 'smoky', 'buttery', 'spiced', 'herbed', 'glazed', 'pickled',
+    'fresh', 'local', 'organic', 'seasonal', 'traditional', 'homestyle', 'hearty',
+    'light', 'rich', 'golden', 'garden', 'farm', 'country', 'rustic',
+    // Expanded: English meal categories
+    'appetizer', 'starter', 'entree', 'main', 'side', 'beverage', 'drink',
+    'breakfast', 'lunch', 'dinner', 'supper', 'brunch', 'buffet', 'special',
+    'choice', 'selection', 'variety', 'assorted', 'combination', 'featured',
+    // Expanded: English meat & fish
+    'brisket', 'chop', 'cutlet', 'fillet', 'ribs', 'steakhouse', 'jerky', 'pulled',
+    'salmon', 'tuna', 'cod', 'halibut', 'bass', 'trout', 'catfish', 'tilapia',
+    'lobster', 'crab', 'clam', 'mussel', 'oyster', 'scallop', 'shrimp',
+    // Expanded: English international dishes
+    'burger', 'burrito', 'taco', 'quesadilla', 'nachos', 'fajita', 'enchilada',
+    'curry', 'stirfry', 'chowder', 'bisque', 'gumbo', 'jambalaya', 'bouillon',
+    'gravy', 'broth', 'stock', 'marinade', 'vinaigrette', 'dressing',
+    // Expanded: English soups & stews
+    'chowder', 'bisque', 'gumbo', 'bouillon', 'consomme', 'minestrone', 'gazpacho',
+    // Expanded: English dairy & grains
+    'cheddar', 'mozzarella', 'parmesan', 'provolone', 'gouda', 'swiss', 'bluecheese',
+    'feta', 'creamcheese', 'cottagecheese', 'sourcream',
+    'pasta', 'spaghetti', 'fettuccine', 'linguine', 'penne', 'rigatoni', 'macaroni',
+    'couscous', 'quinoa', 'barley', 'farro', 'bulgur', 'semolina',
+    // Expanded: English condiments
+    'ketchup', 'mustard', 'mayonnaise', 'relish', 'salsa', 'guacamole', 'pesto',
+    'hummus', 'tahini', 'tzatziki', 'aioli', 'remoulade',
+    // Expanded: English adjectives for menus
+    'daily', 'weekly', 'special', 'featured', 'popular', 'signature', 'classic',
+    'traditional', 'contemporary', 'modern', 'spicy', 'mild', 'hot', 'warm',
+    'chilled', 'iced', 'cold', 'roomtemperature',
+    // Expanded: English utility words
+    'from', 'with', 'and', 'for', 'or', 'to', 'in', 'on', 'of', 'all',
+    'your', 'our', 'the', 'a', 'an', 'per', 'each', 'every',
+    'choose', 'select', 'add', 'extra', 'share', 'enjoy',
+    // Expanded: English foods, adjectives & descriptors
+    'lemon', 'garnish', 'patties', 'corn', 'indian', 'ginger',
+    'green', 'cubes', 'spring', 'white', 'pineapple', 'apricot',
+    'cordon', 'bleu', 'chickpea', 'seed', 'dip', 'punch',
+    'banana', 'pizza', 'mango', 'bowl', 'butter',
+    'millet', 'parsley', 'fennel', 'arugula', 'basil', 'red',
+    'lentil', 'parsnip', 'stripes',
+    'cous', 'mini', 'lasagna', 'menu',
+    'buckwheat', 'sheep', 'lime', 'bell', 'caramel', 'dough',
+    'clear', 'dripping', 'orange',
 ];
 
+const BOTH_SET = new Set(DE_STEMS.filter(w => EN_STEMS.includes(w)));
 const DE_SET = new Set(DE_STEMS);
 const EN_SET = new Set(EN_STEMS);
 const DE_REGEX = new RegExp(DE_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
@@ -4847,6 +4956,9 @@ function splitLanguage(text) {
         wordArray.forEach(word => {
             const w = word.toLowerCase().replace(/[^a-zäöüß]/g, '');
             if (w) {
+                // Skip neutral words that appear in both languages equally
+                if (BOTH_SET.has(w)) return;
+
                 let bestDeMatch = 0;
                 let bestEnMatch = 0;
                 if (DE_SET.has(w)) bestDeMatch = w.length;
@@ -4864,8 +4976,15 @@ function splitLanguage(text) {
                 if (bestDeMatch > 0) de += (bestDeMatch / w.length);
                 if (bestEnMatch > 0) en += (bestEnMatch / w.length);
 
-                if (/^[A-ZÄÖÜ]/.test(word)) {
-                    de += 0.5;
+                // Capitalization bonus: only for words with German-specific features
+                if (/^[A-ZÄÖÜ]/.test(word) && word.length >= 4) {
+                    const w_lower = word.toLowerCase();
+                    // German noun/adjective suffixes
+                    if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
+                        de += 0.3;
+                    } else if (/[äöüß]/.test(w_lower)) {
+                        de += 0.15;
+                    }
                 }
             }
         });
@@ -4888,13 +5007,21 @@ function splitLanguage(text) {
 
             const rightFirstWord = right[0];
             let capitalBonus = 0;
-            if (/^[A-ZÄÖÜ]/.test(rightFirstWord)) {
-                capitalBonus = 1.0;
+            if (/^[A-ZÄÖÜ]/.test(rightFirstWord) && rightFirstWord.length >= 4) {
+                // Only give bonus if the capitalized word looks German
+                const w_lower = rightFirstWord.toLowerCase();
+                if (DE_SET.has(w_lower) || DE_REGEX.test(w_lower)) {
+                    capitalBonus = 0.3;
+                } else if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
+                    capitalBonus = 0.3;
+                } else if (/[äöüß]/.test(w_lower)) {
+                    capitalBonus = 0.2;
+                }
             }
 
             const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en) + capitalBonus;
 
-            const leftLooksEnglish = (leftScore.en > leftScore.de) || (leftScore.en > 0);
+            const leftLooksEnglish = (leftScore.en > leftScore.de) && (leftScore.en > 0);
             const rightLooksGerman = (rightScore.de + capitalBonus) > rightScore.en;
 
             if (leftLooksEnglish && rightLooksGerman && score > maxScore) {
@@ -4903,7 +5030,9 @@ function splitLanguage(text) {
             }
         }
 
-        if (bestK !== -1) {
+        // Minimum confidence threshold — avoid false splits
+        const MIN_SPLIT_CONFIDENCE = 1.5;
+        if (bestK !== -1 && maxScore > MIN_SPLIT_CONFIDENCE) {
             return {
                 enPart: words.slice(0, bestK).join(' '),
                 nextDe: words.slice(bestK).join(' ')
@@ -4949,23 +5078,57 @@ function splitLanguage(text) {
         const slashParts = courseText.split(/\s*\/\s*(?![A-Z,]+$)/);
 
         if (slashParts.length >= 2) {
-            const deCandidate = slashParts[0].trim();
-            let enCandidate = slashParts.slice(1).join(' / ').trim();
+            // Interleave: part[0] = DE1, part[1] = EN1 (+ optional DE2), part[2] = EN2 (+ optional DE3), ...
+            // Collect DE and EN courses separately
+            const dePartsThis = [slashParts[0].trim()];
+            const enPartsThis = [];
 
-            const nestedSplit = heuristicSplitEnDe(enCandidate);
-            if (nestedSplit.nextDe) {
-                deParts.push(deCandidate + allergenTxt);
-                enParts.push(nestedSplit.enPart + allergenTxt);
+            for (let i = 1; i < slashParts.length; i++) {
+                const part = slashParts[i].trim();
+                const splitResult = heuristicSplitEnDe(part);
 
-                const nestedDe = nestedSplit.nextDe + allergenTxt;
-                deParts.push(nestedDe);
-                enParts.push(nestedDe);
-            } else {
-                const enFinal = enCandidate + allergenTxt;
-                const deFinal = deCandidate.includes(allergenTxt.trim()) ? deCandidate : (deCandidate + allergenTxt);
+                if (splitResult.nextDe) {
+                    // Front is EN, back is DE (e.g., "Soup" + "Salat")
+                    enPartsThis.push(splitResult.enPart);
+                    dePartsThis.push(splitResult.nextDe);
+                } else if (i === slashParts.length - 1) {
+                    // Last part: if multi-word with capitalized last word not purely English,
+                    // split last word as DE course (e.g., "Salad Dessert" → EN="Salad", DE="Dessert")
+                    const words = part.split(/\s+/);
+                    if (words.length >= 2 && /^[A-ZÄÖÜ]/.test(words[words.length - 1]) && words[words.length - 1].length >= 3) {
+                        const deGuess = words[words.length - 1];
+                        const w = deGuess.toLowerCase().replace(/[^a-zäöüß]/g, '');
+                        if (!(EN_SET.has(w) && !DE_SET.has(w))) {
+                            enPartsThis.push(words.slice(0, -1).join(' '));
+                            dePartsThis.push(deGuess);
+                            continue;
+                        }
+                    }
+                    // Default: this part is pure EN
+                    enPartsThis.push(part);
+                } else {
+                    enPartsThis.push(part);
+                }
+            }
 
-                deParts.push(deFinal);
-                enParts.push(enFinal);
+            // Pair DE/EN courses by index
+            const pairCount = Math.min(dePartsThis.length, enPartsThis.length);
+            for (let i = 0; i < pairCount; i++) {
+                const deP = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
+                const enP = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
+                deParts.push(deP);
+                enParts.push(enP);
+            }
+            // Unpaired surplus courses → duplicate to both
+            for (let i = pairCount; i < dePartsThis.length; i++) {
+                const p = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
+                deParts.push(p);
+                enParts.push(p);
+            }
+            for (let i = pairCount; i < enPartsThis.length; i++) {
+                const p = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
+                deParts.push(p);
+                enParts.push(p);
             }
         } else {
             const heuristicSplit = heuristicSplitEnDe(courseText);
@@ -5106,9 +5269,9 @@ function injectUI() {
         <header class="app-header">
             <div class="header-content">
                 <div class="brand">
-                    <img src="data:image/png;base64,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" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
+                    <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.8.9</small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -5258,7 +5421,7 @@ function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">v1.8.9</span>
+                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}}</span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">

@@ -2022,9 +2022,9 @@ function createDayCard(day) {
 
             if (item.available) {
                 if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
                 } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
                 }
             }
 
@@ -2043,7 +2043,7 @@ function createDayCard(day) {
 
         itemEl.innerHTML = `
             <div class="item-header">
-                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.name))}</span>
+                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span>
                 <span class="item-price">${item.price.toFixed(2)} €</span>
             </div>
             <div class="item-status-row">
@@ -2586,11 +2586,12 @@ function getRelativeTime(date) {
 
 // === Language Filter (FR-100) ===
 const DE_STEMS = [
-    'apfel', 'achtung', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
+    // Core German food nouns
+    'apfel', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
     'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
     'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
     'gemüse', 'gewürz', 'gratin', 'grieß', 'gulasch', 'gurke', 'himbeer', 'honig', 'huhn', 'hähnchen',
-    'jambalaya', 'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
+    'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
     'kraut', 'kräuter', 'kuchen', 'käse', 'kürbis', 'lauch', 'mandel', 'milch', 'mild', 'mit',
     'mohn', 'most', 'möhre', 'natur', 'nockerl', 'nudel', 'nuss', 'nuß', 'obst', 'oder',
     'olive', 'paprika', 'pfanne', 'pfannkuchen', 'pfeffer', 'pikant', 'pilz', 'plunder', 'püree', 'ragout',
@@ -2598,25 +2599,132 @@ const DE_STEMS = [
     'schnitte', 'schnitzel', 'schoko', 'schupf', 'schwein', 'sellerie', 'senf', 'sosse', 'soße', 'spargel',
     'spätzle', 'speck', 'spieß', 'spinat', 'steak', 'suppe', 'süß', 'tofu', 'tomate', 'topfen',
     'torte', 'trüffel', 'und', 'vanille', 'vogerl', 'vom', 'wien', 'wurst', 'zucchini', 'zum',
-    'zur', 'zwiebel', 'öl'
+    'zur', 'zwiebel', 'öl',
+    // Expanded: German participles & cooking methods
+    'paniert', 'gegrillt', 'geräuchert', 'frittiert', 'gedünstet', 'überbacken', 'gekocht', 'gefüllt',
+    'geschmort', 'garniert', 'mariniert', 'püriert', 'gewürzt', 'gesalzen', 'gehackt', 'gerieben',
+    'gewürfelt', 'passiert', 'gestreift', 'glasiert', 'gratiniert', 'pochiert', 'durchgebraten',
+    // Expanded: German meat & sausage
+    'bratwurst', 'currywurst', 'leberkäse', 'fleischkäse', 'puten', 'hack', 'frikadelle', 'bulette',
+    'klöß', 'würstchen', 'brühwurst', 'leberwurst', 'mettwurst', 'blutwurst', 'roulade',
+    'brustfilet', 'lenden', 'bauch', 'kotelett', 'schulter', 'nacken', 'haxe', 'eisbein',
+    // Expanded: German fish & seafood
+    'lachs', 'backfisch', 'seelachs', 'forelle', 'karpfen', 'zander', 'hecht', 'makrele', 'hering',
+    'kabeljau', 'scholle', 'rotbarsch', 'thunfisch', 'fischstäbchen',
+    // Expanded: German sides & starches
+    'pommes', 'bratkartoffel', 'röstkartoffel', 'schupfnudel', 'bandnudel', 'fingernudel',
+    'semmelknödel', 'kartoffelbrei', 'kartoffelpüree', 'kartoffelsalat', 'püree',
+    'reis', 'nudel', 'spaghetti', 'lasagne', 'tortellini', 'ravioli', 'gnocchi', 'polenta', 'risotto',
+    'spätzle', 'knödel',
+    // Expanded: German vegetables & legumes
+    'champignon', 'linsen', 'mais', 'erbsen', 'bohnen', 'kichererbse', 'schwarzwurzel',
+    'rotkohl', 'weißkohl', 'wirsing', 'mangold', 'fenchel', 'rettich', 'meerrettich', 'kren',
+    'spinat', 'blumenkohl', 'brokkoli', 'sellerie', 'spargel', 'pilz', 'zucchini', 'lauch',
+    'quark', 'schmand', 'buttermilch', 'dinkel', 'roggen', 'hafer', 'gerste',
+    'gurke', 'tomate', 'karotte', 'zwiebel', 'knoblauch', 'paprika', 'kürbis',
+    // Expanded: German food adjectives
+    'knusprig', 'saftig', 'deftig', 'würzig', 'herzhaft', 'cremig', 'sämig', 'fein',
+    'frisch', 'hausgemacht', 'handgemacht', 'selbstgemacht', 'gemischt', 'klassisch',
+    'bayerisch', 'fränkisch', 'steirisch', 'tiroler', 'salzburger', 'münchner',
+    'thüringer', 'wiener', 'griechisch', 'österreichisch', 'asiatisch', 'indisch',
+    'kalorienarm', 'fettreduziert', 'vegetarisch', 'vegan', 'regional', 'saisonal',
+    // Expanded: German herbs & seasoning
+    'dill', 'petersil', 'schnittlauch', 'majoran', 'thymian', 'rosmarin', 'lorbeer',
+    'basilikum', 'oregano', 'kümmel', 'anis', 'zimt', 'nelke', 'muskat',
+    'preiselbeer', 'apfelmus', 'ketchup', 'mayonnaise', 'mostrich', 'senf',
+    // Expanded: German meal structure
+    'portion', 'beilage', 'hauptgericht', 'vorspeise', 'nachspeise', 'nachtisch',
+    'stück', 'teller', 'schale', 'becher', 'flasche', 'glas', 'suppe', 'salat',
+    // Expanded: German-specific compounds
+    'rind', 'schwein', 'huhn', 'puten', 'lamm', 'kalb', 'wild', 'hirsch', 'reh',
+    'frikassee', 'ragout', 'gulasch', 'eintopf', 'braten', 'roulade', 'geschnetzeltes',
+    'rahm', 'sahne', 'schmand', 'topfen', 'quark', 'käse', 'milch',
+    // Expanded: German desserts & baked goods
+    'kuchen', 'torte', 'strudel', 'baiser', 'mousse', 'sorbet', 'pudding',
+    'palatschinke', 'grieß', 'striezel', 'kipferl', 'buchtel', 'germknödel',
+    'schoko', 'nuss', 'mandel', 'marzipan', 'nougat',
+    // Expanded: Common German words in menus
+    'achtung', 'hinweis', 'allergen', 'kennzeichnung', 'auslobung', 'enthält',
+    'älter', 'aktuell', 'täglich', 'wöchentlich', 'monatlich',
+    // Expanded: Austrian/German food words & compounds
+    'punsch', 'würfel', 'gebäck', 'weiß', 'schöberl', 'würstel',
+    'blätter', 'brösel', 'gröstl', 'erdäpfel', 'schmarren',
+    'hühner', 'müsli', 'jäger', 'rüben', 'kernöl', 'laibchen',
+    'soja', 'erdnuss', 'pizza', 'grün', 'königsberg', 'thailänd',
+    // Expanded: German ASCII words (no umlaut, common in Bessa data)
+    'spaetzle', 'frittaten', 'semmel', 'kohlrabi', 'melanzani',
+    'ananas', 'bananen', 'zitronen', 'saure', 'einlage', 'buchstaben',
+    'klein', 'rucola', 'cous', 'mini', 'lasagna', 'creme', 'kokos',
+    'auf', 'von', 'menü',
+    'gebacken', 'gelb', 'klar', 'orangen', 'garnelen', 'graupen',
 ];
 
 const EN_STEMS = [
     'almond', 'and', 'apple', 'asparagus', 'bacon', 'baked', 'ball', 'bean', 'beef', 'berry',
-    'bread', 'breast', 'broccoli', 'bun', 'butter', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
-    'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'chili', 'choco', 'chocolate', 'cider', 'cilantro',
-    'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dessert', 'dip', 'dumpling', 'egg',
-    'eggplant', 'filet', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash', 'gratin',
+    'bread', 'breast', 'broccoli', 'bun', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
+    'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'choco', 'chocolate', 'cider', 'cilantro',
+    'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dumpling', 'egg',
+    'eggplant', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash',
     'ham', 'herb', 'honey', 'hot', 'ice', 'jambalaya', 'leek', 'leg', 'mash', 'meat',
-    'mexican', 'mild', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
-    'olive', 'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
-    'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'ragout', 'raspberry', 'rice', 'roast', 'roll',
-    'salad', 'salami', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
-    'spice', 'spicy', 'spinach', 'steak', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
-    'thyme', 'to', 'tofu', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
-    'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt', 'zucchini'
+    'mexican', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
+    'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
+    'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'raspberry', 'rice', 'roast', 'roll',
+    'salad', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
+    'spice', 'spicy', 'spinach', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
+    'thyme', 'to', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
+    'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt',
+    // Expanded: English cooking methods
+    'grilled', 'roasted', 'smoked', 'steamed', 'poached', 'braised', 'stuffed', 'breaded',
+    'ground', 'minced', 'sliced', 'diced', 'chopped', 'mashed', 'whipped', 'seasoned',
+    'barbecued', 'charred', 'seared', 'toasted', 'broiled', 'blanched', 'scrambled',
+    // Expanded: English food descriptors
+    'crispy', 'crunchy', 'creamy', 'fluffy', 'tender', 'juicy', 'flavorful', 'savory',
+    'zesty', 'tangy', 'smoky', 'buttery', 'spiced', 'herbed', 'glazed', 'pickled',
+    'fresh', 'local', 'organic', 'seasonal', 'traditional', 'homestyle', 'hearty',
+    'light', 'rich', 'golden', 'garden', 'farm', 'country', 'rustic',
+    // Expanded: English meal categories
+    'appetizer', 'starter', 'entree', 'main', 'side', 'beverage', 'drink',
+    'breakfast', 'lunch', 'dinner', 'supper', 'brunch', 'buffet', 'special',
+    'choice', 'selection', 'variety', 'assorted', 'combination', 'featured',
+    // Expanded: English meat & fish
+    'brisket', 'chop', 'cutlet', 'fillet', 'ribs', 'steakhouse', 'jerky', 'pulled',
+    'salmon', 'tuna', 'cod', 'halibut', 'bass', 'trout', 'catfish', 'tilapia',
+    'lobster', 'crab', 'clam', 'mussel', 'oyster', 'scallop', 'shrimp',
+    // Expanded: English international dishes
+    'burger', 'burrito', 'taco', 'quesadilla', 'nachos', 'fajita', 'enchilada',
+    'curry', 'stirfry', 'chowder', 'bisque', 'gumbo', 'jambalaya', 'bouillon',
+    'gravy', 'broth', 'stock', 'marinade', 'vinaigrette', 'dressing',
+    // Expanded: English soups & stews
+    'chowder', 'bisque', 'gumbo', 'bouillon', 'consomme', 'minestrone', 'gazpacho',
+    // Expanded: English dairy & grains
+    'cheddar', 'mozzarella', 'parmesan', 'provolone', 'gouda', 'swiss', 'bluecheese',
+    'feta', 'creamcheese', 'cottagecheese', 'sourcream',
+    'pasta', 'spaghetti', 'fettuccine', 'linguine', 'penne', 'rigatoni', 'macaroni',
+    'couscous', 'quinoa', 'barley', 'farro', 'bulgur', 'semolina',
+    // Expanded: English condiments
+    'ketchup', 'mustard', 'mayonnaise', 'relish', 'salsa', 'guacamole', 'pesto',
+    'hummus', 'tahini', 'tzatziki', 'aioli', 'remoulade',
+    // Expanded: English adjectives for menus
+    'daily', 'weekly', 'special', 'featured', 'popular', 'signature', 'classic',
+    'traditional', 'contemporary', 'modern', 'spicy', 'mild', 'hot', 'warm',
+    'chilled', 'iced', 'cold', 'roomtemperature',
+    // Expanded: English utility words
+    'from', 'with', 'and', 'for', 'or', 'to', 'in', 'on', 'of', 'all',
+    'your', 'our', 'the', 'a', 'an', 'per', 'each', 'every',
+    'choose', 'select', 'add', 'extra', 'share', 'enjoy',
+    // Expanded: English foods, adjectives & descriptors
+    'lemon', 'garnish', 'patties', 'corn', 'indian', 'ginger',
+    'green', 'cubes', 'spring', 'white', 'pineapple', 'apricot',
+    'cordon', 'bleu', 'chickpea', 'seed', 'dip', 'punch',
+    'banana', 'pizza', 'mango', 'bowl', 'butter',
+    'millet', 'parsley', 'fennel', 'arugula', 'basil', 'red',
+    'lentil', 'parsnip', 'stripes',
+    'cous', 'mini', 'lasagna', 'menu',
+    'buckwheat', 'sheep', 'lime', 'bell', 'caramel', 'dough',
+    'clear', 'dripping', 'orange',
 ];
 
+const BOTH_SET = new Set(DE_STEMS.filter(w => EN_STEMS.includes(w)));
 const DE_SET = new Set(DE_STEMS);
 const EN_SET = new Set(EN_STEMS);
 const DE_REGEX = new RegExp(DE_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
@@ -2636,6 +2744,9 @@ function splitLanguage(text) {
         wordArray.forEach(word => {
             const w = word.toLowerCase().replace(/[^a-zäöüß]/g, '');
             if (w) {
+                // Skip neutral words that appear in both languages equally
+                if (BOTH_SET.has(w)) return;
+
                 let bestDeMatch = 0;
                 let bestEnMatch = 0;
                 if (DE_SET.has(w)) bestDeMatch = w.length;
@@ -2653,8 +2764,15 @@ function splitLanguage(text) {
                 if (bestDeMatch > 0) de += (bestDeMatch / w.length);
                 if (bestEnMatch > 0) en += (bestEnMatch / w.length);
 
-                if (/^[A-ZÄÖÜ]/.test(word)) {
-                    de += 0.5;
+                // Capitalization bonus: only for words with German-specific features
+                if (/^[A-ZÄÖÜ]/.test(word) && word.length >= 4) {
+                    const w_lower = word.toLowerCase();
+                    // German noun/adjective suffixes
+                    if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
+                        de += 0.3;
+                    } else if (/[äöüß]/.test(w_lower)) {
+                        de += 0.15;
+                    }
                 }
             }
         });
@@ -2677,13 +2795,21 @@ function splitLanguage(text) {
 
             const rightFirstWord = right[0];
             let capitalBonus = 0;
-            if (/^[A-ZÄÖÜ]/.test(rightFirstWord)) {
-                capitalBonus = 1.0;
+            if (/^[A-ZÄÖÜ]/.test(rightFirstWord) && rightFirstWord.length >= 4) {
+                // Only give bonus if the capitalized word looks German
+                const w_lower = rightFirstWord.toLowerCase();
+                if (DE_SET.has(w_lower) || DE_REGEX.test(w_lower)) {
+                    capitalBonus = 0.3;
+                } else if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
+                    capitalBonus = 0.3;
+                } else if (/[äöüß]/.test(w_lower)) {
+                    capitalBonus = 0.2;
+                }
             }
 
             const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en) + capitalBonus;
 
-            const leftLooksEnglish = (leftScore.en > leftScore.de) || (leftScore.en > 0);
+            const leftLooksEnglish = (leftScore.en > leftScore.de) && (leftScore.en > 0);
             const rightLooksGerman = (rightScore.de + capitalBonus) > rightScore.en;
 
             if (leftLooksEnglish && rightLooksGerman && score > maxScore) {
@@ -2692,7 +2818,9 @@ function splitLanguage(text) {
             }
         }
 
-        if (bestK !== -1) {
+        // Minimum confidence threshold — avoid false splits
+        const MIN_SPLIT_CONFIDENCE = 1.5;
+        if (bestK !== -1 && maxScore > MIN_SPLIT_CONFIDENCE) {
             return {
                 enPart: words.slice(0, bestK).join(' '),
                 nextDe: words.slice(bestK).join(' ')
@@ -2738,23 +2866,57 @@ function splitLanguage(text) {
         const slashParts = courseText.split(/\s*\/\s*(?![A-Z,]+$)/);
 
         if (slashParts.length >= 2) {
-            const deCandidate = slashParts[0].trim();
-            let enCandidate = slashParts.slice(1).join(' / ').trim();
+            // Interleave: part[0] = DE1, part[1] = EN1 (+ optional DE2), part[2] = EN2 (+ optional DE3), ...
+            // Collect DE and EN courses separately
+            const dePartsThis = [slashParts[0].trim()];
+            const enPartsThis = [];
 
-            const nestedSplit = heuristicSplitEnDe(enCandidate);
-            if (nestedSplit.nextDe) {
-                deParts.push(deCandidate + allergenTxt);
-                enParts.push(nestedSplit.enPart + allergenTxt);
+            for (let i = 1; i < slashParts.length; i++) {
+                const part = slashParts[i].trim();
+                const splitResult = heuristicSplitEnDe(part);
 
-                const nestedDe = nestedSplit.nextDe + allergenTxt;
-                deParts.push(nestedDe);
-                enParts.push(nestedDe);
-            } else {
-                const enFinal = enCandidate + allergenTxt;
-                const deFinal = deCandidate.includes(allergenTxt.trim()) ? deCandidate : (deCandidate + allergenTxt);
+                if (splitResult.nextDe) {
+                    // Front is EN, back is DE (e.g., "Soup" + "Salat")
+                    enPartsThis.push(splitResult.enPart);
+                    dePartsThis.push(splitResult.nextDe);
+                } else if (i === slashParts.length - 1) {
+                    // Last part: if multi-word with capitalized last word not purely English,
+                    // split last word as DE course (e.g., "Salad Dessert" → EN="Salad", DE="Dessert")
+                    const words = part.split(/\s+/);
+                    if (words.length >= 2 && /^[A-ZÄÖÜ]/.test(words[words.length - 1]) && words[words.length - 1].length >= 3) {
+                        const deGuess = words[words.length - 1];
+                        const w = deGuess.toLowerCase().replace(/[^a-zäöüß]/g, '');
+                        if (!(EN_SET.has(w) && !DE_SET.has(w))) {
+                            enPartsThis.push(words.slice(0, -1).join(' '));
+                            dePartsThis.push(deGuess);
+                            continue;
+                        }
+                    }
+                    // Default: this part is pure EN
+                    enPartsThis.push(part);
+                } else {
+                    enPartsThis.push(part);
+                }
+            }
 
-                deParts.push(deFinal);
-                enParts.push(enFinal);
+            // Pair DE/EN courses by index
+            const pairCount = Math.min(dePartsThis.length, enPartsThis.length);
+            for (let i = 0; i < pairCount; i++) {
+                const deP = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
+                const enP = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
+                deParts.push(deP);
+                enParts.push(enP);
+            }
+            // Unpaired surplus courses → duplicate to both
+            for (let i = pairCount; i < dePartsThis.length; i++) {
+                const p = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
+                deParts.push(p);
+                enParts.push(p);
+            }
+            for (let i = pairCount; i < enPartsThis.length; i++) {
+                const p = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
+                deParts.push(p);
+                enParts.push(p);
             }
         } else {
             const heuristicSplit = heuristicSplitEnDe(courseText);
