@@ -1998,6 +1998,13 @@ body {
 [data-theme="dark"] .dev-toggle input[type="checkbox"] {
     accent-color: #60a5fa;
 }
+
+.confidence-badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-left: 4px; cursor: default; }
+.confidence-high { background: rgba(39, 174, 96, 0.25); color: #27ae60; border: 1px solid rgba(39, 174, 96, 0.4); }
+.confidence-medium { background: rgba(243, 156, 18, 0.25); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.4); }
+.confidence-low { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+.confidence-fallback { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+.confidence-template { background: rgba(52, 152, 219, 0.25); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
     </style>
 </head>
 <body>
@@ -2238,7 +2245,7 @@ body {
 /* harmony export */ });
 /* unused harmony exports renderHistory, saveFlags, refreshMenuForDate, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(759);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(842);
@@ -3447,7 +3454,7 @@ function githubHeaders() {
 const API_BASE = 'https://api.bessa.app/v1';
 
 /** The client version injected into every API request header. */
-const CLIENT_VERSION = 'v1.8.9';
+const CLIENT_VERSION = 'v1.8.10';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -3490,6 +3497,7 @@ const LS = {
     LAST_UPDATED:            'kantine_last_updated',
     VERSION_CACHE:           'kantine_version_cache',
     DEV_MODE:                'kantine_dev_mode',
+    LANG_MODEL_DELTA:        'kantine_lang_model_delta',
 };
 
 
@@ -3835,7 +3843,7 @@ function getUILang() {
 /* harmony export */   yz: () => (/* binding */ highlightTags)
 /* harmony export */ });
 /* unused harmony export setUserFlags */
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(413);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(759);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(521);
 
 
@@ -3897,7 +3905,7 @@ function setLangMode(lang) {
 /* harmony export */ });
 /* unused harmony exports createDayCard, fetchVersions, openInstallPage, updateCountdown, removeCountdown */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(413);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(759);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(367);
@@ -4199,6 +4207,24 @@ function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
         }
 
+        let confidenceBadge = '';
+        const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+        if (devMode) {
+            const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
+            const conf = split.confidence != null ? split.confidence : 0;
+            const label = split.label || 'fallback';
+            const sub = split.subScores || {};
+            const tooltipParts = [
+                `score ${conf.toFixed(2)}`,
+                `anchor ${(sub.anchor||0).toFixed(2)}`,
+                `purity ${(sub.purity||0).toFixed(2)}`,
+                `courses ${(sub.course||0).toFixed(2)}`,
+                `coverage ${(sub.coverage||0).toFixed(2)}`
+            ];
+            const tooltip = tooltipParts.join(' · ');
+            confidenceBadge = `<span class="badge confidence-badge confidence-${label}" title="${tooltip}">${label}</span>`;
+        }
+
         let orderedBadge = '';
         if (orderCount > 0) {
             const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
@@ -4263,7 +4289,7 @@ function createDayCard(day) {
                 ${cancelButton}
                 ${orderButton}
                 ${flagButton}
-                <div class="badges">${statusBadge}</div>
+                <div class="badges">${statusBadge}${confidenceBadge}</div>
             </div>
             ${tagsHtml}
             <p class="item-desc">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))}</p>`;
@@ -4358,7 +4384,7 @@ async function openInstallPage(rawUrl) {
 }
 
 async function checkForUpdates() {
-    const currentVersion = '{{VERSION}}';
+    const currentVersion = 'v1.8.10';
     const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
 
     try {
@@ -4392,7 +4418,7 @@ function openVersionMenu() {
     const modal = document.getElementById('version-modal');
     const container = document.getElementById('version-list-container');
     const devToggle = document.getElementById('dev-mode-toggle');
-    const currentVersion = '{{VERSION}}';
+    const currentVersion = 'v1.8.10';
 
     if (!modal) return;
     modal.classList.remove('hidden');
@@ -4712,21 +4738,1668 @@ function updateAlarmBell() {
 
 /***/ },
 
-/***/ 413
+/***/ 759
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Ao: () => (/* binding */ getWeekYear),
-/* harmony export */   FS: () => (/* binding */ translateDay),
-/* harmony export */   PC: () => (/* binding */ getLocalizedText),
-/* harmony export */   U4: () => (/* binding */ isNewer),
-/* harmony export */   ZD: () => (/* binding */ escapeHtml),
-/* harmony export */   gs: () => (/* binding */ getRelativeTime),
-/* harmony export */   sg: () => (/* binding */ debounce),
-/* harmony export */   sn: () => (/* binding */ getISOWeek)
-/* harmony export */ });
-/* unused harmony export splitLanguage */
-/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  sg: () => (/* binding */ debounce),
+  ZD: () => (/* binding */ escapeHtml),
+  sn: () => (/* binding */ getISOWeek),
+  PC: () => (/* binding */ getLocalizedText),
+  gs: () => (/* binding */ getRelativeTime),
+  Ao: () => (/* binding */ getWeekYear),
+  U4: () => (/* binding */ isNewer),
+  dk: () => (/* reexport */ splitLanguage),
+  FS: () => (/* binding */ translateDay)
+});
+
+// EXTERNAL MODULE: ./src/state.js
+var state = __webpack_require__(901);
+;// ./src/lang/normalize.js
+function isValidAllergen(content) {
+    if (typeof content !== 'string' || !content) return false;
+    return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
+}
+
+function normalize(text) {
+    let modifiedText = text;
+    let notes = [];
+
+    // 1. Repair allergen-internal slashes: (A/F/N) -> (AFN)
+    modifiedText = modifiedText.replace(/\(([A-Z](?:\/[A-Z])+)\)/g, (match, p1) => {
+        return '(' + p1.replace(/\//g, '') + ')';
+    });
+
+    // 2. Repair slash-before-allergen: /ACLM) -> (ACLM)
+    modifiedText = modifiedText.replace(/\/([A-Z]{1,8})\)/g, '($1)');
+
+    // 4. Detect and park notes (doing it before step 3 to use the 6 spaces rule)
+    
+    // Pass 1: Extract "Achtung Änderung" specifically as requested
+    const aaRegex = /Achtung Änderung/gi;
+    const aaMatches = modifiedText.match(aaRegex);
+    if (aaMatches) {
+        aaMatches.forEach(m => {
+            notes.push(m.trim());
+            modifiedText = modifiedText.replace(m, ' ');
+        });
+    }
+
+    // Pass 2: Detect based on combinations
+    let parts = modifiedText.split(/ {6,}/);
+    if (parts.length > 1) {
+        let lastPart = parts[parts.length - 1];
+        let hasA = /!!!|!{3,}/.test(lastPart);
+        let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
+        let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
+        let hasD = !lastPart.includes(' / ') && !isValidAllergen(lastPart.replace(/[()]/g, ''));
+        
+        if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
+            notes.push(lastPart.trim());
+            modifiedText = modifiedText.substring(0, modifiedText.lastIndexOf(lastPart)).trim();
+        }
+    } else {
+        let exclIndex = modifiedText.indexOf('!!!');
+        if (exclIndex !== -1) {
+            let lastPart = modifiedText.substring(exclIndex);
+            let hasA = true;
+            let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
+            let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
+            let hasD = false;
+            
+            if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
+                notes.push(lastPart.trim());
+                modifiedText = modifiedText.substring(0, exclIndex).trim();
+            }
+        }
+    }
+
+    // 3. Collapse whitespace
+    modifiedText = modifiedText.replace(/\s{2,}/g, ' ').trim();
+
+    return {
+        text: modifiedText,
+        notes: notes
+    };
+}
+;// ./src/lang/templates.js
+// @ts-check
+
+const TEMPLATES = [
+  {
+    test: (t) => /^Suppe\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s+Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
+];
+
+function matchTemplate(normalizedText) {
+  if (typeof normalizedText !== 'string' || !normalizedText) return null;
+
+  for (const tpl of TEMPLATES) {
+    if (tpl.test(normalizedText)) return tpl.result;
+  }
+
+  return null;
+}
+
+;// ./src/lang/segment.js
+function segment_isValidAllergen(content) {
+  if (typeof content !== 'string' || !content) return false;
+  return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
+}
+
+/**
+ * Segments a normalized menu text into separate course objects.
+ * 
+ * @param {string} normalizedText 
+ * @returns {Array<{de: string, en: string, allergen: string, mono: boolean, anchored: boolean}>}
+ */
+function segment(normalizedText) {
+  if (!normalizedText || typeof normalizedText !== 'string') {
+    return [];
+  }
+
+  const courses = [];
+  const parenRegex = /\(([^)]+)\)\s*(?!\s*\/)/g;
+  let match;
+  let lastScanIndex = 0;
+
+  while ((match = parenRegex.exec(normalizedText)) !== null) {
+    const content = match[1];
+    if (segment_isValidAllergen(content)) {
+      // End of this course segment is at the end of the matched parenthesis
+      const segmentEndIndex = match.index + match[0].length;
+      let segmentText = normalizedText.substring(lastScanIndex, segmentEndIndex);
+      
+      courses.push(processSegment(segmentText, content, true));
+      lastScanIndex = segmentEndIndex;
+    }
+  }
+
+  // Any remaining text after the last valid allergen is an unanchored segment
+  if (lastScanIndex < normalizedText.length) {
+    const remainingText = normalizedText.substring(lastScanIndex).trim();
+    if (remainingText) {
+      courses.push(processSegment(remainingText, "", false));
+    }
+  }
+
+  return courses;
+}
+
+function processSegment(segmentText, allergen, anchored) {
+  // 1. Strip the allergen code from the end of the segment text if it exists
+  let textWithoutAllergen = segmentText;
+  if (allergen) {
+    const suffix = `(${allergen})`;
+    if (textWithoutAllergen.endsWith(suffix)) {
+      textWithoutAllergen = textWithoutAllergen.substring(0, textWithoutAllergen.length - suffix.length);
+    } else {
+      // In case of whitespace before the parenthesis in the raw segment
+      const lastParenIndex = textWithoutAllergen.lastIndexOf(`(${allergen})`);
+      if (lastParenIndex !== -1) {
+        textWithoutAllergen = textWithoutAllergen.substring(0, lastParenIndex);
+      }
+    }
+  }
+  textWithoutAllergen = textWithoutAllergen.trim();
+
+  // 2. Split DE|EN at the FIRST slash
+  let de, en, mono;
+  const slashMatch = textWithoutAllergen.match(/\s*\/\s*/);
+  if (slashMatch) {
+    de = textWithoutAllergen.substring(0, slashMatch.index).trim();
+    en = textWithoutAllergen.substring(slashMatch.index + slashMatch[0].length).trim();
+    mono = false;
+  } else {
+    de = textWithoutAllergen;
+    en = textWithoutAllergen;
+    mono = true;
+  }
+
+  // 3. Re-attach allergen if it exists and not already present
+  if (allergen) {
+    const aSuffix = ` (${allergen})`;
+    de = de.includes(`(${allergen})`) ? de : `${de}${aSuffix}`;
+    en = en.includes(`(${allergen})`) ? en : `${en}${aSuffix}`;
+  }
+
+  return {
+    de,
+    en,
+    allergen,
+    mono,
+    anchored
+  };
+}
+
+;// ./src/lang/boundary.js
+function resolveBoundary(fragment, langModel) {
+    const MIN_BOUNDARY_CONFIDENCE = 1.5;
+    const MIN_LEFT_ENGLISH = 1.0;
+    
+    // Handle empty fragment
+    if (!fragment || fragment.trim() === '') {
+        return { enPart: '', deCut: '' };
+    }
+
+    const words = fragment.trim().split(/\s+/);
+    
+    if (words.length < 2) {
+        return { enPart: fragment, deCut: '' };
+    }
+
+    let bestK = -1;
+    let maxScore = -9999;
+
+    for (let k = 1; k < words.length; k++) {
+        const leftWords = words.slice(0, k);
+        const rightWords = words.slice(k);
+
+        const leftText = leftWords.join(' ');
+        const rightText = rightWords.join(' ');
+
+        const leftScore = langModel.scoreLang(leftText);
+        const rightScore = langModel.scoreLang(rightText);
+
+        const leftLooksEnglish = leftScore < -MIN_LEFT_ENGLISH;
+        const rightLooksGerman = rightScore > 0;
+
+        const boundaryScore = (-leftScore) + rightScore;
+
+        if (leftLooksEnglish && rightLooksGerman && boundaryScore > maxScore) {
+            maxScore = boundaryScore;
+            bestK = k;
+        }
+    }
+
+    if (bestK !== -1 && maxScore > MIN_BOUNDARY_CONFIDENCE) {
+        return {
+            enPart: words.slice(0, bestK).join(' '),
+            deCut: words.slice(bestK).join(' ')
+        };
+    }
+
+    return { enPart: fragment, deCut: '' };
+}
+
+;// ./src/lang/score.js
+const WEIGHT_ANCHOR = 0.35;
+const WEIGHT_PURITY = 0.30;
+const WEIGHT_COURSE = 0.20;
+const WEIGHT_COVERAGE = 0.15;
+
+const THRESHOLD_HIGH = 0.80;
+const THRESHOLD_MEDIUM = 0.55;
+
+function tokenize(text) {
+  return (text || '').toLowerCase().match(/[a-zäöüß]{2,}/g) || [];
+}
+
+function scoreSplit({ courses, notes, raw, langModel }) {
+  // anchor score
+  const anchoredCount = courses.filter(c => c.anchored).length;
+  const anchor = anchoredCount / Math.max(courses.length, 1);
+
+  // purity score
+  let puritySum = 0;
+  let purityCount = 0;
+  for (const course of courses) {
+    if (!course.mono) {
+      const deClean = (course.de || '').replace(/\([^)]*\)/g, '').trim();
+      const enClean = (course.en || '').replace(/\([^)]*\)/g, '').trim();
+      
+      const deScoreLang = langModel.scoreLang(deClean);
+      const enScoreLang = langModel.scoreLang(enClean);
+      
+      const de_purity = Math.max(0, deScoreLang) / (Math.abs(deScoreLang) + 1);
+      const en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
+      
+      puritySum += de_purity + en_purity;
+      purityCount += 2;
+    }
+  }
+  const purity = purityCount > 0 ? puritySum / purityCount : 1.0;
+
+  // course score
+  const baseCourseScore = courses.length >= 1 && courses.length <= 3 ? 1.0 : 0.0;
+  let penalties = 0;
+  for (const course of courses) {
+    if (!course.mono) {
+      if (!course.de || course.de.length === 0 || !course.en || course.en.length === 0) {
+        penalties += 0.3;
+      }
+    }
+  }
+  const courseScore = Math.max(0, baseCourseScore - penalties);
+
+  // coverage score
+  const rawTokens = tokenize(raw);
+  const splitText = courses.map(c => (c.de || '') + ' ' + (c.en || '')).join(' ') + ' ' + (notes || []).join(' ');
+  const splitTokenSet = new Set(tokenize(splitText));
+  const covered = rawTokens.filter(t => splitTokenSet.has(t)).length;
+  const coverage = covered / Math.max(rawTokens.length, 1);
+
+  // composite confidence
+  const confidence = Math.max(0, Math.min(1,
+    anchor * WEIGHT_ANCHOR +
+    purity * WEIGHT_PURITY +
+    courseScore * WEIGHT_COURSE +
+    coverage * WEIGHT_COVERAGE
+  ));
+
+  // assign label based on thresholds
+  let label = 'low';
+  if (confidence >= THRESHOLD_HIGH) {
+    label = 'high';
+  } else if (confidence >= THRESHOLD_MEDIUM) {
+    label = 'medium';
+  }
+
+  return {
+    confidence,
+    subScores: {
+      anchor,
+      purity,
+      course: courseScore,
+      coverage
+    },
+    label
+  };
+}
+;// ./src/lang/langModel.js
+function createLangModel(seed) {
+    const FUNC_WEIGHT = 2.0;
+
+    const trigramsDe = { ...(seed.trigramsDe || {}) };
+    const trigramsEn = { ...(seed.trigramsEn || {}) };
+    const funcDe = new Set(seed.funcDe || []);
+    const funcEn = new Set(seed.funcEn || []);
+
+    let totalDe = 0;
+    for (const k in trigramsDe) {
+        totalDe += trigramsDe[k];
+    }
+
+    let totalEn = 0;
+    for (const k in trigramsEn) {
+        totalEn += trigramsEn[k];
+    }
+
+    function scorePhrase(text) {
+        if (!text) return { de: 0, en: 0 };
+
+        let deScore = 0;
+        let enScore = 0;
+
+        const lowerText = text.toLowerCase();
+        const alphaWords = lowerText.match(/[a-zäöüß]+/g) || [];
+
+        let deTriLog = 0;
+        let enTriLog = 0;
+
+        for (const w of alphaWords) {
+            for (let i = 0; i <= w.length - 3; i++) {
+                const tri = w.substring(i, i + 3);
+
+                const countDe = trigramsDe[tri] || 0;
+                deTriLog += Math.log((countDe + 1) / (totalDe + 2));
+
+                const countEn = trigramsEn[tri] || 0;
+                enTriLog += Math.log((countEn + 1) / (totalEn + 2));
+            }
+        }
+
+        const minTri = Math.min(deTriLog, enTriLog);
+        deScore += (deTriLog - minTri);
+        enScore += (enTriLog - minTri);
+
+        for (const w of alphaWords) {
+            if (funcDe.has(w)) deScore += FUNC_WEIGHT;
+            if (funcEn.has(w)) enScore += FUNC_WEIGHT;
+        }
+
+        const umlauts = lowerText.match(/[äöüß]/g);
+        if (umlauts) {
+            deScore += 0.5 * umlauts.length;
+        }
+
+        for (const w of alphaWords) {
+            if (/(ung|suppe|chen|kartoffel|schnitzel)$/.test(w)) deScore += 1.0;
+            if (/(ing|ed)$/.test(w)) enScore += 0.5;
+            if (/^th/.test(w)) enScore += 0.5;
+        }
+
+        const deDigraphs = lowerText.match(/(sch|pf|tz|ck)/g);
+        if (deDigraphs) {
+            deScore += 0.3 * deDigraphs.length;
+        }
+
+        return { de: deScore, en: enScore };
+    }
+
+    function scoreLang(text) {
+        const scores = scorePhrase(text);
+        return scores.de - scores.en;
+    }
+
+    function getModel() {
+        return {
+            version: seed.version,
+            trigramsDe: trigramsDe,
+            trigramsEn: trigramsEn,
+            funcDe: Array.from(funcDe),
+            funcEn: Array.from(funcEn)
+        };
+    }
+
+    function mergeDelta(delta) {
+        if (!delta) return modelObj;
+        for (const [k, v] of Object.entries(delta)) {
+            trigramsDe[k] = (trigramsDe[k] || 0) + v;
+            totalDe += v;
+        }
+        return modelObj;
+    }
+
+    let learnedDelta = { trigramsDe: {}, trigramsEn: {} };
+
+    function learnFromCourse(course, splitResult, storage = typeof localStorage !== 'undefined' ? localStorage : null) {
+        if (course.anchored === true && splitResult.label === 'high') {
+            const extractTrigrams = (text) => {
+                const map = {};
+                if (!text) return map;
+                const lowerText = text.toLowerCase();
+                const alphaWords = lowerText.match(/[a-zäöüß]+/g) || [];
+                for (const w of alphaWords) {
+                    for (let i = 0; i <= w.length - 3; i++) {
+                        const tri = w.substring(i, i + 3);
+                        map[tri] = (map[tri] || 0) + 1;
+                    }
+                }
+                return map;
+            };
+
+            const newDe = extractTrigrams(course.de);
+            const newEn = extractTrigrams(course.en);
+
+            for (const [tri, count] of Object.entries(newDe)) {
+                learnedDelta.trigramsDe[tri] = (learnedDelta.trigramsDe[tri] || 0) + count;
+                trigramsDe[tri] = (trigramsDe[tri] || 0) + count;
+                totalDe += count;
+            }
+            for (const [tri, count] of Object.entries(newEn)) {
+                learnedDelta.trigramsEn[tri] = (learnedDelta.trigramsEn[tri] || 0) + count;
+                trigramsEn[tri] = (trigramsEn[tri] || 0) + count;
+                totalEn += count;
+            }
+        }
+    }
+
+    function loadDelta(storage = typeof localStorage !== 'undefined' ? localStorage : null) {
+        if (!storage) return;
+        try {
+            const dataStr = storage.getItem('kantine_lang_model_delta');
+            if (dataStr) {
+                const delta = JSON.parse(dataStr);
+                if (delta.modelVersion !== seed.version) {
+                    storage.removeItem('kantine_lang_model_delta');
+                } else {
+                    learnedDelta = {
+                        trigramsDe: delta.trigramsDe || {},
+                        trigramsEn: delta.trigramsEn || {}
+                    };
+                    for (const [k, v] of Object.entries(learnedDelta.trigramsDe)) {
+                        trigramsDe[k] = (trigramsDe[k] || 0) + v;
+                        totalDe += v;
+                    }
+                    for (const [k, v] of Object.entries(learnedDelta.trigramsEn)) {
+                        trigramsEn[k] = (trigramsEn[k] || 0) + v;
+                        totalEn += v;
+                    }
+                }
+            }
+        } catch(e) {}
+    }
+
+    function saveDelta(storage = typeof localStorage !== 'undefined' ? localStorage : null) {
+        if (!storage) return;
+
+        let delta = {
+            modelVersion: seed.version,
+            trigramsDe: { ...learnedDelta.trigramsDe },
+            trigramsEn: { ...learnedDelta.trigramsEn }
+        };
+
+        const tryStringify = () => JSON.stringify(delta);
+
+        let str = tryStringify();
+        if (str.length > 50 * 1024) {
+            const allKeys = new Set([...Object.keys(delta.trigramsDe), ...Object.keys(delta.trigramsEn)]);
+            const entries = Array.from(allKeys).map(k => {
+                const w = Math.abs((trigramsDe[k] || 0) - (trigramsEn[k] || 0));
+                return { k, weight: w };
+            });
+            entries.sort((a, b) => a.weight - b.weight);
+
+            while (str.length > 50 * 1024 && entries.length > 0) {
+                const evicted = entries.shift();
+                delete delta.trigramsDe[evicted.k];
+                delete delta.trigramsEn[evicted.k];
+                str = tryStringify();
+            }
+            learnedDelta.trigramsDe = delta.trigramsDe;
+            learnedDelta.trigramsEn = delta.trigramsEn;
+        }
+
+        try {
+            storage.setItem('kantine_lang_model_delta', str);
+        } catch(e) {}
+    }
+
+    const modelObj = {
+        scorePhrase,
+        scoreLang,
+        getModel,
+        mergeDelta,
+        learnFromCourse,
+        loadDelta,
+        saveDelta
+    };
+
+    return modelObj;
+}
+
+;// ./src/lang/langModelSeed.js
+// GENERATED by tools/train-langmodel.js — do not edit by hand.
+// Regenerate via: node tools/train-langmodel.js tests/test_kantine_menuCache.json src/lang/langModelSeed.js (then wrap in export const)
+// @ts-check
+
+var LANG_MODEL_SEED = {
+  "version": "v1.8.9",
+  "trigramsDe": {
+    "ack": 24,
+    "ade": 7,
+    "ahm": 19,
+    "ais": 13,
+    "ami": 32,
+    "ane": 14,
+    "anu": 5,
+    "apf": 18,
+    "arf": 15,
+    "arg": 8,
+    "aro": 27,
+    "art": 52,
+    "asc": 11,
+    "atm": 26,
+    "atu": 5,
+    "aub": 3,
+    "aue": 3,
+    "auf": 26,
+    "aun": 10,
+    "aup": 5,
+    "aur": 6,
+    "bac": 22,
+    "bel": 16,
+    "ben": 6,
+    "bis": 15,
+    "bla": 10,
+    "boe": 3,
+    "boh": 9,
+    "bou": 20,
+    "bra": 27,
+    "bru": 4,
+    "bse": 26,
+    "bst": 10,
+    "bäc": 7,
+    "bär": 9,
+    "ceu": 6,
+    "chk": 9,
+    "chm": 14,
+    "chr": 13,
+    "chs": 40,
+    "cht": 17,
+    "cku": 3,
+    "cuj": 5,
+    "dei": 4,
+    "del": 63,
+    "dep": 3,
+    "der": 17,
+    "dfl": 5,
+    "dka": 3,
+    "dla": 4,
+    "dom": 5,
+    "dru": 4,
+    "dsc": 6,
+    "dsg": 3,
+    "dss": 5,
+    "dsu": 55,
+    "däp": 3,
+    "eau": 4,
+    "ebe": 23,
+    "ebä": 7,
+    "eck": 8,
+    "eeh": 6,
+    "eer": 29,
+    "eeu": 3,
+    "efü": 4,
+    "egi": 5,
+    "eha": 4,
+    "ehe": 6,
+    "ehü": 3,
+    "eie": 7,
+    "eig": 9,
+    "ein": 50,
+    "eis": 76,
+    "eiß": 6,
+    "ejo": 3,
+    "elb": 7,
+    "elf": 5,
+    "elg": 10,
+    "elh": 3,
+    "elk": 15,
+    "ell": 57,
+    "elm": 19,
+    "eln": 34,
+    "elr": 11,
+    "els": 31,
+    "elt": 3,
+    "elu": 4,
+    "eme": 157,
+    "emi": 121,
+    "emm": 8,
+    "emü": 83,
+    "enc": 62,
+    "ene": 35,
+    "eng": 10,
+    "eni": 10,
+    "enk": 22,
+    "enp": 9,
+    "enr": 18,
+    "enü": 4,
+    "era": 21,
+    "ere": 18,
+    "erf": 14,
+    "erj": 4,
+    "erk": 19,
+    "erl": 38,
+    "erm": 30,
+    "ern": 12,
+    "eru": 8,
+    "esm": 3,
+    "esu": 130,
+    "etm": 7,
+    "euf": 3,
+    "eun": 24,
+    "evo": 4,
+    "ezw": 5,
+    "eßn": 10,
+    "eßs": 5,
+    "fbe": 3,
+    "fel": 77,
+    "fer": 8,
+    "ffe": 53,
+    "fio": 14,
+    "fla": 6,
+    "fle": 17,
+    "fmi": 15,
+    "for": 5,
+    "frü": 4,
+    "fsk": 4,
+    "fte": 5,
+    "fzi": 4,
+    "fül": 4,
+    "geb": 37,
+    "gef": 4,
+    "gel": 9,
+    "gem": 85,
+    "gen": 9,
+    "ghu": 26,
+    "gie": 5,
+    "gom": 5,
+    "gri": 27,
+    "grü": 3,
+    "gsr": 4,
+    "gwe": 9,
+    "haf": 7,
+    "hau": 7,
+    "hcr": 14,
+    "hec": 6,
+    "hei": 7,
+    "hel": 6,
+    "hen": 92,
+    "him": 22,
+    "hkä": 5,
+    "hmi": 9,
+    "hmo": 3,
+    "hms": 16,
+    "hne": 40,
+    "hnk": 4,
+    "hnm": 3,
+    "hnu": 4,
+    "hok": 16,
+    "hre": 10,
+    "hsf": 4,
+    "hsu": 18,
+    "htf": 6,
+    "htj": 5,
+    "huh": 13,
+    "hur": 26,
+    "hwü": 4,
+    "hüh": 28,
+    "ieb": 16,
+    "ien": 10,
+    "ier": 18,
+    "ieß": 19,
+    "ign": 6,
+    "iku": 4,
+    "ilc": 13,
+    "ile": 17,
+    "ilz": 3,
+    "imb": 13,
+    "imi": 17,
+    "ind": 78,
+    "ink": 17,
+    "inl": 16,
+    "inm": 12,
+    "int": 8,
+    "iol": 15,
+    "ipl": 9,
+    "irs": 13,
+    "isc": 58,
+    "isf": 3,
+    "isk": 6,
+    "ism": 5,
+    "ita": 7,
+    "itb": 28,
+    "itd": 10,
+    "ite": 39,
+    "itf": 20,
+    "itg": 35,
+    "itj": 8,
+    "itk": 31,
+    "itl": 9,
+    "itm": 23,
+    "itp": 18,
+    "itr": 48,
+    "its": 48,
+    "itt": 45,
+    "itv": 5,
+    "iße": 6,
+    "jog": 27,
+    "kar": 94,
+    "kas": 11,
+    "kau": 3,
+    "ker": 27,
+    "kir": 9,
+    "kko": 8,
+    "kla": 5,
+    "kle": 10,
+    "kno": 7,
+    "knö": 23,
+    "kob": 8,
+    "kok": 30,
+    "kol": 8,
+    "kos": 27,
+    "kro": 13,
+    "krä": 16,
+    "kuc": 81,
+    "kui": 5,
+    "kum": 4,
+    "kun": 3,
+    "käf": 3,
+    "käs": 31,
+    "kür": 10,
+    "lag": 15,
+    "lau": 38,
+    "lbe": 5,
+    "lch": 18,
+    "lcr": 22,
+    "leg": 5,
+    "lei": 29,
+    "lfe": 5,
+    "lge": 11,
+    "lie": 6,
+    "lik": 4,
+    "lki": 3,
+    "lko": 5,
+    "lkä": 4,
+    "llc": 3,
+    "llg": 5,
+    "llk": 3,
+    "llo": 24,
+    "llt": 5,
+    "lmi": 26,
+    "lnm": 3,
+    "lon": 26,
+    "lri": 10,
+    "lsc": 3,
+    "lsu": 19,
+    "lte": 8,
+    "lun": 13,
+    "lzr": 3,
+    "mac": 10,
+    "mbe": 16,
+    "mem": 16,
+    "mes": 125,
+    "met": 8,
+    "mhu": 3,
+    "mia": 4,
+    "mit": 357,
+    "moh": 6,
+    "mpi": 6,
+    "msu": 6,
+    "müs": 83,
+    "nak": 5,
+    "nat": 9,
+    "nau": 5,
+    "ncr": 52,
+    "nde": 29,
+    "ndk": 9,
+    "nds": 74,
+    "neh": 5,
+    "nen": 43,
+    "ner": 47,
+    "nhi": 3,
+    "nig": 7,
+    "nim": 3,
+    "nin": 11,
+    "niz": 3,
+    "nka": 4,
+    "nke": 12,
+    "nko": 11,
+    "nku": 7,
+    "nkä": 7,
+    "nma": 16,
+    "nmi": 42,
+    "nmo": 4,
+    "nob": 7,
+    "non": 6,
+    "nra": 10,
+    "nre": 11,
+    "nsc": 18,
+    "nsu": 12,
+    "nto": 13,
+    "nud": 23,
+    "nun": 19,
+    "nuß": 11,
+    "nöd": 23,
+    "oba": 7,
+    "obl": 7,
+    "obs": 10,
+    "ock": 18,
+    "oeu": 3,
+    "off": 52,
+    "ogh": 26,
+    "ohn": 15,
+    "okk": 10,
+    "oko": 45,
+    "olc": 14,
+    "omi": 8,
+    "one": 35,
+    "onm": 25,
+    "opf": 21,
+    "ore": 5,
+    "orr": 3,
+    "osm": 7,
+    "osp": 6,
+    "oss": 5,
+    "osu": 8,
+    "ott": 38,
+    "oui": 22,
+    "oun": 4,
+    "pec": 5,
+    "pei": 9,
+    "pem": 71,
+    "pet": 6,
+    "pfe": 30,
+    "pfm": 6,
+    "pft": 5,
+    "pie": 3,
+    "pig": 6,
+    "pil": 3,
+    "plu": 9,
+    "ppe": 334,
+    "pre": 13,
+    "pts": 4,
+    "put": 18,
+    "pät": 11,
+    "pür": 6,
+    "rah": 19,
+    "rat": 24,
+    "rbi": 10,
+    "rbr": 6,
+    "rdb": 11,
+    "rdä": 3,
+    "reg": 5,
+    "rei": 61,
+    "rel": 6,
+    "rem": 157,
+    "rer": 9,
+    "res": 13,
+    "rfe": 5,
+    "rfi": 20,
+    "rfl": 7,
+    "rge": 13,
+    "rin": 82,
+    "rit": 15,
+    "rjo": 4,
+    "rkn": 5,
+    "rku": 8,
+    "rla": 10,
+    "rmi": 29,
+    "rok": 11,
+    "ron": 30,
+    "rop": 5,
+    "rrt": 3,
+    "rsc": 19,
+    "rsi": 6,
+    "rst": 11,
+    "rsu": 12,
+    "rte": 17,
+    "rto": 52,
+    "ruc": 16,
+    "run": 7,
+    "rus": 6,
+    "ryk": 3,
+    "räu": 18,
+    "rös": 5,
+    "rüh": 4,
+    "rün": 3,
+    "sbo": 3,
+    "sch": 164,
+    "scr": 13,
+    "seb": 20,
+    "sei": 4,
+    "sen": 34,
+    "seu": 12,
+    "sfl": 3,
+    "sfo": 4,
+    "sge": 5,
+    "skn": 10,
+    "sku": 7,
+    "skä": 4,
+    "smi": 23,
+    "spe": 12,
+    "spu": 8,
+    "spä": 11,
+    "ssk": 11,
+    "ssu": 10,
+    "sth": 3,
+    "stm": 4,
+    "sun": 8,
+    "sup": 335,
+    "süß": 17,
+    "tam": 16,
+    "tau": 9,
+    "tba": 11,
+    "tbr": 5,
+    "tbu": 10,
+    "tde": 3,
+    "teg": 5,
+    "tei": 32,
+    "tel": 48,
+    "tem": 4,
+    "ten": 131,
+    "tfr": 19,
+    "tge": 20,
+    "tgr": 13,
+    "thu": 9,
+    "thü": 4,
+    "tis": 4,
+    "tja": 5,
+    "tjo": 7,
+    "tka": 20,
+    "tkä": 5,
+    "tkü": 3,
+    "tle": 5,
+    "tli": 4,
+    "tma": 21,
+    "tmi": 43,
+    "top": 16,
+    "tpü": 4,
+    "tre": 20,
+    "tsc": 18,
+    "tse": 9,
+    "tsp": 20,
+    "tsü": 3,
+    "tta": 21,
+    "tte": 76,
+    "tth": 4,
+    "ttr": 5,
+    "tun": 9,
+    "tva": 5,
+    "uch": 120,
+    "uco": 11,
+    "ufb": 3,
+    "ufl": 6,
+    "ufs": 5,
+    "ufz": 5,
+    "uhn": 13,
+    "uil": 22,
+    "uja": 5,
+    "und": 99,
+    "uns": 6,
+    "upp": 336,
+    "upt": 4,
+    "usm": 3,
+    "ute": 34,
+    "ußk": 10,
+    "vom": 3,
+    "von": 5,
+    "wie": 16,
+    "wlm": 5,
+    "wür": 9,
+    "zam": 4,
+    "zer": 3,
+    "zit": 15,
+    "zwi": 16,
+    "ßez": 5,
+    "ßka": 17,
+    "ßkr": 10,
+    "ßno": 10,
+    "ßsu": 5,
+    "äck": 7,
+    "äfe": 3,
+    "äpf": 3,
+    "ärl": 9,
+    "äse": 31,
+    "ätz": 11,
+    "äut": 16,
+    "öde": 23,
+    "öst": 3,
+    "ühl": 4,
+    "ühn": 28,
+    "üll": 4,
+    "üne": 3,
+    "ürb": 10,
+    "üre": 6,
+    "ürf": 5,
+    "ürs": 4,
+    "üse": 83,
+    "üßk": 17
+  },
+  "trigramsEn": {
+    "aar": 4,
+    "abb": 5,
+    "aca": 5,
+    "add": 55,
+    "adp": 16,
+    "adu": 10,
+    "adw": 33,
+    "aet": 11,
+    "aha": 2,
+    "akg": 1,
+    "akm": 1,
+    "alc": 7,
+    "alf": 2,
+    "alo": 5,
+    "alv": 1,
+    "amc": 5,
+    "amn": 2,
+    "amr": 2,
+    "amw": 11,
+    "anw": 11,
+    "aon": 1,
+    "aou": 1,
+    "apo": 1,
+    "app": 28,
+    "apu": 5,
+    "ary": 1,
+    "asb": 6,
+    "ash": 14,
+    "ass": 13,
+    "atf": 2,
+    "atp": 9,
+    "atr": 1,
+    "awb": 16,
+    "awi": 32,
+    "aze": 3,
+    "bab": 2,
+    "bak": 28,
+    "bba": 4,
+    "bea": 11,
+    "bes": 6,
+    "boa": 3,
+    "bre": 19,
+    "bsa": 9,
+    "bun": 1,
+    "cab": 3,
+    "cao": 1,
+    "cba": 2,
+    "ceg": 1,
+    "cej": 1,
+    "cel": 8,
+    "cep": 13,
+    "ces": 6,
+    "cew": 9,
+    "cil": 1,
+    "cis": 5,
+    "ciw": 1,
+    "ckp": 5,
+    "ckw": 5,
+    "coa": 2,
+    "coc": 27,
+    "cof": 3,
+    "coi": 2,
+    "com": 2,
+    "cri": 4,
+    "cru": 2,
+    "cub": 5,
+    "dan": 9,
+    "dca": 11,
+    "dcr": 10,
+    "ddu": 9,
+    "deg": 6,
+    "dia": 8,
+    "dki": 1,
+    "dme": 6,
+    "doa": 3,
+    "dpe": 11,
+    "dpl": 18,
+    "dri": 10,
+    "dro": 8,
+    "dsh": 2,
+    "dst": 3,
+    "dto": 7,
+    "dve": 14,
+    "dwi": 34,
+    "dwt": 2,
+    "dyo": 3,
+    "dzu": 2,
+    "eac": 9,
+    "ead": 15,
+    "eaf": 1,
+    "eah": 2,
+    "ear": 12,
+    "eas": 21,
+    "ebb": 1,
+    "ebu": 4,
+    "eco": 5,
+    "edb": 3,
+    "edc": 17,
+    "ede": 3,
+    "edl": 5,
+    "edm": 5,
+    "edt": 13,
+    "edu": 11,
+    "edv": 8,
+    "edw": 3,
+    "edz": 2,
+    "eed": 4,
+    "eep": 4,
+    "eet": 21,
+    "efa": 2,
+    "efi": 6,
+    "efw": 4,
+    "ega": 5,
+    "egg": 20,
+    "eks": 9,
+    "eoa": 2,
+    "eon": 8,
+    "epc": 3,
+    "epi": 2,
+    "epo": 10,
+    "epp": 12,
+    "ero": 7,
+    "ery": 11,
+    "esk": 2,
+    "esw": 15,
+    "etg": 1,
+    "etp": 23,
+    "etw": 9,
+    "euw": 1,
+    "ewe": 7,
+    "ewo": 2,
+    "ews": 5,
+    "eyc": 7,
+    "eyg": 1,
+    "eyo": 4,
+    "eyp": 1,
+    "eyr": 5,
+    "fau": 1,
+    "fed": 4,
+    "fey": 1,
+    "ffl": 1,
+    "ffp": 2,
+    "ffw": 3,
+    "fno": 1,
+    "fpa": 2,
+    "fsm": 1,
+    "fua": 3,
+    "fuu": 2,
+    "fwi": 8,
+    "gal": 2,
+    "gep": 5,
+    "gew": 3,
+    "gfr": 1,
+    "ggp": 10,
+    "gna": 7,
+    "goa": 5,
+    "goy": 3,
+    "gpa": 5,
+    "gpl": 5,
+    "gro": 4,
+    "gsw": 5,
+    "gwi": 8,
+    "gän": 1,
+    "haj": 1,
+    "hak": 6,
+    "hal": 3,
+    "han": 10,
+    "hap": 3,
+    "hav": 2,
+    "hbe": 6,
+    "hbr": 11,
+    "hbu": 5,
+    "hca": 5,
+    "hch": 30,
+    "hck": 1,
+    "hcu": 10,
+    "hda": 2,
+    "hdj": 2,
+    "hea": 4,
+    "hed": 6,
+    "hfa": 1,
+    "hfr": 5,
+    "hga": 22,
+    "hgl": 2,
+    "hha": 6,
+    "hhe": 5,
+    "hho": 2,
+    "hhu": 1,
+    "hio": 1,
+    "hit": 7,
+    "hiw": 9,
+    "hka": 1,
+    "hle": 4,
+    "hlo": 1,
+    "hoc": 17,
+    "hpa": 11,
+    "hpe": 6,
+    "hpo": 11,
+    "hpr": 2,
+    "hpu": 5,
+    "hra": 4,
+    "hsc": 6,
+    "hse": 11,
+    "hsh": 5,
+    "hsw": 4,
+    "htu": 4,
+    "htz": 1,
+    "hva": 5,
+    "hve": 13,
+    "hwi": 30,
+    "hyo": 2,
+    "icb": 2,
+    "ida": 5,
+    "ihb": 1,
+    "imp": 2,
+    "inv": 2,
+    "ipc": 5,
+    "ipe": 5,
+    "iph": 1,
+    "ipj": 1,
+    "ipm": 2,
+    "ipp": 7,
+    "irt": 1,
+    "ish": 37,
+    "isv": 1,
+    "iwi": 18,
+    "ked": 34,
+    "kef": 4,
+    "kep": 2,
+    "kes": 21,
+    "kew": 5,
+    "kgr": 1,
+    "kin": 9,
+    "kmi": 2,
+    "kpe": 5,
+    "kst": 7,
+    "kwh": 4,
+    "kwi": 10,
+    "laa": 2,
+    "laz": 2,
+    "ldg": 9,
+    "lee": 9,
+    "lel": 5,
+    "leo": 2,
+    "lev": 5,
+    "ley": 6,
+    "lkr": 1,
+    "lls": 7,
+    "lnw": 2,
+    "lof": 1,
+    "lpe": 7,
+    "lsi": 2,
+    "lso": 6,
+    "lsw": 1,
+    "lue": 4,
+    "lve": 1,
+    "lwi": 14,
+    "mal": 13,
+    "mbs": 3,
+    "mch": 3,
+    "mcr": 2,
+    "meg": 1,
+    "mep": 4,
+    "mew": 2,
+    "mki": 2,
+    "mno": 2,
+    "mok": 6,
+    "mpk": 7,
+    "mps": 1,
+    "mro": 2,
+    "mwi": 12,
+    "naw": 6,
+    "ndv": 6,
+    "ndy": 3,
+    "new": 10,
+    "nfl": 2,
+    "nga": 2,
+    "ngf": 1,
+    "ngä": 1,
+    "nha": 1,
+    "nid": 5,
+    "nio": 16,
+    "niw": 4,
+    "nle": 7,
+    "nti": 8,
+    "nts": 1,
+    "ntw": 1,
+    "nut": 46,
+    "nve": 4,
+    "nwi": 24,
+    "oal": 4,
+    "obu": 2,
+    "oco": 54,
+    "oes": 24,
+    "ofi": 3,
+    "ofk": 1,
+    "ofu": 11,
+    "ogu": 32,
+    "ois": 2,
+    "okm": 1,
+    "okw": 2,
+    "ome": 2,
+    "omo": 4,
+    "omr": 2,
+    "onl": 5,
+    "onw": 6,
+    "oom": 10,
+    "oor": 1,
+    "ope": 2,
+    "opp": 7,
+    "otc": 12,
+    "otg": 7,
+    "oth": 20,
+    "our": 13,
+    "ove": 6,
+    "owi": 8,
+    "oyo": 4,
+    "pat": 10,
+    "pbe": 7,
+    "pbu": 5,
+    "pch": 4,
+    "pcr": 5,
+    "pea": 34,
+    "pep": 12,
+    "pge": 4,
+    "phi": 3,
+    "phl": 1,
+    "pja": 1,
+    "pka": 2,
+    "pki": 8,
+    "pla": 27,
+    "ple": 27,
+    "pop": 6,
+    "ppl": 27,
+    "ppy": 6,
+    "pra": 2,
+    "psa": 51,
+    "puf": 2,
+    "pum": 9,
+    "pur": 2,
+    "pyc": 2,
+    "pyr": 1,
+    "rai": 3,
+    "rco": 1,
+    "rdn": 1,
+    "rdp": 1,
+    "rds": 2,
+    "red": 7,
+    "ret": 1,
+    "rew": 1,
+    "rex": 1,
+    "rim": 2,
+    "rip": 14,
+    "rks": 5,
+    "rkw": 5,
+    "rlh": 2,
+    "rni": 20,
+    "roo": 10,
+    "row": 2,
+    "rpe": 1,
+    "rro": 25,
+    "rsl": 6,
+    "rsm": 1,
+    "rsn": 5,
+    "rss": 1,
+    "rsv": 1,
+    "rtc": 3,
+    "ruf": 1,
+    "rug": 9,
+    "rui": 20,
+    "ruk": 1,
+    "rum": 2,
+    "rwi": 7,
+    "ryb": 3,
+    "ryc": 22,
+    "ryp": 7,
+    "ryw": 13,
+    "ryy": 11,
+    "sed": 13,
+    "sew": 5,
+    "sgr": 2,
+    "sha": 4,
+    "she": 16,
+    "shr": 12,
+    "shs": 6,
+    "ske": 4,
+    "sle": 8,
+    "smo": 6,
+    "smu": 1,
+    "sni": 5,
+    "spb": 7,
+    "ssr": 5,
+    "stw": 6,
+    "sty": 4,
+    "sug": 2,
+    "sve": 3,
+    "swe": 20,
+    "swi": 37,
+    "tac": 2,
+    "tao": 6,
+    "taw": 19,
+    "tce": 1,
+    "tcr": 11,
+    "tdu": 2,
+    "teb": 10,
+    "tec": 5,
+    "ted": 7,
+    "teo": 5,
+    "tgi": 7,
+    "thb": 43,
+    "thc": 44,
+    "the": 11,
+    "thf": 6,
+    "thg": 29,
+    "thh": 14,
+    "thl": 14,
+    "thp": 35,
+    "tht": 23,
+    "thv": 18,
+    "thw": 22,
+    "tie": 10,
+    "tih": 2,
+    "til": 7,
+    "toc": 33,
+    "toe": 25,
+    "too": 1,
+    "tos": 28,
+    "tow": 4,
+    "try": 3,
+    "tsg": 1,
+    "tso": 13,
+    "tuf": 4,
+    "twi": 20,
+    "tyl": 3,
+    "tza": 1,
+    "uck": 5,
+    "ueb": 2,
+    "uff": 8,
+    "ugo": 2,
+    "ugu": 7,
+    "uke": 1,
+    "umb": 3,
+    "umk": 2,
+    "umo": 1,
+    "unc": 4,
+    "unt": 1,
+    "upb": 6,
+    "upe": 2,
+    "upg": 5,
+    "uph": 3,
+    "upi": 6,
+    "upk": 3,
+    "upl": 4,
+    "upr": 1,
+    "ups": 54,
+    "urd": 9,
+    "urv": 1,
+    "urw": 1,
+    "ush": 10,
+    "usw": 3,
+    "utb": 1,
+    "utc": 16,
+    "utp": 6,
+    "utw": 3,
+    "uun": 2,
+    "uwi": 1,
+    "veb": 1,
+    "ver": 6,
+    "vet": 1,
+    "wbe": 16,
+    "wee": 20,
+    "whe": 4,
+    "whi": 6,
+    "wis": 6,
+    "wlw": 5,
+    "wok": 4,
+    "wso": 5,
+    "wti": 2,
+    "yap": 4,
+    "yaw": 3,
+    "ybe": 4,
+    "yca": 11,
+    "yco": 3,
+    "ycu": 2,
+    "ygi": 1,
+    "yle": 5,
+    "ymu": 2,
+    "yog": 32,
+    "ypi": 2,
+    "ypo": 5,
+    "ypu": 1,
+    "ysa": 8,
+    "ysc": 6,
+    "ysk": 3,
+    "yso": 2,
+    "ywi": 13,
+    "yyo": 11,
+    "zat": 1,
+    "zed": 2,
+    "zen": 4
+  },
+  "funcDe": [
+    "mit",
+    "und",
+    "auf",
+    "von",
+    "vom",
+    "nach",
+    "in",
+    "an",
+    "zu",
+    "aus",
+    "bei",
+    "für",
+    "über",
+    "unter"
+  ],
+  "funcEn": [
+    "with",
+    "and",
+    "on",
+    "from",
+    "the",
+    "of",
+    "in",
+    "a",
+    "an",
+    "to",
+    "at",
+    "by",
+    "for"
+  ]
+};
+
+;// ./src/lang/splitter.js
+
+
+
+
+
+
+
+
+function splitLanguage(text, options = {}) {
+    if (!text) return { de: '', en: '', raw: '', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, label: 'fallback', notes: [] };
+
+    const { text: normText, notes } = normalize(text);
+
+    const tplResult = matchTemplate(normText);
+    if (tplResult) {
+        tplResult.raw = '• ' + text;
+        tplResult.notes = notes;
+        return tplResult;
+    }
+
+    const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
+
+    const courses = segment(normText);
+
+    // Resolve anchor-less boundaries (Layer 3)
+    for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        if (!course.anchored && course.en) {
+            if (langModel.scoreLang(course.en) > 0) {
+                const { enPart, deCut } = resolveBoundary(course.en, langModel);
+                if (deCut) {
+                    if (course.mono) {
+                        course.en = enPart;
+                        course.de = deCut;
+                        course.mono = false;
+                    } else {
+                        courses[i].en = enPart;
+                        courses.splice(i + 1, 0, {
+                            de: deCut,
+                            en: deCut,
+                            mono: true,
+                            anchored: false
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    const deParts = [];
+    const enParts = [];
+
+    for (const course of courses) {
+        const dePart = course.de;
+        const enPart = course.en;
+        deParts.push(dePart);
+        enParts.push(enPart);
+    }
+
+    if (deParts.length > 3 || enParts.length > 3) {
+        const formattedRaw = '• ' + text.replace(/(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?=\S)(?!\s*\/)/g, '($1)\n• ').replace(/^• • /, '• ');
+        return { de: formattedRaw, en: formattedRaw, raw: formattedRaw, label: 'fallback', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, notes };
+    }
+
+    const de = deParts.length > 0 ? '• ' + deParts.join('\n• ') : '';
+    const en = enParts.length > 0 ? '• ' + enParts.join('\n• ') : '';
+    const raw = de;
+
+    const { confidence, subScores, label } = scoreSplit({ courses, notes, raw: normText, langModel });
+
+    const noteText = notes.length > 0 ? '\n' + notes.join(' ') : '';
+    return { de: de + noteText, en: en + noteText, raw: raw + noteText, confidence, subScores, label, notes };
+}
+
+;// ./src/utils.js
 
 
 function getISOWeek(date) {
@@ -4750,7 +6423,7 @@ function getWeekYear(d) {
  * @returns {string} Translated day name
  */
 function translateDay(englishDay) {
-    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en') return englishDay;
+    if (state/* langMode */.Kl === 'en') return englishDay;
     const map = { Monday: 'Montag', Tuesday: 'Dienstag', Wednesday: 'Mittwoch', Thursday: 'Donnerstag', Friday: 'Freitag', Saturday: 'Samstag', Sunday: 'Sonntag' };
     return map[englishDay] || englishDay;
 }
@@ -4797,368 +6470,14 @@ function getRelativeTime(date) {
 }
 
 // === Language Filter (FR-100) ===
-const DE_STEMS = [
-    // Core German food nouns
-    'apfel', 'aubergine', 'auflauf', 'beere', 'blumenkohl', 'bohne', 'braten', 'brokkoli', 'brot', 'brust',
-    'brötchen', 'butter', 'chili', 'dessert', 'dip', 'eier', 'eintopf', 'eis', 'erbse', 'erdbeer',
-    'essig', 'filet', 'fisch', 'fisole', 'fleckerl', 'fleisch', 'flügel', 'frucht', 'für', 'gebraten',
-    'gemüse', 'gewürz', 'gratin', 'grieß', 'gulasch', 'gurke', 'himbeer', 'honig', 'huhn', 'hähnchen',
-    'joghurt', 'karotte', 'kartoffel', 'keule', 'kirsch', 'knacker', 'knoblauch', 'knödel', 'kompott',
-    'kraut', 'kräuter', 'kuchen', 'käse', 'kürbis', 'lauch', 'mandel', 'milch', 'mild', 'mit',
-    'mohn', 'most', 'möhre', 'natur', 'nockerl', 'nudel', 'nuss', 'nuß', 'obst', 'oder',
-    'olive', 'paprika', 'pfanne', 'pfannkuchen', 'pfeffer', 'pikant', 'pilz', 'plunder', 'püree', 'ragout',
-    'rahm', 'reis', 'rind', 'sahne', 'salami', 'salat', 'salz', 'sauer', 'scharf', 'schinken',
-    'schnitte', 'schnitzel', 'schoko', 'schupf', 'schwein', 'sellerie', 'senf', 'sosse', 'soße', 'spargel',
-    'spätzle', 'speck', 'spieß', 'spinat', 'steak', 'suppe', 'süß', 'tofu', 'tomate', 'topfen',
-    'torte', 'trüffel', 'und', 'vanille', 'vogerl', 'vom', 'wien', 'wurst', 'zucchini', 'zum',
-    'zur', 'zwiebel', 'öl',
-    // Expanded: German participles & cooking methods
-    'paniert', 'gegrillt', 'geräuchert', 'frittiert', 'gedünstet', 'überbacken', 'gekocht', 'gefüllt',
-    'geschmort', 'garniert', 'mariniert', 'püriert', 'gewürzt', 'gesalzen', 'gehackt', 'gerieben',
-    'gewürfelt', 'passiert', 'gestreift', 'glasiert', 'gratiniert', 'pochiert', 'durchgebraten',
-    // Expanded: German meat & sausage
-    'bratwurst', 'currywurst', 'leberkäse', 'fleischkäse', 'puten', 'hack', 'frikadelle', 'bulette',
-    'klöß', 'würstchen', 'brühwurst', 'leberwurst', 'mettwurst', 'blutwurst', 'roulade',
-    'brustfilet', 'lenden', 'bauch', 'kotelett', 'schulter', 'nacken', 'haxe', 'eisbein',
-    // Expanded: German fish & seafood
-    'lachs', 'backfisch', 'seelachs', 'forelle', 'karpfen', 'zander', 'hecht', 'makrele', 'hering',
-    'kabeljau', 'scholle', 'rotbarsch', 'thunfisch', 'fischstäbchen',
-    // Expanded: German sides & starches
-    'pommes', 'bratkartoffel', 'röstkartoffel', 'schupfnudel', 'bandnudel', 'fingernudel',
-    'semmelknödel', 'kartoffelbrei', 'kartoffelpüree', 'kartoffelsalat', 'püree',
-    'reis', 'nudel', 'spaghetti', 'lasagne', 'tortellini', 'ravioli', 'gnocchi', 'polenta', 'risotto',
-    'spätzle', 'knödel',
-    // Expanded: German vegetables & legumes
-    'champignon', 'linsen', 'mais', 'erbsen', 'bohnen', 'kichererbse', 'schwarzwurzel',
-    'rotkohl', 'weißkohl', 'wirsing', 'mangold', 'fenchel', 'rettich', 'meerrettich', 'kren',
-    'spinat', 'blumenkohl', 'brokkoli', 'sellerie', 'spargel', 'pilz', 'zucchini', 'lauch',
-    'quark', 'schmand', 'buttermilch', 'dinkel', 'roggen', 'hafer', 'gerste',
-    'gurke', 'tomate', 'karotte', 'zwiebel', 'knoblauch', 'paprika', 'kürbis',
-    // Expanded: German food adjectives
-    'knusprig', 'saftig', 'deftig', 'würzig', 'herzhaft', 'cremig', 'sämig', 'fein',
-    'frisch', 'hausgemacht', 'handgemacht', 'selbstgemacht', 'gemischt', 'klassisch',
-    'bayerisch', 'fränkisch', 'steirisch', 'tiroler', 'salzburger', 'münchner',
-    'thüringer', 'wiener', 'griechisch', 'österreichisch', 'asiatisch', 'indisch',
-    'kalorienarm', 'fettreduziert', 'vegetarisch', 'vegan', 'regional', 'saisonal',
-    // Expanded: German herbs & seasoning
-    'dill', 'petersil', 'schnittlauch', 'majoran', 'thymian', 'rosmarin', 'lorbeer',
-    'basilikum', 'oregano', 'kümmel', 'anis', 'zimt', 'nelke', 'muskat',
-    'preiselbeer', 'apfelmus', 'ketchup', 'mayonnaise', 'mostrich', 'senf',
-    // Expanded: German meal structure
-    'portion', 'beilage', 'hauptgericht', 'vorspeise', 'nachspeise', 'nachtisch',
-    'stück', 'teller', 'schale', 'becher', 'flasche', 'glas', 'suppe', 'salat',
-    // Expanded: German-specific compounds
-    'rind', 'schwein', 'huhn', 'puten', 'lamm', 'kalb', 'wild', 'hirsch', 'reh',
-    'frikassee', 'ragout', 'gulasch', 'eintopf', 'braten', 'roulade', 'geschnetzeltes',
-    'rahm', 'sahne', 'schmand', 'topfen', 'quark', 'käse', 'milch',
-    // Expanded: German desserts & baked goods
-    'kuchen', 'torte', 'strudel', 'baiser', 'mousse', 'sorbet', 'pudding',
-    'palatschinke', 'grieß', 'striezel', 'kipferl', 'buchtel', 'germknödel',
-    'schoko', 'nuss', 'mandel', 'marzipan', 'nougat',
-    // Expanded: Common German words in menus
-    'achtung', 'hinweis', 'allergen', 'kennzeichnung', 'auslobung', 'enthält',
-    'älter', 'aktuell', 'täglich', 'wöchentlich', 'monatlich',
-    // Expanded: Austrian/German food words & compounds
-    'punsch', 'würfel', 'gebäck', 'weiß', 'schöberl', 'würstel',
-    'blätter', 'brösel', 'gröstl', 'erdäpfel', 'schmarren',
-    'hühner', 'müsli', 'jäger', 'rüben', 'kernöl', 'laibchen',
-    'soja', 'erdnuss', 'pizza', 'grün', 'königsberg', 'thailänd',
-    // Expanded: German ASCII words (no umlaut, common in Bessa data)
-    'spaetzle', 'frittaten', 'semmel', 'kohlrabi', 'melanzani',
-    'ananas', 'bananen', 'zitronen', 'saure', 'einlage', 'buchstaben',
-    'klein', 'rucola', 'cous', 'mini', 'lasagna', 'creme', 'kokos',
-    'auf', 'von', 'menü',
-    'gebacken', 'gelb', 'klar', 'orangen', 'garnelen', 'graupen',
-];
 
-const EN_STEMS = [
-    'almond', 'and', 'apple', 'asparagus', 'bacon', 'baked', 'ball', 'bean', 'beef', 'berry',
-    'bread', 'breast', 'broccoli', 'bun', 'cabbage', 'cake', 'caper', 'carrot', 'casserole',
-    'cauliflower', 'celery', 'cheese', 'cherry', 'chicken', 'choco', 'chocolate', 'cider', 'cilantro',
-    'coffee', 'compote', 'cream', 'cucumber', 'curd', 'danish', 'dumpling', 'egg',
-    'eggplant', 'fish', 'for', 'fried', 'from', 'fruit', 'garlic', 'goulash',
-    'ham', 'herb', 'honey', 'hot', 'ice', 'jambalaya', 'leek', 'leg', 'mash', 'meat',
-    'mexican', 'milk', 'mint', 'mushroom', 'mustard', 'noodle', 'nut', 'oat', 'oil',
-    'onion', 'or', 'oven', 'pan', 'pancake', 'pea', 'pepper', 'plain', 'plate',
-    'poppy', 'pork', 'potato', 'pumpkin', 'radish', 'raspberry', 'rice', 'roast', 'roll',
-    'salad', 'salt', 'sauce', 'sausage', 'shrimp', 'skewer', 'slice', 'soup', 'sour',
-    'spice', 'spicy', 'spinach', 'stew', 'strawberr', 'strawberry', 'strudel', 'sweet', 'tart',
-    'thyme', 'to', 'tomat', 'tomato', 'truffle', 'trukey', 'turkey', 'vanilla', 'vegan',
-    'vegetable', 'vinegar', 'wedge', 'wing', 'with', 'wok', 'yogurt',
-    // Expanded: English cooking methods
-    'grilled', 'roasted', 'smoked', 'steamed', 'poached', 'braised', 'stuffed', 'breaded',
-    'ground', 'minced', 'sliced', 'diced', 'chopped', 'mashed', 'whipped', 'seasoned',
-    'barbecued', 'charred', 'seared', 'toasted', 'broiled', 'blanched', 'scrambled',
-    // Expanded: English food descriptors
-    'crispy', 'crunchy', 'creamy', 'fluffy', 'tender', 'juicy', 'flavorful', 'savory',
-    'zesty', 'tangy', 'smoky', 'buttery', 'spiced', 'herbed', 'glazed', 'pickled',
-    'fresh', 'local', 'organic', 'seasonal', 'traditional', 'homestyle', 'hearty',
-    'light', 'rich', 'golden', 'garden', 'farm', 'country', 'rustic',
-    // Expanded: English meal categories
-    'appetizer', 'starter', 'entree', 'main', 'side', 'beverage', 'drink',
-    'breakfast', 'lunch', 'dinner', 'supper', 'brunch', 'buffet', 'special',
-    'choice', 'selection', 'variety', 'assorted', 'combination', 'featured',
-    // Expanded: English meat & fish
-    'brisket', 'chop', 'cutlet', 'fillet', 'ribs', 'steakhouse', 'jerky', 'pulled',
-    'salmon', 'tuna', 'cod', 'halibut', 'bass', 'trout', 'catfish', 'tilapia',
-    'lobster', 'crab', 'clam', 'mussel', 'oyster', 'scallop', 'shrimp',
-    // Expanded: English international dishes
-    'burger', 'burrito', 'taco', 'quesadilla', 'nachos', 'fajita', 'enchilada',
-    'curry', 'stirfry', 'chowder', 'bisque', 'gumbo', 'jambalaya', 'bouillon',
-    'gravy', 'broth', 'stock', 'marinade', 'vinaigrette', 'dressing',
-    // Expanded: English soups & stews
-    'chowder', 'bisque', 'gumbo', 'bouillon', 'consomme', 'minestrone', 'gazpacho',
-    // Expanded: English dairy & grains
-    'cheddar', 'mozzarella', 'parmesan', 'provolone', 'gouda', 'swiss', 'bluecheese',
-    'feta', 'creamcheese', 'cottagecheese', 'sourcream',
-    'pasta', 'spaghetti', 'fettuccine', 'linguine', 'penne', 'rigatoni', 'macaroni',
-    'couscous', 'quinoa', 'barley', 'farro', 'bulgur', 'semolina',
-    // Expanded: English condiments
-    'ketchup', 'mustard', 'mayonnaise', 'relish', 'salsa', 'guacamole', 'pesto',
-    'hummus', 'tahini', 'tzatziki', 'aioli', 'remoulade',
-    // Expanded: English adjectives for menus
-    'daily', 'weekly', 'special', 'featured', 'popular', 'signature', 'classic',
-    'traditional', 'contemporary', 'modern', 'spicy', 'mild', 'hot', 'warm',
-    'chilled', 'iced', 'cold', 'roomtemperature',
-    // Expanded: English utility words
-    'from', 'with', 'and', 'for', 'or', 'to', 'in', 'on', 'of', 'all',
-    'your', 'our', 'the', 'a', 'an', 'per', 'each', 'every',
-    'choose', 'select', 'add', 'extra', 'share', 'enjoy',
-    // Expanded: English foods, adjectives & descriptors
-    'lemon', 'garnish', 'patties', 'corn', 'indian', 'ginger',
-    'green', 'cubes', 'spring', 'white', 'pineapple', 'apricot',
-    'cordon', 'bleu', 'chickpea', 'seed', 'dip', 'punch',
-    'banana', 'pizza', 'mango', 'bowl', 'butter',
-    'millet', 'parsley', 'fennel', 'arugula', 'basil', 'red',
-    'lentil', 'parsnip', 'stripes',
-    'cous', 'mini', 'lasagna', 'menu',
-    'buckwheat', 'sheep', 'lime', 'bell', 'caramel', 'dough',
-    'clear', 'dripping', 'orange',
-];
 
-const BOTH_SET = new Set(DE_STEMS.filter(w => EN_STEMS.includes(w)));
-const DE_SET = new Set(DE_STEMS);
-const EN_SET = new Set(EN_STEMS);
-const DE_REGEX = new RegExp(DE_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
-const EN_REGEX = new RegExp(EN_STEMS.slice().sort((a, b) => b.length - a.length).join('|'), 'g');
 
-function splitLanguage(text) {
-    if (!text) return { de: '', en: '', raw: '' };
-
-    const raw = text;
-    let formattedRaw = text.replace(/(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?=\S)(?!\s*\/)/g, '($1)\n• ');
-    if (!formattedRaw.startsWith('• ')) {
-        formattedRaw = '• ' + formattedRaw;
-    }
-
-    function scoreBlock(wordArray) {
-        let de = 0, en = 0;
-        wordArray.forEach(word => {
-            const w = word.toLowerCase().replace(/[^a-zäöüß]/g, '');
-            if (w) {
-                // Skip neutral words that appear in both languages equally
-                if (BOTH_SET.has(w)) return;
-
-                let bestDeMatch = 0;
-                let bestEnMatch = 0;
-                if (DE_SET.has(w)) bestDeMatch = w.length;
-                else {
-                    const deMatch = w.match(DE_REGEX);
-                    if (deMatch) deMatch.forEach(m => { if (m.length > bestDeMatch) bestDeMatch = m.length; });
-                }
-
-                if (EN_SET.has(w)) bestEnMatch = w.length;
-                else {
-                    const enMatch = w.match(EN_REGEX);
-                    if (enMatch) enMatch.forEach(m => { if (m.length > bestEnMatch) bestEnMatch = m.length; });
-                }
-
-                if (bestDeMatch > 0) de += (bestDeMatch / w.length);
-                if (bestEnMatch > 0) en += (bestEnMatch / w.length);
-
-                // Capitalization bonus: only for words with German-specific features
-                if (/^[A-ZÄÖÜ]/.test(word) && word.length >= 4) {
-                    const w_lower = word.toLowerCase();
-                    // German noun/adjective suffixes
-                    if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
-                        de += 0.3;
-                    } else if (/[äöüß]/.test(w_lower)) {
-                        de += 0.15;
-                    }
-                }
-            }
-        });
-        return { de, en };
-    }
-
-    function heuristicSplitEnDe(fragment) {
-        const words = fragment.trim().split(/\s+/);
-        if (words.length < 2) return { enPart: fragment, nextDe: '' };
-
-        let bestK = -1;
-        let maxScore = -9999;
-
-        for (let k = 1; k < words.length; k++) {
-            const left = words.slice(0, k);
-            const right = words.slice(k);
-
-            const leftScore = scoreBlock(left);
-            const rightScore = scoreBlock(right);
-
-            const rightFirstWord = right[0];
-            let capitalBonus = 0;
-            if (/^[A-ZÄÖÜ]/.test(rightFirstWord) && rightFirstWord.length >= 4) {
-                // Only give bonus if the capitalized word looks German
-                const w_lower = rightFirstWord.toLowerCase();
-                if (DE_SET.has(w_lower) || DE_REGEX.test(w_lower)) {
-                    capitalBonus = 0.3;
-                } else if (/(?:ung|keit|heit|chen|lein|schaft|tum|nis|ling|lich|ig|bar|sam|haft|los)$/.test(w_lower)) {
-                    capitalBonus = 0.3;
-                } else if (/[äöüß]/.test(w_lower)) {
-                    capitalBonus = 0.2;
-                }
-            }
-
-            const score = (leftScore.en - leftScore.de) + (rightScore.de - rightScore.en) + capitalBonus;
-
-            const leftLooksEnglish = (leftScore.en > leftScore.de) && (leftScore.en > 0);
-            const rightLooksGerman = (rightScore.de + capitalBonus) > rightScore.en;
-
-            if (leftLooksEnglish && rightLooksGerman && score > maxScore) {
-                maxScore = score;
-                bestK = k;
-            }
-        }
-
-        // Minimum confidence threshold — avoid false splits
-        const MIN_SPLIT_CONFIDENCE = 1.5;
-        if (bestK !== -1 && maxScore > MIN_SPLIT_CONFIDENCE) {
-            return {
-                enPart: words.slice(0, bestK).join(' '),
-                nextDe: words.slice(bestK).join(' ')
-            };
-        }
-        return { enPart: fragment, nextDe: '' };
-    }
-
-    const allergenRegex = /(.*?)(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*(?!\s*[/])/g;
-    let match;
-    const rawCourses = [];
-    let lastScanIndex = 0;
-
-    while ((match = allergenRegex.exec(text)) !== null) {
-        if (match.index > lastScanIndex) {
-            rawCourses.push(text.substring(lastScanIndex, match.index).trim());
-        }
-        rawCourses.push(match[0].trim());
-        lastScanIndex = allergenRegex.lastIndex;
-    }
-    if (lastScanIndex < text.length) {
-        rawCourses.push(text.substring(lastScanIndex).trim());
-    }
-    if (rawCourses.length === 0 && text.trim() !== '') {
-        rawCourses.push(text.trim());
-    }
-
-    const deParts = [];
-    const enParts = [];
-
-    for (let course of rawCourses) {
-        let courseMatch = course.match(/(.*?)(?:\(|(?:\/|\s|^))([A-Z,]+)\)\s*$/);
-        let courseText = course;
-        let allergenTxt = "";
-        let allergenCode = "";
-
-        if (courseMatch) {
-            courseText = courseMatch[1].trim();
-            allergenCode = courseMatch[2];
-            allergenTxt = ` (${allergenCode})`;
-        }
-
-        const slashParts = courseText.split(/\s*\/\s*(?![A-Z,]+$)/);
-
-        if (slashParts.length >= 2) {
-            // Interleave: part[0] = DE1, part[1] = EN1 (+ optional DE2), part[2] = EN2 (+ optional DE3), ...
-            // Collect DE and EN courses separately
-            const dePartsThis = [slashParts[0].trim()];
-            const enPartsThis = [];
-
-            for (let i = 1; i < slashParts.length; i++) {
-                const part = slashParts[i].trim();
-                const splitResult = heuristicSplitEnDe(part);
-
-                if (splitResult.nextDe) {
-                    // Front is EN, back is DE (e.g., "Soup" + "Salat")
-                    enPartsThis.push(splitResult.enPart);
-                    dePartsThis.push(splitResult.nextDe);
-                } else if (i === slashParts.length - 1) {
-                    // Last part: if multi-word with capitalized last word not purely English,
-                    // split last word as DE course (e.g., "Salad Dessert" → EN="Salad", DE="Dessert")
-                    const words = part.split(/\s+/);
-                    if (words.length >= 2 && /^[A-ZÄÖÜ]/.test(words[words.length - 1]) && words[words.length - 1].length >= 3) {
-                        const deGuess = words[words.length - 1];
-                        const w = deGuess.toLowerCase().replace(/[^a-zäöüß]/g, '');
-                        if (!(EN_SET.has(w) && !DE_SET.has(w))) {
-                            enPartsThis.push(words.slice(0, -1).join(' '));
-                            dePartsThis.push(deGuess);
-                            continue;
-                        }
-                    }
-                    // Default: this part is pure EN
-                    enPartsThis.push(part);
-                } else {
-                    enPartsThis.push(part);
-                }
-            }
-
-            // Pair DE/EN courses by index
-            const pairCount = Math.min(dePartsThis.length, enPartsThis.length);
-            for (let i = 0; i < pairCount; i++) {
-                const deP = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
-                const enP = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
-                deParts.push(deP);
-                enParts.push(enP);
-            }
-            // Unpaired surplus courses → duplicate to both
-            for (let i = pairCount; i < dePartsThis.length; i++) {
-                const p = dePartsThis[i].includes(allergenTxt.trim()) ? dePartsThis[i] : dePartsThis[i] + allergenTxt;
-                deParts.push(p);
-                enParts.push(p);
-            }
-            for (let i = pairCount; i < enPartsThis.length; i++) {
-                const p = enPartsThis[i].includes(allergenTxt.trim()) ? enPartsThis[i] : enPartsThis[i] + allergenTxt;
-                deParts.push(p);
-                enParts.push(p);
-            }
-        } else {
-            const heuristicSplit = heuristicSplitEnDe(courseText);
-            if (heuristicSplit.nextDe) {
-                enParts.push(heuristicSplit.enPart + allergenTxt);
-                deParts.push(heuristicSplit.nextDe + allergenTxt);
-            } else {
-                deParts.push(courseText + allergenTxt);
-                enParts.push(courseText + allergenTxt);
-            }
-        }
-    }
-
-    let deJoined = deParts.join('\n• ');
-    if (deParts.length > 0 && !deJoined.startsWith('• ')) deJoined = '• ' + deJoined;
-
-    let enJoined = enParts.join('\n• ');
-    if (enParts.length > 0 && !enJoined.startsWith('• ')) enJoined = '• ' + enJoined;
-
-    return {
-        de: deJoined,
-        en: enJoined,
-        raw: formattedRaw
-    };
-}
 
 function getLocalizedText(text) {
-    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'all') return text || '';
+    if (state/* langMode */.Kl === 'all') return text || '';
     const split = splitLanguage(text);
-    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en') return split.en || split.raw;
+    if (state/* langMode */.Kl === 'en') return split.en || split.raw;
     return split.de || split.raw;
 }
 
@@ -5269,9 +6588,9 @@ function injectUI() {
         <header class="app-header">
             <div class="header-content">
                 <div class="brand">
-                    <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
+                    <img src="data:image/png;base64,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" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.8.10</small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -5421,7 +6740,7 @@ function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}}</span>
+                        <strong>Aktuell:</strong> <span id="version-current">v1.8.10</span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -5509,8 +6828,8 @@ var constants = __webpack_require__(521);
 var api = __webpack_require__(672);
 // EXTERNAL MODULE: ./src/i18n.js
 var i18n = __webpack_require__(646);
-// EXTERNAL MODULE: ./src/utils.js
-var utils = __webpack_require__(413);
+// EXTERNAL MODULE: ./src/utils.js + 8 modules
+var utils = __webpack_require__(759);
 ;// ./src/events.js
 
 
