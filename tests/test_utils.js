@@ -31,8 +31,29 @@ const sandbox = {
 // 2. Load Source Code
 const utilsPath = path.join(__dirname, '..', 'src', 'utils.js');
 const utilsCode = fs.readFileSync(utilsPath, 'utf8');
+
+// Load lang modules
+function cleanSrc(src) {
+  return src.replace(/export {.*?}.*?;/g, '')
+            .replace(/export /g,'')
+            .replace(/import .*? from .*?;/g,'')
+            .replace(/^(const|let) /gm,'var ');
+}
+
+const langCode = 
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/types.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/normalize.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/templates.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModel.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModelSeed.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/segment.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/boundary.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/score.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/splitter.js'),'utf8'));
+
 // Strip exports and imports for vm
-const cleanedUtilsCode = utilsCode
+const cleanedUtilsCode = langCode + '\n' + utilsCode
+    .replace(/export {.*?}.*?;/g, '')
     .replace(/export /g, '')
     .replace(/import .*? from .*?;/g, '');
 
@@ -178,6 +199,19 @@ assertEquals(englishOnly.en, '• Grilled Chicken Salad', "English only not spli
 const multiGerman = sandbox.splitLanguage("Schnitzel (A) Pommes (B) Salat (C)");
 assertEquals(multiGerman.de, '• Schnitzel (A)\n• Pommes (B)\n• Salat (C)', "Multi-course pure German (DE)");
 assertEquals(multiGerman.en, '• Schnitzel (A)\n• Pommes (B)\n• Salat (C)', "Multi-course pure German (EN)");
+
+// NEW: Broken allergen repair preserved through pipeline
+const brokenAllergen = sandbox.splitLanguage("Beef soup with egg pancakes/ACLM) Main dish(G)");
+assert(brokenAllergen.de.includes('(ACLM)'), "Broken allergen repaired in de output");
+assert(!brokenAllergen.de.includes('/ACLM)'), "Broken slash-allergen gone from de output");
+
+// NEW: Non-allergen paren preserved
+const stroganoff = sandbox.splitLanguage("Boeuf Stroganoff(Beef) mit Spätzle / Beef stroganoff with spaetzle(ACGLM)");
+assert(stroganoff.de.includes('(Beef)'), "Non-allergen paren preserved in de");
+
+// NEW: Note parking — note not in course text
+const withNote = sandbox.splitLanguage("Kürbiscremesuppe / Pumpkin cream Achtung Änderung Grillhendl (A)");
+assert(!withNote.de.includes('Achtung Änderung') || withNote.notes.length > 0, "Note parked or absent from de");
 
 // --- Test getLocalizedText ---
 console.log("Testing getLocalizedText...");

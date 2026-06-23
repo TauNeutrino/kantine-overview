@@ -206,7 +206,25 @@ async function main() {
   buildStandalone();
   const { JS_MIN, CSS_ESC } = await buildBookmarklet();
   buildInstaller(JS_MIN, CSS_ESC);
-  
+
+  // Smoke check: verify baked language model made it into the bundle
+  const bundleContent = fs.readFileSync(path.join(DIST, 'kantine.bundle.js'), 'utf8');
+  if (!bundleContent.includes('trigramsDe')) {
+    console.error('❌ SMOKE FAIL: baked model (trigramsDe) not found in bundle');
+    process.exit(1);
+  }
+  console.log('✓ Smoke check: baked model present in bundle');
+
+  // Size guard: bookmarklet must not grow beyond baseline + 3 KB
+  const BASELINE_BOOKMARKLET_SIZE = 194716;
+  const MAX_GROWTH = 3072;
+  const bookmarkletSize = fs.statSync(path.join(DIST, 'bookmarklet.txt')).size;
+  if (bookmarkletSize > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {
+    console.error(`❌ SIZE GUARD: bookmarklet.txt ${bookmarkletSize} bytes, growth ${bookmarkletSize - BASELINE_BOOKMARKLET_SIZE} > ${MAX_GROWTH}`);
+    process.exit(1);
+  }
+  console.log(`✓ Size guard: ${bookmarkletSize} bytes (growth ${bookmarkletSize - BASELINE_BOOKMARKLET_SIZE}/${MAX_GROWTH})`);
+
   console.log('=== Build Complete ===');
   fs.readdirSync(DIST).forEach(f => {
     const s = fs.statSync(path.join(DIST, f));
