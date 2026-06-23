@@ -1987,3 +1987,10 @@ body {
 [data-theme="dark"] .dev-toggle input[type="checkbox"] {
     accent-color: #60a5fa;
 }
+
+.confidence-badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-left: 4px; cursor: default; }
+.confidence-high { background: rgba(39, 174, 96, 0.25); color: #27ae60; border: 1px solid rgba(39, 174, 96, 0.4); }
+.confidence-medium { background: rgba(243, 156, 18, 0.25); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.4); }
+.confidence-low { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+.confidence-fallback { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
+.confidence-template { background: rgba(52, 152, 219, 0.25); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }

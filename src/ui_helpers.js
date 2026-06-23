@@ -1,5 +1,5 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
-import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText } from './utils.js';
+import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
 import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
@@ -295,6 +295,24 @@ export function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${t('soldOut')}</span>`;
         }
 
+        let confidenceBadge = '';
+        const devMode = localStorage.getItem(LS.DEV_MODE) === 'true';
+        if (devMode) {
+            const split = splitLanguage(item.description || '');
+            const conf = split.confidence != null ? split.confidence : 0;
+            const label = split.label || 'fallback';
+            const sub = split.subScores || {};
+            const tooltipParts = [
+                `score ${conf.toFixed(2)}`,
+                `anchor ${(sub.anchor||0).toFixed(2)}`,
+                `purity ${(sub.purity||0).toFixed(2)}`,
+                `courses ${(sub.course||0).toFixed(2)}`,
+                `coverage ${(sub.coverage||0).toFixed(2)}`
+            ];
+            const tooltip = tooltipParts.join(' · ');
+            confidenceBadge = `<span class="badge confidence-badge confidence-${label}" title="${tooltip}">${label}</span>`;
+        }
+
         let orderedBadge = '';
         if (orderCount > 0) {
             const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
@@ -359,7 +377,7 @@ export function createDayCard(day) {
                 ${cancelButton}
                 ${orderButton}
                 ${flagButton}
-                <div class="badges">${statusBadge}</div>
+                <div class="badges">${statusBadge}${confidenceBadge}</div>
             </div>
             ${tagsHtml}
             <p class="item-desc">${escapeHtml(getLocalizedText(item.description))}</p>`;

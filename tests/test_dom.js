@@ -83,7 +83,8 @@ const html = `
 log("Reading file jsCode...");
 const jsCode = fs.readFileSync('dist/kantine.bundle.js', 'utf8')
     .replace('if (window.__KANTINE_LOADED) {', 'if (false) {')
-    .replace('window.location.reload();', 'window.__RELOAD_CALLED = true;');
+    .replace('window.location.reload();', 'window.__RELOAD_CALLED = true;')
+    .replace('function createDayCard(day) {', 'window.createDayCard = function(day) {');
 
 log("Instantiating JSDOM...");
 const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://web.bessa.app/" });
@@ -271,6 +272,34 @@ const testCode = `
         } else {
             throw new Error("Feature 4: EN language button not found");
         }
+
+        console.log("--- Testing Confidence Badge (DEV Mode) ---");
+        const mockDay = {
+            date: '2026-06-25',
+            weekday: 4,
+            items: [{
+                id: 'item_123',
+                articleId: 123,
+                name: 'Schnitzel',
+                description: 'DE: Wiener Schnitzel | EN: Viennese Schnitzel (Confidence: 0.95)',
+                price: 5.50,
+                available: true,
+                amountTracking: false
+            }]
+        };
+
+        localStorage.setItem('kantine_dev_mode', 'false');
+        let cardOff = window.createDayCard(mockDay);
+        if (cardOff && cardOff.querySelector('.confidence-badge')) throw new Error('Badge should be absent when DEV off');
+
+        localStorage.setItem('kantine_dev_mode', 'true');
+        let cardOn = window.createDayCard(mockDay);
+        let badgeOn = cardOn ? cardOn.querySelector('.confidence-badge') : null;
+        if (!badgeOn) throw new Error('Badge must be present when DEV on');
+        
+        let titleAttr = badgeOn.getAttribute('title') || '';
+        if (!titleAttr.includes('score')) throw new Error('Badge tooltip must contain score');
+        console.log("✅ Confidence Badge (DEV Mode) Test Passed");
 
         window.__TEST_PASSED = true;
     `;

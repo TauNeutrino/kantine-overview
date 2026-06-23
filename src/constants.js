@@ -51,4 +51,5 @@ export const LS = {
     LAST_UPDATED:            'kantine_last_updated',
     VERSION_CACHE:           'kantine_version_cache',
     DEV_MODE:                'kantine_dev_mode',
+    LANG_MODEL_DELTA:        'kantine_lang_model_delta',
 };
