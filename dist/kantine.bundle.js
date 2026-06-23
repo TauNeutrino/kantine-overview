@@ -2001,8 +2001,8 @@ function createDayCard(day) {
         if (dm) {
             const c = split.confidence ?? 0;
             const s = split.subScores || {};
-            const tp = `score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
-            cBadge = `<span class="badge confidence-badge confidence-${lbl} floating" title="${tp}">${lbl}</span>`;
+            const tp = `Split confidence: score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
+            cBadge = `<span class="badge confidence-badge confidence-${lbl}" title="${tp}">${lbl}</span>`;
         }
 
         let orderedBadge = '';
@@ -2059,7 +2059,7 @@ function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))}</p>${cBadge}</div>`;
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))} ${cBadge}</p></div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {
@@ -4941,23 +4941,23 @@ function bindEvents() {
 
     const btnLangToggle = document.getElementById('btn-lang-toggle');
     const langDropdown = document.getElementById('lang-dropdown');
-    if (btnLangToggle && langDropdown) {
-        btnLangToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            langDropdown.classList.toggle('hidden');
-        });
+
+    function updateLangToggleLabel() {
+        if (btnLangToggle) btnLangToggle.textContent = state/* langMode */.Kl.toUpperCase();
     }
 
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            (0,state/* setLangMode */.UD)(btn.dataset.lang);
-            localStorage.setItem(constants.LS.LANG, btn.dataset.lang);
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (langDropdown) langDropdown.classList.add('hidden');
+    if (btnLangToggle) {
+        btnLangToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const modes = ['de', 'en', 'all'];
+            const nextIndex = (modes.indexOf(state/* langMode */.Kl) + 1) % modes.length;
+            const next = modes[nextIndex];
+            (0,state/* setLangMode */.UD)(next);
+            localStorage.setItem(constants.LS.LANG, next);
+            updateLangToggleLabel();
             updateUILanguage();
         });
-    });
+    }
 
     if (btnHighlights) {
         btnHighlights.addEventListener('click', () => {
@@ -4988,9 +4988,6 @@ function bindEvents() {
     window.addEventListener('click', (e) => {
         if (e.target === historyModal) historyModal.classList.add('hidden');
         if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
-        if (langDropdown && !langDropdown.classList.contains('hidden') && !e.target.closest('#lang-toggle')) {
-            langDropdown.classList.add('hidden');
-        }
     });
 
     const versionTag = document.querySelector('.version-tag');
@@ -5192,6 +5189,8 @@ function bindEvents() {
         const grid = document.querySelector('.days-grid');
         if (grid) (0,ui_helpers/* syncMenuItemHeights */.wy)(grid);
     }, 150));
+
+    updateLangToggleLabel();
 }
 
 ;// ./src/index.js
