@@ -4319,22 +4319,24 @@ function peelGluedTailFromUnanchored(courses, langModel) {
 function peelTrailingMonoCourse(courses) {
     if (courses.length !== 2) return courses;
     const last = courses[1];
-    if (last.anchored) return courses;
+    const allergen = last.allergen || '';
 
-    const enWords = (last.en || '').trim().split(/\s+/);
+    const enWords = stripAllergen(last.en, allergen).split(/\s+/);
     if (enWords.length < 2) return courses;
 
     const word = enWords[enWords.length - 1];
     if (!/^[A-ZÄÖÜ][a-zäöüß]/.test(word)) return courses;
 
     const newEn = enWords.slice(0, -1).join(' ');
-    const deWords = (last.de || '').trim().split(/\s+/);
+    const deNoAllergen = stripAllergen(last.de, allergen);
+    const deWords = deNoAllergen.split(/\s+/);
     const newDe = (deWords.length >= 2 && deWords[deWords.length - 1] === word)
         ? deWords.slice(0, -1).join(' ')
-        : last.de;
+        : deNoAllergen;
 
-    courses[1] = { de: newDe, en: newEn, allergen: last.allergen || '', mono: newDe === newEn, anchored: false };
-    courses.push({ de: word, en: word, allergen: '', mono: true, anchored: false });
+    courses[1] = { de: newDe, en: newEn, allergen: '', mono: newDe === newEn, anchored: false };
+    const monoText = allergen ? `${word} (${allergen})` : word;
+    courses.push({ de: monoText, en: monoText, allergen, mono: true, anchored: !!allergen });
     return courses;
 }
 
