@@ -1,4 +1,4 @@
-import { displayMode, authToken, userFlags, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
+import { displayMode, authToken, userFlags, langMode, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
 import { API_BASE, LS } from './constants.js';
@@ -123,23 +123,23 @@ export function bindEvents() {
 
     const btnLangToggle = document.getElementById('btn-lang-toggle');
     const langDropdown = document.getElementById('lang-dropdown');
-    if (btnLangToggle && langDropdown) {
-        btnLangToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            langDropdown.classList.toggle('hidden');
-        });
+
+    function updateLangToggleLabel() {
+        if (btnLangToggle) btnLangToggle.textContent = langMode.toUpperCase();
     }
 
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            setLangMode(btn.dataset.lang);
-            localStorage.setItem(LS.LANG, btn.dataset.lang);
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (langDropdown) langDropdown.classList.add('hidden');
+    if (btnLangToggle) {
+        btnLangToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const modes = ['de', 'en', 'all'];
+            const nextIndex = (modes.indexOf(langMode) + 1) % modes.length;
+            const next = modes[nextIndex];
+            setLangMode(next);
+            localStorage.setItem(LS.LANG, next);
+            updateLangToggleLabel();
             updateUILanguage();
         });
-    });
+    }
 
     if (btnHighlights) {
         btnHighlights.addEventListener('click', () => {
@@ -170,9 +170,6 @@ export function bindEvents() {
     window.addEventListener('click', (e) => {
         if (e.target === historyModal) historyModal.classList.add('hidden');
         if (e.target === highlightsModal) highlightsModal.classList.add('hidden');
-        if (langDropdown && !langDropdown.classList.contains('hidden') && !e.target.closest('#lang-toggle')) {
-            langDropdown.classList.add('hidden');
-        }
     });
 
     const versionTag = document.querySelector('.version-tag');
@@ -374,4 +371,6 @@ export function bindEvents() {
         const grid = document.querySelector('.days-grid');
         if (grid) syncMenuItemHeights(grid);
     }, 150));
+
+    updateLangToggleLabel();
 }

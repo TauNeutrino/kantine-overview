@@ -463,8 +463,13 @@ body {
 }
 
 #btn-lang-toggle {
-    padding: 0;
     min-width: 42px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0 8px;
+    text-align: center;
+    justify-content: center;
 }
 
 .lang-dropdown-menu {
@@ -1039,7 +1044,7 @@ body {
     white-space: nowrap;
 }
 
-.item-desc-wrap{position:relative}.item-desc-wrap:has(.floating) .item-desc{padding-bottom:1.25rem}
+.item-desc-wrap { position: relative; }
 .item-desc {
     font-size: 0.875rem;
     color: var(--text-secondary);
@@ -1989,8 +1994,7 @@ body {
     accent-color: #60a5fa;
 }
 
-.confidence-badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; margin-left: 4px; cursor: default; }
-.confidence-badge.floating{position:absolute;bottom:.25rem;right:0;margin:0;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.confidence-badge { font-size: 0.6em; padding: 1px 4px; border-radius: 4px; margin-left: 4px; cursor: default; vertical-align: middle; opacity: 0.75; }
 .confidence-high { background: rgba(39, 174, 96, 0.25); color: #27ae60; border: 1px solid rgba(39, 174, 96, 0.4); }
 .confidence-medium { background: rgba(243, 156, 18, 0.25); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.4); }
 .confidence-low { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
