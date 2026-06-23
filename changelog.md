@@ -1,7 +1,11 @@
 ## v1.9.0 (2026-06-23)
-- ✨ **Feature**: Versionsübersicht zeigt „Installieren"- und „→ Github"-Buttons jetzt auch für die bereits installierte Version.
-- ✨ **Feature**: Sprachumschaltung als 3-State-Toggle (DE/EN/ALL) – ein Klick schaltet zum nächsten Modus, kein Dropdown mehr.
-- 🎨 **UI**: Confidence-Badge (DEV-Modus) sitzt jetzt inline am Ende der Menü-Beschreibung statt als eigenes Element. Kleiner, unscheinbarer. Tooltip beginnt mit „Split confidence:".
+- 🔄 **Sprachsplitter komplett überarbeitet**: Handgepflegte Wortlisten ersetzt durch selbstlernendes Trigramm-Sprachmodell. Erkennt DE/EN-Grenzen anhand Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Modell nicht kennt. Mono-Desserts/Markenwörter (Donut, Balisto, Vanillapudding) werden als eigener Gang erkannt. Verschmolzene Gänge durch fehlende Allergene werden korrekt getrennt. 2-Gänge-Ergebnisse werden als verdächtig eingestuft.
+- ✨ **Hover-Tooltip** auf Menübeschreibungen mit zweifelhaftem Split (medium/low) zeigt den Originaltext zur Kontrolle.
+- ✨ **Sprachumschaltung** als 3-State-Toggle (DE/EN/ALL) – ein Klick, kein Dropdown.
+- ✨ **Versionsübersicht**: „Installieren"- und „→ Github"-Buttons auch für die aktuell installierte Version sichtbar.
+- 🎨 **DEV-Badge**: Confidence-Badge sitzt inline in der Menübeschreibung, kleiner und unscheinbarer.
+- 🐛 **Diverse Bugfixes** (v1.8.7–v1.8.9): Host-CSS-Überschreibungen, Blob-URL-Redirect, Menüname-Lokalisierung bei Sprachwechsel, Live-Mengenaktualisierung nach Bestellung.
+- 🛠️ **Build**: plattformunabhängige Node.js-Scripts (`npm run build`, `npm run release`) ersetzen Bash-Scripts.
 
 ## v1.8.11 (2026-06-23)
 - 🐛 **Bugfix**: Verschmolzene Gänge werden korrekt getrennt. Wenn ein Gericht in der Wochenkarte kein Allergen hatte, wurden zuvor zwei Gerichte fälschlich zu einem zusammengefasst (z. B. „Curryhuhn" und „Erdbeer-Rhabarber-Tiramisu"). Der Splitter erkennt die Gericht-Grenzen jetzt anhand der Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Sprachmodell nicht kennt.
