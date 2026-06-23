@@ -2224,7 +2224,6 @@ function openVersionMenu() {
                         <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
                         ${badge}
                     </div>
-                    ${!isCurrent ? `
                     <div class="version-actions">
                         <button class="btn-install-raw"
                             data-raw-url="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.rawUrl)}"
@@ -2235,7 +2234,7 @@ function openVersionMenu() {
                             title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} auf GitHub ansehen">
                             &rarr; Github
                         </a>
-                    </div>` : ''}
+                    </div>
                 `;
 
                 // Attach click handler for Blob-based install
