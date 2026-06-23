@@ -3,3 +3,6 @@ node_modules/
 .DS_Store
 *.log
 venv/
+.omo/
+test_eval*.js
+test_split.js
