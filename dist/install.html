@@ -79,9 +79,13 @@
             <summary class="styled-summary">Changelog & Version History</summary>
             <div class="changelog-container">
                 <h3>v1.9.0 (2026-06-23)</h3>
-<ul><li>✨ **Feature**: Versionsübersicht zeigt „Installieren"- und „→ Github"-Buttons jetzt auch für die bereits installierte Version.</li></ul>
-<ul><li>✨ **Feature**: Sprachumschaltung als 3-State-Toggle (DE/EN/ALL) – ein Klick schaltet zum nächsten Modus, kein Dropdown mehr.</li></ul>
-<ul><li>🎨 **UI**: Confidence-Badge (DEV-Modus) sitzt jetzt inline am Ende der Menü-Beschreibung statt als eigenes Element. Kleiner, unscheinbarer. Tooltip beginnt mit „Split confidence:".</li></ul>
+<ul><li>🔄 **Sprachsplitter komplett überarbeitet**: Handgepflegte Wortlisten ersetzt durch selbstlernendes Trigramm-Sprachmodell. Erkennt DE/EN-Grenzen anhand Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Modell nicht kennt. Mono-Desserts/Markenwörter (Donut, Balisto, Vanillapudding) werden als eigener Gang erkannt. Verschmolzene Gänge durch fehlende Allergene werden korrekt getrennt. 2-Gänge-Ergebnisse werden als verdächtig eingestuft.</li></ul>
+<ul><li>✨ **Hover-Tooltip** auf Menübeschreibungen mit zweifelhaftem Split (medium/low) zeigt den Originaltext zur Kontrolle.</li></ul>
+<ul><li>✨ **Sprachumschaltung** als 3-State-Toggle (DE/EN/ALL) – ein Klick, kein Dropdown.</li></ul>
+<ul><li>✨ **Versionsübersicht**: „Installieren"- und „→ Github"-Buttons auch für die aktuell installierte Version sichtbar.</li></ul>
+<ul><li>🎨 **DEV-Badge**: Confidence-Badge sitzt inline in der Menübeschreibung, kleiner und unscheinbarer.</li></ul>
+<ul><li>🐛 **Diverse Bugfixes** (v1.8.7–v1.8.9): Host-CSS-Überschreibungen, Blob-URL-Redirect, Menüname-Lokalisierung bei Sprachwechsel, Live-Mengenaktualisierung nach Bestellung.</li></ul>
+<ul><li>🛠️ **Build**: plattformunabhängige Node.js-Scripts (`npm run build`, `npm run release`) ersetzen Bash-Scripts.</li></ul>
 
 <h3>v1.8.11 (2026-06-23)</h3>
 <ul><li>🐛 **Bugfix**: Verschmolzene Gänge werden korrekt getrennt. Wenn ein Gericht in der Wochenkarte kein Allergen hatte, wurden zuvor zwei Gerichte fälschlich zu einem zusammengefasst (z. B. „Curryhuhn" und „Erdbeer-Rhabarber-Tiramisu"). Der Splitter erkennt die Gericht-Grenzen jetzt anhand der Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Sprachmodell nicht kennt.</li></ul>
