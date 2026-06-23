@@ -106,6 +106,24 @@ try {
     vm.runInContext(code, sandbox);
     // Execute module to get function reference, since IIFE creates private scope
     // For test_logic.js we need to evaluate the raw utils.js code to test splitLanguage directly
+    const langDir = require('path').join(__dirname, 'src', 'lang');
+    // Load lang modules in dependency order (bottom-up, no-import first)
+    const langModules = [
+      'types.js',         // no deps — defines LABELS + type JSDoc
+      'normalize.js',     // no deps
+      'templates.js',     // no deps
+      'langModelSeed.js', // no deps — exports LANG_MODEL_SEED
+      'langModel.js',     // createLangModel(seed) — seed passed by caller
+      'segment.js',       // depends: normalize
+      'boundary.js',      // resolveBoundary(fragment, langModel) — langModel passed in
+      'score.js',         // depends: LABELS from types.js
+      'splitter.js',      // depends: normalize, templates, segment, boundary, score, langModel, LANG_MODEL_SEED
+    ];
+    for (const file of langModules) {
+      const code = require('fs').readFileSync(require('path').join(langDir, file), 'utf8');
+      const cleaned = code.replace(/export /g, '').replace(/import .*? from .*?;/g, '');
+      vm.runInContext(cleaned, sandbox);
+    }
     const utilsCode = require('fs').readFileSync(require('path').join(__dirname, 'src', 'utils.js'), 'utf8');
     const cleanedUtilsCode = utilsCode.replace(/export /g, '').replace(/import .*? from .*?;/g, '');
     vm.runInContext(cleanedUtilsCode, sandbox);
@@ -268,7 +286,9 @@ try {
             body: createMockElement('body'),
             head: createMockElement('head'),
             createElement: (tag) => createMockElement(tag),
-            getElementById: (id) => createMockElement(id)
+            getElementById: (id) => createMockElement(id),
+            querySelector: () => createMockElement('mock'),
+            querySelectorAll: () => [createMockElement('mock')]
         },
         window: {
             matchMedia: () => ({ matches: false }),
