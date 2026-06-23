@@ -1,3 +1,10 @@
+## v1.8.11 (2026-06-23)
+- 🐛 **Bugfix**: Verschmolzene Gänge werden korrekt getrennt. Wenn ein Gericht in der Wochenkarte kein Allergen hatte, wurden zuvor zwei Gerichte fälschlich zu einem zusammengefasst (z. B. „Curryhuhn" und „Erdbeer-Rhabarber-Tiramisu"). Der Splitter erkennt die Gericht-Grenzen jetzt anhand der Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Sprachmodell nicht kennt.
+- ✨ **Feature**: Einzeln geschriebene Mono-Desserts/Markenwörter (z. B. Donut, Balisto, Vanillapudding) werden als eigener dritter Gang erkannt, statt an das vorige Gericht zu kleben.
+- ✨ **Feature**: Bei zweifelhaften Splits (Confidence „medium" oder niedriger) zeigt ein Hover über die Menü-Beschreibung den originalen Rohtext als Tooltip zur Kontrolle.
+- 🎨 **UI**: Der Confidence-Badge (`kantine_dev_mode`) schwebt jetzt unten rechts in der Menü-Beschreibung statt neben dem Verfügbarkeits-Badge.
+- 🐛 **Bugfix**: Ein 2-Gänge-Ergebnis wird als verdächtig eingestuft (normal sind 3 Gänge oder 1 am Freitag) und in der Confidence herabgestuft.
+
 ## v1.8.10 (2026-06-23)
 - 🔄 **Refactor**: Sprach-Erkennung (`splitLanguage`) komplett neu geschrieben. Handgepflegte Wort-Stamm-Listen (DE_STEMS, EN_STEMS) wurden durch ein selbstlernendes Trigramm-Sprachmodell ersetzt, das sich automatisch an neue Menüs anpasst und eine Confidence-Bewertung liefert.
 - ✨ **Feature**: DEV-Confidence-Badge im `kantine_dev_mode` – zeigt Confidence-Score und Sub-Scores (Anchor/Purity/Course/Coverage) als Tooltip an.

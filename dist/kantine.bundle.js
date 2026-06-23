@@ -26,7 +26,7 @@
 /* harmony export */ });
 /* unused harmony exports renderHistory, saveFlags, refreshMenuForDate, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(759);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(842);
@@ -1624,7 +1624,7 @@ function getUILang() {
 /* harmony export */   yz: () => (/* binding */ highlightTags)
 /* harmony export */ });
 /* unused harmony export setUserFlags */
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(759);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(160);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(521);
 
 
@@ -1686,7 +1686,7 @@ function setLangMode(lang) {
 /* harmony export */ });
 /* unused harmony exports createDayCard, fetchVersions, openInstallPage, updateCountdown, removeCountdown */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(759);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(367);
@@ -1988,22 +1988,21 @@ function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
         }
 
-        let confidenceBadge = '';
-        const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
-        if (devMode) {
-            const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
-            const conf = split.confidence != null ? split.confidence : 0;
-            const label = split.label || 'fallback';
-            const sub = split.subScores || {};
-            const tooltipParts = [
-                `score ${conf.toFixed(2)}`,
-                `anchor ${(sub.anchor||0).toFixed(2)}`,
-                `purity ${(sub.purity||0).toFixed(2)}`,
-                `courses ${(sub.course||0).toFixed(2)}`,
-                `coverage ${(sub.coverage||0).toFixed(2)}`
-            ];
-            const tooltip = tooltipParts.join(' · ');
-            confidenceBadge = `<span class="badge confidence-badge confidence-${label}" title="${tooltip}">${label}</span>`;
+        const dm = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+        const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
+        const lbl = split.label || 'fallback';
+        
+        let dTitle = '';
+        if (lbl !== 'high' && lbl !== 'template') {
+            dTitle = ` title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}"`;
+        }
+
+        let cBadge = '';
+        if (dm) {
+            const c = split.confidence ?? 0;
+            const s = split.subScores || {};
+            const tp = `score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
+            cBadge = `<span class="badge confidence-badge confidence-${lbl} floating" title="${tp}">${lbl}</span>`;
         }
 
         let orderedBadge = '';
@@ -2060,20 +2059,7 @@ function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `
-            <div class="item-header">
-                <span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span>
-                <span class="item-price">${item.price.toFixed(2)} €</span>
-            </div>
-            <div class="item-status-row">
-                ${orderedBadge}
-                ${cancelButton}
-                ${orderButton}
-                ${flagButton}
-                <div class="badges">${statusBadge}${confidenceBadge}</div>
-            </div>
-            ${tagsHtml}
-            <p class="item-desc">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))}</p>`;
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))}</p>${cBadge}</div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {
@@ -2519,7 +2505,7 @@ function updateAlarmBell() {
 
 /***/ },
 
-/***/ 759
+/***/ 160
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -2774,7 +2760,125 @@ function resolveBoundary(fragment, langModel) {
     return { enPart: fragment, deCut: '' };
 }
 
+;// ./src/lang/loanwords.js
+// Cross-lingual food loanwords that appear (often capitalized) in BOTH German and
+// English menu descriptions and may score "German-ish" on the trigram model.
+//
+// Used for two purposes:
+//  1. dishes.js  — avoid mistaking a loanword inside an English dish name for the
+//                  start of the next German dish (small tie-breaker penalty).
+//  2. score.js   — exempt these from the asymmetric "German-word-inside-English"
+//                  purity penalty, so a legit English dish name isn't punished.
+const LOANWORDS = new Set([
+    'gnocchi', 'risotto', 'tiramisu', 'ravioli', 'lasagne', 'lasagna', 'pasta', 'penne',
+    'spaghetti', 'pesto', 'ratatouille', 'stifado', 'gulasch', 'goulash', 'couscous',
+    'bulgur', 'falafel', 'hummus', 'masala', 'chana', 'ravaya', 'yakitori', 'donut',
+    'muffin', 'parmesan', 'mozzarella', 'feta', 'focaccia', 'baguette', 'panini',
+    'gyros', 'baklava', 'wrap', 'bowl', 'dip', 'wok', 'sushi', 'curry', 'chili',
+    'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
+    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio'
+]);
+
+function isLoanword(token) {
+    if (!token) return false;
+    const w = String(token).toLowerCase().replace(/[^a-zäöüß]/g, '');
+    return w.length > 0 && LOANWORDS.has(w);
+}
+
+;// ./src/lang/dishes.js
+
+
+// Split a reconstructed bilingual segment "DE1 / EN1 DE2 / EN2 ..." into individual
+// dishes. The separator-slash count is the structural skeleton (every bilingual dish
+// is "German / English"); allergens are optional anchors handled by the caller.
+//
+// Each returned dish = { de, en, mono }. The caller (splitter.js) reattaches the
+// allergen to the LAST dish and assigns the `anchored` flag.
+function splitDishes(text, langModel) {
+    const t = String(text || '').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim();
+    if (!t) return [];
+
+    const tokens = t.split(' ');
+    const slashIdxs = [];
+    for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i] === '/') slashIdxs.push(i);
+    }
+
+    // No slash -> a single mono dish (e.g. "Vanillapudding").
+    if (slashIdxs.length === 0) {
+        return [{ de: t, en: t, mono: true }];
+    }
+
+    // Exactly one slash -> a single bilingual dish.
+    if (slashIdxs.length === 1) {
+        const si = slashIdxs[0];
+        const de = tokens.slice(0, si).join(' ').trim();
+        const en = tokens.slice(si + 1).join(' ').trim();
+        if (!de || !en) {
+            const solo = de || en;
+            return [{ de: solo, en: solo, mono: true }];
+        }
+        return [{ de, en, mono: false }];
+    }
+
+    // Two or more slashes -> peel the first dish, recurse on the remainder.
+    // Structure between the first two slashes is "EN_1 ... DE_2"; the EN_1 -> DE_2
+    // boundary is resolved via the multi-signal detector below.
+    const s1 = slashIdxs[0];
+    const s2 = slashIdxs[1];
+    const de1 = tokens.slice(0, s1).join(' ').trim();
+    const mid = tokens.slice(s1 + 1, s2); // EN_1 ... DE_2
+    const k = findDishBoundary(mid, langModel);
+    const en1 = mid.slice(0, k).join(' ').trim();
+    const de2 = mid.slice(k).join(' ').trim();
+    const tail = tokens.slice(s2 + 1).join(' ').trim();
+
+    const first = { de: de1, en: en1 || de1, mono: false };
+    const remainder = (de2 ? de2 + ' / ' : '/ ') + tail;
+    return [first, ...splitDishes(remainder, langModel)];
+}
+
+function classifyToken(token, langModel, isFirst) {
+    if (isLoanword(token)) return 'ambig';
+    if (!isFirst && /^[A-ZÄÖÜ]/.test(token)) return 'de';
+    const s = langModel.scoreLang(token);
+    if (s > 0.5) return 'de';
+    if (s < -0.5) return 'en';
+    return 'ambig';
+}
+
+function findDishBoundary(midTokens, langModel) {
+    const n = midTokens.length;
+    if (n <= 1) return n;
+
+    const tags = midTokens.map((t, i) => classifyToken(t, langModel, i === 0));
+
+    let bestK = 1;
+    let bestPenalty = Infinity;
+    let bestCap = -1;
+
+    for (let k = 1; k < n; k++) {
+        let leftGerman = 0;
+        for (let i = 0; i < k; i++) if (tags[i] === 'de') leftGerman++;
+        let rightEnglish = 0;
+        for (let i = k; i < n; i++) if (tags[i] === 'en') rightEnglish++;
+
+        const penalty = leftGerman + rightEnglish;
+        const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
+
+        if (penalty < bestPenalty || (penalty === bestPenalty && cap > bestCap)) {
+            bestPenalty = penalty;
+            bestCap = cap;
+            bestK = k;
+        }
+    }
+
+    return bestK;
+}
+
 ;// ./src/lang/score.js
+
+
 const WEIGHT_ANCHOR = 0.35;
 const WEIGHT_PURITY = 0.30;
 const WEIGHT_COURSE = 0.20;
@@ -2785,6 +2889,23 @@ const THRESHOLD_MEDIUM = 0.55;
 
 function tokenize(text) {
   return (text || '').toLowerCase().match(/[a-zäöüß]{2,}/g) || [];
+}
+
+function countGermanIntrusionsInEnglish(enClean) {
+  const tokens = enClean.split(/\s+/);
+  let count = 0;
+  for (let i = 1; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (!/^[A-ZÄÖÜ]/.test(tok)) continue;
+    const word = tok.toLowerCase().replace(/[^a-zäöüß]/g, '');
+    if (word.length < 3 || isLoanword(tok)) continue;
+    count++;
+  }
+  return count;
+}
+
+function hasSeparatorSlash(text) {
+  return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
 }
 
 function scoreSplit({ courses, notes, raw, langModel }) {
@@ -2804,8 +2925,11 @@ function scoreSplit({ courses, notes, raw, langModel }) {
       const enScoreLang = langModel.scoreLang(enClean);
       
       const de_purity = Math.max(0, deScoreLang) / (Math.abs(deScoreLang) + 1);
-      const en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
-      
+      let en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
+      if (countGermanIntrusionsInEnglish(enClean) > 0) {
+        en_purity = Math.min(en_purity, 0.2);
+      }
+
       puritySum += de_purity + en_purity;
       purityCount += 2;
     }
@@ -2813,7 +2937,7 @@ function scoreSplit({ courses, notes, raw, langModel }) {
   const purity = purityCount > 0 ? puritySum / purityCount : 1.0;
 
   // course score
-  const baseCourseScore = courses.length >= 1 && courses.length <= 3 ? 1.0 : 0.0;
+  const baseCourseScore = (courses.length === 1 || courses.length === 3) ? 1.0 : 0.0;
   let penalties = 0;
   for (const course of courses) {
     if (!course.mono) {
@@ -2839,16 +2963,25 @@ function scoreSplit({ courses, notes, raw, langModel }) {
     coverage * WEIGHT_COVERAGE
   ));
 
-  // assign label based on thresholds
+  const corrupted = courses.some(c => hasSeparatorSlash(c.en) || hasSeparatorSlash(c.de));
+  const suspiciousCourseCount = courses.length === 2;
+
   let label = 'low';
-  if (confidence >= THRESHOLD_HIGH) {
+  if (!corrupted && !suspiciousCourseCount && confidence >= THRESHOLD_HIGH) {
     label = 'high';
-  } else if (confidence >= THRESHOLD_MEDIUM) {
+  } else if (!corrupted && confidence >= THRESHOLD_MEDIUM) {
     label = 'medium';
   }
 
+  let finalConfidence = confidence;
+  if (corrupted) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_MEDIUM - 0.05);
+  } else if (suspiciousCourseCount) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_HIGH - 0.01);
+  }
+
   return {
-    confidence,
+    confidence: finalConfidence,
     subScores: {
       anchor,
       purity,
@@ -4114,6 +4247,97 @@ var LANG_MODEL_SEED = {
 
 
 
+
+function stripAllergen(text, allergen) {
+    if (!text) return '';
+    let out = text;
+    if (allergen) {
+        const suffix = `(${allergen})`;
+        const idx = out.lastIndexOf(suffix);
+        if (idx !== -1) out = out.slice(0, idx) + out.slice(idx + suffix.length);
+    }
+    return out.replace(/\s+/g, ' ').trim();
+}
+
+function attachAllergen(dish, allergen, anchored) {
+    let de = dish.de || '';
+    let en = dish.en || '';
+    if (allergen) {
+        const tag = ` (${allergen})`;
+        if (!de.includes(`(${allergen})`)) de = de + tag;
+        if (!en.includes(`(${allergen})`)) en = en + tag;
+    }
+    return { de, en, allergen: allergen || '', mono: !!dish.mono, anchored: !!anchored };
+}
+
+// Allergen-internal slashes are repaired during normalization, so a "/" surviving
+// paren removal can only be a dish separator => merged dishes.
+function splitter_hasSeparatorSlash(text) {
+    return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
+}
+
+function repairMergedCourses(courses, langModel) {
+    const repaired = [];
+    for (const course of courses) {
+        if (!course.mono && splitter_hasSeparatorSlash(course.en)) {
+            const allergen = course.allergen || '';
+            const fullText = stripAllergen(course.de, allergen) + ' / ' + stripAllergen(course.en, allergen);
+            const dishes = splitDishes(fullText, langModel);
+            if (dishes.length >= 2) {
+                dishes.forEach((dish, idx) => {
+                    const isLast = idx === dishes.length - 1;
+                    repaired.push(attachAllergen(dish, isLast ? allergen : '', isLast ? course.anchored : false));
+                });
+                continue;
+            }
+        }
+        repaired.push(course);
+    }
+    return repaired;
+}
+
+function peelGluedTailFromUnanchored(courses, langModel) {
+    for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        if (!course.anchored && course.en && !splitter_hasSeparatorSlash(course.en) && langModel.scoreLang(course.en) > 0) {
+            const { enPart, deCut } = resolveBoundary(course.en, langModel);
+            if (deCut) {
+                if (course.mono) {
+                    course.en = enPart;
+                    course.de = deCut;
+                    course.mono = false;
+                } else {
+                    courses[i].en = enPart;
+                    courses.splice(i + 1, 0, { de: deCut, en: deCut, mono: true, anchored: false });
+                }
+            }
+        }
+    }
+    return courses;
+}
+
+function peelTrailingMonoCourse(courses) {
+    if (courses.length !== 2) return courses;
+    const last = courses[1];
+    if (last.anchored) return courses;
+
+    const enWords = (last.en || '').trim().split(/\s+/);
+    if (enWords.length < 2) return courses;
+
+    const word = enWords[enWords.length - 1];
+    if (!/^[A-ZÄÖÜ][a-zäöüß]/.test(word)) return courses;
+
+    const newEn = enWords.slice(0, -1).join(' ');
+    const deWords = (last.de || '').trim().split(/\s+/);
+    const newDe = (deWords.length >= 2 && deWords[deWords.length - 1] === word)
+        ? deWords.slice(0, -1).join(' ')
+        : last.de;
+
+    courses[1] = { de: newDe, en: newEn, allergen: last.allergen || '', mono: newDe === newEn, anchored: false };
+    courses.push({ de: word, en: word, allergen: '', mono: true, anchored: false });
+    return courses;
+}
+
 function splitLanguage(text, options = {}) {
     if (!text) return { de: '', en: '', raw: '', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, label: 'fallback', notes: [] };
 
@@ -4128,32 +4352,10 @@ function splitLanguage(text, options = {}) {
 
     const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
 
-    const courses = segment(normText);
-
-    // Resolve anchor-less boundaries (Layer 3)
-    for (let i = 0; i < courses.length; i++) {
-        const course = courses[i];
-        if (!course.anchored && course.en) {
-            if (langModel.scoreLang(course.en) > 0) {
-                const { enPart, deCut } = resolveBoundary(course.en, langModel);
-                if (deCut) {
-                    if (course.mono) {
-                        course.en = enPart;
-                        course.de = deCut;
-                        course.mono = false;
-                    } else {
-                        courses[i].en = enPart;
-                        courses.splice(i + 1, 0, {
-                            de: deCut,
-                            en: deCut,
-                            mono: true,
-                            anchored: false
-                        });
-                    }
-                }
-            }
-        }
-    }
+    let courses = segment(normText);
+    courses = repairMergedCourses(courses, langModel);
+    courses = peelGluedTailFromUnanchored(courses, langModel);
+    courses = peelTrailingMonoCourse(courses);
 
     const deParts = [];
     const enParts = [];
@@ -4609,8 +4811,8 @@ var constants = __webpack_require__(521);
 var api = __webpack_require__(672);
 // EXTERNAL MODULE: ./src/i18n.js
 var i18n = __webpack_require__(646);
-// EXTERNAL MODULE: ./src/utils.js + 8 modules
-var utils = __webpack_require__(759);
+// EXTERNAL MODULE: ./src/utils.js + 10 modules
+var utils = __webpack_require__(160);
 ;// ./src/events.js
 
 
