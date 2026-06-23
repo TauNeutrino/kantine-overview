@@ -1,3 +1,11 @@
+## v1.8.10 (2026-06-23)
+- 🔄 **Refactor**: Sprach-Erkennung (`splitLanguage`) komplett neu geschrieben. Handgepflegte Wort-Stamm-Listen (DE_STEMS, EN_STEMS) wurden durch ein selbstlernendes Trigramm-Sprachmodell ersetzt, das sich automatisch an neue Menüs anpasst und eine Confidence-Bewertung liefert.
+- ✨ **Feature**: DEV-Confidence-Badge im `kantine_dev_mode` – zeigt Confidence-Score und Sub-Scores (Anchor/Purity/Course/Coverage) als Tooltip an.
+- 🧪 **Testing**: Umfassende Test-Suite für das neue Sprachmodell (9 Modul-Tests + 451-Item "No Info Lost"-Prüfung + Hold-out Evaluierungs-Harness).
+- 🛠️ **Build**: Build-Script (`build-bookmarklet.sh`) und Release-Script (`release.sh`) als plattformunabhängige Node.js-Scripts portiert (`scripts/build.js`, `scripts/release.js`). Build läuft jetzt via `npm run build`.
+- 🐛 **Bugfix**: `test_logic.js` VM-Sandbox lädt nun ES6-Module in korrekter Dependency-Reihenfolge, sodass der Splitter-Test nicht mehr an undefined-Imports scheitert.
+- 🐛 **Bugfix**: Redirect-Test in `test_logic.js` erhält jetzt `document.querySelector`/`querySelectorAll`-Mock, um Fehler durch Top-Level-DOM-Zugriffe importierter Module zu vermeiden.
+-
 ## v1.8.9 (2026-06-22)
 - ✨ **Feature**: Nach erfolgreicher Bestellung eines beobachteten Menüs wird dessen "Notify"-Status (Glocken-Icon) nun automatisch entfernt.
 - ✨ **Feature**: Nach einer Bestellung (oder Stornierung) wird die angezeigte Restmenge des Menüs automatisch mittels Live-API-Call auf den aktuellen Wert aktualisiert.
