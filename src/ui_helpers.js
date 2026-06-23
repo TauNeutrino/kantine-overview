@@ -295,22 +295,21 @@ export function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${t('soldOut')}</span>`;
         }
 
-        let confidenceBadge = '';
-        const devMode = localStorage.getItem(LS.DEV_MODE) === 'true';
-        if (devMode) {
-            const split = splitLanguage(item.description || '');
-            const conf = split.confidence != null ? split.confidence : 0;
-            const label = split.label || 'fallback';
-            const sub = split.subScores || {};
-            const tooltipParts = [
-                `score ${conf.toFixed(2)}`,
-                `anchor ${(sub.anchor||0).toFixed(2)}`,
-                `purity ${(sub.purity||0).toFixed(2)}`,
-                `courses ${(sub.course||0).toFixed(2)}`,
-                `coverage ${(sub.coverage||0).toFixed(2)}`
-            ];
-            const tooltip = tooltipParts.join(' · ');
-            confidenceBadge = `<span class="badge confidence-badge confidence-${label}" title="${tooltip}">${label}</span>`;
+        const dm = localStorage.getItem(LS.DEV_MODE) === 'true';
+        const split = splitLanguage(item.description || '');
+        const lbl = split.label || 'fallback';
+        
+        let dTitle = '';
+        if (lbl !== 'high' && lbl !== 'template') {
+            dTitle = ` title="${escapeHtml(item.description || '')}"`;
+        }
+
+        let cBadge = '';
+        if (dm) {
+            const c = split.confidence ?? 0;
+            const s = split.subScores || {};
+            const tp = `score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
+            cBadge = `<span class="badge confidence-badge confidence-${lbl} floating" title="${tp}">${lbl}</span>`;
         }
 
         let orderedBadge = '';
@@ -367,20 +366,7 @@ export function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `
-            <div class="item-header">
-                <span class="item-name">${escapeHtml(item.name)}</span>
-                <span class="item-price">${item.price.toFixed(2)} €</span>
-            </div>
-            <div class="item-status-row">
-                ${orderedBadge}
-                ${cancelButton}
-                ${orderButton}
-                ${flagButton}
-                <div class="badges">${statusBadge}${confidenceBadge}</div>
-            </div>
-            ${tagsHtml}
-            <p class="item-desc">${escapeHtml(getLocalizedText(item.description))}</p>`;
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description))}</p>${cBadge}</div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {
