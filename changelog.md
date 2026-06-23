@@ -1,3 +1,8 @@
+## v1.9.0 (2026-06-23)
+- ✨ **Feature**: Versionsübersicht zeigt „Installieren"- und „→ Github"-Buttons jetzt auch für die bereits installierte Version.
+- ✨ **Feature**: Sprachumschaltung als 3-State-Toggle (DE/EN/ALL) – ein Klick schaltet zum nächsten Modus, kein Dropdown mehr.
+- 🎨 **UI**: Confidence-Badge (DEV-Modus) sitzt jetzt inline am Ende der Menü-Beschreibung statt als eigenes Element. Kleiner, unscheinbarer. Tooltip beginnt mit „Split confidence:".
+
 ## v1.8.11 (2026-06-23)
 - 🐛 **Bugfix**: Verschmolzene Gänge werden korrekt getrennt. Wenn ein Gericht in der Wochenkarte kein Allergen hatte, wurden zuvor zwei Gerichte fälschlich zu einem zusammengefasst (z. B. „Curryhuhn" und „Erdbeer-Rhabarber-Tiramisu"). Der Splitter erkennt die Gericht-Grenzen jetzt anhand der Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Sprachmodell nicht kennt.
 - ✨ **Feature**: Einzeln geschriebene Mono-Desserts/Markenwörter (z. B. Donut, Balisto, Vanillapudding) werden als eigener dritter Gang erkannt, statt an das vorige Gericht zu kleben.

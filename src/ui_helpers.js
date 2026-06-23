@@ -531,7 +531,6 @@ export function openVersionMenu() {
                         <strong>${escapeHtml(v.tag)}</strong>
                         ${badge}
                     </div>
-                    ${!isCurrent ? `
                     <div class="version-actions">
                         <button class="btn-install-raw"
                             data-raw-url="${escapeHtml(v.rawUrl)}"
@@ -542,7 +541,7 @@ export function openVersionMenu() {
                             title="${escapeHtml(v.tag)} auf GitHub ansehen">
                             &rarr; Github
                         </a>
-                    </div>` : ''}
+                    </div>
                 `;
 
                 // Attach click handler for Blob-based install
