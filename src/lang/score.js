@@ -1,3 +1,5 @@
+import { isLoanword } from './loanwords.js';
+
 const WEIGHT_ANCHOR = 0.35;
 const WEIGHT_PURITY = 0.30;
 const WEIGHT_COURSE = 0.20;
@@ -8,6 +10,23 @@ const THRESHOLD_MEDIUM = 0.55;
 
 function tokenize(text) {
   return (text || '').toLowerCase().match(/[a-zäöüß]{2,}/g) || [];
+}
+
+function countGermanIntrusionsInEnglish(enClean) {
+  const tokens = enClean.split(/\s+/);
+  let count = 0;
+  for (let i = 1; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (!/^[A-ZÄÖÜ]/.test(tok)) continue;
+    const word = tok.toLowerCase().replace(/[^a-zäöüß]/g, '');
+    if (word.length < 3 || isLoanword(tok)) continue;
+    count++;
+  }
+  return count;
+}
+
+function hasSeparatorSlash(text) {
+  return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
 }
 
 export function scoreSplit({ courses, notes, raw, langModel }) {
@@ -27,8 +46,11 @@ export function scoreSplit({ courses, notes, raw, langModel }) {
       const enScoreLang = langModel.scoreLang(enClean);
       
       const de_purity = Math.max(0, deScoreLang) / (Math.abs(deScoreLang) + 1);
-      const en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
-      
+      let en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
+      if (countGermanIntrusionsInEnglish(enClean) > 0) {
+        en_purity = Math.min(en_purity, 0.2);
+      }
+
       puritySum += de_purity + en_purity;
       purityCount += 2;
     }
@@ -36,7 +58,7 @@ export function scoreSplit({ courses, notes, raw, langModel }) {
   const purity = purityCount > 0 ? puritySum / purityCount : 1.0;
 
   // course score
-  const baseCourseScore = courses.length >= 1 && courses.length <= 3 ? 1.0 : 0.0;
+  const baseCourseScore = (courses.length === 1 || courses.length === 3) ? 1.0 : 0.0;
   let penalties = 0;
   for (const course of courses) {
     if (!course.mono) {
@@ -62,16 +84,25 @@ export function scoreSplit({ courses, notes, raw, langModel }) {
     coverage * WEIGHT_COVERAGE
   ));
 
-  // assign label based on thresholds
+  const corrupted = courses.some(c => hasSeparatorSlash(c.en) || hasSeparatorSlash(c.de));
+  const suspiciousCourseCount = courses.length === 2;
+
   let label = 'low';
-  if (confidence >= THRESHOLD_HIGH) {
+  if (!corrupted && !suspiciousCourseCount && confidence >= THRESHOLD_HIGH) {
     label = 'high';
-  } else if (confidence >= THRESHOLD_MEDIUM) {
+  } else if (!corrupted && confidence >= THRESHOLD_MEDIUM) {
     label = 'medium';
   }
 
+  let finalConfidence = confidence;
+  if (corrupted) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_MEDIUM - 0.05);
+  } else if (suspiciousCourseCount) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_HIGH - 0.01);
+  }
+
   return {
-    confidence,
+    confidence: finalConfidence,
     subScores: {
       anchor,
       purity,

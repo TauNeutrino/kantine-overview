@@ -12,6 +12,7 @@ const ROOT = path.join(__dirname, '..');
 eval(
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/langModel.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/langModelSeed.js'), 'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/loanwords.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/score.js'), 'utf8'))
 );
 

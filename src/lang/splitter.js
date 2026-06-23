@@ -2,9 +2,100 @@ import { normalize } from './normalize.js';
 import { matchTemplate } from './templates.js';
 import { segment } from './segment.js';
 import { resolveBoundary } from './boundary.js';
+import { splitDishes } from './dishes.js';
 import { scoreSplit } from './score.js';
 import { createLangModel } from './langModel.js';
 import { LANG_MODEL_SEED } from './langModelSeed.js';
+
+function stripAllergen(text, allergen) {
+    if (!text) return '';
+    let out = text;
+    if (allergen) {
+        const suffix = `(${allergen})`;
+        const idx = out.lastIndexOf(suffix);
+        if (idx !== -1) out = out.slice(0, idx) + out.slice(idx + suffix.length);
+    }
+    return out.replace(/\s+/g, ' ').trim();
+}
+
+function attachAllergen(dish, allergen, anchored) {
+    let de = dish.de || '';
+    let en = dish.en || '';
+    if (allergen) {
+        const tag = ` (${allergen})`;
+        if (!de.includes(`(${allergen})`)) de = de + tag;
+        if (!en.includes(`(${allergen})`)) en = en + tag;
+    }
+    return { de, en, allergen: allergen || '', mono: !!dish.mono, anchored: !!anchored };
+}
+
+// Allergen-internal slashes are repaired during normalization, so a "/" surviving
+// paren removal can only be a dish separator => merged dishes.
+function hasSeparatorSlash(text) {
+    return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
+}
+
+function repairMergedCourses(courses, langModel) {
+    const repaired = [];
+    for (const course of courses) {
+        if (!course.mono && hasSeparatorSlash(course.en)) {
+            const allergen = course.allergen || '';
+            const fullText = stripAllergen(course.de, allergen) + ' / ' + stripAllergen(course.en, allergen);
+            const dishes = splitDishes(fullText, langModel);
+            if (dishes.length >= 2) {
+                dishes.forEach((dish, idx) => {
+                    const isLast = idx === dishes.length - 1;
+                    repaired.push(attachAllergen(dish, isLast ? allergen : '', isLast ? course.anchored : false));
+                });
+                continue;
+            }
+        }
+        repaired.push(course);
+    }
+    return repaired;
+}
+
+function peelGluedTailFromUnanchored(courses, langModel) {
+    for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        if (!course.anchored && course.en && !hasSeparatorSlash(course.en) && langModel.scoreLang(course.en) > 0) {
+            const { enPart, deCut } = resolveBoundary(course.en, langModel);
+            if (deCut) {
+                if (course.mono) {
+                    course.en = enPart;
+                    course.de = deCut;
+                    course.mono = false;
+                } else {
+                    courses[i].en = enPart;
+                    courses.splice(i + 1, 0, { de: deCut, en: deCut, mono: true, anchored: false });
+                }
+            }
+        }
+    }
+    return courses;
+}
+
+function peelTrailingMonoCourse(courses) {
+    if (courses.length !== 2) return courses;
+    const last = courses[1];
+    if (last.anchored) return courses;
+
+    const enWords = (last.en || '').trim().split(/\s+/);
+    if (enWords.length < 2) return courses;
+
+    const word = enWords[enWords.length - 1];
+    if (!/^[A-ZÄÖÜ][a-zäöüß]/.test(word)) return courses;
+
+    const newEn = enWords.slice(0, -1).join(' ');
+    const deWords = (last.de || '').trim().split(/\s+/);
+    const newDe = (deWords.length >= 2 && deWords[deWords.length - 1] === word)
+        ? deWords.slice(0, -1).join(' ')
+        : last.de;
+
+    courses[1] = { de: newDe, en: newEn, allergen: last.allergen || '', mono: newDe === newEn, anchored: false };
+    courses.push({ de: word, en: word, allergen: '', mono: true, anchored: false });
+    return courses;
+}
 
 export function splitLanguage(text, options = {}) {
     if (!text) return { de: '', en: '', raw: '', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, label: 'fallback', notes: [] };
@@ -20,32 +111,10 @@ export function splitLanguage(text, options = {}) {
 
     const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
 
-    const courses = segment(normText);
-
-    // Resolve anchor-less boundaries (Layer 3)
-    for (let i = 0; i < courses.length; i++) {
-        const course = courses[i];
-        if (!course.anchored && course.en) {
-            if (langModel.scoreLang(course.en) > 0) {
-                const { enPart, deCut } = resolveBoundary(course.en, langModel);
-                if (deCut) {
-                    if (course.mono) {
-                        course.en = enPart;
-                        course.de = deCut;
-                        course.mono = false;
-                    } else {
-                        courses[i].en = enPart;
-                        courses.splice(i + 1, 0, {
-                            de: deCut,
-                            en: deCut,
-                            mono: true,
-                            anchored: false
-                        });
-                    }
-                }
-            }
-        }
-    }
+    let courses = segment(normText);
+    courses = repairMergedCourses(courses, langModel);
+    courses = peelGluedTailFromUnanchored(courses, langModel);
+    courses = peelTrailingMonoCourse(courses);
 
     const deParts = [];
     const enParts = [];

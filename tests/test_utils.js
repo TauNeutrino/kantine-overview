@@ -45,11 +45,13 @@ const langCode =
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/normalize.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/templates.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModel.js'),'utf8')) + '\n' +
-  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModelSeed.js'),'utf8')) + '\n' +
-  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/segment.js'),'utf8')) + '\n' +
-  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/boundary.js'),'utf8')) + '\n' +
-  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/score.js'),'utf8')) + '\n' +
-  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/splitter.js'),'utf8'));
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModelSeed.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/loanwords.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/segment.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/boundary.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/score.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/dishes.js'),'utf8')) + '\n' +
+cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/splitter.js'),'utf8'));
 
 // Strip exports and imports for vm
 const cleanedUtilsCode = langCode + '\n' + utilsCode

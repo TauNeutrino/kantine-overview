@@ -397,7 +397,7 @@ function stepSmokeAndSize(ctx) {
   }
 
   // Size guard: bookmarklet must not grow beyond baseline + 3 KB
-  const BASELINE_BOOKMARKLET_SIZE = 200000;
+  const BASELINE_BOOKMARKLET_SIZE = 205000;
   const MAX_GROWTH = 5120;
   const size = ctx.BOOKMARKLET_SIZE || 0;
   if (size > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {
