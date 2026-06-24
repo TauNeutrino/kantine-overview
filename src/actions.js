@@ -470,10 +470,12 @@ export async function placeOrder(date, articleId, name, price, description) {
         } else {
             const data = await response.json();
             showToast(`Fehler: ${data.detail || data.non_field_errors?.[0] || 'Bestellung fehlgeschlagen'}`, 'error');
+            await refreshMenuForDate(date);
         }
     } catch (error) {
         console.error('Order error:', error);
         showToast('Netzwerkfehler bei Bestellung', 'error');
+        await refreshMenuForDate(date);
     }
 }
 

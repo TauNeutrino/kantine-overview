@@ -1,3 +1,6 @@
+## v1.9.3 (2026-06-24)
+- ✨ **Feature**: Bei fehlgeschlagener Bestellung (API-Fehler oder Netzwerkfehler) werden die verfügbaren Stückzahlen des Menüs automatisch neu geladen und im UI aktualisiert.
+
 ## v1.9.2 (2026-06-24)
 - ⚡ **Performance**: GitHub API Rate-Limit-Schutz für das Version-Menü. `checkForUpdates()` prüft zuerst den lokalen Cache (1h TTL) und spart so den API-Call beim stündlichen Polling. `fetchVersions()` sendet gespeicherte ETag-Header für Conditional Requests – GitHub-Antworten mit `304 Not Modified` werden nicht aufs Rate-Limit angerechnet. DevMode-Wechsel löscht auch den ETag-Cache.
 
