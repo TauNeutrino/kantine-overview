@@ -1,3 +1,6 @@
+## v1.9.1 (2026-06-24)
+- 🐛 **Bugfix**: Sprachsplitter interpretiert Slashes innerhalb von Klammern nicht mehr fälschlich als DE/EN-Trenner. Menüs mit Fleischangaben in Klammern wie `(Schwein/Rind)` oder `(pork/beef)` werden jetzt korrekt zweisprachig aufgeteilt (`high` confidence statt `fallback`).
+
 ## v1.9.0 (2026-06-23)
 - 🔄 **Sprachsplitter komplett überarbeitet**: Handgepflegte Wortlisten ersetzt durch selbstlernendes Trigramm-Sprachmodell. Erkennt DE/EN-Grenzen anhand Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Modell nicht kennt. Mono-Desserts/Markenwörter (Donut, Balisto, Vanillapudding) werden als eigener Gang erkannt. Verschmolzene Gänge durch fehlende Allergene werden korrekt getrennt. 2-Gänge-Ergebnisse werden als verdächtig eingestuft.
 - ✨ **Hover-Tooltip** auf Menübeschreibungen mit zweifelhaftem Split (medium/low) zeigt den Originaltext zur Kontrolle.
