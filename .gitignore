@@ -3,6 +3,7 @@ node_modules/
 .DS_Store
 *.log
 venv/
+__pycache__/
 .omo/
 test_eval*.js
 test_split.js
