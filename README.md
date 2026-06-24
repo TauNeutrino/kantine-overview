@@ -31,11 +31,41 @@ graph TD
 
 ---
 
-## ⚙️ Build & Distribution Pipeline
+## ⚙️ Build & Release
 
-1.  **Bundling**: Webpack fasst alle Module in `kantine.bundle.js` zusammen.
-2.  **Veredelung**: `build-bookmarklet.sh` injiziert Versionen/Favicons und minimiert den Code via **Terser**.
-3.  **Deployment**: Erzeugung der `javascript:` Bookmarklet-URL und der `install.html`.
+Das Projekt verwendet zwei Node.js-Skripte für Build und Release:
+
+### `npm run build`
+
+Erzeugt alle Distributionsartefakte aus den Quellen in `src/`:
+
+1. **Webpack** — Bündelt alle ES6-Module zu `dist/kantine.bundle.js`
+2. **Minimierung** — Terser minifiziert das Bundle
+3. **Bookmarklet** — `dist/bookmarklet-payload.js`, `dist/bookmarklet.txt`
+4. **Installer** — `dist/install.html` (mit Changelog und Versionsanzeige)
+5. **Standalone** — `dist/kantine-standalone.html` (für UI-Tests mit Mock-Daten)
+6. **Smoke-Tests** — Automatisierte Prüfung aller Artefakte, DOM-Tests und Build-Integrität
+
+Der Build läuft vollständig lokal, ohne externe Dependencies außerhalb von `node_modules`.
+
+### `npm run release`
+
+Veröffentlicht den aktuellen Build. Voraussetzung: `npm run build` wurde ausgeführt.
+
+1. **Commit** — `dist/` wird in einem separaten Commit mit Message `chore: update build artifacts for <version>` committet
+2. **Tag** — Ein Git-Tag mit der Version aus `version.txt` wird erstellt (`git tag <version>`)
+3. **Push** — HEAD und der Tag werden zu `origin` gepusht (Tag per `--force`, damit ein erneuter Release den Tag verschieben kann)
+
+> ⚠️ `npm run release` setzt voraus, dass alle Code-Änderungen (außerhalb `dist/`) bereits committet sind. Das Skript bricht ab, wenn uncommittete Änderungen in `src/`, `version.txt` oder `changelog.md` vorliegen.
+
+### Release-Workflow (üblich)
+
+```
+npm run build        # 1. bauen
+git add -A           # 2. Code-Änderungen staged
+git commit -m "..."  # 3. Code committen
+npm run release      # 4. dist/ committen, taggen, pushen
+```
 
 ---
 
