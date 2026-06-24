@@ -2680,12 +2680,25 @@ function processSegment(segmentText, allergen, anchored) {
   }
   textWithoutAllergen = textWithoutAllergen.trim();
 
-  // 2. Split DE|EN at the FIRST slash
+  // 2. Split DE|EN at the FIRST slash that is NOT inside parentheses
+  //    (skips slashes in e.g. "(Schwein/Rind)" or "(pork/beef)")
   let de, en, mono;
-  const slashMatch = textWithoutAllergen.match(/\s*\/\s*/);
-  if (slashMatch) {
-    de = textWithoutAllergen.substring(0, slashMatch.index).trim();
-    en = textWithoutAllergen.substring(slashMatch.index + slashMatch[0].length).trim();
+  let slashIdx = -1;
+  let parenDepth = 0;
+  for (let i = 0; i < textWithoutAllergen.length; i++) {
+    const ch = textWithoutAllergen[i];
+    if (ch === '(') parenDepth++;
+    else if (ch === ')') parenDepth--;
+    else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+  }
+  if (slashIdx !== -1) {
+    // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
+    let left = slashIdx;
+    let right = slashIdx + 1;
+    while (left > 0 && textWithoutAllergen[left - 1] === ' ') left--;
+    while (right < textWithoutAllergen.length && textWithoutAllergen[right] === ' ') right++;
+    de = textWithoutAllergen.substring(0, left).trim();
+    en = textWithoutAllergen.substring(right).trim();
     mono = false;
   } else {
     de = textWithoutAllergen;
