@@ -1,3 +1,6 @@
+## v1.9.4 (2026-06-24)
+- 🐛 **Fix**: `renderVisibleWeeks()` erhält die Scroll-Position des `.days-grid`-Containers vor dem DOM-Wipe und stellt sie nach dem Re-Render wieder her. Die Seite springt bei Refreshs (z.B. nach Bestellung/Stornierung/Flag-Änderung) nicht mehr nach oben.
+
 ## v1.9.3 (2026-06-24)
 - ✨ **Feature**: Bei fehlgeschlagener Bestellung (API-Fehler oder Netzwerkfehler) werden die verfügbaren Stückzahlen des Menüs automatisch neu geladen und im UI aktualisiert.
 

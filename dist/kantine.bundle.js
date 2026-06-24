@@ -1797,6 +1797,11 @@ function updateNextWeekBadge() {
 function renderVisibleWeeks() {
     const menuContainer = document.getElementById('menu-container');
     if (!menuContainer) return;
+
+    // Save scroll position before DOM wipe — .days-grid is the scroll container
+    const oldGrid = menuContainer.querySelector('.days-grid');
+    const savedScrollTop = oldGrid ? oldGrid.scrollTop : 0;
+
     menuContainer.innerHTML = '';
 
     let targetWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT;
@@ -1846,6 +1851,10 @@ function renderVisibleWeeks() {
     });
 
     menuContainer.appendChild(grid);
+
+    // Restore scroll position on the new .days-grid
+    if (savedScrollTop > 0) grid.scrollTop = savedScrollTop;
+
     setTimeout(() => syncMenuItemHeights(grid), 0);
 }
 
