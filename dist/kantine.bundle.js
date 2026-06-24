@@ -1201,10 +1201,17 @@ function apiHeaders(token) {
 /**
  * Returns request headers for the GitHub REST API v3.
  * Used for version checks and release listing.
+ * Pass optional etag to enable conditional requests (If-None-Match),
+ * which return 304 Not Modified (no rate limit cost) when content is unchanged.
+ * @param {string|null} [etag] - Stored ETag for conditional request
  * @returns {Object} HTTP headers for fetch()
  */
-function githubHeaders() {
-    return { 'Accept': 'application/vnd.github.v3+json' };
+function githubHeaders(etag) {
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (etag) {
+        headers['If-None-Match'] = etag;
+    }
+    return headers;
 }
 
 
@@ -1277,6 +1284,7 @@ const LS = {
     HIGHLIGHT_TAGS:          'kantine_highlightTags',
     LAST_UPDATED:            'kantine_last_updated',
     VERSION_CACHE:           'kantine_version_cache',
+    VERSION_ETAG:            'kantine_version_etag',
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
 };
@@ -2105,13 +2113,24 @@ async function fetchVersions(devMode) {
         ? `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/tags?per_page=20`
         : `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/releases?per_page=20`;
 
-    const resp = await fetch(endpoint, { headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .githubHeaders */ .O)() });
+    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost
+    const storedEtag = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
+    const resp = await fetch(endpoint, { headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .githubHeaders */ .O)(storedEtag) });
+
+    // 304 Not Modified — content unchanged, skip processing
+    if (resp.status === 304) return null;
+
     if (!resp.ok) {
         if (resp.status === 403) {
             throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
         }
         throw new Error(`GitHub API ${resp.status}`);
     }
+
+    // Persist new ETag for next conditional request
+    const newEtag = resp.headers.get('ETag');
+    if (newEtag) localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG, newEtag);
+
     const data = await resp.json();
 
     return data.map(item => {
@@ -2154,9 +2173,27 @@ async function checkForUpdates() {
     const currentVersion = '{{VERSION}}';
     const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
 
+    // Cache-first: use cached versions if ≤1h old to avoid hitting GitHub API rate limit
+    const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
+    if (cachedRaw) {
+        try {
+            const cached = JSON.parse(cachedRaw);
+            if (cached && cached.timestamp && cached.devMode === devMode && cached.versions && cached.versions.length) {
+                const age = Date.now() - cached.timestamp;
+                if (age < 60 * 60 * 1000) {
+                    const latest = cached.versions[0].tag;
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) {
+                        showUpdateBadge(cached.versions[0]);
+                    }
+                    return; // skip API call entirely
+                }
+            }
+        } catch (_) {}
+    }
+
     try {
         const versions = await fetchVersions(devMode);
-        if (!versions.length) return;
+        if (!versions || !versions.length) return;
 
         localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
             timestamp: Date.now(), devMode, versions
@@ -2166,18 +2203,23 @@ async function checkForUpdates() {
 
         if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) return;
 
-        const headerTitle = document.querySelector('.header-left h1');
-        if (headerTitle && !headerTitle.querySelector('.update-icon')) {
-            const icon = document.createElement('span');
-            icon.className = 'update-icon';
-            icon.role = 'button';
-            icon.innerHTML = '🆕';
-            icon.title = `Update: ${latest} — Klick zum Installieren`;
-            icon.addEventListener('click', () => openInstallPage(versions[0].rawUrl));
-            headerTitle.appendChild(icon);
-        }
+        showUpdateBadge(versions[0]);
     } catch (e) {
         console.warn('[Kantine] Version check failed:', e);
+    }
+}
+
+/** Helper: show/cache the 🆕 badge in the header. Extracted so cache-first path can also show it. */
+function showUpdateBadge(version) {
+    const headerTitle = document.querySelector('.header-left h1');
+    if (headerTitle && !headerTitle.querySelector('.update-icon')) {
+        const icon = document.createElement('span');
+        icon.className = 'update-icon';
+        icon.role = 'button';
+        icon.innerHTML = '🆕';
+        icon.title = `Update: ${version.tag} — Klick zum Installieren`;
+        icon.addEventListener('click', () => openInstallPage(version.rawUrl));
+        headerTitle.appendChild(icon);
     }
 }
 
@@ -2261,15 +2303,16 @@ function openVersionMenu() {
             }
 
             const liveVersions = await fetchVersions(dm);
+            if (liveVersions !== null) {
+                const liveVersionsStr = JSON.stringify(liveVersions);
+                const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
 
-            const liveVersionsStr = JSON.stringify(liveVersions);
-            const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
-
-            if (liveVersionsStr !== cachedVersionsStr) {
-                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
-                    timestamp: Date.now(), devMode: dm, versions: liveVersions
-                }));
-                renderVersionsList(liveVersions);
+                if (liveVersionsStr !== cachedVersionsStr) {
+                    localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
+                        timestamp: Date.now(), devMode: dm, versions: liveVersions
+                    }));
+                    renderVersionsList(liveVersions);
+                }
             }
 
         } catch (e) {
@@ -2282,6 +2325,7 @@ function openVersionMenu() {
     devToggle.onchange = () => {
         localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, devToggle.checked);
         localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
+        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
         loadVersions(true);
     };
 }

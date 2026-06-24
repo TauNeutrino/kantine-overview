@@ -1,3 +1,6 @@
+## v1.9.2 (2026-06-24)
+- ⚡ **Performance**: GitHub API Rate-Limit-Schutz für das Version-Menü. `checkForUpdates()` prüft zuerst den lokalen Cache (1h TTL) und spart so den API-Call beim stündlichen Polling. `fetchVersions()` sendet gespeicherte ETag-Header für Conditional Requests – GitHub-Antworten mit `304 Not Modified` werden nicht aufs Rate-Limit angerechnet. DevMode-Wechsel löscht auch den ETag-Cache.
+
 ## v1.9.1 (2026-06-24)
 - 🐛 **Bugfix**: Sprachsplitter interpretiert Slashes innerhalb von Klammern nicht mehr fälschlich als DE/EN-Trenner. Menüs mit Fleischangaben in Klammern wie `(Schwein/Rind)` oder `(pork/beef)` werden jetzt korrekt zweisprachig aufgeteilt (`high` confidence statt `fallback`).
 

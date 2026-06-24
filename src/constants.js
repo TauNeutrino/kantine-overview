@@ -50,6 +50,7 @@ export const LS = {
     HIGHLIGHT_TAGS:          'kantine_highlightTags',
     LAST_UPDATED:            'kantine_last_updated',
     VERSION_CACHE:           'kantine_version_cache',
+    VERSION_ETAG:            'kantine_version_etag',
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
 };

@@ -25,8 +25,15 @@ export function apiHeaders(token) {
 /**
  * Returns request headers for the GitHub REST API v3.
  * Used for version checks and release listing.
+ * Pass optional etag to enable conditional requests (If-None-Match),
+ * which return 304 Not Modified (no rate limit cost) when content is unchanged.
+ * @param {string|null} [etag] - Stored ETag for conditional request
  * @returns {Object} HTTP headers for fetch()
  */
-export function githubHeaders() {
-    return { 'Accept': 'application/vnd.github.v3+json' };
+export function githubHeaders(etag) {
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (etag) {
+        headers['If-None-Match'] = etag;
+    }
+    return headers;
 }

@@ -412,13 +412,24 @@ export async function fetchVersions(devMode) {
         ? `${GITHUB_API}/tags?per_page=20`
         : `${GITHUB_API}/releases?per_page=20`;
 
-    const resp = await fetch(endpoint, { headers: githubHeaders() });
+    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost
+    const storedEtag = localStorage.getItem(LS.VERSION_ETAG);
+    const resp = await fetch(endpoint, { headers: githubHeaders(storedEtag) });
+
+    // 304 Not Modified — content unchanged, skip processing
+    if (resp.status === 304) return null;
+
     if (!resp.ok) {
         if (resp.status === 403) {
             throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
         }
         throw new Error(`GitHub API ${resp.status}`);
     }
+
+    // Persist new ETag for next conditional request
+    const newEtag = resp.headers.get('ETag');
+    if (newEtag) localStorage.setItem(LS.VERSION_ETAG, newEtag);
+
     const data = await resp.json();
 
     return data.map(item => {
@@ -461,9 +472,27 @@ export async function checkForUpdates() {
     const currentVersion = '{{VERSION}}';
     const devMode = localStorage.getItem(LS.DEV_MODE) === 'true';
 
+    // Cache-first: use cached versions if ≤1h old to avoid hitting GitHub API rate limit
+    const cachedRaw = localStorage.getItem(LS.VERSION_CACHE);
+    if (cachedRaw) {
+        try {
+            const cached = JSON.parse(cachedRaw);
+            if (cached && cached.timestamp && cached.devMode === devMode && cached.versions && cached.versions.length) {
+                const age = Date.now() - cached.timestamp;
+                if (age < 60 * 60 * 1000) {
+                    const latest = cached.versions[0].tag;
+                    if (isNewer(latest, currentVersion)) {
+                        showUpdateBadge(cached.versions[0]);
+                    }
+                    return; // skip API call entirely
+                }
+            }
+        } catch (_) {}
+    }
+
     try {
         const versions = await fetchVersions(devMode);
-        if (!versions.length) return;
+        if (!versions || !versions.length) return;
 
         localStorage.setItem(LS.VERSION_CACHE, JSON.stringify({
             timestamp: Date.now(), devMode, versions
@@ -473,18 +502,23 @@ export async function checkForUpdates() {
 
         if (!isNewer(latest, currentVersion)) return;
 
-        const headerTitle = document.querySelector('.header-left h1');
-        if (headerTitle && !headerTitle.querySelector('.update-icon')) {
-            const icon = document.createElement('span');
-            icon.className = 'update-icon';
-            icon.role = 'button';
-            icon.innerHTML = '🆕';
-            icon.title = `Update: ${latest} — Klick zum Installieren`;
-            icon.addEventListener('click', () => openInstallPage(versions[0].rawUrl));
-            headerTitle.appendChild(icon);
-        }
+        showUpdateBadge(versions[0]);
     } catch (e) {
         console.warn('[Kantine] Version check failed:', e);
+    }
+}
+
+/** Helper: show/cache the 🆕 badge in the header. Extracted so cache-first path can also show it. */
+function showUpdateBadge(version) {
+    const headerTitle = document.querySelector('.header-left h1');
+    if (headerTitle && !headerTitle.querySelector('.update-icon')) {
+        const icon = document.createElement('span');
+        icon.className = 'update-icon';
+        icon.role = 'button';
+        icon.innerHTML = '🆕';
+        icon.title = `Update: ${version.tag} — Klick zum Installieren`;
+        icon.addEventListener('click', () => openInstallPage(version.rawUrl));
+        headerTitle.appendChild(icon);
     }
 }
 
@@ -568,15 +602,16 @@ export function openVersionMenu() {
             }
 
             const liveVersions = await fetchVersions(dm);
+            if (liveVersions !== null) {
+                const liveVersionsStr = JSON.stringify(liveVersions);
+                const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
 
-            const liveVersionsStr = JSON.stringify(liveVersions);
-            const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
-
-            if (liveVersionsStr !== cachedVersionsStr) {
-                localStorage.setItem(LS.VERSION_CACHE, JSON.stringify({
-                    timestamp: Date.now(), devMode: dm, versions: liveVersions
-                }));
-                renderVersionsList(liveVersions);
+                if (liveVersionsStr !== cachedVersionsStr) {
+                    localStorage.setItem(LS.VERSION_CACHE, JSON.stringify({
+                        timestamp: Date.now(), devMode: dm, versions: liveVersions
+                    }));
+                    renderVersionsList(liveVersions);
+                }
             }
 
         } catch (e) {
@@ -589,6 +624,7 @@ export function openVersionMenu() {
     devToggle.onchange = () => {
         localStorage.setItem(LS.DEV_MODE, devToggle.checked);
         localStorage.removeItem(LS.VERSION_CACHE);
+        localStorage.removeItem(LS.VERSION_ETAG);
         loadVersions(true);
     };
 }
