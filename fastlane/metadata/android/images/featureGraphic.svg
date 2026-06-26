@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8F5E9"/>
+      <stop offset="100%" stop-color="#C8E6C9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#bg)"/>
+  <g transform="translate(512, 250)">
+    <text x="0" y="-20" text-anchor="middle" font-family="sans-serif" font-size="72" font-weight="bold" fill="#1B5E20">Kantine</text>
+    <text x="0" y="30" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#2E7D32">Your digital canteen menu</text>
+  </g>
+  <rect x="362" y="320" width="300" height="60" rx="30" fill="#4CAF50" opacity="0.2"/>
+  <text x="512" y="360" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#1B5E20">Material 3 Design</text>
+</svg>

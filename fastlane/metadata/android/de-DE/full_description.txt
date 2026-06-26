@@ -1,0 +1,14 @@
+Kantine - Deine digitale Speisekarte für die Bessa-Kantine.
+
+Mit Kantine behältst du den Überblick über das aktuelle Wochenangebot. Die App zeigt dir die Menüs für diese und nächste Woche in einer übersichtlichen Listenansicht.
+
+Funktionen:
+- Login mit deinem Bessa-Konto
+- Wochenansicht: Diese Woche & Nächste Woche
+- Automatische DE/EN Spracherkennung per Splitter
+- Modernes Material 3 Design mit dynamischen Farben
+
+Datenschutz & Sicherheit:
+Keine Registrierung nötig - einfach mit dem Bessa-Konto einloggen und loslegen. Die App sammelt keine persönlichen Daten, zeigt keine Werbung und trackt nichts. Alle Daten werden verschlüsselt übertragen (HTTPS TLS 1.3).
+
+Kantine liest nur die Menüdaten - es gibt keine Bestellfunktion, keine Bestellhistorie und keine Push-Benachrichtigungen.
