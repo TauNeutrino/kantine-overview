@@ -1,0 +1,344 @@
+[
+  {
+    "input": "Vanillapudding",
+    "expected": {
+      "de": "• Vanillapudding",
+      "en": "• Vanillapudding",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Grießbrei",
+    "expected": {
+      "de": "• Grießbrei",
+      "en": "• Grießbrei",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Bauernomelett",
+    "expected": {
+      "de": "• Bauernomelett",
+      "en": "• Bauernomelett",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Käsespätzle",
+    "expected": {
+      "de": "• Käsespätzle",
+      "en": "• Käsespätzle",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Chicken Nuggets",
+    "expected": {
+      "de": "• Chicken Nuggets",
+      "en": "• Chicken Nuggets",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Fish and Chips",
+    "expected": {
+      "de": "• Fish and Chips",
+      "en": "• Fish and Chips",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Pasta Salad",
+    "expected": {
+      "de": "• Pasta Salad",
+      "en": "• Pasta Salad",
+      "confidence": 0.65,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Rindsroulade / Beef rolls",
+    "expected": {
+      "de": "• Rindsroulade",
+      "en": "• Beef rolls",
+      "confidence": 0.607623195380604,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Kartoffelsuppe / Potato soup",
+    "expected": {
+      "de": "• Kartoffelsuppe",
+      "en": "• Potato soup",
+      "confidence": 0.6244089683686315,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Schnitzel mit Pommes / Schnitzel with fries",
+    "expected": {
+      "de": "• Schnitzel mit Pommes",
+      "en": "• Schnitzel with fries",
+      "confidence": 0.6140723952962261,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Spaghetti Bolognese / Spaghetti Bolognese",
+    "expected": {
+      "de": "• Spaghetti Bolognese",
+      "en": "• Spaghetti Bolognese",
+      "confidence": 0.38,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Gemüsecurry mit Reis (A) / Vegetable curry with rice (A)",
+    "expected": {
+      "de": "• Gemüsecurry mit Reis (A)",
+      "en": "• Vegetable curry with rice (A)",
+      "confidence": 0.9847511440853635,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Hähnchenbrust mit Reis und Gemüse (1,2,3) / Chicken breast with rice and vegetables (1,2,3)",
+    "expected": {
+      "de": "• Hähnchenbrust mit Reis und Gemüse (1,2,3)",
+      "en": "• Chicken breast with rice and vegetables (1,2,3)",
+      "confidence": 0.6407015557938048,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Rindssuppe mit Frittaten / Beef broth with pancakes (A,C)\nSchnitzel mit Reis / Schnitzel with rice (A)\nGemischter Salat / Mixed salad",
+    "expected": {
+      "de": "• Rindssuppe mit Frittaten (A,C)\n• Schnitzel mit Reis (A)\n• Gemischter Salat",
+      "en": "• Beef broth with pancakes (A,C)\n• Schnitzel with rice (A)\n• Mixed salad",
+      "confidence": 0.8583678142539276,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Rindfleischsuppe (A)",
+    "expected": {
+      "de": "• Rindfleischsuppe (A)",
+      "en": "• Rindfleischsuppe (A)",
+      "confidence": 0.9999999999999999,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Käsespätzle (A,C,G)",
+    "expected": {
+      "de": "• Käsespätzle (A,C,G)",
+      "en": "• Käsespätzle (A,C,G)",
+      "confidence": 0.9999999999999999,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Pizza Salami (A,D) / Pizza Salami (A,D)",
+    "expected": {
+      "de": "• Pizza Salami (A,D)",
+      "en": "• Pizza Salami (A,D)",
+      "confidence": 0.7300000000000001,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Burger mit Pommes (A) / Burger with fries (A)",
+    "expected": {
+      "de": "• Burger mit Pommes (A)",
+      "en": "• Burger with fries (A)",
+      "confidence": 0.963729833181172,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Suppe / Soup Salat / Salad Dessert",
+    "expected": {
+      "de": "• Suppe\n• Salat\n• Dessert",
+      "en": "• Soup\n• Salad\n• Dessert",
+      "confidence": 1,
+      "label": "template"
+    }
+  },
+  {
+    "input": "Pasta / Pasta Salat / Salad",
+    "expected": {
+      "de": "• Pasta\n• Salat",
+      "en": "• Pasta\n• Salad",
+      "confidence": 0.2620283084718633,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Suppe / Soup Salat / Salad Dessert",
+    "expected": {
+      "de": "• Suppe\n• Salat\n• Dessert",
+      "en": "• Soup\n• Salad\n• Dessert",
+      "confidence": 1,
+      "label": "template"
+    }
+  },
+  {
+    "input": "Schnitzel (A/F/N) / Schnitzel (A/F/N)",
+    "expected": {
+      "de": "• Schnitzel (AFN)",
+      "en": "• Schnitzel (AFN)",
+      "confidence": 0.7226778666341633,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "",
+    "expected": {
+      "de": "",
+      "en": "",
+      "confidence": 0,
+      "label": "fallback"
+    }
+  },
+  {
+    "input": "   ",
+    "expected": {
+      "de": "",
+      "en": "",
+      "confidence": 0.3,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Müsli mit Joghurt (A) / Muesli with yoghurt (A)",
+    "expected": {
+      "de": "• Müsli mit Joghurt (A)",
+      "en": "• Muesli with yoghurt (A)",
+      "confidence": 0.9715521237261379,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Süßkartoffelsuppe / Sweet potato soup",
+    "expected": {
+      "de": "• Süßkartoffelsuppe",
+      "en": "• Sweet potato soup",
+      "confidence": 0.6388317425037726,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Käse-Lauch-Suppe / Cheese-leek soup",
+    "expected": {
+      "de": "• Käse-Lauch-Suppe",
+      "en": "• Cheese-leek soup",
+      "confidence": 0.6311116932560346,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Döner / Doner",
+    "expected": {
+      "de": "• Döner",
+      "en": "• Doner",
+      "confidence": 0.4380393101516563,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Bauerntopf mit Rind (A, C) / Farmer pot with beef (A, C)",
+    "expected": {
+      "de": "• Bauerntopf mit Rind (A, C)",
+      "en": "• Farmer pot with beef (A, C)",
+      "confidence": 0.9797152256681328,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Risotto mit Pilzen / Risotto with mushrooms",
+    "expected": {
+      "de": "• Risotto mit Pilzen",
+      "en": "• Risotto with mushrooms",
+      "confidence": 0.6047083158309956,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Pasta mit Pesto / Pasta with pesto",
+    "expected": {
+      "de": "• Pasta mit Pesto",
+      "en": "• Pasta with pesto",
+      "confidence": 0.5610648927801458,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Tiramisu (A,G) / Tiramisu (A,G)",
+    "expected": {
+      "de": "• Tiramisu (A,G)",
+      "en": "• Tiramisu (A,G)",
+      "confidence": 0.8059356827748242,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Vanillepudding mit Schokolade (A,G)",
+    "expected": {
+      "de": "• Vanillepudding mit Schokolade (A,G)",
+      "en": "• Vanillepudding mit Schokolade (A,G)",
+      "confidence": 0.9999999999999999,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Rahmschnitzel (A) / Cream schnitzel (A)\nButtergemüse (A) / Buttered vegetables (A)\nPommes frites / French fries",
+    "expected": {
+      "de": "• Rahmschnitzel (A)\n• Buttergemüse (A)\n• Pommes frites",
+      "en": "• Cream schnitzel (A)\n• Buttered vegetables (A)\n• French fries",
+      "confidence": 0.8297980382039537,
+      "label": "high"
+    }
+  },
+  {
+    "input": "Asia Nudeln (A) / Asian noodles (A)\nFrühlingsrolle / Spring roll",
+    "expected": {
+      "de": "• Asia Nudeln (A)\n• Frühlingsrolle",
+      "en": "• Asian noodles (A)\n• Spring roll",
+      "confidence": 0.5038720058700265,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Cordon Bleu (A) / Cordon Bleu (A)\nBratkartoffeln / Fried potatoes",
+    "expected": {
+      "de": "• Cordon Bleu (A)\n• Bratkartoffeln",
+      "en": "• Cordon Bleu (A)\n• Fried potatoes",
+      "confidence": 0.4827817190565742,
+      "label": "low"
+    }
+  },
+  {
+    "input": "Hühnerfrikassee / Chicken fricassee",
+    "expected": {
+      "de": "• Hühnerfrikassee",
+      "en": "• Chicken fricassee",
+      "confidence": 0.6132522290413638,
+      "label": "medium"
+    }
+  },
+  {
+    "input": "Wurstsalat mit Pommes / Sausage salad with fries",
+    "expected": {
+      "de": "• Wurstsalat mit Pommes",
+      "en": "• Sausage salad with fries",
+      "confidence": 0.5965994671492648,
+      "label": "medium"
+    }
+  }
+]
