@@ -1,0 +1,6 @@
+# Set the path to your Android SDK
+# On macOS, typically:
+# sdk.dir=/Users/<username>/Library/Android/sdk
+# On Linux:
+# sdk.dir=/home/<username>/Android/Sdk
+sdk.dir=/path/to/Android/sdk

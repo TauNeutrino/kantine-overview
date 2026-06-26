@@ -1,0 +1,42 @@
+{
+  "results": [
+    {
+      "id": 1,
+      "name": "Mittagsmenü",
+      "items": [
+        {
+          "id": 101,
+          "name": "Wiener Schnitzel mit Kartoffelsalat",
+          "description": "Paniertes Schweineschnitzel mit hausgemachtem Kartoffelsalat",
+          "price": "6.90",
+          "available_amount": "15",
+          "amount_tracking": true
+        },
+        {
+          "id": 102,
+          "name": "Gemüse-Curry mit Basmatireis",
+          "description": "Veganes Curry mit saisonalem Gemüse und Kokosmilch",
+          "price": "5.50",
+          "available_amount": "0",
+          "amount_tracking": true
+        },
+        {
+          "id": 103,
+          "name": "Rindergulasch mit Spätzle",
+          "description": "Geschmortes Rindfleisch in Paprikasauce mit Eierspätzle",
+          "price": "7.20",
+          "available_amount": "8",
+          "amount_tracking": true
+        },
+        {
+          "id": 104,
+          "name": "Tagessuppe: Tomatencremesuppe",
+          "description": "Cremige Tomatensuppe mit Croutons",
+          "price": "3.20",
+          "available_amount": "0",
+          "amount_tracking": false
+        }
+      ]
+    }
+  ]
+}
