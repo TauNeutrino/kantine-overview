@@ -4,17 +4,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Cutlery icon: fork and knife -->
-    <group
-        android:translateX="27"
-        android:translateY="24">
-        <!-- Fork -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M16,0C14.9,0 14,0.9 14,2v16h-4V2C10,0.9 9.1,0 8,0S6,0.9 6,2v16c0,3.31 2.69,6 6,6s6,-2.69 6,-6V2C18,0.9 17.1,0 16,0z" />
-        <!-- Knife -->
-        <path
-            android:fillColor="#FFFFFF"
-            android:pathData="M48,60V6c0,-3.31 -2.69,-6 -6,-6C36.69,0 32,6.69 32,14v18c0,2.21 1.79,4 4,4h4v24c0,2.21 1.79,4 4,4s4,-1.79 4,-4z" />
-    </group>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,34 L38,74 L46,74 L46,58 L54,58 L54,50 L46,50 L46,42 L62,42 L62,34 Z" />
 </vector>

@@ -6,3 +6,7 @@ venv/
 .omo/
 test_eval*.js
 test_split.js
+
+# Android keystore
+android/keystore/
+android/keystore.properties
