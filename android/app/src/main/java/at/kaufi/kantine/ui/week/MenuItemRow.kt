@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MenuItemRow(
     item: MenuItemData,
+    displayName: String = item.nameDe,
     modifier: Modifier = Modifier,
 ) {
     val alphaValue = if (item.isAvailable) 1.0f else 0.5f
@@ -39,7 +40,7 @@ fun MenuItemRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = item.name,
+                text = displayName,
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.weight(1f),
             )

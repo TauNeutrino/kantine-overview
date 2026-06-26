@@ -3,6 +3,7 @@ package at.kaufi.kantine.domain.splitter
 import android.content.Context
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject
@@ -14,7 +15,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class SeedLoader @Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
 ) {
     private val moshi: Moshi = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())

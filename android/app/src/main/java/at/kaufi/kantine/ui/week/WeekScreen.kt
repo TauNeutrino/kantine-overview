@@ -35,6 +35,7 @@ fun WeekScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val selectedTab by viewModel.selectedTab.collectAsState()
+    val currentLang by viewModel.currentLang.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state) {
@@ -90,7 +91,7 @@ fun WeekScreen(
                                 )
                             }
                             items(weekData.days) { day ->
-                                DayCard(day = day)
+                                DayCard(day = day, currentLang = currentLang)
                             }
                         }
                     }

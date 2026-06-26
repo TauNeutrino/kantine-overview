@@ -6,6 +6,10 @@ import at.kaufi.kantine.data.local.WeekWithDays
 import at.kaufi.kantine.data.mapper.getISOWeekNumber
 import at.kaufi.kantine.data.mapper.getISOWeekYear
 import at.kaufi.kantine.data.repository.MenuRepository
+import at.kaufi.kantine.domain.i18n.TranslationManager
+import at.kaufi.kantine.domain.splitter.LangModel
+import at.kaufi.kantine.domain.splitter.SplitResult
+import at.kaufi.kantine.domain.splitter.Splitter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +26,8 @@ data class MenuItemData(
     val description: String,
     val price: String,
     val isAvailable: Boolean,
+    val nameDe: String = name,
+    val nameEn: String = name,
 )
 
 data class DayData(
@@ -47,6 +53,8 @@ sealed interface WeekScreenState {
 @HiltViewModel
 class WeekScreenViewModel @Inject constructor(
     private val menuRepository: MenuRepository,
+    private val langModel: LangModel,
+    private val translationManager: TranslationManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<WeekScreenState>(WeekScreenState.Loading)
@@ -55,11 +63,16 @@ class WeekScreenViewModel @Inject constructor(
     private val _selectedTab = MutableStateFlow(0)
     val selectedTab: StateFlow<Int> = _selectedTab.asStateFlow()
 
+    val currentLang: StateFlow<String> = translationManager.currentLang
+
+    private var splitterCache = mutableMapOf<String, SplitResult>()
+
     init { loadData() }
 
     fun loadData() {
         viewModelScope.launch {
             _state.value = WeekScreenState.Loading
+            splitterCache = mutableMapOf()
             try {
                 val now = LocalDate.now()
                 val thisWeekNumber = getISOWeekNumber(now)
@@ -110,11 +123,16 @@ class WeekScreenViewModel @Inject constructor(
                 DayData(
                     dateLabel = dateLabel,
                     items = day.items.map { item ->
+                        val cached = splitterCache.getOrPut(item.name) {
+                            Splitter.splitLanguage(item.name, langModel)
+                        }
                         MenuItemData(
                             name = item.name,
                             description = item.description ?: "",
                             price = formatPrice(item.price),
                             isAvailable = item.available,
+                            nameDe = cached.de.ifEmpty { item.name },
+                            nameEn = cached.en.ifEmpty { item.name },
                         )
                     }
                 )

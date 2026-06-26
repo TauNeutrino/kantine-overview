@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DayCard(
     day: DayData,
+    currentLang: String,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -36,7 +37,10 @@ fun DayCard(
                 )
             } else {
                 day.items.forEach { item ->
-                    MenuItemRow(item = item)
+                    MenuItemRow(
+                        item = item,
+                        displayName = if (currentLang == "en") item.nameEn else item.nameDe,
+                    )
                 }
             }
         }
