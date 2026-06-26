@@ -71,6 +71,14 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
+     * Clears the stored token and resets the login state to Idle.
+     */
+    fun logout() {
+        tokenManager.clearToken()
+        _loginState.value = LoginState.Idle
+    }
+
+    /**
      * Resets the login state to Idle (e.g. after a dismissed error).
      */
     fun resetState() {
