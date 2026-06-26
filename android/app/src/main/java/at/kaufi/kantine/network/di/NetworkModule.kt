@@ -22,12 +22,6 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideTokenProvider(): TokenProvider = object : TokenProvider {
-        override fun getToken(): String? = null
-    }
-
-    @Provides
-    @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY

@@ -3,6 +3,7 @@ package at.kaufi.kantine.network
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * OkHttp interceptor for the Bessa API.
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
  * - Handles 429 → exponential backoff up to 3 retries → [BessaException.RateLimited]
  * - Handles 5xx → [BessaException.ServerError]
  */
-class BessaInterceptor(
+class BessaInterceptor @Inject constructor(
     private val tokenProvider: TokenProvider,
 ) : Interceptor {
 
