@@ -1,307 +1,578 @@
-## v1.9.4 (2026-06-24)
-- 🐛 **Fix**: `renderVisibleWeeks()` erhält die Scroll-Position des `.days-grid`-Containers vor dem DOM-Wipe und stellt sie nach dem Re-Render wieder her. Die Seite springt bei Refreshs (z.B. nach Bestellung/Stornierung/Flag-Änderung) nicht mehr nach oben.
-
-## v1.9.3 (2026-06-24)
-- ✨ **Feature**: Bei fehlgeschlagener Bestellung (API-Fehler oder Netzwerkfehler) werden die verfügbaren Stückzahlen des Menüs automatisch neu geladen und im UI aktualisiert.
-
-## v1.9.2 (2026-06-24)
-- ⚡ **Performance**: GitHub API Rate-Limit-Schutz für das Version-Menü. `checkForUpdates()` prüft zuerst den lokalen Cache (1h TTL) und spart so den API-Call beim stündlichen Polling. `fetchVersions()` sendet gespeicherte ETag-Header für Conditional Requests – GitHub-Antworten mit `304 Not Modified` werden nicht aufs Rate-Limit angerechnet. DevMode-Wechsel löscht auch den ETag-Cache.
-
-## v1.9.1 (2026-06-24)
-- 🐛 **Bugfix**: Sprachsplitter interpretiert Slashes innerhalb von Klammern nicht mehr fälschlich als DE/EN-Trenner. Menüs mit Fleischangaben in Klammern wie `(Schwein/Rind)` oder `(pork/beef)` werden jetzt korrekt zweisprachig aufgeteilt (`high` confidence statt `fallback`).
-
-## v1.9.0 (2026-06-23)
-- 🔄 **Sprachsplitter komplett überarbeitet**: Handgepflegte Wortlisten ersetzt durch selbstlernendes Trigramm-Sprachmodell. Erkennt DE/EN-Grenzen anhand Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Modell nicht kennt. Mono-Desserts/Markenwörter (Donut, Balisto, Vanillapudding) werden als eigener Gang erkannt. Verschmolzene Gänge durch fehlende Allergene werden korrekt getrennt. 2-Gänge-Ergebnisse werden als verdächtig eingestuft.
-- ✨ **Hover-Tooltip** auf Menübeschreibungen mit zweifelhaftem Split (medium/low) zeigt den Originaltext zur Kontrolle.
-- ✨ **Sprachumschaltung** als 3-State-Toggle (DE/EN/ALL) – ein Klick, kein Dropdown.
-- ✨ **Versionsübersicht**: „Installieren"- und „→ Github"-Buttons auch für die aktuell installierte Version sichtbar.
-- 🎨 **DEV-Badge**: Confidence-Badge sitzt inline in der Menübeschreibung, kleiner und unscheinbarer.
-- 🐛 **Diverse Bugfixes** (v1.8.7–v1.8.9): Host-CSS-Überschreibungen, Blob-URL-Redirect, Menüname-Lokalisierung bei Sprachwechsel, Live-Mengenaktualisierung nach Bestellung.
-- 🛠️ **Build**: plattformunabhängige Node.js-Scripts (`npm run build`, `npm run release`) ersetzen Bash-Scripts.
-
-## v1.8.11 (2026-06-23)
-- 🐛 **Bugfix**: Verschmolzene Gänge werden korrekt getrennt. Wenn ein Gericht in der Wochenkarte kein Allergen hatte, wurden zuvor zwei Gerichte fälschlich zu einem zusammengefasst (z. B. „Curryhuhn" und „Erdbeer-Rhabarber-Tiramisu"). Der Splitter erkennt die Gericht-Grenzen jetzt anhand der Slash-Struktur und deutscher Großschreibung – auch bei seltenen Wörtern, die das Sprachmodell nicht kennt.
-- ✨ **Feature**: Einzeln geschriebene Mono-Desserts/Markenwörter (z. B. Donut, Balisto, Vanillapudding) werden als eigener dritter Gang erkannt, statt an das vorige Gericht zu kleben.
-- ✨ **Feature**: Bei zweifelhaften Splits (Confidence „medium" oder niedriger) zeigt ein Hover über die Menü-Beschreibung den originalen Rohtext als Tooltip zur Kontrolle.
-- 🎨 **UI**: Der Confidence-Badge (`kantine_dev_mode`) schwebt jetzt unten rechts in der Menü-Beschreibung statt neben dem Verfügbarkeits-Badge.
-- 🐛 **Bugfix**: Ein 2-Gänge-Ergebnis wird als verdächtig eingestuft (normal sind 3 Gänge oder 1 am Freitag) und in der Confidence herabgestuft.
-
-## v1.8.10 (2026-06-23)
-- 🔄 **Refactor**: Sprach-Erkennung (`splitLanguage`) komplett neu geschrieben. Handgepflegte Wort-Stamm-Listen (DE_STEMS, EN_STEMS) wurden durch ein selbstlernendes Trigramm-Sprachmodell ersetzt, das sich automatisch an neue Menüs anpasst und eine Confidence-Bewertung liefert.
-- ✨ **Feature**: DEV-Confidence-Badge im `kantine_dev_mode` – zeigt Confidence-Score und Sub-Scores (Anchor/Purity/Course/Coverage) als Tooltip an.
-- 🧪 **Testing**: Umfassende Test-Suite für das neue Sprachmodell (9 Modul-Tests + 451-Item "No Info Lost"-Prüfung + Hold-out Evaluierungs-Harness).
-- 🛠️ **Build**: Build-Script (`build-bookmarklet.sh`) und Release-Script (`release.sh`) als plattformunabhängige Node.js-Scripts portiert (`scripts/build.js`, `scripts/release.js`). Build läuft jetzt via `npm run build`.
-- 🐛 **Bugfix**: `test_logic.js` VM-Sandbox lädt nun ES6-Module in korrekter Dependency-Reihenfolge, sodass der Splitter-Test nicht mehr an undefined-Imports scheitert.
-- 🐛 **Bugfix**: Redirect-Test in `test_logic.js` erhält jetzt `document.querySelector`/`querySelectorAll`-Mock, um Fehler durch Top-Level-DOM-Zugriffe importierter Module zu vermeiden.
--
-## v1.8.9 (2026-06-22)
-- ✨ **Feature**: Nach erfolgreicher Bestellung eines beobachteten Menüs wird dessen "Notify"-Status (Glocken-Icon) nun automatisch entfernt.
-- ✨ **Feature**: Nach einer Bestellung (oder Stornierung) wird die angezeigte Restmenge des Menüs automatisch mittels Live-API-Call auf den aktuellen Wert aktualisiert.
-- 🐛 **Bugfix**: Beim Wechseln der Sprache wurden die Namen der Menüs auf den Karten bisher nicht sofort neu gerendert. Dies wurde korrigiert, indem auch der Menü-Titel in Echtzeit lokalisiert wird.
-
-## v1.8.8 (2026-06-18)
-- 🐛 **Bugfix**: Redirect-Prüfung bei Blob-URLs korrigiert. Wenn das Bookmarklet auf einer `blob:`-URL ausgeführt wird (z. B. auf der Installer-Seite), wird das Protokoll nun korrekt erkannt und leitet den Benutzer zuverlässig zu `https://web.bessa.app/knapp-kantine` weiter.
-## v1.8.7 (2026-06-18)
-- 🐛 **Bugfix**: Hintergrundfarbe und Schriftart-Spezifität korrigiert. Der Body-Hintergrund der Wirtsseite (Klasse `.bg`) hat zuvor unseren Body-Hintergrund überschrieben, wodurch die Übersicht und die teiltransparente Titelleiste grau verfärbt wurden. Dies wird nun durch spezifischere Selektoren (`body, body.bg`) und `!important` behoben. Zudem wurde die Schriftart `Inter` wiederhergestellt und `#kantine-wrapper` erhielt eine explizite Hintergrundfarbe.
-
-
-## v1.8.6 (2026-05-11)
-- 🐛 **Bugfix**: PayPal-Button mittels CSS-Scaling (0.9) eingepasst, um Clipping am unteren Rand zu verhindern, ohne die Footer-Höhe zu verändern.
-
-## v1.8.5 (2026-05-11)
-- 🐛 **Bugfix**: Rechtes Footer-Padding erhöht, um Überlagerung der Spenden-Buttons durch den Scrollbalken zu verhindern.
-
-## v1.8.4 (2026-05-11)
-- 📐 **Layout**: Spenden-Buttons (Ko-fi & PayPal) auf die rechte Seite des Footers verschoben.
-- 🎨 **UX**: Ko-fi Button weiter verkleinert (20px) für eine noch dezentere Integration.
-
-## v1.8.3 (2026-05-11)
-- 🎨 Spenden-Buttons (Ko-fi & PayPal) auf 24px Höhe verkleinert.
-- 📐 Footer-Layout optimiert und Padding reduziert für kompaktere Darstellung.
-
-## v1.8.2 (2026-05-11)
-- ✨ Spenden-Buttons (Ko-fi & PayPal) im Footer hinzugefügt.
-- 🎨 Footer-Layout auf Flexbox umgestellt für bessere Desktop- & Mobile-Darstellung.
-
-## v1.8.1 (2026-05-11)
-- 🔒 **Fix**: `htmlpreview.github.io`-Links wurden durch Firewalls geblockt. Installer-Seiten werden nun direkt aus dem GitHub Raw-Content (`raw.githubusercontent.com`) per Fetch geladen und als Blob-URL im Browser geöffnet – kein externer Proxy mehr nötig.
-- ✨ **UX**: Im Versions-Dialog ersetzt ein Zwei-Button-Layout den alten Einzel-Link:  
-  - **Installieren** – Lädt `install.html` via Blob aus GitHub Raw-Content und öffnet sie gerendert in einem neuen Tab.  
-  - **→ Github** – Öffnet die Datei direkt im GitHub Dateibrowser (neuer Tab).
-- 🔒 **Fix**: Das `🆕`-Update-Icon im Header verlinkt nun ebenfalls per Blob-Fetch statt über `htmlpreview`.
-
-## v1.8.0 (2026-05-10)
-- 🐛 **Bugfix**: Kritischer Fehler bei der Bestellübermittlung behoben.
-  - Das Datumsformat (`date`) im Payload der `placeOrder`-Funktion wurde von `T10:30:00Z` auf `T09:00:00.000Z` geändert. Das Kantinen-Terminal verlangt strikt dieses Format inklusive Millisekunden, um die Bestellung für den Mittagstisch anzuzeigen.
-  - Das `preorder`-Flag wird nun standardmäßig als `false` (statt `true`) an die API übergeben, da Vorbestellungen sonst im Küchensystem gefiltert wurden, obwohl das Web-Backend sie akzeptiert hat.
-- 📝 **Docs**: OpenAPI Spezifikation (`bessa-openapi.yaml`) um die neuen Erkenntnisse bezüglich des Küchen-Terminals erweitert.
-
-## v1.7.3 (2026-03-17)
-- 🛠️ **Build**: Build-Fehler in den DOM-Tests behoben (JSDOM-Domain-Check).
-- 🏷️ **Metadata**: Version auf v1.7.3 angehoben.
-
-## v1.7.2 (2026-03-12)
-- 🛡️ **Security**: Logout-Logik vervollständigt (FR-006). Beim Abmelden werden nun alle App-bezogenen Daten (inkl. Bestellhistorie, Cache und Einstellungen) aus dem `localStorage` gelöscht.
-- 🧹 **Cleanup**: Veraltete `GUEST_TOKEN` Rückstände in `events.js` und `ui_helpers.js` entfernt.
-- 🧪 **Testing**: Die Security-Test-Suite wurde um eine Verifikation der Logout-Datenlöschung erweitert.
-
-## v1.7.1 (2026-03-12)
-- 🛡️ **Security**: Kritischer Security-Fix und Härtung:
-  - **XSS-Schutz**: `innerHTML` durch `textContent` in `renderTagsList` (Actions) und `showErrorModal` (UI-Helpers) ersetzt.
-  - **XSS-Schutz**: Dynamische Kartenelemente in `createDayCard` validiert.
-  - **Input-Validierung**: Neue Schlagwörter werden nun auf Länge (2-20 Zeichen) und erlaubte Zeichen (Alphanumerisch + Food-Sonderzeichen) geprüft.
-  - **GUEST_TOKEN**: Der hardcodierte Gast-Token wurde komplett aus dem Code entfernt. Nicht-eingeloggte Nutzer haben keinen API-Zugriff mehr (Sicherheitsbestimmung).
-  - **Auth-Guards**: API-Funktionen (`loadMenuDataFromAPI`, `refreshFlaggedItems`) prüfen nun explizit auf vorhandene Authentifizierung vor dem Fetch.
-- 🛡️ **Tech**: Sicherheits-Test-Suite `tests/test_security.js` implementiert.
-
-## v1.6.25 (2026-03-12)
-- ⚡ **Performance**: Debounced Resize-Listener hinzugefügt. Die Höhen-Synchronisierung der Menü-Karten wird nun auch bei Viewport-Änderungen (z.B. Fenster-Skalierung oder Orientierungswechsel) automatisch und effizient ausgeführt.
-- 🧹 **Tech**: `debounce` Utility-Funktion in `utils.js` ergänzt.
-
-## v1.6.24 (2026-03-12)
-- ⚡ **Performance**: Layout Thrashing in `syncMenuItemHeights` behoben. Durch Batch-Verarbeitung von DOM-Lese- und Schreibvorgängen wurde die Rendering-Effizienz beim Wochenwechsel verbessert.
-
-## v1.6.23 (2026-03-12)
-- 🎨 **UI**: Umfassende UI-Verbesserungen umgesetzt:
-  - **Glassmorphism**: Header-Hintergrundtransparenz auf 72% reduziert (war 90%) – der Blur-Effekt ist nun beim Scrollen sichtbar.
-  - **Dark-Mode Kontrast**: `--bg-card` abgedunkelt (`#283548`), `--border-color` leicht aufgehellt (`#526377`) – bessere Trennung zwischen Body und Card.
-  - **Accent-Color**: Im Light-Mode von Slate-900 (fast schwarz) auf Blue-600 (`#2563eb`) geändert – klarer sichtbarer Akzent.
-  - **Typography**: `.item-desc` `line-height` auf 1.5 (body-konsistent), `.day-date` kleiner und dezenter (0.8rem, opacity 0.75), `.item-name` leicht reduziert (0.95rem).
-  - **Item-Separator**: Subtile Trennlinie zwischen Menü-Items in der Tageskarte.
-  - **Badge-Konsistenz**: Alle Badges (`badge`, `tag-badge-small`) auf `border-radius: 6px` vereinheitlicht.
-  - **A11y – Reduced Motion**: `@media (prefers-reduced-motion: reduce)` deaktiviert alle dekorativen Puls-/Glow-Animationen für Motion-sensitive Nutzer.
-  - **A11y – Focus-Visible**: Globaler `:focus-visible` Outline-Ring (2px, accent-color) für Tastaturnavigation.
-  - **Active-States**: `:active` Feedback (`scale(0.97)`) für Bestell-, Storno- und Flag-Buttons.
-  - **Mobile Breakpoint**: Von 600px auf 768px erweitert (deckt Tablets ab); Grid-Deklaration explizit gesetzt um Browser-Override-Bug zu vermeiden.
-
-## v1.6.22 (2026-03-12)
-- 🧹 **UX Cleanup**: Text-Label am Sprachumschalter entfernt. Der Button zeigt nun nur noch das `translate`-Icon an, was die Controls-Bar ruhiger macht.
-
-## v1.6.21 (2026-03-12)
-- ✨ **Feature**: Sprachumschaltung Redesign – Die Sprachwahl (DE/EN/ALL) wurde von der Header-Mitte in den rechten Controls-Bereich verschoben. Sie ist nun als Icon-Dropdown mit aktueller Status-Anzeige (z.B. "DE") verfügbar. Für die deutsche Sprache wird die 🇦🇹 Flagge verwendet.
-
-## v1.6.20 (2026-03-12)
-- 🧹 **Cleanup**: Wochenkosten-Anzeige entfernt (Weekly Cost Display) – Auf User-Wunsch wurde die Anzeige der wöchentlichen Gesamtkosten im Header entfernt, um die UI zu entschlacken. FR-040 als obsolet markiert.
-
-## v1.6.19 (2026-03-11)
-- 🎨 **UX**: Grid-Layout & Glow Overlap Fix – Die Karten-Inhalte wurden auf ein sauberes Grid-Gap-Modell umgestellt (`row-gap: 1.5rem`). Dies verhindert technische Überlappungen von Menü-Items und stellt sicher, dass Glow-Effekte (Bestellt, Highlight) alle Inhalte korrekt umschließen. Manuelle Abstände wurden bereinigt.
-
-- 🎨 **UX**: Glow-Styling angepasst – Die farblichen Hervorhebungen (Bestellt, Highlight, Flagged) wurden so korrigiert, dass sie nicht mehr bis an den Kartenrand reichen, sondern innerhalb des Karten-Bodys mit entsprechendem Seitenabstand angezeigt werden.
-
-- 🎨 **UX**: Fix Card Content Overflow – In der 5-Tage-Ansicht (Landscape) auf schmalen Bildschirmen umbrechen die Status-Badges und Buttons jetzt korrekt in eine neue Zeile, statt über den Kartenrand hinauszuragen. Das Karten-Padding wurde für Desktop-Ansichten optimiert.
-
-- 🧹 **Wartbarkeit**: Alle verbliebenen hardcodierten deutschen UI-Strings in `actions.js` via `t()` übersetzt (Progress-Texte, Fehler-Labels, 'Angemeldet', 'Hintergrund-Synchronisation').
-- 🔑 **Wartbarkeit**: Alle `localStorage`-Schlüssel in einheitliches `LS`-Objekt in `constants.js` zentralisiert. Alle Quelldateien verwenden jetzt `LS.*` statt Rohstrings.
-- 🛡️ **Robustheit**: `setLangMode()` und `setDisplayMode()` in `state.js` prüfen jetzt Eingabewerte – ungültige Werte werden verworfen und protokolliert.
-- 📝 **Kodierung**: JSDoc für `ui.js` und `injectUI()` ergänzt.
-
-- 🐛 **Bugfix**: Geprüfte Menüs (`refreshFlaggedItems`) aktualisieren jetzt nur noch die tatsächlich geflaggten Artikel – nicht mehr alle Menüs des betroffenen Tages ([Bug 1]).
-- 🐛 **Bugfix**: Beim Öffnen des Highlights-Modals werden bestehende Tags sofort angezeigt, auch ohne vorherige Neueingabe ([Bug 2]).
-- 🎨 **UX**: Die Zahlen-Badges im „Nächste Woche"-Button wurden entfernt. Die Bestellübersicht (bestellt / bestellbar / gesamt + Highlights) ist jetzt als Tooltip abrufbar ([FR-100 Update]).
-- 🌍 **Feature**: Bei Auswahl von EN wird die gesamte Benutzeroberfläche auf Englisch umgestellt (Buttons, Tooltips, Modals, Status-Badges, Wochentage, Bestellhistorie). DE und ALL behalten Deutsch bei ([FR-122]).
-- ✨ **Feature**: Das Glühen des „Nächste Woche"-Buttons wird jetzt nur noch ausgelöst, wenn für Montag–Donnerstag bestellbare Menüs ohne bestehende Bestellung vorhanden sind. Freitag ist von dieser Prüfung ausgenommen ([FR-092 Update]).
-- 🧹 **Wartbarkeit**: Code-Qualitätsprüfung aller Quelldateien – JSDoc-Kommentare ergänzt, Erklärungen für komplexe Logikblöcke hinzugefügt.
-- 📦 **Neu**: `src/i18n.js` – Zentrales Übersetzungsmodul für alle statischen UI-Labels (DE/EN).
-
-## v1.6.14 (2026-03-10)
-- 🐛 **Bugfix**: Die globale "Aktualisiert am"-Zeit im Header wird bei einer manuellen Prüfung der geflaggten Menüs nicht mehr zurückgesetzt.
-
-## v1.6.13 (2026-03-10)
-- ✨ **Feature**: Manueller Refresh der geflaggten Menüs durch Klick auf das Alarm-Icon im Header ([FR-093](REQUIREMENTS.md#FR-093)).
-- 🔄 **UI**: Visuelle Rückmeldung während der Prüfung durch Rotation des Icons.
-- 🔔 **Notification**: Toast-Benachrichtigung zeigt die Anzahl der geprüften Menüs an.
-
-## v1.6.12 (2026-03-10)
-- 🔄 **Refactor**: Modularisierung von `kantine.js` in ES6-Module (`api.js`, `state.js`, `utils.js`, `ui.js`, etc.).
-- 📦 **Build**: Integration von Webpack in den Build-Prozess zur Unterstützung der modularen Struktur.
-- 🛡️ **Security**: XSS-Schutz durch Escaping dynamischer Inhalte in `innerHTML`.
-- ⚡ **Performance**:
-    - Optimierte Tag-Badge-Generierung und UI-Render-Loops (Verwendung von `reduce`).
-    - Nutzung von `insertAdjacentHTML` statt `innerHTML` für effizienteres Rendering.
-    - Batch-Fetching von `availableDates` zur Reduzierung der API-Calls.
-    - Performance-Fixes in `ui_helpers.js`.
-- 🧪 **Testing**: Unit-Tests für GitHub API-Header Generierung hinzugefügt.
-- 🧹 **Cleanup**: Entfernung verwaister `console.log` Statements.
-- 🐛 **Bugfix**: Korrektur des Tooltips beim Alarm-Icon (Polling-Zeit vs. globale Aktualisierungszeit).
-
-## v1.6.11 (2026-03-09)
-- 🔄 **Refactor**: Trennung der Zeitstempel für die Hauptaktualisierung (Header) und die Benachrichtigungsprüfung (Bell-Icon). Das Polling aktualisiert nun nicht mehr fälschlicherweise die "Aktualisiert am"-Zeit im Header.
-- 🏷️ **Metadata**: Version auf v1.6.11 angehoben.
-
-## v1.6.10 (2026-03-09)
-- **Feature**: Robuste Kurs-Erkennung in zweisprachigen Menüs ([FR-121](REQUIREMENTS.md#FR-121)).
-- **Fix**: Verhindert das Verschieben von Gängen bei fehlenden englischen Übersetzungen.
-- **Improved**: Heuristik-Split erkennt nun zuverlässiger den Übergang von Englisch zurück zu Deutsch (z.B. bei "Achtung"-Hinweisen)
-
-## v1.6.9 (2026-03-09)
-- 🐛 **Bugfix**: Fehlerhafte Zeitangabe beim Bell-Icon ("vor 291h") behoben. Der Tooltip wird nun minütlich aktualisiert und nach jeder Menü-Prüfung korrekt neu gesetzt.
-- 🔄 **Refactor**: Zeitstempel-Management für die letzte Aktualisierung vereinheitlicht und im `localStorage` persistiert.
-
-## v1.6.8 (2026-03-06)
-- ⚡ **Performance**: Das JavaScript für das Kantinen-Bookmarklet wird nun beim Build-Prozess (via Terser) minimiert, was die Länge der injizierten URL spürbar reduziert.
-
-## v1.6.7 (2026-03-06)
-- 🎨 **Style**: Das neue Header-Logo (`favicon_base.png`) wird nun konsequent auf 40x40px generiert und gerendert.
-
-## v1.6.6 (2026-03-06)
-- 🎨 **Style**: Den Schatten und den hervorstehenden Karten-Effekt für bestellte Menüs an vergangenen Tagen komplett entfernt - verbleiben nun visuell flach und unaufdringlich wie nicht-bestellte Menüs.
-
-## v1.6.5 (2026-03-06)
-- ✨ **Feature**: Das `restaurant_menu` Icon im Header wurde durch das neue `favicon_base.png` Logo ersetzt, passend zur Textgröße skaliert.
-- 🎨 **Style**: Violette Umrahmung (Bestellt-Markierung) an vergangenen Tagen entfernt, um den Fokus auf aktuelle und zukünftige Bestellungen zu lenken.
-- 🎨 **Style**: Der Glow-Effekt für am heutigen Tag bestellte Menüs wurde intensiviert.
-
-## v1.6.4 (2026-03-05)
-- ✨ **Feature**: Sprach-Lexikon (DE/EN) massiv erweitert um österreichische Begriffe (Nockerl, Fleckerl, Topfen, Mohn, Most etc.) und gängige Tippfehler aus dem Bessa-System (trukey, coffe, oveb etc.).
-- 🧹 **Cleanup**: Sprach-Lexikon dedupliziert und alphabetisch sortiert für bessere Performance und Wartbarkeit.
-- 🐛 **Bugfix**: Trennung von zweisprachigen Menüs (`splitLanguage`) verbessert: Erfasst nun auch Schrägstriche ohne Leerzeichen (z.B. `Suppe/Soup`).
-- 🐛 **Bugfix**: Fehlerhafte Badge-Anzeige korrigiert (Variable `count` vs `orderCount`).
-
-## v1.6.3 (2026-03-05)
-- ✨ **Chore**: Slogan im Footer aktualisiert ("Jetzt Bessa Einfach! • Knapp-Kantine Wrapper • 2026 by Kaufis-Kitchen") und Footer-Höhe für mehr Platzierung optimiert.
-
-## v1.6.2 (2026-03-05)
-- ✨ **Feature**: Wochentags-Header (Montag, Dienstag etc.) scrollen nun als "Sticky Header" mit und bleiben am oberen Bildschirmrand haften.
-  - Das Layout clippt scrollende Speisen ordentlich darunter weg.
-  - Vollständiges Viewport-Scrolling: Das Layout nutzt nun die ganze Höhe aus (`100dvh`), wodurch Scrollbalken sauber am Rand positioniert sind.
-- 🐛 **Bugfix**: Probleme mit Bessa's default `overflow` Verhalten behoben, das `position: sticky` auf iOS/WebKit-Browsern blockierte.
-
-## v1.6.0 (2026-03-04)
-- ✨ **Feature**: Sprachfilter für zweisprachige Menübeschreibungen. Neuer DE/EN/ALL Toggle im Header ermöglicht das Umschalten zwischen Deutsch, Englisch und dem vollen Originaltext. Allergen-Codes werden in allen Modi angezeigt. Einstellung wird persistent gespeichert.
-
-## v1.5.1 (2026-03-04)
-- 🐛 **Bugfix**: Freitagsbestellungen schlugen fehl ("Onlinebestellung sind nicht verfügbar"). Ursache: Der Order-Payload verwendete `preorder: false` und eine falsche Uhrzeit (`T10:00:00.000Z` statt `T10:30:00Z`). Beides wurde anhand der originalen Bessa-API korrigiert.
-
-## v1.5.0 (2026-02-26)
-Das große "Quality of Life"-Update! Zusammenfassung aller Features und Fixes seit v1.4.0:
-
-- ✨ **Bestellhistorie**: Übersichtliche Historie direkt in der App – gruppiert nach Jahr/Monat, inklusive Summen, Stati (Offen/Abgeschlossen/Storniert) und Delta-Cache für rasantes Laden.
-- ⚡ **Smart Cache & Performance**: Massive Reduzierung von API-Calls und Ladezeiten durch intelligenten lokalen Cache. Das Bookmarklet startet nun praktisch verzögerungsfrei.
-- 🔄 **GitHub Release Management**: In-App Versions-Menü mit Auto-Update Check (`🆕` Icon). Umschalten zwischen "Stable" und "Dev" Versionen sowie Downgrade-Möglichkeit direkt über die GitHub API.
-- 🌟 **Smart Highlights & UX**: Speisen-Favoriten leuchten nun im Design-Violett und erhalten Feature-Badges. Der Bestell-Badge für nächste Woche filtert nun intelligent personalisierte Highlights voraus.
-- 🔔 **Bestell-Warnung & Notifications**: Der System-Alarm berücksichtigt nun Sessions korrekt, zeigt dynamische Farbwechsel (gelb/grün/rot) und warnt verlässlich vor dem Bestellschluss (10:00 Uhr). Altlasten von Vortagen werden automatisch geputzt.
-- 🎨 **Eigenes Favicon**: Das Bookmarklet und der Installer haben nun ein eigenes Icon (Dreieck mit Besteck), das beim Hineinziehen in die Lesezeichenleiste übernommen wird (dynamisch generiert als lokales PNG).
-- 🧹 **Lokaler Cache-Clear**: Ein in das Versions-Menü eingebauter "Papierkorb", der ausschließlich fehlerhafte Kantinen-Caches putzt, ohne dabei versehentlich die aktive Bessa-Host-Session zu zerstören.
-- 🔒 **Sitzungs-Persistenz**: Die Login-Session überdauert jetzt neue Tabs, Fenster und Version-Upgrades reibungslos durch den Wechsel auf `localStorage`.
-- 🛡️ **Testing & Stabilität**: Vollautomatische DOM- und Logik-Testing-Suites in der Release-Pipeline integriert. Fehlerhafte UI-Buttons gehören der Vergangenheit an.
-
-
-## v1.4.0 (2026-02-22)
-- **Feature**: Bestellhistorie per Knopfdruck abrufbar. Übersichtliche Darstellung, gruppiert nach Monaten und Kalenderwochen, inklusive Stornos. 📜✨
-
-## v1.3.2 (2026-02-19)
-- **Fix**: Falsche Anzahl an Highlight-Menüs im "Nächste Woche"-Badge korrigiert (zählte alle Menüs statt nur Highlights). 🐛
-
-## v1.3.1 (2026-02-17)
-- **Feature**: Smart Cache – API-Refresh beim Start wird übersprungen wenn Daten für die aktuelle KW vorhanden und Cache < 1h alt ist. ⚡
-
-## v1.3.0 (2026-02-16)
-- **Feature**: GitHub Release Management 📦
-  - Version-Menü: Klick auf Versionsnummer zeigt alle verfügbaren Versionen
-  - Dev-Mode Toggle: Zwischen Releases (stabil) und Tags (dev) wechseln
-  - Downgrade-Support: Jede Version hat einen eigenen Installer-Link
-  - Update-Check nutzt jetzt die GitHub API statt `version.txt`
-  - GitHub PAT für höheres API-Rate-Limit (5000/h)
-  - SemVer-Check: Update-Icon nur bei wirklich neuerer Version
-
-## v1.2.9 (2026-02-16)
-
-## v1.2.8 (2026-02-16)
-- **Debug**: Weiteres Logging (Fetch-Status, Start-Log) zur Fehlersuche. 🔎
-
-## v1.2.7 (2026-02-16)
-- **Debug**: Verbose Logging für Update-Check eingebaut. 🐞
-
-## v1.2.6 (2026-02-16)
-- **Test**: Version Bump zum Testen der Live-Update-Erkennung. 🧪
-
-## v1.2.5 (2026-02-16)
-- **Refactor**: Update-Erkennung komplett überarbeitet (stündlicher Check, diskretes 🆕 Icon im Header, kein Banner mehr). 🔄
-- **Cleanup**: Ungenutzter CSS-Code und Netzwerk-Traffic reduziert. 🧹
-- **Fix**: Highlight-Logik stabilisiert (keine falschen Matches bei leeren Tags). 🏷️
-
-## v1.2.4 (2026-02-16)
-- **Feature**: Gefundene Highlights werden jetzt direkt im Menü als Badge angezeigt. 🏷️
-
-## v1.2.3 (2026-02-16)
-- **Fix**: Update-Icon ist jetzt klickbar und führt direkt zum Installer. 🔗
-- **Dev**: Unit-Tests für Update-Logik im Build integriert. 🛡️
-
-## v1.2.2 (2026-02-16)
-- **UX**: Installer-Changelog jetzt einklappbar für mehr Übersicht. 📂
-
-## v1.2.1 (2026-02-16)
-- **Fix**: Smart Highlights werden jetzt korrekt auf Menü-Items angewendet (`checkHighlight` in `createDayCard`). 🌟
-- **Feature**: Mock-Daten (`mock-data.js`) für Standalone-Tests eingebaut. 🧪
-- **Style**: Highlight-Glow mit blauer Puls-Animation (`blue-pulse`) überarbeitet. 💎
-- **Style**: Tag-Badges konsistent mit Badge-System gestaltet. 🏷️
-- **Style**: "Hinzufügen"-Button (`#btn-add-tag`) als Primary-Button gestylt. 🎨
-- **Style**: Modal-Body Padding und Input-Font korrigiert. 🔧
-- **Docs**: README Projektstruktur mit Tabelle für `dist/`-Artefakte ergänzt. 📖
-
-## v1.2.0 (2026-02-16)
-- **Feature**: Bessere UX im Installer (Button oben, Log unten, Features aktualisiert). 💅
-- **Tech**: Build-Tests hinzugefügt. 🧪
-- **Fix**: Encoding-Probleme final behoben (dank Python Buildlogic). 🐍
-
-## v1.1.2 (2026-02-16)
-- **Fix**: Encoding-Problem beim Bookmarklet behoben (URL Malformed Error). 🔗
-
-## v1.1.1 (2026-02-16)
-- **Fix**: Kritischer Fehler behoben, der das Laden des Wrappers verhinderte. 🐛
-
-## v1.1.0 (2026-02-16)
-- **Feature: Bestell-Countdown**: Zeigt 1 Stunde vor Bestellschluss einen roten Countdown an. ⏳
-- **Feature: Smart Highlights**: Markiere deine Lieblingsspeisen (z.B. "Schnitzel", "Vegetarisch"), damit sie leuchten. 🌟
-- **Feature: Changelog**: Diese Übersicht der Änderungen. 📜
-- **Verbesserung**: Live-Check der Version beim Update.
-
-## v1.0.3 (2026-02-13)
-- **Fix**: Update-Link öffnet nun den Installer direkt als Webseite (via htmlpreview).
-
-## v1.0.2 (2026-02-13)
-- **Sync**: Version mit GitHub synchronisiert.
-
-## v1.0.1 (2026-02-12)
-- **UI**: Besseres Design für "Nächste Woche" (Badges).
-- **Core**: Grundlegende Funktionen (Bestellen, Guthaben, Token-Store).
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.9.4] - 2026-06-24
+
+### Fixed
+- `renderVisibleWeeks()` restores scroll position of the `.days-grid` container after DOM re-render. The page no longer jumps to top on refreshes (e.g. after ordering, cancellation, or flag changes).
+
+## [1.9.3] - 2026-06-24
+
+### Added
+- On failed order (API or network error), available quantities of the menu are automatically reloaded and updated in the UI.
+
+## [1.9.2] - 2026-06-24
+
+### Changed
+- GitHub API rate-limit protection for the version menu. `checkForUpdates()` now checks local cache (1h TTL) first, saving the API call during hourly polling. `fetchVersions()` sends stored ETag headers for conditional requests — GitHub responses with `304 Not Modified` do not count against the rate limit. DevMode switch also clears the ETag cache.
+
+## [1.9.1] - 2026-06-24
+
+### Fixed
+- Language splitter no longer incorrectly interprets slashes inside parentheses as DE/EN separators. Menus with meat indications like `(Schwein/Rind)` or `(pork/beef)` are now correctly split bilingual (`high` confidence instead of `fallback`).
+
+## [1.9.0] - 2026-06-23
+
+### Added
+- Hover tooltip on menu descriptions with doubtful split (medium/low confidence) shows the original text for verification.
+- Language switch as a 3-state toggle (DE/EN/ALL) — one click, no dropdown.
+- Version overview: "Install" and "→ Github" buttons are now visible for the currently installed version too.
+
+### Changed
+- Language splitter completely overhauled: hand-maintained word lists replaced by a self-learning trigram language model. Detects DE/EN boundaries based on slash structure and German capitalization — even for rare words the model does not know. Mono-desserts/brand words (Donut, Balisto, Vanillapudding) are recognized as their own course. Merged courses due to missing allergens are correctly separated. 2-course results are flagged as suspicious.
+- DEV badge: confidence badge sits inline in the menu description, smaller and more discreet.
+
+### Fixed
+- Various bugfixes (v1.8.7–v1.8.9): host CSS overrides, blob URL redirect, menu name localization on language switch, live quantity update after ordering.
+
+### Changed
+- Build: platform-independent Node.js scripts (`npm run build`, `npm run release`) replace bash scripts.
+
+## [1.8.11] - 2026-06-23
+
+### Fixed
+- Merged courses are now correctly separated. When a dish in the weekly menu had no allergen, two dishes were previously incorrectly merged (e.g. "Curryhuhn" and "Erdbeer-Rhabarber-Tiramisu"). The splitter now recognizes dish boundaries based on slash structure and German capitalization — even for rare words the language model does not know.
+- A 2-course result is flagged as suspicious (normal are 3 courses or 1 on Friday) and downgraded in confidence.
+
+### Added
+- Individually written mono-desserts/brand words (e.g. Donut, Balisto, Vanillapudding) are recognized as their own third course, instead of sticking to the previous dish.
+- For doubtful splits (confidence "medium" or lower), hovering over the menu description shows the original raw text as a tooltip for verification.
+
+### Changed
+- UI: The confidence badge (`kantine_dev_mode`) now floats bottom-right in the menu description instead of next to the availability badge.
+
+## [1.8.10] - 2026-06-23
+
+### Changed
+- Language recognition (`splitLanguage`) completely rewritten. Hand-maintained word stem lists (DE_STEMS, EN_STEMS) were replaced by a self-learning trigram language model that automatically adapts to new menus and provides a confidence rating.
+- Build scripts (`build-bookmarklet.sh` and `release.sh`) ported to platform-independent Node.js scripts (`scripts/build.js`, `scripts/release.js`). Build now runs via `npm run build`.
+
+### Added
+- DEV confidence badge in `kantine_dev_mode` — shows confidence score and sub-scores (Anchor/Purity/Course/Coverage) as tooltip.
+- Comprehensive test suite for the new language model (9 module tests + 451-item "No Info Lost" check + hold-out evaluation harness).
+
+### Fixed
+- `test_logic.js` VM sandbox now loads ES6 modules in correct dependency order, so the splitter test no longer fails on undefined imports.
+- Redirect test in `test_logic.js` now receives `document.querySelector`/`querySelectorAll` mock to avoid errors from top-level DOM accesses of imported modules.
+
+## [1.8.9] - 2026-06-22
+
+### Added
+- After successful order of a watched menu, its "Notify" status (bell icon) is now automatically removed.
+- After an order (or cancellation), the displayed remaining quantity of the menu is automatically updated via live API call.
+
+### Fixed
+- When switching languages, menu names on the cards were not immediately re-rendered. This was fixed by also localizing the menu title in real time.
+
+## [1.8.8] - 2026-06-18
+
+### Fixed
+- Redirect check for blob URLs corrected. When the bookmarklet is executed on a `blob:` URL (e.g. on the installer page), the protocol is now correctly recognized and reliably redirects the user to `https://web.bessa.app/knapp-kantine`.
+
+## [1.8.7] - 2026-06-18
+
+### Fixed
+- Background color and font specificity corrected. The host page's body background (class `.bg`) had previously overwritten our body background, causing the overview and semi-transparent title bar to turn gray. This is now fixed with more specific selectors (`body, body.bg`) and `!important`. The `Inter` font was also restored and `#kantine-wrapper` received an explicit background color.
+
+## [1.8.6] - 2026-05-11
+
+### Fixed
+- PayPal button scaled via CSS (0.9) to prevent clipping at the bottom edge without changing the footer height.
+
+## [1.8.5] - 2026-05-11
+
+### Fixed
+- Right footer padding increased to prevent donation buttons from being overlapped by the scrollbar.
+
+## [1.8.4] - 2026-05-11
+
+### Changed
+- Layout: donation buttons (Ko-fi & PayPal) moved to the right side of the footer.
+- UX: Ko-fi button further reduced (20px) for even more discreet integration.
+
+## [1.8.3] - 2026-05-11
+
+### Changed
+- Donation buttons (Ko-fi & PayPal) reduced to 24px height.
+- Footer layout optimized and padding reduced for more compact display.
+
+## [1.8.2] - 2026-05-11
+
+### Added
+- Donation buttons (Ko-fi & PayPal) added to the footer.
+
+### Changed
+- Footer layout switched to Flexbox for better desktop and mobile display.
+
+## [1.8.1] - 2026-05-11
+
+### Fixed
+- `htmlpreview.github.io` links were being blocked by firewalls. Installer pages are now loaded directly from GitHub raw content (`raw.githubusercontent.com`) via fetch and opened as a blob URL in the browser — no external proxy needed.
+- The `🆕` update icon in the header now also links via blob fetch instead of `htmlpreview`.
+
+### Added
+- UX: In the version dialog, a two-button layout replaces the old single link:
+  - **Install** — Loads `install.html` via blob from GitHub raw content and opens it rendered in a new tab.
+  - **→ Github** — Opens the file directly in the GitHub file browser (new tab).
+
+## [1.8.0] - 2026-05-10
+
+### Fixed
+- Critical error in order submission fixed.
+  - The date format (`date`) in the `placeOrder` payload was changed from `T10:30:00Z` to `T09:00:00.000Z`. The canteen terminal strictly requires this format including milliseconds to display the order for lunch.
+  - The `preorder` flag is now passed as `false` by default (instead of `true`), since pre-orders were otherwise filtered in the kitchen system even though the web backend accepted them.
+
+### Changed
+- Docs: OpenAPI specification (`bessa-openapi.yaml`) extended with new findings regarding the kitchen terminal.
+
+## [1.7.3] - 2026-03-17
+
+### Fixed
+- Build error in DOM tests fixed (JSDOM domain check).
+
+### Changed
+- Metadata: version bumped to v1.7.3.
+
+## [1.7.2] - 2026-03-12
+
+### Security
+- Logout logic completed (FR-006). When logging out, all app-related data (including order history, cache, and settings) is now deleted from `localStorage`.
+
+### Changed
+- Cleanup: obsolete `GUEST_TOKEN` residues in `events.js` and `ui_helpers.js` removed.
+- Testing: security test suite extended with verification of logout data deletion.
+
+## [1.7.1] - 2026-03-12
+
+### Security
+- XSS protection: `innerHTML` replaced by `textContent` in `renderTagsList` (Actions) and `showErrorModal` (UI-Helpers).
+- XSS protection: dynamic card elements in `createDayCard` validated.
+- Input validation: new keywords are now checked for length (2-20 characters) and allowed characters (alphanumeric + food special characters).
+- `GUEST_TOKEN`: the hardcoded guest token was completely removed from the code. Non-logged-in users no longer have API access (security regulation).
+- Auth guards: API functions (`loadMenuDataFromAPI`, `refreshFlaggedItems`) now explicitly check for existing authentication before fetching.
+- Security test suite `tests/test_security.js` implemented.
+
+## [1.6.25] - 2026-03-12
+
+### Added
+- Debounced resize listener. Height synchronization of menu cards is now also executed automatically and efficiently on viewport changes (e.g. window scaling or orientation change).
+- `debounce` utility function added to `utils.js`.
+
+## [1.6.24] - 2026-03-12
+
+### Changed
+- Performance: layout thrashing in `syncMenuItemHeights` fixed. Batch processing of DOM read and write operations improved rendering efficiency when switching weeks.
+
+## [1.6.23] - 2026-03-12
+
+### Added
+- Glassmorphism: header background transparency reduced to 72% (was 90%) — the blur effect is now visible when scrolling.
+- Dark mode contrast: `--bg-card` darkened (`#283548`), `--border-color` slightly lightened (`#526377`) — better separation between body and card.
+- Accent color: in light mode changed from Slate-900 (almost black) to Blue-600 (`#2563eb`) — clearer visible accent.
+- Typography: `.item-desc` `line-height` to 1.5 (body-consistent), `.day-date` smaller and more discreet (0.8rem, opacity 0.75), `.item-name` slightly reduced (0.95rem).
+- Item separator: subtle dividing line between menu items in the day card.
+- Badge consistency: all badges (`badge`, `tag-badge-small`) unified to `border-radius: 6px`.
+- A11y — reduced motion: `@media (prefers-reduced-motion: reduce)` disables all decorative pulse/glow animations for motion-sensitive users.
+- A11y — focus-visible: global `:focus-visible` outline ring (2px, accent-color) for keyboard navigation.
+- Active states: `:active` feedback (`scale(0.97)`) for order, cancel, and flag buttons.
+- Mobile breakpoint: extended from 600px to 768px (covers tablets); grid declaration explicitly set to avoid browser override bug.
+
+## [1.6.22] - 2026-03-12
+
+### Changed
+- UX cleanup: text label at language switch removed. The button now only shows the `translate` icon, making the controls bar calmer.
+
+## [1.6.21] - 2026-03-12
+
+### Added
+- Language switch redesign — the language selection (DE/EN/ALL) was moved from the header center to the right controls area. It is now available as an icon dropdown with current status display (e.g. "DE"). The 🇦🇹 flag is used for German.
+
+## [1.6.20] - 2026-03-12
+
+### Removed
+- Weekly cost display removed — at user request, the display of weekly total costs in the header was removed to declutter the UI. FR-040 marked as obsolete.
+
+## [1.6.19] - 2026-03-11
+
+### Added
+- Grid layout & glow overlap fix — card contents switched to a clean grid-gap model (`row-gap: 1.5rem`). This prevents technical overlaps of menu items and ensures glow effects (ordered, highlight) correctly wrap all contents. Manual spacing cleaned up.
+- Glow styling adjusted — color highlights (ordered, highlight, flagged) were corrected so they no longer reach the card edge, but are displayed within the card body with appropriate side spacing.
+- Fix card content overflow — in the 5-day view (landscape) on narrow screens, status badges and buttons now correctly wrap to a new line instead of protruding beyond the card edge. Card padding optimized for desktop views.
+- Feature: when EN is selected, the entire user interface switches to English (buttons, tooltips, modals, status badges, weekdays, order history). DE and ALL retain German.
+- Feature: the glow of the "Next Week" button is now only triggered when orderable menus without existing orders are available for Monday–Thursday. Friday is excluded from this check.
+- `src/i18n.js` — central translation module for all static UI labels (DE/EN).
+
+### Changed
+- Maintainability: all remaining hardcoded German UI strings in `actions.js` translated via `t()` (progress texts, error labels, 'Logged in', 'Background synchronization').
+- Maintainability: all `localStorage` keys centralized into a unified `LS` object in `constants.js`. All source files now use `LS.*` instead of raw strings.
+- Robustness: `setLangMode()` and `setDisplayMode()` in `state.js` now validate input values — invalid values are discarded and logged.
+- Documentation: JSDoc for `ui.js` and `injectUI()` added.
+- Code quality check of all source files — JSDoc comments added, explanations for complex logic blocks added.
+
+### Fixed
+- Checked menus (`refreshFlaggedItems`) now only update the actually flagged items — no longer all menus of the affected day.
+- When opening the highlights modal, existing tags are displayed immediately, even without prior new input.
+- The number badges in the "Next Week" button were removed. The order overview (ordered / orderable / total + highlights) is now available as a tooltip.
+
+## [1.6.14] - 2026-03-10
+
+### Fixed
+- The global "Updated at" time in the header is no longer reset on a manual check of flagged menus.
+
+## [1.6.13] - 2026-03-10
+
+### Added
+- Manual refresh of flagged menus by clicking the alarm icon in the header ([FR-093](REQUIREMENTS.md#FR-093)).
+- Visual feedback during the check via rotation of the icon.
+- Notification: toast notification shows the number of checked menus.
+
+## [1.6.12] - 2026-03-10
+
+### Added
+- Modularization of `kantine.js` into ES6 modules (`api.js`, `state.js`, `utils.js`, `ui.js`, etc.).
+- Webpack integration into the build process to support the modular structure.
+- Security: XSS protection through escaping of dynamic content in `innerHTML`.
+- Performance optimizations:
+  - Optimized tag badge generation and UI render loops (use of `reduce`).
+  - Use of `insertAdjacentHTML` instead of `innerHTML` for more efficient rendering.
+  - Batch fetching of `availableDates` to reduce API calls.
+  - Performance fixes in `ui_helpers.js`.
+- Testing: unit tests for GitHub API header generation added.
+- Cleanup: removal of orphaned `console.log` statements.
+
+### Fixed
+- Correction of the tooltip at the alarm icon (polling time vs. global update time).
+
+## [1.6.11] - 2026-03-09
+
+### Changed
+- Refactor: separation of timestamps for the main update (header) and the notification check (bell icon). Polling no longer incorrectly updates the "Updated at" time in the header.
+- Metadata: version bumped to v1.6.11.
+
+## [1.6.10] - 2026-03-09
+
+### Added
+- Robust course recognition in bilingual menus ([FR-121](REQUIREMENTS.md#FR-121)).
+- Improved: heuristic split now more reliably recognizes the transition from English back to German (e.g. with "Achtung" notices).
+
+### Fixed
+- Prevents shifting of courses when English translations are missing.
+
+## [1.6.9] - 2026-03-09
+
+### Fixed
+- Incorrect time display at the bell icon ("291h ago") fixed. The tooltip is now updated every minute and correctly reset after each menu check.
+
+### Changed
+- Timestamp management for the last update unified and persisted in `localStorage`.
+
+## [1.6.8] - 2026-03-06
+
+### Changed
+- Performance: the JavaScript for the canteen bookmarklet is now minimized during the build process (via Terser), which noticeably reduces the length of the injected URL.
+
+## [1.6.7] - 2026-03-06
+
+### Changed
+- Style: the new header logo (`favicon_base.png`) is now consistently generated and rendered at 40x40px.
+
+## [1.6.6] - 2026-03-06
+
+### Changed
+- Style: shadow and protruding card effect for ordered menus on past days completely removed — they now remain visually flat and unobtrusive like non-ordered menus.
+
+## [1.6.5] - 2026-03-06
+
+### Added
+- The `restaurant_menu` icon in the header was replaced by the new `favicon_base.png` logo, scaled to match the text size.
+
+### Changed
+- Style: purple border (ordered marking) on past days removed to focus attention on current and future orders.
+- Style: the glow effect for menus ordered on the current day was intensified.
+
+## [1.6.4] - 2026-03-05
+
+### Added
+- Language lexicon (DE/EN) massively expanded with Austrian terms (Nockerl, Fleckerl, Topfen, Mohn, Most etc.) and common typos from the Bessa system (trukey, coffe, oveb etc.).
+
+### Changed
+- Cleanup: language lexicon deduplicated and alphabetically sorted for better performance and maintainability.
+
+### Fixed
+- Separation of bilingual menus (`splitLanguage`) improved: now also catches slashes without spaces (e.g. `Suppe/Soup`).
+- Incorrect badge display corrected (variable `count` vs `orderCount`).
+
+## [1.6.3] - 2026-03-05
+
+### Changed
+- Slogan in the footer updated ("Jetzt Bessa Einfach! • Knapp-Kantine Wrapper • 2026 by Kaufis-Kitchen") and footer height optimized for more placement space.
+
+## [1.6.2] - 2026-03-05
+
+### Added
+- Weekday headers (Monday, Tuesday etc.) now scroll as "sticky headers" and stick to the top of the screen.
+  - The layout clips scrolling dishes neatly underneath.
+  - Full viewport scrolling: the layout now uses the full height (`100dvh`), so scrollbars are cleanly positioned at the edge.
+
+### Fixed
+- Problems with Bessa's default `overflow` behavior fixed, which blocked `position: sticky` on iOS/WebKit browsers.
+
+## [1.6.0] - 2026-03-04
+
+### Added
+- Language filter for bilingual menu descriptions. New DE/EN/ALL toggle in the header enables switching between German, English, and the full original text. Allergen codes are displayed in all modes. Setting is persistently saved.
+
+## [1.5.1] - 2026-03-04
+
+### Fixed
+- Friday orders failed ("Online orders are not available"). Cause: the order payload used `preorder: false` and a wrong time (`T10:00:00.000Z` instead of `T10:30:00Z`). Both were corrected based on the original Bessa API.
+
+## [1.5.0] - 2026-02-26
+
+### Added
+- **Order History**: clear history directly in the app — grouped by year/month, including sums, statuses (Open/Completed/Cancelled) and delta cache for lightning-fast loading.
+- **Smart Cache & Performance**: massive reduction of API calls and loading times through intelligent local cache. The bookmarklet now starts practically delay-free.
+- **GitHub Release Management**: in-app version menu with auto-update check (`🆕` icon). Switch between "Stable" and "Dev" versions as well as downgrade possibility directly via the GitHub API.
+- **Smart Highlights & UX**: food favorites now glow in design purple and receive feature badges. The order badge for next week now intelligently filters personalized highlights.
+- **Order Warning & Notifications**: the system alarm now correctly accounts for sessions, shows dynamic color changes (yellow/green/red) and reliably warns before the order deadline (10:00 AM). Legacy items from previous days are automatically cleaned up.
+- **Own Favicon**: the bookmarklet and the installer now have their own icon (triangle with cutlery), which is adopted when dragged into the bookmark bar (dynamically generated as local PNG).
+- **Local Cache Clear**: a "trash can" built into the version menu that exclusively cleans faulty canteen caches without accidentally destroying the active Bessa host session.
+- **Session Persistence**: the login session now survives new tabs, windows, and version upgrades smoothly through the switch to `localStorage`.
+- **Testing & Stability**: fully automated DOM and logic testing suites integrated into the release pipeline. Faulty UI buttons are a thing of the past.
+
+## [1.4.0] - 2026-02-22
+
+### Added
+- Order history available at the press of a button. Clear display, grouped by months and calendar weeks, including cancellations.
+
+## [1.3.2] - 2026-02-19
+
+### Fixed
+- Wrong number of highlight menus in the "Next Week" badge corrected (counted all menus instead of only highlights).
+
+## [1.3.1] - 2026-02-16
+
+### Changed
+- Smart Cache — API refresh at startup is skipped when data for the current calendar week is present and cache is < 1h old.
+
+## [1.3.0] - 2026-02-16
+
+### Added
+- GitHub Release Management
+  - Version menu: click on version number shows all available versions.
+  - Dev-Mode toggle: switch between releases (stable) and tags (dev).
+  - Downgrade support: each version has its own installer link.
+  - Update check now uses the GitHub API instead of `version.txt`.
+  - GitHub PAT for higher API rate limit (5000/h).
+  - SemVer check: update icon only on truly newer version.
+
+## [1.2.9] - 2026-02-16
+
+No changes.
+
+## [1.2.8] - 2026-02-16
+
+### Added
+- Additional logging (fetch status, start log) for troubleshooting.
+
+## [1.2.7] - 2026-02-16
+
+### Added
+- Verbose logging for update check built in.
+
+## [1.2.6] - 2026-02-16
+
+### Changed
+- Version bump for testing live update detection.
+
+## [1.2.5] - 2026-02-16
+
+### Changed
+- Update detection completely overhauled (hourly check, discreet 🆕 icon in header, no more banner).
+- Cleanup: unused CSS code and network traffic reduced.
+
+### Fixed
+- Highlight logic stabilized (no false matches on empty tags).
+
+## [1.2.4] - 2026-02-16
+
+### Added
+- Found highlights are now displayed directly in the menu as a badge.
+
+## [1.2.3] - 2026-02-16
+
+### Added
+- Unit tests for update logic integrated into the build.
+
+### Fixed
+- Update icon is now clickable and leads directly to the installer.
+
+## [1.2.2] - 2026-02-16
+
+### Changed
+- Installer changelog now collapsible for more overview.
+
+## [1.2.1] - 2026-02-16
+
+### Added
+- Mock data (`mock-data.js`) for standalone tests built in.
+
+### Changed
+- Highlight glow with blue pulse animation (`blue-pulse`) revised.
+- Tag badges designed consistently with the badge system.
+- "Add" button (`#btn-add-tag`) styled as primary button.
+- Modal body padding and input font corrected.
+- README project structure with table for `dist/` artifacts added.
+
+### Fixed
+- Smart Highlights are now correctly applied to menu items (`checkHighlight` in `createDayCard`).
+
+## [1.2.0] - 2026-02-16
+
+### Added
+- Build tests added.
+
+### Changed
+- Better UX in the installer (button at top, log at bottom, features updated).
+
+### Fixed
+- Encoding problems finally fixed (thanks to Python build logic).
+
+## [1.1.2] - 2026-02-16
+
+### Fixed
+- Encoding problem with the bookmarklet fixed (URL Malformed Error).
+
+## [1.1.1] - 2026-02-16
+
+### Fixed
+- Critical error that prevented the wrapper from loading fixed.
+
+## [1.1.0] - 2026-02-16
+
+### Added
+- **Order Countdown**: shows a red countdown 1 hour before the order deadline.
+- **Smart Highlights**: mark your favorite dishes (e.g. "Schnitzel", "Vegetarian") so they glow.
+- **Changelog**: this overview of changes.
+
+### Changed
+- Live check of the version on update.
+
+## [1.0.3] - 2026-02-13
+
+### Fixed
+- Update link now opens the installer directly as a web page (via htmlpreview).
+
+## [1.0.2] - 2026-02-13
+
+### Changed
+- Version synchronized with GitHub.
+
+## [1.0.1] - 2026-02-12
+
+### Added
+- Better design for "Next Week" (badges).
+
+### Changed
+- Core: basic functions (order, balance, token store).
+
+---
+
+## Android App
+
+## [1.0.0] - 2026-06-26
+
+### Added
+- Android native app with Jetpack Compose + Material 3.
+- Login screen with Bessa API authentication.
+- Weekly menu overview with DE/EN language detection.
+- Week navigation (swipe or arrow buttons).
+- Hilt dependency injection.
+- Room local database for menu caching.
+- Retrofit + OkHttp networking with TLS 1.3.
+- Moshi JSON parsing with KSP code generation.
+- EncryptedSharedPreferences for secure token storage.
+- RTL/language support (DE/EN).
+- ProGuard/R8 minification and resource shrinking.
+- Fastlane metadata for Play Store listing.
+
+[Unreleased]: https://github.com/user/repo/compare/v1.9.4...HEAD
+[1.9.4]: https://github.com/user/repo/compare/v1.9.3...v1.9.4
+[1.9.3]: https://github.com/user/repo/compare/v1.9.2...v1.9.3
+[1.9.2]: https://github.com/user/repo/compare/v1.9.1...v1.9.2
+[1.9.1]: https://github.com/user/repo/compare/v1.9.0...v1.9.1
+[1.9.0]: https://github.com/user/repo/compare/v1.8.11...v1.9.0
+[1.8.11]: https://github.com/user/repo/compare/v1.8.10...v1.8.11
+[1.8.10]: https://github.com/user/repo/compare/v1.8.9...v1.8.10
+[1.8.9]: https://github.com/user/repo/compare/v1.8.8...v1.8.9
+[1.8.8]: https://github.com/user/repo/compare/v1.8.7...v1.8.8
+[1.8.7]: https://github.com/user/repo/compare/v1.8.6...v1.8.7
+[1.8.6]: https://github.com/user/repo/compare/v1.8.5...v1.8.6
+[1.8.5]: https://github.com/user/repo/compare/v1.8.4:...v1.8.5
+[1.8.4]: https://github.com/user/repo/compare/v1.8.3...v1.8.4
+[1.8.3]: https://github.com/user/repo/compare/v1.8.2...v1.8.3
+[1.8.2]: https://github.com/user/repo/compare/v1.8.1...v1.8.2
+[1.8.1]: https://github.com/user/repo/compare/v1.8.0...v1.8.1
+[1.8.0]: https://github.com/user/repo/compare/v1.7.3...v1.8.0
+[1.7.3]: https://github.com/user/repo/compare/v1.7.2...v1.7.3
+[1.7.2]: https://github.com/user/repo/compare/v1.7.1...v1.7.2
+[1.7.1]: https://github.com/user/repo/compare/v1.6.25...v1.7.1
+[1.6.25]: https://github.com/user/repo/compare/v1.6.24...v1.6.25
+[1.6.24]: https://github.com/user/repo/compare/v1.6.23...v1.6.24
+[1.6.23]: https://github.com/user/repo/compare/v1.6.22...v1.6.23
+[1.6.22]: https://github.com/user/repo/compare/v1.6.21...v1.6.22
+[1.6.21]: https://github.com/user/repo/compare/v1.6.20...v1.6.21
+[1.6.20]: https://github.com/user/repo/compare/v1.6.19...v1.6.20
+[1.6.19]: https://github.com/user/repo/compare/v1.6.14...v1.6.19
+[1.6.14]: https://github.com/user/repo/compare/v1.6.13...v1.6.14
+[1.6.13]: https://github.com/user/repo/compare/v1.6.12...v1.6.13
+[1.6.12]: https://github.com/user/repo/compare/v1.6.11...v1.6.12
+[1.6.11]: https://github.com/user/repo/compare/v1.6.10...v1.6.11
+[1.6.10]: https://github.com/user/repo/compare/v1.6.9...v1.6.10
+[1.6.9]: https://github.com/user/repo/compare/v1.6.8...v1.6.9
+[1.6.8]: https://github.com/user/repo/compare/v1.6.7...v1.6.8
+[1.6.7]: https://github.com/user/repo/compare/v1.6.6...v1.6.7
+[1.6.6]: https://github.com/user/repo/compare/v1.6.5...v1.6.6
+[1.6.5]: https://github.com/user/repo/compare/v1.6.4...v1.6.5
+[1.6.4]: https://github.com/user/repo/compare/v1.6.3...v1.6.4
+[1.6.3]: https://github.com/user/repo/compare/v1.6.2...v1.6.3
+[1.6.2]: https://github.com/user/repo/compare/v1.6.0...v1.6.2
+[1.6.0]: https://github.com/user/repo/compare/v1.5.1...v1.6.0
+[1.5.1]: https://github accuser/repo/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/user/repo/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/user/repo/compare/v1.3.2...v1.4.0
+[1.3.2]: https://github.com/user/repo/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/user/repo/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/user/repo/compare/v1.2.9...v1.3.0
+[1.2.9]: https://github.com/user/repo/compare/v1.2.8...v1.2.9
+[1.2.8]: https://github.com/user/repo/compare/v1.2.7...v1.2.8
+[1.2.7]: https://github.com/user/repo/compare/v1.2.6...v1.2.7
+[1.2.6]: https://github.com/user/repo/compare/v1.2.5...v1.2.6
+[1.2.5]: https://github.com/user/repo/compare/v1.2.4...v1.2.5
+[1.2.4]: https://github.com/user/repo/compare/v1.2.3...v1.2.4
+[1.2.3]: https://github.com/user/repo/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/user/repo/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/user/repo/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/user/repo/compare/v1.1.2...v1.2.0
+[1.1.2]: https://github.com/user/repo/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/user/repo/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/user/repo/compare/v1.0.3...v1.1.0
+[1.0.3]: https://github.com/user/repo/compare/v1.0.2...v1.0.3
+[1.0.2]: https://github.com/user/repo/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/user/repo/releases/tag/v1.0.1

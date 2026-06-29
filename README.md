@@ -1,107 +1,219 @@
-# 🍽️ Kantine Wrapper Bookmarklet
+# Kantine
 
-Ein hochmoderner Wrapper für die [Bessa Knapp-Kantine](https://web.bessa.app/knapp-kantine). Dieses Projekt transformiert Standard-API-Daten in eine effiziente Wochenansicht mit Fokus auf Usability und Performance.
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![version](https://img.shields.io/badge/version-1.9.4-blue)](changelog.md)
+[![Android](https://img.shields.io/badge/Android-Kotlin-green)](android/)
+[![Web](https://img.shields.io/badge/Web-ES6-yellow)](src/)
+
+Hochmoderne Clients für die [Bessa Knapp-Kantine](https://web.bessa.app/knapp-kantine) – als **Web Lesezeichen (Bookmarklet)** und **Android Native App**. Beide Projekte nutzen die gleiche Bessa API und teilen die Kernidee: eine effiziente Wochenansicht der Kantine-Speisepläne mit Fokus auf Usability und DE/EN-Spracherkennung.
 
 ---
 
-## 🏗️ System-Architektur
+## Inhaltsverzeichnis
 
-Das Projekt nutzt eine modulare **ES6-Architektur**, die per Webpack gebündelt und als Bookmarklet injiziert wird.
+- [Projektübersicht](#projektübersicht)
+- [Web Lesezeichen (Bookmarklet)](#web-lesezeichen-bookmarklet)
+- [Android App](#android-app)
+- [Repository Struktur](#repository-struktur)
+- [Getting Started](#getting-started)
+- [Design System](#design-system)
+- [Mitwirken](#mitwirken)
+- [Lizenz](#lizenz)
 
-### 🧩 Modul-Verantwortlichkeiten
-- **[index.js](file:///config/kantine-wrapper/src/index.js)**: Entry Point. Steuert die Initialisierung und das Polling.
-- **[state.js](file:///config/kantine-wrapper/src/state.js)**: Zentrales State-Management (Singleton).
-- **[actions.js](file:///config/kantine-wrapper/src/actions.js)**: Business Logic (API-Calls, Cache-Management, Flagging-Logik).
-- **[ui.js](file:///config/kantine-wrapper/src/ui.js)** & **[ui_helpers.js](file:///config/kantine-wrapper/src/ui_helpers.js)**: Rendering-Logik und dynamische Komponenten (Tageskarten, Toasts).
-- **[events.js](file:///config/kantine-wrapper/src/events.js)**: Zentrales Event-Handling für alle Interaktionen.
-- **[i18n.js](file:///config/kantine-wrapper/src/i18n.js)**: Lokalisierung (DE/EN).
-- **[api.js](file:///config/kantine-wrapper/src/api.js)**, **[constants.js](file:///config/kantine-wrapper/src/constants.js)** & **[utils.js](file:///config/kantine-wrapper/src/utils.js)**: Infrastruktur, Konstanten und Hilfsfunktionen.
+---
 
-### 🔄 Datenfluss & Cache
-```mermaid
-graph TD
-    A[Bessa API] -->|Fetch| B[actions.js]
-    B -->|Update| C[state.js]
-    C -->|Trigger| D[ui_helpers.js]
-    D -->|Render| E[Browser DOM]
-    B -->|Persist| F[LocalStorage]
-    F -->|Rehydrate| C
+## Projektübersicht
+
+Dieses Monorepo enthält zwei unabhängige Client-Implementierungen für die Knapp-Kantine:
+
+| Projekt | Sprache | Framework | Build | Ziel |
+|---------|---------|-----------|-------|------|
+| **Web Lesezeichen** | JavaScript (ES6) | Eigenentwicklung | Webpack + Terser | Browser-Overlay via Bookmarklet |
+| **Android App** | Kotlin | Jetpack Compose + Material 3 | Gradle (AGP 8.7.0) | Native Android App (API 31+) |
+
+**Gemeinsamkeiten:** Beide Projekte authentifizieren sich gegen die Bessa API (`https://web.bessa.app/knapp-kantine`), unterstützen DE/EN-Spracherkennung und bieten eine Wochenübersicht der Speisepläne.
+
+---
+
+## Web Lesezeichen (Bookmarklet)
+
+Ein moderner Wrapper der Bessa-Kantine als Bookmarklet – keine Installation nötig.
+
+### Architektur
+
+Das Bookmarklet injiziert eine vollständige UI-Overlay in die Bessa-Webseite. Die modulare **ES6-Architektur** wird per Webpack gebündelt:
+
+- **`src/index.js`** – Entry Point, Initialisierung
+- **`src/state.js`** – Zentrales State-Management (Singleton)
+- **`src/actions.js`** – Business Logic (API-Calls, Cache-Management)
+- **`src/ui.js`** / **`src/ui_helpers.js`** – Rendering und Komponenten
+- **`src/events.js`** – Event-Handling
+- **`src/api.js`** – API-Transport
+- **`src/i18n.js`** – Lokalisierung DE/EN
+- **`src/constants.js`** / **`src/utils.js`** – Infrastruktur
+
+**Datenfluss:** Bessa API → `actions.js` → `state.js` → DOM Rendering
+
+**Caching:** Daten werden beim Start aus `localStorage` gerendert, während ein Silent-Refresh im Hintergrund die Aktualität sicherstellt.
+
+### Build & Test
+
+```bash
+npm install
+npm run build    # Webpack + Terser + Bookmarklet + Standalone HTML
+npm test         # Test Suite (test_utils, test_actions, test_logic)
+npm run release  # Build + Commit + Tag + Push
 ```
-**Instant UI Strategy**: Daten werden beim Start sofort aus dem `localStorage` gerendert, während im Hintergrund ein Silent-Refresh die Aktualität sicherstellt.
+
+Die Build-Artefakte liegen in `dist/`:
+- `kantine.bundle.js` – Gebündeltes JS
+- `bookmarklet.txt` – Bookmarklet-Code zum Einfügen
+- `install.html` – Installer mit Changelog
+- `kantine-standalone.html` – Standalone UI-Test mit Mock-Daten
+
+### Features
+
+- Wochenansicht mit Navigation
+- DE/EN-Spracherkennung (automatisch)
+- Session Harvesting für bestehende Bessa-Sitzungen
+- Smart Highlights (Substring-Matching für Favoriten)
+- Delta-Caching für Bestellverlauf
+- Lokalisierung (DE/EN) via `i18n.js`
 
 ---
 
-## ⚙️ Build & Release
+## Android App
 
-Das Projekt verwendet zwei Node.js-Skripte für Build und Release:
+Native Android App für die Knapp-Kantine, geschrieben in **Kotlin** mit **Jetpack Compose** und **Material 3**.
 
-### `npm run build`
+### Architektur
 
-Erzeugt alle Distributionsartefakte aus den Quellen in `src/`:
+Die App folgt der **MVVM-Architektur** mit Repository-Pattern:
 
-1. **Webpack** — Bündelt alle ES6-Module zu `dist/kantine.bundle.js`
-2. **Minimierung** — Terser minifiziert das Bundle
-3. **Bookmarklet** — `dist/bookmarklet-payload.js`, `dist/bookmarklet.txt`
-4. **Installer** — `dist/install.html` (mit Changelog und Versionsanzeige)
-5. **Standalone** — `dist/kantine-standalone.html` (für UI-Tests mit Mock-Daten)
-6. **Smoke-Tests** — Automatisierte Prüfung aller Artefakte, DOM-Tests und Build-Integrität
+- **UI Layer:** Compose Screens + ViewModels (StateFlow)
+- **Domain Layer:** i18n, Splitter
+- **Data Layer:** Repository → Room DB / API Service
+- **DI:** Hilt Module (Network, Database, Auth)
+- **Navigation:** Navigation Compose
 
-Der Build läuft vollständig lokal, ohne externe Dependencies außerhalb von `node_modules`.
+**Tech Stack:**
 
-### `npm run release`
+| Bereich | Technologie |
+|---------|-------------|
+| UI | Jetpack Compose + Material 3 (BOM 2024.10.00) |
+| DI | Hilt 2.52 |
+| Networking | Retrofit 2.11.0 + OkHttp 4.12.0 |
+| JSON | Moshi 1.15.1 + KSP |
+| Lokale DB | Room 2.6.1 + KSP |
+| Auth Storage | EncryptedSharedPreferences 1.1.0-alpha06 |
+| Navigation | Navigation Compose 2.8.3 |
+| ViewModel | Lifecycle ViewModel Compose 2.8.6 |
 
-Veröffentlicht den aktuellen Build. Voraussetzung: `npm run build` wurde ausgeführt.
+### Build & Test
 
-1. **Commit** — `dist/` wird in einem separaten Commit mit Message `chore: update build artifacts for <version>` committet
-2. **Tag** — Ein Git-Tag mit der Version aus `version.txt` wird erstellt (`git tag <version>`)
-3. **Push** — HEAD und der Tag werden zu `origin` gepusht (Tag per `--force`, damit ein erneuter Release den Tag verschieben kann)
+```bash
+# Debug APK
+cd android && ./gradlew assembleDebug
 
-> ⚠️ `npm run release` setzt voraus, dass alle Code-Änderungen (außerhalb `dist/`) bereits committet sind. Das Skript bricht ab, wenn uncommittete Änderungen in `src/`, `version.txt` oder `changelog.md` vorliegen.
+# Unit Tests
+./gradlew test
 
-### Release-Workflow (üblich)
+# Release AAB (benötigt Keystore)
+./gradlew bundleRelease
+```
+
+Voraussetzungen: JDK 17, Android SDK (API 31–35), Android Studio empfohlen.
+
+**MVP Features:**
+- Login mit Bessa API Authentifizierung
+- Wochenübersicht der Speisepläne
+- Navigation zwischen Wochen
+- DE/EN-Spracherkennung
+- Material 3 Dynamic Colors
+
+> Detaillierte Architektur: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+> Setup-Anleitung: [docs/SETUP.md](docs/SETUP.md)
+> Play Store Deployment: [docs/play-store-setup.md](docs/play-store-setup.md)
+
+---
+
+## Repository Struktur
 
 ```
-npm run build        # 1. bauen
-git add -A           # 2. Code-Änderungen staged
-git commit -m "..."  # 3. Code committen
-npm run release      # 4. dist/ committen, taggen, pushen
+├── android/              # Android App (Gradle, Kotlin)
+│   ├── app/src/          # App-Modul (Kotlin + Compose)
+│   └── keystore/         # Keystore (gitignored)
+├── src/                  # Web Bookmarklet Quellen (ES6)
+├── dist/                 # Build-Artefakte (Web)
+├── tests/                # Web Test Suite
+├── docs/                 # Dokumentation
+│   ├── ARCHITECTURE.md
+│   ├── SETUP.md
+│   ├── TESTING.md
+│   ├── android-architecture-decision.md
+│   ├── android-signing.md
+│   ├── data-safety.md
+│   ├── design-system.md
+│   ├── play-store-setup.md
+│   ├── play-store-release.md
+│   └── store-description-guidelines.md
+├── fastlane/             # Play Store Metadata
+├── scripts/              # Build Scripts (Web)
+├── tools/                # Entwickler-Tools
+├── version.txt           # Aktuelle Version
+└── package.json          # Web-Projekt-Dependencies
 ```
 
 ---
 
-## 🧠 Kern-Features & Entscheidungen
+## Getting Started
 
-- **Warum ein Bookmarklet?** Keine Installation erforderlich; nutzt die bestehende Browser-Session des Nutzers.
-- **Smart Highlights**: Substring-Matching markiert Favoriten (z.B. "Schnitzel") automatisch.
-- **Order History**: Nutzt **Delta-Caching**, um nur neue Bestellungen nachzuladen und die API-Last zu minimieren.
-- **Flagging System**: Erlaubt die Überwachung ausverkaufter Menüs mit automatischer In-App Benachrichtigung bei Verfügbarkeit.
+1. **Repository klonen**
+   ```bash
+   git clone <repo-url>
+   cd kantine-overview
+   ```
 
----
+2. **Web Bookmarklet**
+   ```bash
+   npm install
+   npm run build
+   # Öffne dist/install.html im Browser
+   ```
 
-## 🛡️ Sicherheit & Datenschutz
+3. **Android App**
+   ```bash
+   # Öffne android/ in Android Studio
+   # Sync Gradle → Run
+   ```
 
-- **Authentifizierung**: Der Wrapper versucht primär, bestehende Sitzungen („Session Harvesting“) der Bessa-Seite (`AkitaStores`) zu erkennen.
-- **Login-Fallback**: Falls keine aktive Sitzung gefunden wird, bietet der Wrapper einen Login-Dialog ([FR-001](file:///config/kantine-wrapper/REQUIREMENTS.md#FR-001)).
-- **Passwort-Handling**: **Passwörter werden niemals gespeichert.** Sie werden verschlüsselt an die offizielle Bessa-API übertragen. Nur der resultierende `authToken` wird für die Dauer der Sitzung im `localStorage` persistiert.
-- **Transparenz**: Alle Aktionen, die Kosten verursachen (Bestellungen), erfordern eine bewusste Nutzerinteraktion.
-
----
-
-## 🧪 Entwicklung & Verifizierung
-
-- **Standalone Mode**: `dist/kantine-standalone.html` nutzt `mock-data.js` für UI-Tests ohne API.
-- **Automatisierte Tests**: 
-  - `node test_logic.js` (Logik)
-  - `node tests/test_dom.js` (UI-Interaktionen via JSDOM)
-  - `pytest` (Build-Integrität)
+Ausführliche Setup-Anleitung: [docs/SETUP.md](docs/SETUP.md)
 
 ---
 
-*Powered by Kaufis-Kitchen & AI Support.*
+## Design System
 
-## ?Y??? Design System
+Das visuelle Design des Projekts ist in zwei getrennten Systemen dokumentiert:
 
-Das UI-Kit und die Design-System-Dokumentation befinden sich im [docs/]-Ordner:
-- **[Design System Guide](docs/design-system.md)** (Markdown)
-- **[Interaktives UI Kit](docs/kantine-ui-kit.html)** (HTML-Preview)
+- **Web Bookmarklet:** [docs/design-system.md](docs/design-system.md) – Design Tokens, UI-Komponenten, Farben
+- **Android App:** Material 3 Theme mit Dynamic Colors (siehe `android/app/src/main/java/at/kaufi/kantine/ui/theme/`)
 
+---
+
+## Mitwirken
+
+Beiträge sind willkommen! Bitte unsere Richtlinien beachten:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) – Contribution Guide
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) – Verhaltenskodex
+- [SECURITY.md](SECURITY.md) – Sicherheitsrichtlinie
+- [TESTING.md](docs/TESTING.md) – Tests ausführen und schreiben
+
+---
+
+## Lizenz
+
+MIT License – siehe [LICENSE](LICENSE).
+
+Copyright (c) 2024–2026 Kantine Contributors
