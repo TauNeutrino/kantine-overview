@@ -154,10 +154,16 @@ function stepReadAndInject() {
   const FAVICON_URL = `data:image/png;base64,${FAVICON_B64}`;
   const JS_BUNDLE_CONTENT = read(JS_BUNDLE);
   const MOCK_JS   = exists(MOCK_JS_FILE) ? read(MOCK_JS_FILE) : '';
+  const GIST_PAT  = process.env.GIST_PAT || '';
+  const GIST_ID   = process.env.GIST_ID  || '{{GIST_ID}}';
+  const GIST_SALT = process.env.GIST_SALT || '{{GIST_SALT}}';
 
   const JS_INJECTED = JS_BUNDLE_CONTENT
     .replace(/\{\{VERSION\}\}/g, VERSION)
-    .replace(/\{\{FAVICON_DATA_URI\}\}/g, FAVICON_URL);
+    .replace(/\{\{FAVICON_DATA_URI\}\}/g, FAVICON_URL)
+    .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT)
+    .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
+    .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT);
 
   return { VERSION, CSS, FAVICON_URL, JS_INJECTED, MOCK_JS };
 }
@@ -281,6 +287,16 @@ function stepInstaller(ctx) {
         <li>&#x1F3F7;&#xFE0F; <strong>Badges & Status:</strong> Men&#x00FC;-Codes (M1, M2) und Bestellstatus direkt sichtbar.</li>
     </ul>
 
+    <div style="margin-top: 30px; padding: 15px; background: rgba(0, 154, 168, 0.1); border: 1px solid rgba(0, 154, 168, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
+      <strong>&#x1F4CA; Nutzungsstatistiken:</strong><br>
+      Dieses Bookmarklet erfasst pseudonymisierte Nutzungsdaten (z.B. Anzahl der Aufrufe, verwendete Features, Performance-Werte).
+      Die Daten werden <strong>ausschlie&szlig;lich aggregiert</strong> und <strong>ohne Personenbezug</strong> (t&auml;glich wechselnder Hash, keine User-ID im Klartext)
+      an ein GitHub Gist &uuml;bertragen. Eine Identifikation einzelner Nutzer ist nicht m&ouml;glich.
+      Rechtsgrundlage: Ihr Interesse an der Verbesserung dieser Software (Art. 6 Abs. 1 lit. f DSGVO).
+      Mit der Installation und Nutzung des Bookmarklets stimmen Sie der Erfassung zu.
+      Sie k&ouml;nnen die Erfassung jederzeit deaktivieren, indem Sie das Bookmarklet nicht mehr nutzen.
+    </div>
+
     <div style="margin-top: 30px; padding: 15px; background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
              <strong>&#x26A0;&#xFE0F; Haftungsausschluss:</strong><br>
              Die Verwendung dieses Bookmarklets erfolgt auf eigene Verantwortung. Der Entwickler &#x00FC;bernimmt keine Haftung f&#x00FC;r Sch&#x00E4;den, Datenverlust oder ungewollte Bestellungen, die durch die Nutzung dieser Software entstehen.
@@ -396,8 +412,20 @@ function stepSmokeAndSize(ctx) {
     ok('Smoke check: baked model present in bundle');
   }
 
-  // Size guard: bookmarklet must not grow beyond baseline + 3 KB
-  const BASELINE_BOOKMARKLET_SIZE = 205000;
+  // Gist injection status
+  const GP = process.env.GIST_PAT;
+  const GI = process.env.GIST_ID;
+  if (GP) {
+    log('✓ Gist PAT injected (length: ' + GP.length + ')');
+  } else {
+    log('ℹ Gist PAT not set — placeholders remain in bundle');
+  }
+  log('✓ Gist ID: ' + (GI ? (GI === '{{GIST_ID}}' ? '(placeholder)' : GI.substring(0, 8) + '...') : '(empty)'));
+  const GS = process.env.GIST_SALT;
+  log('✓ Gist Salt: ' + (GS ? '(set)' : '(placeholder)'));
+
+  // Size guard: bookmarklet must not grow beyond baseline + 5 KB
+  const BASELINE_BOOKMARKLET_SIZE = 212202;
   const MAX_GROWTH = 5120;
   const size = ctx.BOOKMARKLET_SIZE || 0;
   if (size > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {

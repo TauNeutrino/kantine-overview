@@ -31,6 +31,8 @@
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(842);
 /* harmony import */ var _i18n_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(646);
+/* harmony import */ var _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(618);
+
 
 
 
@@ -489,6 +491,7 @@ async function placeOrder(date, articleId, name, price, description) {
 
         if (response.ok || response.status === 201) {
             showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderSuccess')}: ${name}`, 'success');
+            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.increment('order_placed');
             fullOrderHistoryCache = null;
             
             const flagId = `${date}_${articleId}`;
@@ -528,6 +531,7 @@ async function cancelOrder(date, articleId, name) {
 
         if (response.ok) {
             showToast(`${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelSuccess')}: ${name}`, 'success');
+            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.increment('order_cancelled');
             fullOrderHistoryCache = null;
             await fetchOrders();
             await refreshMenuForDate(date);
@@ -942,6 +946,7 @@ async function loadMenuDataFromAPI() {
         return;
     }
 
+    const __apiStart = Date.now();
     try {
         progressModal.classList.remove('hidden');
         progressMessage.textContent = 'Hole verfügbare Daten...';
@@ -1115,6 +1120,10 @@ async function loadMenuDataFromAPI() {
         });
     } finally {
         loading.classList.add('hidden');
+        _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.set('api_latency_ms', Date.now() - __apiStart);
+        if (window.__kantine_load_start) {
+            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.set('load_time_ms', Date.now() - window.__kantine_load_start);
+        }
     }
 }
 
@@ -1224,13 +1233,16 @@ function githubHeaders(etag) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   IY: () => (/* binding */ RAW_INSTALLER_BASE),
+/* harmony export */   KJ: () => (/* binding */ GIST_ID),
 /* harmony export */   LS: () => (/* binding */ LS),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
+/* harmony export */   d7: () => (/* binding */ GIST_SALT),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
 /* harmony export */   fK: () => (/* binding */ GITHUB_FILE_BASE),
 /* harmony export */   fZ: () => (/* binding */ CLIENT_VERSION),
 /* harmony export */   fv: () => (/* binding */ POLL_INTERVAL_MS),
 /* harmony export */   pe: () => (/* binding */ GITHUB_API),
+/* harmony export */   q: () => (/* binding */ GIST_PAT),
 /* harmony export */   tE: () => (/* binding */ API_BASE)
 /* harmony export */ });
 /* unused harmony export GITHUB_REPO */
@@ -1289,7 +1301,13 @@ const LS = {
     VERSION_ETAG:            'kantine_version_etag',
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
+    STATS_STATE:             '_kstats_state',
+    STATS_ANON_ID:           '_kstats_anon_id',
 };
+
+const GIST_ID = '{{GIST_ID}}';
+const GIST_SALT = '{{GIST_SALT}}';
+const GIST_PAT = '{{GIST_PAT}}';
 
 
 /***/ },
@@ -1678,6 +1696,167 @@ function setLangMode(lang) {
     }
     langMode = lang;
 }
+
+
+/***/ },
+
+/***/ 618
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   F: () => (/* binding */ tracker)
+/* harmony export */ });
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
+const STORAGE_KEY = '_kstats_state';
+
+
+
+class StatsTracker {
+    constructor() {
+        this._state = null;
+    }
+
+    _getToday() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    _freshState(today) {
+        return {
+            date: today,
+            daily: {},
+            hash: null,
+            session: { start_ms: Date.now() },
+            has_flushed: false,
+            pendingFlush: null
+        };
+    }
+
+    load() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const today = this._getToday();
+
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                this._state = {
+                    date: parsed.date || today,
+                    daily: parsed.daily || {},
+                    hash: parsed.hash || null,
+                    session: parsed.session || { start_ms: Date.now() },
+                    has_flushed: parsed.has_flushed || false,
+                    pendingFlush: parsed.pendingFlush || null
+                };
+            } catch (e) {
+                this._state = this._freshState(today);
+            }
+        } else {
+            this._state = this._freshState(today);
+        }
+
+        if (this._state.date !== today) {
+            this._state.pendingFlush = {
+                date: this._state.date,
+                daily: { ...this._state.daily },
+                hash: this._state.hash
+            };
+            this._state.daily = {};
+            this._state.hash = null;
+            this._state.session = { start_ms: Date.now() };
+            this._state.date = today;
+            this._state.has_flushed = false;
+            this.persist();
+        }
+
+        return this._state;
+    }
+
+    persist() {
+        if (!this._state) this.load();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+    }
+
+    increment(key) {
+        this.load();
+        if (!this._state.daily[key]) this._state.daily[key] = 0;
+        this._state.daily[key]++;
+        this.persist();
+    }
+
+    set(key, value) {
+        this.load();
+        this._state.daily[key] = value;
+        this.persist();
+    }
+
+    reset() {
+        this._state = this._freshState(this._getToday());
+        localStorage.removeItem(STORAGE_KEY);
+    }
+
+    getLocalStats() {
+        this.load();
+        return { ...this._state.daily };
+    }
+
+    getPendingFlush() {
+        this.load();
+        return this._state.pendingFlush ? { ...this._state.pendingFlush } : null;
+    }
+
+    markFlushed() {
+        this.load();
+        this._state.has_flushed = true;
+        this._state.pendingFlush = null;
+        this.persist();
+    }
+
+    async flushToGist(pendingDate, pendingDaily, pendingHash) {
+        try {
+            const resp = await fetch(`https://api.github.com/gists/${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ}`, {
+                headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (!resp.ok) throw new Error(`Gist GET failed: ${resp.status}`);
+            const gist = await resp.json();
+            let data = JSON.parse(gist.files['stats.json'].content);
+
+            const dayKey = pendingDate;
+            if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
+            const day = data.daily[dayKey];
+
+            if (!day.seen_hashes.includes(pendingHash)) {
+                day.seen_hashes.push(pendingHash);
+                day.unique_today++;
+            }
+
+            for (const [key, val] of Object.entries(pendingDaily)) {
+                if (typeof val === 'number') {
+                    day[key] = (day[key] || 0) + val;
+                }
+            }
+
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+            for (const dk of Object.keys(data.daily)) {
+                if (dk < thirtyDaysAgo && data.daily[dk].seen_hashes) {
+                    delete data.daily[dk].seen_hashes;
+                }
+            }
+
+            data.last_updated = new Date().toISOString();
+            const patchResp = await fetch(`https://api.github.com/gists/${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
+            });
+            if (!patchResp.ok) throw new Error(`Gist PATCH failed: ${patchResp.status}`);
+
+            this.markFlushed();
+        } catch (e) {
+            console.warn('[StatsTracker] Flush failed:', e.message);
+        }
+    }
+}
+
+const tracker = new StatsTracker();
 
 
 /***/ },
@@ -4597,6 +4776,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/state.js
 var state = __webpack_require__(901);
+// EXTERNAL MODULE: ./src/stats-tracker.js
+var stats_tracker = __webpack_require__(618);
 ;// ./src/ui.js
 /**
  * UI injection module.
@@ -4604,6 +4785,7 @@ var state = __webpack_require__(901);
  * including fonts, icon stylesheet, favicon, and all modal/panel containers.
  * Must be called before bindEvents() and any state-rendering logic.
  */
+
 
 
 /**
@@ -4868,6 +5050,8 @@ function injectUI() {
         };
         document.body.appendChild(script);
     }
+
+    stats_tracker/* tracker */.F.increment('browser_load');
 }
 
 // EXTERNAL MODULE: ./src/actions.js
@@ -4883,6 +5067,7 @@ var i18n = __webpack_require__(646);
 // EXTERNAL MODULE: ./src/utils.js + 10 modules
 var utils = __webpack_require__(160);
 ;// ./src/events.js
+
 
 
 
@@ -5023,6 +5208,7 @@ function bindEvents() {
             localStorage.setItem(constants.LS.LANG, next);
             updateLangToggleLabel();
             updateUILanguage();
+            stats_tracker/* tracker */.F.increment('lang_switch');
         });
     }
 
@@ -5030,6 +5216,7 @@ function bindEvents() {
         btnHighlights.addEventListener('click', () => {
             (0,actions/* renderTagsList */.Y1)();
             highlightsModal.classList.remove('hidden');
+            stats_tracker/* tracker */.F.increment('highlights_mgr');
         });
     }
 
@@ -5046,6 +5233,7 @@ function bindEvents() {
         }
         historyModal.classList.remove('hidden');
         (0,actions/* fetchFullOrderHistory */.Aq)();
+        stats_tracker/* tracker */.F.increment('order_history');
     });
 
     btnHistoryClose.addEventListener('click', () => {
@@ -5125,6 +5313,7 @@ function bindEvents() {
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
         themeIcon.textContent = next === 'dark' ? 'dark_mode' : 'light_mode';
+        stats_tracker/* tracker */.F.increment('theme_switch');
     });
 
     btnThisWeek.addEventListener('click', () => {
@@ -5133,6 +5322,7 @@ function bindEvents() {
             btnThisWeek.classList.add('active');
             btnNextWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
+            stats_tracker/* tracker */.F.increment('week_nav');
         }
     });
 
@@ -5143,6 +5333,7 @@ function bindEvents() {
             btnNextWeek.classList.add('active');
             btnThisWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
+            stats_tracker/* tracker */.F.increment('week_nav');
         }
     });
 
@@ -5152,6 +5343,7 @@ function bindEvents() {
             return;
         }
         (0,actions/* loadMenuDataFromAPI */.m9)();
+        stats_tracker/* tracker */.F.increment('refresh');
     });
 
     const bellBtn = document.getElementById('alarm-bell');
@@ -5219,6 +5411,7 @@ function bindEvents() {
                 loginModal.classList.add('hidden');
                 (0,actions/* fetchOrders */.Gb)();
                 loginForm.reset();
+                stats_tracker/* tracker */.F.increment('login');
                 (0,actions/* startPolling */.g8)();
                 (0,actions/* loadMenuDataFromAPI */.m9)();
             } else {
@@ -5249,6 +5442,7 @@ function bindEvents() {
         (0,actions/* stopPolling */.Et)();
         (0,actions/* updateAuthUI */.i_)();
         (0,ui_helpers/* renderVisibleWeeks */.OR)();
+        stats_tracker/* tracker */.F.increment('logout');
     });
 
     // Sync heights on window resize (FR-Performance)
@@ -5260,7 +5454,37 @@ function bindEvents() {
     updateLangToggleLabel();
 }
 
+;// ./src/stats-hash.js
+const STORAGE_KEY_ANON = '_kstats_anon_id';
+
+async function computeDailyHash(authToken, currentUser, GIST_SALT) {
+    const today = new Date().toISOString().split('T')[0];
+    let identity;
+    if (authToken && currentUser) {
+        identity = currentUser;
+    } else {
+        let anonUUID = localStorage.getItem(STORAGE_KEY_ANON);
+        if (!anonUUID) {
+            anonUUID = crypto.randomUUID();
+            localStorage.setItem(STORAGE_KEY_ANON, anonUUID);
+        }
+        identity = anonUUID;
+    }
+    const data = identity + today + (GIST_SALT || '');
+    const encoder = new TextEncoder();
+    const buffer = encoder.encode(data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 ;// ./src/index.js
+window.__kantine_load_start = Date.now();
+
+
+
+
+
 
 
 
@@ -5276,6 +5500,25 @@ if (!window.__KANTINE_LOADED) {
 
     window.__KANTINE_LOADED = true;
 
+    // Stats: baseline metrics
+    stats_tracker/* tracker */.F.increment('starts');
+    stats_tracker/* tracker */.F.set('version', '{{VERSION}}');
+    stats_tracker/* tracker */.F.set('hour', new Date().getHours());
+    stats_tracker/* tracker */.F.set('day', new Date().getDay());
+    stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
+    stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
+    stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
+    
+    const pending = stats_tracker/* tracker */.F.getPendingFlush();
+    if (pending) {
+        computeDailyHash(state/* authToken */.gX, null, constants/* GIST_SALT */.d7).then(hash => {
+            stats_tracker/* tracker */.F.load().hash = hash;
+            stats_tracker/* tracker */.F.persist();
+        });
+        // Fire-and-forget flush to Gist (non-blocking)
+        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, pending.hash).catch(e => console.warn('Flush failed:', e));
+    }
+
     injectUI();
     bindEvents();
     (0,actions/* updateAuthUI */.i_)();
@@ -5284,6 +5527,7 @@ if (!window.__KANTINE_LOADED) {
     const hadCache = (0,actions/* loadMenuCache */.KG)();
     if (hadCache) {
         document.getElementById('loading').classList.add('hidden');
+        stats_tracker/* tracker */.F.set('load_time_ms', Date.now() - window.__kantine_load_start);
         if (!(0,actions/* isCacheFresh */.VL)()) {
             (0,actions/* loadMenuDataFromAPI */.m9)();
         }
@@ -5298,6 +5542,13 @@ if (!window.__KANTINE_LOADED) {
     (0,ui_helpers/* checkForUpdates */.Ux)();
     setInterval(ui_helpers/* checkForUpdates */.Ux, 60 * 60 * 1000);
 }
+
+window.addEventListener('beforeunload', () => {
+    const startMs = stats_tracker/* tracker */.F.load().session?.start_ms;
+    if (startMs) {
+        stats_tracker/* tracker */.F.set('session_duration_s', Math.round((Date.now() - startMs) / 1000));
+    }
+});
 
 /******/ })()
 ;
