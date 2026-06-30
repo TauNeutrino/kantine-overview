@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kantine Usage Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #1a1a2e; color: #eee; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #029AA8; margin-bottom: 5px; }
+        .subtitle { color: #a0aec0; margin-bottom: 30px; font-size: 0.9em; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+        .kpi-card { background: #16213e; border-radius: 12px; padding: 20px; text-align: center; }
+        .kpi-card .value { font-size: 2em; font-weight: 700; color: #029AA8; }
+        .kpi-card .label { color: #a0aec0; font-size: 0.85em; margin-top: 4px; }
+
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
+        .chart-card { background: #16213e; border-radius: 12px; padding: 20px; }
+        .chart-card.full { grid-column: 1 / -1; }
+        .chart-card h2 { color: #029AA8; font-size: 1em; margin-bottom: 15px; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #a0aec0; }
+        .empty-state h2 { color: #029AA8; margin-bottom: 10px; }
+        .error-state { text-align: center; padding: 60px 20px; color: #e95454; }
+
+        .loading { text-align: center; padding: 60px; color: #a0aec0; }
+        .spinner { width: 40px; height: 40px; border: 3px solid #16213e; border-top-color: #029AA8; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .chart-row { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Kantine Usage Dashboard</h1>
+    <p class="subtitle">Nutzungsstatistiken &mdash; <span id="last-updated">-</span></p>
+
+    <div id="kpi-container" class="kpi-grid"></div>
+    <div id="charts-container"></div>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Lade Daten...</p>
+    </div>
+</div>
+
+<script>
+const GIST_ID = '{{GIST_ID}}';
+
+async function fetchGistData() {
+    const resp = await fetch(`https://api.github.com/gists/${GIST_ID}`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const gist = await resp.json();
+    return JSON.parse(gist.files['stats.json'].content);
+}
+
+function renderDashboard(data) {
+    const days = Object.keys(data.daily).sort();
+    if (days.length === 0) return showEmpty('Keine Daten vorhanden');
+
+    document.getElementById('last-updated').textContent = data.last_updated
+        ? 'Zuletzt aktualisiert: ' + new Date(data.last_updated).toLocaleString('de-DE')
+        : '-';
+
+    const latest = data.daily[days[days.length - 1]];
+    let totalUnique = 0, totalActions = 0;
+    for (const d of days) {
+        totalUnique += data.daily[d].unique_today || 0;
+        for (const [k, v] of Object.entries(data.daily[d])) {
+            if (typeof v === 'number' && k !== 'unique_today') totalActions += v;
+        }
+    }
+
+    document.getElementById('kpi-container').innerHTML = [
+        { value: latest.unique_today || 0, label: 'Heute aktiv (DAU)' },
+        { value: totalUnique, label: 'Einzigartige Nutzer (\u2211)' },
+        { value: totalActions, label: 'Aktionen gesamt' },
+        { value: days.length, label: 'Tage mit Daten' }
+    ].map(k => `<div class="kpi-card"><div class="value">${k.value}</div><div class="label">${k.label}</div></div>`).join('');
+
+    const container = document.getElementById('charts-container');
+    const featureKeys = ['starts','highlight','order','lang_switch','theme_switch','week_nav','refresh','login','logout','browser_load','order_history','highlights_mgr','order_placed','order_cancelled'];
+
+    const activeFeatures = [];
+    for (const fk of featureKeys) {
+        let sum = 0;
+        for (const d of days) if (data.daily[d][fk]) sum += data.daily[d][fk];
+        if (sum > 0) activeFeatures.push(fk);
+    }
+
+    container.innerHTML = '<div class="chart-card full"><h2>Starts &uuml;ber Zeit</h2><canvas id="line-chart" style="height:300px"></canvas></div>';
+
+    if (activeFeatures.length > 0) {
+        container.innerHTML += '<div class="chart-row"><div class="chart-card"><h2>Feature-Nutzung (aggregiert)</h2><canvas id="bar-chart" style="height:280px"></canvas></div><div class="chart-card"><h2>Feature-Verteilung</h2><canvas id="pie-chart" style="height:280px"></canvas></div></div>';
+    }
+
+    const colors = ['#029AA8','#E95454','#FFB347','#48C774','#A855F7','#3B82F6','#F59E0B','#EC4899','#14B8A6','#8B5CF6','#F97316','#06B6D4','#84CC16','#D946EF'];
+
+    new Chart(document.getElementById('line-chart'), {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: activeFeatures.slice(0, 8).map((fk, i) => ({
+                label: fk,
+                data: days.map(d => data.daily[d][fk] || 0),
+                borderColor: colors[i % colors.length],
+                backgroundColor: colors[i % colors.length] + '20',
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.3
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#a0aec0' } } },
+            scales: { x: { ticks: { color: '#a0aec0' } }, y: { ticks: { color: '#a0aec0' } } }
+        }
+    });
+
+    if (activeFeatures.length > 0) {
+        new Chart(document.getElementById('bar-chart'), {
+            type: 'bar',
+            data: {
+                labels: activeFeatures,
+                datasets: [{
+                    label: 'Gesamt',
+                    data: activeFeatures.map(fk => { let s = 0; for (const d of days) s += data.daily[d][fk] || 0; return s; }),
+                    backgroundColor: activeFeatures.map((_, i) => colors[i % colors.length] + '80'),
+                    borderColor: activeFeatures.map((_, i) => colors[i % colors.length]),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { ticks: { color: '#a0aec0' } }, y: { ticks: { color: '#a0aec0' } } }
+            }
+        });
+
+        new Chart(document.getElementById('pie-chart'), {
+            type: 'pie',
+            data: {
+                labels: activeFeatures,
+                datasets: [{
+                    data: activeFeatures.map(fk => { let s = 0; for (const d of days) s += data.daily[d][fk] || 0; return s; }),
+                    backgroundColor: activeFeatures.map((_, i) => colors[i % colors.length])
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#a0aec0', boxWidth: 12 } } }
+            }
+        });
+    }
+}
+
+function showEmpty(msg) {
+    document.getElementById('loading').innerHTML = '<div class="empty-state"><h2>\uD83D\uDCCA ' + msg + '</h2><p>Sobald Nutzungsdaten vorhanden sind, werden sie hier angezeigt.</p></div>';
+}
+
+function showError(msg) {
+    document.getElementById('loading').innerHTML = '<div class="error-state"><h2>Fehler beim Laden</h2><p>' + msg + '</p></div>';
+}
+
+(async () => {
+    try {
+        const data = await fetchGistData();
+        document.getElementById('loading').style.display = 'none';
+        renderDashboard(data);
+    } catch (e) {
+        document.getElementById('loading').style.display = 'none';
+        if (GIST_ID === '{{GIST_ID}}') {
+            showEmpty('Dashboard: GIST_ID nicht konfiguriert');
+        } else {
+            showError(e.message);
+        }
+    }
+})();
+</script>
+</body>
+</html>
