@@ -4,6 +4,7 @@ import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BA
 import { apiHeaders, githubHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
 import { t } from './i18n.js';
+import { tracker } from './stats-tracker.js';
 
 let fullOrderHistoryCache = null;
 
@@ -456,6 +457,7 @@ export async function placeOrder(date, articleId, name, price, description) {
 
         if (response.ok || response.status === 201) {
             showToast(`${t('orderSuccess')}: ${name}`, 'success');
+            tracker.increment('order_placed');
             fullOrderHistoryCache = null;
             
             const flagId = `${date}_${articleId}`;
@@ -495,6 +497,7 @@ export async function cancelOrder(date, articleId, name) {
 
         if (response.ok) {
             showToast(`${t('cancelSuccess')}: ${name}`, 'success');
+            tracker.increment('order_cancelled');
             fullOrderHistoryCache = null;
             await fetchOrders();
             await refreshMenuForDate(date);
@@ -909,6 +912,7 @@ export async function loadMenuDataFromAPI() {
         return;
     }
 
+    const __apiStart = Date.now();
     try {
         progressModal.classList.remove('hidden');
         progressMessage.textContent = 'Hole verfügbare Daten...';
@@ -1082,6 +1086,10 @@ export async function loadMenuDataFromAPI() {
         });
     } finally {
         loading.classList.add('hidden');
+        tracker.set('api_latency_ms', Date.now() - __apiStart);
+        if (window.__kantine_load_start) {
+            tracker.set('load_time_ms', Date.now() - window.__kantine_load_start);
+        }
     }
 }
 

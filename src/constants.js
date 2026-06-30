@@ -53,4 +53,9 @@ export const LS = {
     VERSION_ETAG:            'kantine_version_etag',
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
+    STATS_STATE:             '_kstats_state',
+    STATS_ANON_ID:           '_kstats_anon_id',
 };
+
+export const GIST_ID = '{{GIST_ID}}';
+export const GIST_SALT = '{{GIST_SALT}}';

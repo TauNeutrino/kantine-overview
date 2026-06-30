@@ -5,6 +5,7 @@
  * Must be called before bindEvents() and any state-rendering logic.
  */
 import { langMode } from './state.js';
+import { tracker } from './stats-tracker.js';
 
 /**
  * Injects the full application HTML into the current tab.
@@ -268,4 +269,6 @@ export function injectUI() {
         };
         document.body.appendChild(script);
     }
+
+    tracker.increment('browser_load');
 }

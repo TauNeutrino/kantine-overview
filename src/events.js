@@ -2,6 +2,7 @@ import { displayMode, authToken, userFlags, langMode, setLangMode, setDisplayMod
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
 import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
 import { API_BASE, LS } from './constants.js';
+import { tracker } from './stats-tracker.js';
 import { apiHeaders } from './api.js';
 import { t } from './i18n.js';
 import { debounce } from './utils.js';
@@ -138,6 +139,7 @@ export function bindEvents() {
             localStorage.setItem(LS.LANG, next);
             updateLangToggleLabel();
             updateUILanguage();
+            tracker.increment('lang_switch');
         });
     }
 
@@ -145,6 +147,7 @@ export function bindEvents() {
         btnHighlights.addEventListener('click', () => {
             renderTagsList();
             highlightsModal.classList.remove('hidden');
+            tracker.increment('highlights_mgr');
         });
     }
 
@@ -161,6 +164,7 @@ export function bindEvents() {
         }
         historyModal.classList.remove('hidden');
         fetchFullOrderHistory();
+        tracker.increment('order_history');
     });
 
     btnHistoryClose.addEventListener('click', () => {
@@ -240,6 +244,7 @@ export function bindEvents() {
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('theme', next);
         themeIcon.textContent = next === 'dark' ? 'dark_mode' : 'light_mode';
+        tracker.increment('theme_switch');
     });
 
     btnThisWeek.addEventListener('click', () => {
@@ -248,6 +253,7 @@ export function bindEvents() {
             btnThisWeek.classList.add('active');
             btnNextWeek.classList.remove('active');
             renderVisibleWeeks();
+            tracker.increment('week_nav');
         }
     });
 
@@ -258,6 +264,7 @@ export function bindEvents() {
             btnNextWeek.classList.add('active');
             btnThisWeek.classList.remove('active');
             renderVisibleWeeks();
+            tracker.increment('week_nav');
         }
     });
 
@@ -267,6 +274,7 @@ export function bindEvents() {
             return;
         }
         loadMenuDataFromAPI();
+        tracker.increment('refresh');
     });
 
     const bellBtn = document.getElementById('alarm-bell');
@@ -334,6 +342,7 @@ export function bindEvents() {
                 loginModal.classList.add('hidden');
                 fetchOrders();
                 loginForm.reset();
+                tracker.increment('login');
                 startPolling();
                 loadMenuDataFromAPI();
             } else {
@@ -364,6 +373,7 @@ export function bindEvents() {
         stopPolling();
         updateAuthUI();
         renderVisibleWeeks();
+        tracker.increment('logout');
     });
 
     // Sync heights on window resize (FR-Performance)
