@@ -1,5 +1,7 @@
 const STORAGE_KEY = '_kstats_state';
 
+import { GIST_ID, GIST_PAT } from './constants.js';
+
 class StatsTracker {
     constructor() {
         this._state = null;
@@ -97,6 +99,51 @@ class StatsTracker {
         this._state.has_flushed = true;
         this._state.pendingFlush = null;
         this.persist();
+    }
+
+    async flushToGist(pendingDate, pendingDaily, pendingHash) {
+        try {
+            const resp = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                headers: { 'Authorization': `token ${GIST_PAT}`, 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (!resp.ok) throw new Error(`Gist GET failed: ${resp.status}`);
+            const gist = await resp.json();
+            let data = JSON.parse(gist.files['stats.json'].content);
+
+            const dayKey = pendingDate;
+            if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
+            const day = data.daily[dayKey];
+
+            if (!day.seen_hashes.includes(pendingHash)) {
+                day.seen_hashes.push(pendingHash);
+                day.unique_today++;
+            }
+
+            for (const [key, val] of Object.entries(pendingDaily)) {
+                if (typeof val === 'number') {
+                    day[key] = (day[key] || 0) + val;
+                }
+            }
+
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+            for (const dk of Object.keys(data.daily)) {
+                if (dk < thirtyDaysAgo && data.daily[dk].seen_hashes) {
+                    delete data.daily[dk].seen_hashes;
+                }
+            }
+
+            data.last_updated = new Date().toISOString();
+            const patchResp = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `token ${GIST_PAT}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
+            });
+            if (!patchResp.ok) throw new Error(`Gist PATCH failed: ${patchResp.status}`);
+
+            this.markFlushed();
+        } catch (e) {
+            console.warn('[StatsTracker] Flush failed:', e.message);
+        }
     }
 }
 

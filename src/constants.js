@@ -59,3 +59,4 @@ export const LS = {
 
 export const GIST_ID = '{{GIST_ID}}';
 export const GIST_SALT = '{{GIST_SALT}}';
+export const GIST_PAT = '{{GIST_PAT}}';

@@ -34,6 +34,8 @@ if (!window.__KANTINE_LOADED) {
             tracker.load().hash = hash;
             tracker.persist();
         });
+        // Fire-and-forget flush to Gist (non-blocking)
+        tracker.flushToGist(pending.date, pending.daily, pending.hash).catch(e => console.warn('Flush failed:', e));
     }
 
     injectUI();
