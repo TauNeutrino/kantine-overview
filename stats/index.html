@@ -48,13 +48,14 @@
 </div>
 
 <script>
-const GIST_ID = '{{GIST_ID}}';
+// Public raw URL — auch für secret Gists ohne Auth lesbar (CORS erlaubt)
+const GIST_OWNER = 'TauNeutrino';
+const GIST_ID = '1e8de3cc6c9dcb90cf0905d502ce2fa4';
 
 async function fetchGistData() {
-    const resp = await fetch(`https://api.github.com/gists/${GIST_ID}`);
+    const resp = await fetch(`https://gist.githubusercontent.com/${GIST_OWNER}/${GIST_ID}/raw/stats.json`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const gist = await resp.json();
-    return JSON.parse(gist.files['stats.json'].content);
+    return resp.json();
 }
 
 function renderDashboard(data) {
@@ -175,11 +176,7 @@ function showError(msg) {
         renderDashboard(data);
     } catch (e) {
         document.getElementById('loading').style.display = 'none';
-        if (GIST_ID === '{{GIST_ID}}') {
-            showEmpty('Dashboard: GIST_ID nicht konfiguriert');
-        } else {
-            showError(e.message);
-        }
+        showEmpty(e.message);
     }
 })();
 </script>
