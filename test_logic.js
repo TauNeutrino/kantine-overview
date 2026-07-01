@@ -95,8 +95,21 @@ const sandbox = {
     setTimeout: (cb) => cb(), // Execute immediately to resolve promises/logic
     requestAnimationFrame: (cb) => cb(),
     Date: Date,
+    TextEncoder: require('util').TextEncoder,
+    crypto: {
+        randomUUID: () => '00000000-0000-0000-0000-000000000000',
+        subtle: {
+            digest: async (algorithm, buffer) => {
+                // SHA-256 via Node crypto — same output as Web Crypto
+                const nodeCrypto = require('crypto');
+                return nodeCrypto.createHash('sha256').update(buffer).digest();
+            }
+        }
+    },
     // Add other globals used in kantine.js
-    Notification: { permission: 'denied', requestPermission: () => { } }
+    Notification: { permission: 'denied', requestPermission: () => { } },
+    TextEncoder: TextEncoder,
+    crypto: crypto,
 };
 
 // 3. Instrument Code to expose functions or run check
