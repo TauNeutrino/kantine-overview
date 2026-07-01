@@ -1724,7 +1724,7 @@ class StatsTracker {
         return {
             date: today,
             daily: {},
-            hash: null,
+            user_hash: null,
             session: { start_ms: Date.now() },
             has_flushed: false,
             pendingFlush: null
@@ -1741,7 +1741,7 @@ class StatsTracker {
                 this._state = {
                     date: parsed.date || today,
                     daily: parsed.daily || {},
-                    hash: parsed.hash || null,
+                    user_hash: parsed.user_hash || null,
                     session: parsed.session || { start_ms: Date.now() },
                     has_flushed: parsed.has_flushed || false,
                     pendingFlush: parsed.pendingFlush || null
@@ -1757,10 +1757,9 @@ class StatsTracker {
             this._state.pendingFlush = {
                 date: this._state.date,
                 daily: { ...this._state.daily },
-                hash: this._state.hash
+                user_hash: this._state.user_hash
             };
             this._state.daily = {};
-            this._state.hash = null;
             this._state.session = { start_ms: Date.now() };
             this._state.date = today;
             this._state.has_flushed = false;
@@ -1810,7 +1809,7 @@ class StatsTracker {
         this.persist();
     }
 
-    async flushToGist(pendingDate, pendingDaily, pendingHash) {
+    async flushToGist(pendingDate, pendingDaily, pendingUserHash) {
         try {
             const resp = await fetch(`https://api.github.com/gists/${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ}`, {
                 headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Accept': 'application/vnd.github.v3+json' }
@@ -1819,18 +1818,30 @@ class StatsTracker {
             const gist = await resp.json();
             let data = JSON.parse(gist.files['stats.json'].content);
 
+            // Track daily unique users via stable user hash
             const dayKey = pendingDate;
             if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
             const day = data.daily[dayKey];
 
-            if (!day.seen_hashes.includes(pendingHash)) {
-                day.seen_hashes.push(pendingHash);
+            if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
+                day.seen_hashes.push(pendingUserHash);
                 day.unique_today++;
             }
 
             for (const [key, val] of Object.entries(pendingDaily)) {
                 if (typeof val === 'number') {
                     day[key] = (day[key] || 0) + val;
+                }
+            }
+
+            // Track all-time unique users
+            if (pendingUserHash) {
+                if (!data.all_time) {
+                    data.all_time = { unique_hashes: [], unique_users: 0 };
+                }
+                if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
+                    data.all_time.unique_hashes.push(pendingUserHash);
+                    data.all_time.unique_users++;
                 }
             }
 
@@ -4775,7 +4786,7 @@ function debounce(func, wait) {
 var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/state.js
-var state = __webpack_require__(901);
+var src_state = __webpack_require__(901);
 // EXTERNAL MODULE: ./src/stats-tracker.js
 var stats_tracker = __webpack_require__(618);
 ;// ./src/ui.js
@@ -4856,9 +4867,9 @@ function injectUI() {
                             <span class="material-icons-round">translate</span>
                         </button>
                         <div id="lang-dropdown" class="lang-dropdown-menu hidden">
-                            <button class="lang-btn${state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
-                            <button class="lang-btn${state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
-                            <button class="lang-btn${state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
+                            <button class="lang-btn${src_state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
+                            <button class="lang-btn${src_state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
+                            <button class="lang-btn${src_state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
                         </div>
                     </div>
                     <button id="btn-login-open" class="user-badge-btn icon-btn-small" title="Mit Bessa.app Account anmelden">
@@ -5160,7 +5171,7 @@ function updateUILanguage() {
 
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
-    if (alarmBell && state/* userFlags */.BY.size === 0) {
+    if (alarmBell && src_state/* userFlags */.BY.size === 0) {
         alarmBell.title = (0,i18n.t)('alarmTooltipNone');
     }
 
@@ -5195,16 +5206,16 @@ function bindEvents() {
     const langDropdown = document.getElementById('lang-dropdown');
 
     function updateLangToggleLabel() {
-        if (btnLangToggle) btnLangToggle.textContent = state/* langMode */.Kl.toUpperCase();
+        if (btnLangToggle) btnLangToggle.textContent = src_state/* langMode */.Kl.toUpperCase();
     }
 
     if (btnLangToggle) {
         btnLangToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             const modes = ['de', 'en', 'all'];
-            const nextIndex = (modes.indexOf(state/* langMode */.Kl) + 1) % modes.length;
+            const nextIndex = (modes.indexOf(src_state/* langMode */.Kl) + 1) % modes.length;
             const next = modes[nextIndex];
-            (0,state/* setLangMode */.UD)(next);
+            (0,src_state/* setLangMode */.UD)(next);
             localStorage.setItem(constants.LS.LANG, next);
             updateLangToggleLabel();
             updateUILanguage();
@@ -5227,7 +5238,7 @@ function bindEvents() {
     }
 
     btnHistory.addEventListener('click', () => {
-        if (!state/* authToken */.gX) {
+        if (!src_state/* authToken */.gX) {
             loginModal.classList.remove('hidden');
             return;
         }
@@ -5317,8 +5328,8 @@ function bindEvents() {
     });
 
     btnThisWeek.addEventListener('click', () => {
-        if (state/* displayMode */.sw !== 'this-week') {
-            (0,state/* setDisplayMode */.qo)('this-week');
+        if (src_state/* displayMode */.sw !== 'this-week') {
+            (0,src_state/* setDisplayMode */.qo)('this-week');
             btnThisWeek.classList.add('active');
             btnNextWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5328,8 +5339,8 @@ function bindEvents() {
 
     btnNextWeek.addEventListener('click', () => {
         btnNextWeek.classList.remove('new-week-available');
-        if (state/* displayMode */.sw !== 'next-week') {
-            (0,state/* setDisplayMode */.qo)('next-week');
+        if (src_state/* displayMode */.sw !== 'next-week') {
+            (0,src_state/* setDisplayMode */.qo)('next-week');
             btnNextWeek.classList.add('active');
             btnThisWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5338,7 +5349,7 @@ function bindEvents() {
     });
 
     btnRefresh.addEventListener('click', () => {
-        if (!state/* authToken */.gX) {
+        if (!src_state/* authToken */.gX) {
             loginModal.classList.remove('hidden');
             return;
         }
@@ -5389,8 +5400,8 @@ function bindEvents() {
             const data = await response.json();
 
             if (response.ok) {
-                (0,state/* setAuthToken */.O5)(data.key);
-                (0,state/* setCurrentUser */.lt)(employeeId);
+                (0,src_state/* setAuthToken */.O5)(data.key);
+                (0,src_state/* setCurrentUser */.lt)(employeeId);
                 localStorage.setItem(constants.LS.AUTH_TOKEN, data.key);
                 localStorage.setItem(constants.LS.CURRENT_USER, employeeId);
 
@@ -5436,9 +5447,9 @@ function bindEvents() {
             }
         });
 
-        (0,state/* setAuthToken */.O5)(null);
-        (0,state/* setCurrentUser */.lt)(null);
-        (0,state/* setOrderMap */.di)(new Map());
+        (0,src_state/* setAuthToken */.O5)(null);
+        (0,src_state/* setCurrentUser */.lt)(null);
+        (0,src_state/* setOrderMap */.di)(new Map());
         (0,actions/* stopPolling */.Et)();
         (0,actions/* updateAuthUI */.i_)();
         (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5457,8 +5468,12 @@ function bindEvents() {
 ;// ./src/stats-hash.js
 const STORAGE_KEY_ANON = '_kstats_anon_id';
 
-async function computeDailyHash(authToken, currentUser, GIST_SALT) {
-    const today = new Date().toISOString().split('T')[0];
+/**
+ * Stable user hash – does NOT change over time.
+ * Used to count both daily and total unique users.
+ * Based solely on the user's identity (username if logged in, or persistent random UUID).
+ */
+async function computeUserHash(authToken, currentUser, GIST_SALT) {
     let identity;
     if (authToken && currentUser) {
         identity = currentUser;
@@ -5470,7 +5485,7 @@ async function computeDailyHash(authToken, currentUser, GIST_SALT) {
         }
         identity = anonUUID;
     }
-    const data = identity + today + (GIST_SALT || '');
+    const data = identity + (GIST_SALT || '');
     const encoder = new TextEncoder();
     const buffer = encoder.encode(data);
     const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -5506,17 +5521,22 @@ if (!window.__KANTINE_LOADED) {
     stats_tracker/* tracker */.F.set('hour', new Date().getHours());
     stats_tracker/* tracker */.F.set('day', new Date().getDay());
     stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
-    stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
-    stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
+    stats_tracker/* tracker */.F.set('lang', src_state/* langMode */.Kl);
+    stats_tracker/* tracker */.F.set('logged_in', !!src_state/* authToken */.gX);
+    
+    // Initialize stable user hash (persistent, computed once)
+    const state = stats_tracker/* tracker */.F.load();
+    if (!state.user_hash) {
+        computeUserHash(src_state/* authToken */.gX, null, constants/* GIST_SALT */.d7).then(hash => {
+            state.user_hash = hash;
+            stats_tracker/* tracker */.F.persist();
+        });
+    }
     
     const pending = stats_tracker/* tracker */.F.getPendingFlush();
     if (pending) {
-        computeDailyHash(state/* authToken */.gX, null, constants/* GIST_SALT */.d7).then(hash => {
-            stats_tracker/* tracker */.F.load().hash = hash;
-            stats_tracker/* tracker */.F.persist();
-        });
         // Fire-and-forget flush to Gist (non-blocking)
-        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, pending.hash).catch(e => console.warn('Flush failed:', e));
+        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, pending.user_hash).catch(e => console.warn('Flush failed:', e));
     }
 
     injectUI();
@@ -5535,7 +5555,7 @@ if (!window.__KANTINE_LOADED) {
         (0,actions/* loadMenuDataFromAPI */.m9)();
     }
 
-    if (state/* authToken */.gX) {
+    if (src_state/* authToken */.gX) {
         (0,actions/* startPolling */.g8)();
     }
 
