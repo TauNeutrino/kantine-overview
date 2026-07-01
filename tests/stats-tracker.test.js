@@ -133,7 +133,6 @@ clearStorage();
 localStorageData._kstats_state = JSON.stringify({
     date: '2024-01-01',
     daily: { views: 5, clicks: 3 },
-    hash: null,
     session: { start_ms: 1234567890 },
     has_flushed: true,
     pendingFlush: null
@@ -141,7 +140,7 @@ localStorageData._kstats_state = JSON.stringify({
 const freshStats = sandbox.tracker.getLocalStats();
 assertEquals(Object.keys(freshStats).length, 0, "Daily should be empty on date rollover");
 const pending = sandbox.tracker.getPendingFlush();
-assertDeepEquals(pending, { date: '2024-01-01', daily: { views: 5, clicks: 3 }, hash: null },
+assertDeepEquals(pending, { date: '2024-01-01', daily: { views: 5, clicks: 3 }, user_hash: null },
     "Old daily should become pendingFlush on date rollover");
 
 // --- Test load with same date (continue) ---
@@ -151,7 +150,6 @@ const today = new Date().toISOString().split('T')[0];
 localStorageData._kstats_state = JSON.stringify({
     date: today,
     daily: { views: 10 },
-    hash: null,
     session: { start_ms: 1234567890 },
     has_flushed: false,
     pendingFlush: null
@@ -171,25 +169,25 @@ clearStorage();
 localStorageData._kstats_state = JSON.stringify({
     date: today,
     daily: { starts: 5 },
-    hash: 'abc123',
+    user_hash: 'abc123',
     session: { start_ms: 1234567890 },
     has_flushed: false,
-    pendingFlush: { date: '2024-01-01', daily: { starts: 3 }, hash: 'def456' }
+    pendingFlush: { date: '2024-01-01', daily: { starts: 3 }, user_hash: 'def456' }
 });
 sandbox.tracker.markFlushed();
 const flushedState = JSON.parse(localStorageData._kstats_state);
 assertEquals(flushedState.has_flushed, true, "has_flushed should be true after markFlushed");
 assertEquals(flushedState.pendingFlush, null, "pendingFlush should be null after markFlushed");
 
-// --- Test computeDailyHash consistency ---
-console.log("Testing computeDailyHash consistency...");
+// --- Test computeUserHash consistency ---
+console.log("Testing computeUserHash consistency...");
 (async () => {
-    const hash1 = await sandbox.computeDailyHash('token', 'user1', 'salt');
-    const hash2 = await sandbox.computeDailyHash('token', 'user1', 'salt');
-    assertEquals(hash1, hash2, "Same inputs should produce same hash");
+    const hash1 = await sandbox.computeUserHash('token', 'user1', 'salt');
+    const hash2 = await sandbox.computeUserHash('token', 'user1', 'salt');
+    assertEquals(hash1, hash2, "Same inputs should produce same user hash");
 
-    const hash3 = await sandbox.computeDailyHash(null, null, 'salt');
-    assertNotNull(hash3, "Hash should be generated for anonymous user");
+    const hash3 = await sandbox.computeUserHash(null, null, 'salt');
+    assertNotNull(hash3, "User hash should be generated for anonymous user");
 
     console.log("✅ All Stats Tracker Unit Tests Passed!");
 })().catch(e => {

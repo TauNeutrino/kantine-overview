@@ -21,7 +21,7 @@ try {
         { name: 'StatsTracker.flushToGist', pattern: 'flushToGist' },
         { name: 'StatsTracker.markFlushed', pattern: 'markFlushed' },
         { name: 'StatsTracker.load', pattern: '.load(' },
-        { name: 'computeDailyHash', pattern: 'computeDailyHash' },
+        { name: 'computeUserHash', pattern: 'computeUserHash' },
         { name: 'GitHub Gist URL', pattern: 'api.github.com/gists' },
         { name: 'GIST_ID placeholder', pattern: '{{GIST_ID}}' },
         { name: 'GIST_PAT placeholder', pattern: '{{GIST_PAT}}' },

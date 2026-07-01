@@ -1,7 +1,11 @@
 const STORAGE_KEY_ANON = '_kstats_anon_id';
 
-export async function computeDailyHash(authToken, currentUser, GIST_SALT) {
-    const today = new Date().toISOString().split('T')[0];
+/**
+ * Stable user hash – does NOT change over time.
+ * Used to count both daily and total unique users.
+ * Based solely on the user's identity (username if logged in, or persistent random UUID).
+ */
+export async function computeUserHash(authToken, currentUser, GIST_SALT) {
     let identity;
     if (authToken && currentUser) {
         identity = currentUser;
@@ -13,7 +17,7 @@ export async function computeDailyHash(authToken, currentUser, GIST_SALT) {
         }
         identity = anonUUID;
     }
-    const data = identity + today + (GIST_SALT || '');
+    const data = identity + (GIST_SALT || '');
     const encoder = new TextEncoder();
     const buffer = encoder.encode(data);
     const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);

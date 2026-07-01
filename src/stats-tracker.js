@@ -15,7 +15,7 @@ class StatsTracker {
         return {
             date: today,
             daily: {},
-            hash: null,
+            user_hash: null,
             session: { start_ms: Date.now() },
             has_flushed: false,
             pendingFlush: null
@@ -32,7 +32,7 @@ class StatsTracker {
                 this._state = {
                     date: parsed.date || today,
                     daily: parsed.daily || {},
-                    hash: parsed.hash || null,
+                    user_hash: parsed.user_hash || null,
                     session: parsed.session || { start_ms: Date.now() },
                     has_flushed: parsed.has_flushed || false,
                     pendingFlush: parsed.pendingFlush || null
@@ -48,10 +48,9 @@ class StatsTracker {
             this._state.pendingFlush = {
                 date: this._state.date,
                 daily: { ...this._state.daily },
-                hash: this._state.hash
+                user_hash: this._state.user_hash
             };
             this._state.daily = {};
-            this._state.hash = null;
             this._state.session = { start_ms: Date.now() };
             this._state.date = today;
             this._state.has_flushed = false;
@@ -101,7 +100,7 @@ class StatsTracker {
         this.persist();
     }
 
-    async flushToGist(pendingDate, pendingDaily, pendingHash) {
+    async flushToGist(pendingDate, pendingDaily, pendingUserHash) {
         try {
             const resp = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
                 headers: { 'Authorization': `token ${GIST_PAT}`, 'Accept': 'application/vnd.github.v3+json' }
@@ -110,18 +109,30 @@ class StatsTracker {
             const gist = await resp.json();
             let data = JSON.parse(gist.files['stats.json'].content);
 
+            // Track daily unique users via stable user hash
             const dayKey = pendingDate;
             if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
             const day = data.daily[dayKey];
 
-            if (!day.seen_hashes.includes(pendingHash)) {
-                day.seen_hashes.push(pendingHash);
+            if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
+                day.seen_hashes.push(pendingUserHash);
                 day.unique_today++;
             }
 
             for (const [key, val] of Object.entries(pendingDaily)) {
                 if (typeof val === 'number') {
                     day[key] = (day[key] || 0) + val;
+                }
+            }
+
+            // Track all-time unique users
+            if (pendingUserHash) {
+                if (!data.all_time) {
+                    data.all_time = { unique_hashes: [], unique_users: 0 };
+                }
+                if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
+                    data.all_time.unique_hashes.push(pendingUserHash);
+                    data.all_time.unique_users++;
                 }
             }
 

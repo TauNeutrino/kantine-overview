@@ -6,7 +6,7 @@ import { updateAuthUI, cleanupExpiredFlags, loadMenuCache, isCacheFresh, loadMen
 import { checkForUpdates } from './ui_helpers.js';
 import { authToken } from './state.js';
 import { tracker } from './stats-tracker.js';
-import { computeDailyHash } from './stats-hash.js';
+import { computeUserHash } from './stats-hash.js';
 import { GIST_ID, GIST_SALT } from './constants.js';
 import { langMode } from './state.js';
 
@@ -28,14 +28,19 @@ if (!window.__KANTINE_LOADED) {
     tracker.set('lang', langMode);
     tracker.set('logged_in', !!authToken);
     
-    const pending = tracker.getPendingFlush();
-    if (pending) {
-        computeDailyHash(authToken, null, GIST_SALT).then(hash => {
-            tracker.load().hash = hash;
+    // Initialize stable user hash (persistent, computed once)
+    const state = tracker.load();
+    if (!state.user_hash) {
+        computeUserHash(authToken, null, GIST_SALT).then(hash => {
+            state.user_hash = hash;
             tracker.persist();
         });
+    }
+    
+    const pending = tracker.getPendingFlush();
+    if (pending) {
         // Fire-and-forget flush to Gist (non-blocking)
-        tracker.flushToGist(pending.date, pending.daily, pending.hash).catch(e => console.warn('Flush failed:', e));
+        tracker.flushToGist(pending.date, pending.daily, pending.user_hash).catch(e => console.warn('Flush failed:', e));
     }
 
     injectUI();
