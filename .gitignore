@@ -11,3 +11,4 @@ test_split.js
 # Android keystore
 android/keystore/
 android/keystore.properties
+android/android-sdk/
