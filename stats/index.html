@@ -21,6 +21,9 @@
         .chart-card { background: #16213e; border-radius: 12px; padding: 20px; }
         .chart-card.full { grid-column: 1 / -1; }
         .chart-card h2 { color: #029AA8; font-size: 1em; margin-bottom: 15px; }
+        .chart-wrap { position: relative; height: 300px; }
+        .chart-row .chart-card .chart-wrap { height: 280px; }
+        .chart-wrap canvas { display: block; width: 100%; height: 100%; }
 
         .empty-state { text-align: center; padding: 60px 20px; color: #a0aec0; }
         .empty-state h2 { color: #029AA8; margin-bottom: 10px; }
@@ -94,10 +97,10 @@ function renderDashboard(data) {
         if (sum > 0) activeFeatures.push(fk);
     }
 
-    container.innerHTML = '<div class="chart-card full"><h2>Starts &uuml;ber Zeit</h2><canvas id="line-chart" style="height:300px"></canvas></div>';
+    container.innerHTML = '<div class="chart-card full"><h2>Starts &uuml;ber Zeit</h2><div class="chart-wrap"><canvas id="line-chart"></canvas></div></div>';
 
     if (activeFeatures.length > 0) {
-        container.innerHTML += '<div class="chart-row"><div class="chart-card"><h2>Feature-Nutzung (aggregiert)</h2><canvas id="bar-chart" style="height:280px"></canvas></div><div class="chart-card"><h2>Feature-Verteilung</h2><canvas id="pie-chart" style="height:280px"></canvas></div></div>';
+        container.innerHTML += '<div class="chart-row"><div class="chart-card"><h2>Feature-Nutzung (aggregiert)</h2><div class="chart-wrap"><canvas id="bar-chart"></canvas></div></div><div class="chart-card"><h2>Feature-Verteilung</h2><div class="chart-wrap"><canvas id="pie-chart"></canvas></div></div></div>';
     }
 
     const colors = ['#029AA8','#E95454','#FFB347','#48C774','#A855F7','#3B82F6','#F59E0B','#EC4899','#14B8A6','#8B5CF6','#F97316','#06B6D4','#84CC16','#D946EF'];
