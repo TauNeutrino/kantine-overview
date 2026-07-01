@@ -2,7 +2,7 @@
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![version](https://img.shields.io/badge/version-1.9.4-blue)](changelog.md)
+[![version](https://img.shields.io/badge/version-1.10.0-blue)](changelog.md)
 [![Android](https://img.shields.io/badge/Android-Kotlin-green)](android/)
 [![Web](https://img.shields.io/badge/Web-ES6-yellow)](src/)
 
