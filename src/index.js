@@ -29,14 +29,15 @@ if (!window.__KANTINE_LOADED) {
     tracker.set('logged_in', !!authToken);
     
     const state = tracker.load();
-    state.user_hash = computeUserHash();
-    tracker.persist();
-
-    const pending = tracker.getPendingFlush();
-    if (pending) {
-        tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
-            .catch(e => console.warn('Flush failed:', e));
-    }
+    (async () => {
+        state.user_hash = await computeUserHash();
+        tracker.persist();
+        const pending = tracker.getPendingFlush();
+        if (pending) {
+            tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+                .catch(e => console.warn('Flush failed:', e));
+        }
+    })();
 
     injectUI();
     bindEvents();

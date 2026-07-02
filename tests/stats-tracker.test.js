@@ -11,16 +11,38 @@ const mockLocalStorage = {
     removeItem: function(key) { delete localStorageData[key] }
 };
 
+// Deterministic crypto.subtle mock — same input always = same output
+const mockCrypto = {
+    subtle: {
+        digest: async function(algo, buffer) {
+            const text = new TextDecoder().decode(buffer);
+            let hash = 5381;
+            for (let i = 0; i < text.length; i++) {
+                hash = ((hash << 5) + hash) + text.charCodeAt(i);
+                hash = hash & hash;
+            }
+            const out = new Uint8Array(32);
+            for (let i = 0; i < 32; i++) out[i] = (hash + i * 17) & 0xFF;
+            return out.buffer;
+        }
+    }
+};
+
 const sandbox = {
     console: console,
     localStorage: mockLocalStorage,
+    crypto: mockCrypto,
+    Array: Array,
+    Array: { from: Array.from },
+    Uint8Array: Uint8Array,
+    TextEncoder: TextEncoder,
+    TextDecoder: TextDecoder,
     LS: { CURRENT_USER: 'kantine_currentUser' },
     Date: Date,
     JSON: JSON,
     parseInt: parseInt,
     isNaN: isNaN,
-    Math: Math,
-    Array: Array
+    Math: Math
 };
 
 const statsHashPath = path.join(__dirname, '..', 'src', 'stats-hash.js');
@@ -51,7 +73,7 @@ try {
 
 function assertEquals(actual, expected, message) {
     if (actual !== expected) {
-        console.error(`❌ Assertion Failed: ${message}`);
+        console.error(`\u274c Assertion Failed: ${message}`);
         console.error(`   Expected: ${JSON.stringify(expected)}`);
         console.error(`   Actual:   ${JSON.stringify(actual)}`);
         process.exit(1);
@@ -62,7 +84,7 @@ function assertDeepEquals(actual, expected, message) {
     const actualStr = JSON.stringify(actual);
     const expectedStr = JSON.stringify(expected);
     if (actualStr !== expectedStr) {
-        console.error(`❌ Assertion Failed: ${message}`);
+        console.error(`\u274c Assertion Failed: ${message}`);
         console.error(`   Expected: ${expectedStr}`);
         console.error(`   Actual:   ${actualStr}`);
         process.exit(1);
@@ -71,7 +93,7 @@ function assertDeepEquals(actual, expected, message) {
 
 function assertNull(value, message) {
     if (value !== null && value !== undefined) {
-        console.error(`❌ Assertion Failed: ${message} (got ${JSON.stringify(value)})`);
+        console.error(`\u274c Assertion Failed: ${message} (got ${JSON.stringify(value)})`);
         process.exit(1);
     }
 }
@@ -151,43 +173,50 @@ const flushedState = JSON.parse(localStorageData._kstats_state);
 assertEquals(flushedState.has_flushed, true, "has_flushed should be true after markFlushed");
 assertEquals(flushedState.pendingFlush, null, "pendingFlush should be null after markFlushed");
 
-// --- Test computeUserHash (new semantics) ---
+// --- Test computeUserHash semantics ---
 console.log("Testing computeUserHash semantics...");
-clearStorage();
+(async () => {
+    clearStorage();
 
-// No currentUser → null
-const hashLoggedOut = sandbox.computeUserHash();
-assertNull(hashLoggedOut, "User hash should be null when no kantine_currentUser is set");
+    // No currentUser → null
+    const hashLoggedOut = await sandbox.computeUserHash();
+    assertNull(hashLoggedOut, "User hash should be null when no kantine_currentUser is set");
 
-// With currentUser → stable, distinct, non-null
-localStorageData.kantine_currentUser = '42';
-const hash1 = sandbox.computeUserHash();
-const hash2 = sandbox.computeUserHash();
-assertEquals(typeof hash1, 'string', "hash should be a string when user is logged in");
-assertEquals(hash1.length, 8, "DJB2 output should be 8 hex chars");
-assertEquals(hash1, hash2, "Same user should produce same hash");
+    // With currentUser → stable SHA-256 hex string (64 chars)
+    localStorageData.kantine_currentUser = '42';
+    const hash1 = await sandbox.computeUserHash();
+    const hash2 = await sandbox.computeUserHash();
+    assertEquals(typeof hash1, 'string', "hash should be a string when user is logged in");
+    assertEquals(hash1.length, 64, "SHA-256 output should be 64 hex chars");
+    assertEquals(hash1, hash2, "Same user should produce same hash");
 
-// Different user → different hash
-localStorageData.kantine_currentUser = '99';
-const hash3 = sandbox.computeUserHash();
-if (hash1 === hash3) {
-    console.error(`❌ Assertion Failed: Different users must produce different hashes (both: ${hash1})`);
+    // Different user → different hash
+    localStorageData.kantine_currentUser = '99';
+    const hash3 = await sandbox.computeUserHash();
+    if (hash1 === hash3) {
+        console.error(`\u274c Assertion Failed: Different users must produce different hashes (both: ${hash1})`);
+        process.exit(1);
+    }
+    console.log("   hash(42) =", hash1);
+    console.log("   hash(99) =", hash3);
+
+    // Logged out again → null
+    delete localStorageData.kantine_currentUser;
+    const hashLoggedOutAgain = await sandbox.computeUserHash();
+    assertNull(hashLoggedOutAgain, "User hash should return to null after logout");
+
+    // --- Test tracker.persist preserves hash ---
+    console.log("Testing tracker.persist preserves hash...");
+    clearStorage();
+    localStorageData.kantine_currentUser = 'employee-7';
+    const s = sandbox.tracker.load();
+    s.user_hash = await sandbox.computeUserHash();
+    sandbox.tracker.persist();
+    const persisted = JSON.parse(localStorageData._kstats_state);
+    assertEquals(persisted.user_hash, s.user_hash, "Persisted state should include user_hash");
+
+    console.log("\u2705 All Stats Tracker Unit Tests Passed!");
+})().catch(e => {
+    console.error("\u274c Async test failed:", e.message);
     process.exit(1);
-}
-
-// Logged out again → null
-delete localStorageData.kantine_currentUser;
-const hashLoggedOutAgain = sandbox.computeUserHash();
-assertNull(hashLoggedOutAgain, "User hash should return to null after logout");
-
-// --- Test tracker.persist preserves hash ---
-console.log("Testing tracker.persist preserves hash...");
-clearStorage();
-localStorageData.kantine_currentUser = 'employee-7';
-const s = sandbox.tracker.load();
-s.user_hash = sandbox.computeUserHash();
-sandbox.tracker.persist();
-const persisted = JSON.parse(localStorageData._kstats_state);
-assertEquals(persisted.user_hash, s.user_hash, "Persisted state should include user_hash");
-
-console.log("✅ All Stats Tracker Unit Tests Passed!");
+});

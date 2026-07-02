@@ -5502,24 +5502,14 @@ function bindEvents() {
 ;// ./src/stats-hash.js
 
 
-function djb2(str) {
-    let h = 5381;
-    for (let i = 0; i < str.length; i++) {
-        h = ((h << 5) + h) + str.charCodeAt(i);
-        h = h & h;
-    }
-    return (h >>> 0).toString(16).padStart(8, '0');
-}
-
-/**
- * Stable user hash based on the persistent `kantine_currentUser` identity.
- * Returns null when no user is logged in — only authenticated users are counted
- * as unique, since the session auth-token rotates and would break uniqueness otherwise.
- */
-function computeUserHash() {
+async function computeUserHash() {
     const currentUser = localStorage.getItem(constants.LS.CURRENT_USER);
     if (!currentUser) return null;
-    return djb2(currentUser);
+    const encoder = new TextEncoder();
+    const buffer = encoder.encode(currentUser);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 ;// ./src/index.js
@@ -5554,14 +5544,15 @@ if (!window.__KANTINE_LOADED) {
     stats_tracker/* tracker */.F.set('logged_in', !!src_state/* authToken */.gX);
     
     const state = stats_tracker/* tracker */.F.load();
-    state.user_hash = computeUserHash();
-    stats_tracker/* tracker */.F.persist();
-
-    const pending = stats_tracker/* tracker */.F.getPendingFlush();
-    if (pending) {
-        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
-            .catch(e => console.warn('Flush failed:', e));
-    }
+    (async () => {
+        state.user_hash = await computeUserHash();
+        stats_tracker/* tracker */.F.persist();
+        const pending = stats_tracker/* tracker */.F.getPendingFlush();
+        if (pending) {
+            stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+                .catch(e => console.warn('Flush failed:', e));
+        }
+    })();
 
     injectUI();
     bindEvents();
