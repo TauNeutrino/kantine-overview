@@ -1,17 +1,24 @@
 const STORAGE_KEY_ANON = '_kstats_anon_id';
 
 function generateUUID() {
-    try {
-        return crypto.randomUUID();
-    } catch (_) {
-        // Fallback for older browsers: crypto.getRandomValues is widely supported
-        const arr = new Uint8Array(16);
-        crypto.getRandomValues(arr);
-        arr[6] = (arr[6] & 0x0f) | 0x40;
-        arr[8] = (arr[8] & 0x3f) | 0x80;
-        const hex = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-        return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        try { return crypto.randomUUID(); } catch (_) {}
     }
+    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+        try {
+            const arr = new Uint8Array(16);
+            crypto.getRandomValues(arr);
+            arr[6] = (arr[6] & 0x0f) | 0x40;
+            arr[8] = (arr[8] & 0x3f) | 0x80;
+            const hex = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+            return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+        } catch (_) {}
+    }
+    // Math.random()-based fallback — works in every context
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
 }
 
 /**
