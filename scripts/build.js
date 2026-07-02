@@ -168,7 +168,7 @@ function stepReadAndInject() {
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
     .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT);
 
-  return { VERSION, CSS, FAVICON_URL, JS_INJECTED, MOCK_JS };
+  return { VERSION, CSS, FAVICON_URL, JS_INJECTED, MOCK_JS, COMMIT_HASH };
 }
 
 // ── 6. Standalone HTML ────────────────────────────────────────────────────
@@ -260,14 +260,14 @@ function stepInstaller(ctx) {
         <h1 style="margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px;">
             <img src="${ctx.FAVICON_URL}" alt="Logo" style="width: 40px; height: 40px;"> 
             Kantine Wrapper 
-            <span style="font-size:0.5em; opacity:0.6; font-weight:400; margin-left:5px;">${VERSION}</span>
+            <span style="font-size:0.5em; opacity:0.6; font-weight:400; margin-left:5px;">${VERSION}<span style="font-size:0.6em;opacity:0.5;margin-left:4px">${ctx.COMMIT_HASH}</span></span>
         </h1>
         <p style="font-size: 1.2rem; color: #a0aec0; margin-top: 0; font-style: italic;">"Mahlzeit! Jetzt bessa einfach."</p>
     </div>
     
     <div class="card" style="text-align: center; border: 2px solid #029AA8;">
         <p style="margin-bottom:15px; font-weight:bold;">&#x1F4D6; Diesen Button in die Lesezeichen-Leiste ziehen:</p>
-        <p><a class="bookmarklet" id="bookmarklet-link" href="${encodedUrl}" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">Kantine ${VERSION}</a></p>
+        <p><a class="bookmarklet" id="bookmarklet-link" href="${encodedUrl}" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">Kantine ${VERSION} <span style="font-size:0.6em;opacity:0.7">${ctx.COMMIT_HASH}</span></a></p>
     </div>
 
     <div class="card">
