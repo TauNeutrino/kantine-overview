@@ -267,7 +267,8 @@ function stepInstaller(ctx) {
     
     <div class="card" style="text-align: center; border: 2px solid #029AA8;">
         <p style="margin-bottom:15px; font-weight:bold;">&#x1F4D6; Diesen Button in die Lesezeichen-Leiste ziehen:</p>
-        <p><a class="bookmarklet" id="bookmarklet-link" href="${encodedUrl}" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">Kantine ${VERSION}<br><span style="font-size:0.5em;opacity:0.7">(${ctx.COMMIT_HASH})</span></a></p>
+        <p><a class="bookmarklet" id="bookmarklet-link" href="${encodedUrl}" title="Nicht klicken! Ziehe mich in deine Lesezeichen-Leiste.">Kantine ${VERSION}</a></p>
+        <p style="text-align:center;font-size:0.75em;color:#7a8ba3;margin-top:4px">(${ctx.COMMIT_HASH})</p>
     </div>
 
     <div class="card">
