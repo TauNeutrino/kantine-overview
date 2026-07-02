@@ -5524,20 +5524,24 @@ if (!window.__KANTINE_LOADED) {
     stats_tracker/* tracker */.F.set('lang', src_state/* langMode */.Kl);
     stats_tracker/* tracker */.F.set('logged_in', !!src_state/* authToken */.gX);
     
-    // Initialize stable user hash (persistent, computed once)
+    // Initialize stable user hash (persistent, computed once).
+    // Must complete before flushToGist so unique-user counting includes the hash.
     const state = stats_tracker/* tracker */.F.load();
-    if (!state.user_hash) {
-        computeUserHash(src_state/* authToken */.gX, null, constants/* GIST_SALT */.d7).then(hash => {
-            state.user_hash = hash;
-            stats_tracker/* tracker */.F.persist();
-        });
-    }
-    
-    const pending = stats_tracker/* tracker */.F.getPendingFlush();
-    if (pending) {
-        // Fire-and-forget flush to Gist (non-blocking)
-        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, pending.user_hash).catch(e => console.warn('Flush failed:', e));
-    }
+    (async () => {
+        if (!state.user_hash) {
+            try {
+                state.user_hash = await computeUserHash(src_state/* authToken */.gX, null, constants/* GIST_SALT */.d7);
+                stats_tracker/* tracker */.F.persist();
+            } catch (e) {
+                console.warn('[Stats] Failed to compute user hash:', e.message);
+            }
+        }
+        const pending = stats_tracker/* tracker */.F.getPendingFlush();
+        if (pending) {
+            await stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+                .catch(e => console.warn('Flush failed:', e));
+        }
+    })();
 
     injectUI();
     bindEvents();
