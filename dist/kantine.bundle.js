@@ -1708,6 +1708,7 @@ function setLangMode(lang) {
 /* harmony export */ });
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
 const STORAGE_KEY = '_kstats_state';
+const GIST_ID_KEY = '_kstats_gist_id';
 
 
 
@@ -1809,14 +1810,46 @@ class StatsTracker {
         this.persist();
     }
 
+    _resolveGistId() {
+        return localStorage.getItem(GIST_ID_KEY) || _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ;
+    }
+
+    _saveGistId(id) {
+        localStorage.setItem(GIST_ID_KEY, id);
+    }
+
     async flushToGist(pendingDate, pendingDaily, pendingUserHash) {
         try {
-            const resp = await fetch(`https://api.github.com/gists/${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ}`, {
+            let gistId = this._resolveGistId();
+            let resp = await fetch(`https://api.github.com/gists/${gistId}`, {
                 headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Accept': 'application/vnd.github.v3+json' }
             });
-            if (!resp.ok) throw new Error(`Gist GET failed: ${resp.status}`);
-            const gist = await resp.json();
-            let data = JSON.parse(gist.files['stats.json'].content);
+
+            let data;
+            if (resp.status === 404 && !localStorage.getItem(GIST_ID_KEY)) {
+                // Gist doesn't exist and we haven't saved an ID yet — auto-create
+                console.log('[StatsTracker] Gist not found, creating a new secret Gist...');
+                const createResp = await fetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: 'Kantine Usage Stats',
+                        public: false,
+                        files: { 'stats.json': { content: '{}' } }
+                    })
+                });
+                if (!createResp.ok) throw new Error(`Gist CREATE failed: ${createResp.status}`);
+                const created = await createResp.json();
+                gistId = created.id;
+                this._saveGistId(gistId);
+                data = {};
+                console.log('[StatsTracker] Created Gist:', gistId);
+            } else if (!resp.ok) {
+                throw new Error(`Gist GET failed: ${resp.status}`);
+            } else {
+                const gist = await resp.json();
+                data = JSON.parse(gist.files['stats.json'].content);
+            }
 
             // Track daily unique users via stable user hash
             const dayKey = pendingDate;
@@ -1853,7 +1886,7 @@ class StatsTracker {
             }
 
             data.last_updated = new Date().toISOString();
-            const patchResp = await fetch(`https://api.github.com/gists/${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ}`, {
+            const patchResp = await fetch(`https://api.github.com/gists/${gistId}`, {
                 method: 'PATCH',
                 headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
