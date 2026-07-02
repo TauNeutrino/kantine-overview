@@ -4,53 +4,25 @@ const path = require('path');
 
 console.log("=== Running Stats Tracker Unit Tests ===");
 
-// Mock localStorage
 const localStorageData = {};
 const mockLocalStorage = {
     getItem: function(key) { return localStorageData[key] || null; },
     setItem: function(key, val) { localStorageData[key] = String(val); },
-    removeItem: function(key) { delete localStorageData[key]; }
-};
-
-// Mock crypto with deterministic digest
-const mockCrypto = {
-    subtle: {
-        digest: async function(algorithm, data) {
-            const text = new TextDecoder().decode(data);
-            let hash = 0;
-            for (let i = 0; i < text.length; i++) {
-                const char = text.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & 0xFFFFFFFF;
-            }
-            const arr = new Uint8Array(32);
-            for (let i = 0; i < 32; i++) {
-                arr[i] = (Math.abs(hash) + i * 17) % 256;
-            }
-            return arr.buffer;
-        }
-    },
-    randomUUID: function() {
-        return 'mock-uuid-' + Math.random().toString(36).substring(2);
-    }
+    removeItem: function(key) { delete localStorageData[key] }
 };
 
 const sandbox = {
     console: console,
     localStorage: mockLocalStorage,
-    crypto: mockCrypto,
+    LS: { CURRENT_USER: 'kantine_currentUser' },
     Date: Date,
     JSON: JSON,
     parseInt: parseInt,
     isNaN: isNaN,
     Math: Math,
-    Array: Array,
-    Uint8Array: Uint8Array,
-    TextEncoder: TextEncoder,
-    TextDecoder: TextDecoder
+    Array: Array
 };
 
-// Load source code
 const statsHashPath = path.join(__dirname, '..', 'src', 'stats-hash.js');
 const statsTrackerPath = path.join(__dirname, '..', 'src', 'stats-tracker.js');
 
@@ -97,9 +69,9 @@ function assertDeepEquals(actual, expected, message) {
     }
 }
 
-function assertNotNull(value, message) {
-    if (value === null || value === undefined) {
-        console.error(`❌ Assertion Failed: ${message}`);
+function assertNull(value, message) {
+    if (value !== null && value !== undefined) {
+        console.error(`❌ Assertion Failed: ${message} (got ${JSON.stringify(value)})`);
         process.exit(1);
     }
 }
@@ -179,18 +151,43 @@ const flushedState = JSON.parse(localStorageData._kstats_state);
 assertEquals(flushedState.has_flushed, true, "has_flushed should be true after markFlushed");
 assertEquals(flushedState.pendingFlush, null, "pendingFlush should be null after markFlushed");
 
-// --- Test computeUserHash consistency ---
-console.log("Testing computeUserHash consistency...");
-(async () => {
-    const hash1 = await sandbox.computeUserHash('token', 'user1', 'salt');
-    const hash2 = await sandbox.computeUserHash('token', 'user1', 'salt');
-    assertEquals(hash1, hash2, "Same inputs should produce same user hash");
+// --- Test computeUserHash (new semantics) ---
+console.log("Testing computeUserHash semantics...");
+clearStorage();
 
-    const hash3 = await sandbox.computeUserHash(null, null, 'salt');
-    assertNotNull(hash3, "User hash should be generated for anonymous user");
+// No currentUser → null
+const hashLoggedOut = sandbox.computeUserHash();
+assertNull(hashLoggedOut, "User hash should be null when no kantine_currentUser is set");
 
-    console.log("✅ All Stats Tracker Unit Tests Passed!");
-})().catch(e => {
-    console.error("❌ Async test failed:", e.message);
+// With currentUser → stable, distinct, non-null
+localStorageData.kantine_currentUser = '42';
+const hash1 = sandbox.computeUserHash();
+const hash2 = sandbox.computeUserHash();
+assertEquals(typeof hash1, 'string', "hash should be a string when user is logged in");
+assertEquals(hash1.length, 8, "DJB2 output should be 8 hex chars");
+assertEquals(hash1, hash2, "Same user should produce same hash");
+
+// Different user → different hash
+localStorageData.kantine_currentUser = '99';
+const hash3 = sandbox.computeUserHash();
+if (hash1 === hash3) {
+    console.error(`❌ Assertion Failed: Different users must produce different hashes (both: ${hash1})`);
     process.exit(1);
-});
+}
+
+// Logged out again → null
+delete localStorageData.kantine_currentUser;
+const hashLoggedOutAgain = sandbox.computeUserHash();
+assertNull(hashLoggedOutAgain, "User hash should return to null after logout");
+
+// --- Test tracker.persist preserves hash ---
+console.log("Testing tracker.persist preserves hash...");
+clearStorage();
+localStorageData.kantine_currentUser = 'employee-7';
+const s = sandbox.tracker.load();
+s.user_hash = sandbox.computeUserHash();
+sandbox.tracker.persist();
+const persisted = JSON.parse(localStorageData._kstats_state);
+assertEquals(persisted.user_hash, s.user_hash, "Persisted state should include user_hash");
+
+console.log("✅ All Stats Tracker Unit Tests Passed!");

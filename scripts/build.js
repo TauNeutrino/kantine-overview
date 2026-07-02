@@ -346,6 +346,7 @@ function stepTests(ctx) {
     'tests/test_utils.js',
     'test_logic.js',
     'tests/test_dom.js',
+    'tests/stats-tracker.test.js',
   ];
   let allPassed = true;
   for (const t of tests) {

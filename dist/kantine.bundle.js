@@ -1236,7 +1236,6 @@ function githubHeaders(etag) {
 /* harmony export */   KJ: () => (/* binding */ GIST_ID),
 /* harmony export */   LS: () => (/* binding */ LS),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
-/* harmony export */   d7: () => (/* binding */ GIST_SALT),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
 /* harmony export */   fK: () => (/* binding */ GITHUB_FILE_BASE),
 /* harmony export */   fZ: () => (/* binding */ CLIENT_VERSION),
@@ -1245,7 +1244,7 @@ function githubHeaders(etag) {
 /* harmony export */   q: () => (/* binding */ GIST_PAT),
 /* harmony export */   tE: () => (/* binding */ API_BASE)
 /* harmony export */ });
-/* unused harmony export GITHUB_REPO */
+/* unused harmony exports GITHUB_REPO, GIST_SALT */
 /**
  * Application-wide constants.
  * All API endpoints, IDs and timing parameters are centralized here
@@ -1302,7 +1301,6 @@ const LS = {
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
     STATS_STATE:             '_kstats_state',
-    STATS_ANON_ID:           '_kstats_anon_id',
 };
 
 const GIST_ID = '{{GIST_ID}}';
@@ -5502,73 +5500,26 @@ function bindEvents() {
 }
 
 ;// ./src/stats-hash.js
-const STORAGE_KEY_ANON = '_kstats_anon_id';
 
-function generateUUID() {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        try { return crypto.randomUUID(); } catch (_) {}
-    }
-    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
-        try {
-            const arr = new Uint8Array(16);
-            crypto.getRandomValues(arr);
-            arr[6] = (arr[6] & 0x0f) | 0x40;
-            arr[8] = (arr[8] & 0x3f) | 0x80;
-            const hex = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
-            return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
-        } catch (_) {}
-    }
-    // Math.random()-based fallback — works in every context
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = Math.random() * 16 | 0;
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-}
 
-/**
- * Stable non-crypto hash (DJB2) — fallback when crypto.subtle is unavailable.
- * Sufficient for deduplication purposes; not cryptographically secure.
- */
-function simpleHash(str) {
-    let hash = 5381;
+function djb2(str) {
+    let h = 5381;
     for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) + hash) + str.charCodeAt(i);
-        hash = hash & hash;
+        h = ((h << 5) + h) + str.charCodeAt(i);
+        h = h & h;
     }
-    return (hash >>> 0).toString(16).padStart(8, '0');
-}
-
-async function digest(str) {
-    try {
-        const encoder = new TextEncoder();
-        const buffer = encoder.encode(str);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    } catch (_) {
-        // crypto.subtle unavailable (e.g. restricted bookmarklet context) — use DJB2
-        return simpleHash(str);
-    }
+    return (h >>> 0).toString(16).padStart(8, '0');
 }
 
 /**
- * Stable user hash – does NOT change over time.
- * Used to count both daily and total unique users.
- * Based solely on the user's identity (username if logged in, or persistent random UUID).
+ * Stable user hash based on the persistent `kantine_currentUser` identity.
+ * Returns null when no user is logged in — only authenticated users are counted
+ * as unique, since the session auth-token rotates and would break uniqueness otherwise.
  */
-async function computeUserHash(authToken, currentUser, GIST_SALT) {
-    let identity;
-    if (authToken && currentUser) {
-        identity = currentUser;
-    } else {
-        let anonUUID = localStorage.getItem(STORAGE_KEY_ANON);
-        if (!anonUUID) {
-            anonUUID = generateUUID();
-            localStorage.setItem(STORAGE_KEY_ANON, anonUUID);
-        }
-        identity = anonUUID;
-    }
-    return digest(identity + (GIST_SALT || ''));
+function computeUserHash() {
+    const currentUser = localStorage.getItem(constants.LS.CURRENT_USER);
+    if (!currentUser) return null;
+    return djb2(currentUser);
 }
 
 ;// ./src/index.js
@@ -5602,24 +5553,15 @@ if (!window.__KANTINE_LOADED) {
     stats_tracker/* tracker */.F.set('lang', src_state/* langMode */.Kl);
     stats_tracker/* tracker */.F.set('logged_in', !!src_state/* authToken */.gX);
     
-    // Initialize stable user hash (persistent, computed once).
-    // Must complete before flushToGist so unique-user counting includes the hash.
     const state = stats_tracker/* tracker */.F.load();
-    (async () => {
-        if (!state.user_hash) {
-            try {
-                state.user_hash = await computeUserHash(src_state/* authToken */.gX, null, constants/* GIST_SALT */.d7);
-                stats_tracker/* tracker */.F.persist();
-            } catch (e) {
-                console.warn('[Stats] Failed to compute user hash:', e.message);
-            }
-        }
-        const pending = stats_tracker/* tracker */.F.getPendingFlush();
-        if (pending) {
-            await stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
-                .catch(e => console.warn('Flush failed:', e));
-        }
-    })();
+    state.user_hash = computeUserHash();
+    stats_tracker/* tracker */.F.persist();
+
+    const pending = stats_tracker/* tracker */.F.getPendingFlush();
+    if (pending) {
+        stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+            .catch(e => console.warn('Flush failed:', e));
+    }
 
     injectUI();
     bindEvents();

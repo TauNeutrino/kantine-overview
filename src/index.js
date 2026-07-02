@@ -7,7 +7,7 @@ import { checkForUpdates } from './ui_helpers.js';
 import { authToken } from './state.js';
 import { tracker } from './stats-tracker.js';
 import { computeUserHash } from './stats-hash.js';
-import { GIST_ID, GIST_SALT } from './constants.js';
+import { GIST_ID } from './constants.js';
 import { langMode } from './state.js';
 
 if (!window.__KANTINE_LOADED) {
@@ -28,24 +28,15 @@ if (!window.__KANTINE_LOADED) {
     tracker.set('lang', langMode);
     tracker.set('logged_in', !!authToken);
     
-    // Initialize stable user hash (persistent, computed once).
-    // Must complete before flushToGist so unique-user counting includes the hash.
     const state = tracker.load();
-    (async () => {
-        if (!state.user_hash) {
-            try {
-                state.user_hash = await computeUserHash(authToken, null, GIST_SALT);
-                tracker.persist();
-            } catch (e) {
-                console.warn('[Stats] Failed to compute user hash:', e.message);
-            }
-        }
-        const pending = tracker.getPendingFlush();
-        if (pending) {
-            await tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
-                .catch(e => console.warn('Flush failed:', e));
-        }
-    })();
+    state.user_hash = computeUserHash();
+    tracker.persist();
+
+    const pending = tracker.getPendingFlush();
+    if (pending) {
+        tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+            .catch(e => console.warn('Flush failed:', e));
+    }
 
     injectUI();
     bindEvents();
