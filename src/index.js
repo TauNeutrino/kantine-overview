@@ -30,8 +30,15 @@ if (!window.__KANTINE_LOADED) {
     
     const state = tracker.load();
     (async () => {
-        state.user_hash = await computeUserHash();
-        tracker.persist();
+        try {
+            const newHash = await computeUserHash();
+            if (newHash !== state.user_hash) {
+                state.user_hash = newHash;
+                tracker.persist();
+            }
+        } catch (e) {
+            console.warn('[Stats] computeUserHash failed:', e.message);
+        }
         const pending = tracker.getPendingFlush();
         if (pending) {
             tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)

@@ -5545,8 +5545,15 @@ if (!window.__KANTINE_LOADED) {
     
     const state = stats_tracker/* tracker */.F.load();
     (async () => {
-        state.user_hash = await computeUserHash();
-        stats_tracker/* tracker */.F.persist();
+        try {
+            const newHash = await computeUserHash();
+            if (newHash !== state.user_hash) {
+                state.user_hash = newHash;
+                stats_tracker/* tracker */.F.persist();
+            }
+        } catch (e) {
+            console.warn('[Stats] computeUserHash failed:', e.message);
+        }
         const pending = stats_tracker/* tracker */.F.getPendingFlush();
         if (pending) {
             stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
