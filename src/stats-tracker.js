@@ -144,8 +144,11 @@ class StatsTracker {
 
             // Track daily unique users via stable user hash
             const dayKey = pendingDate;
-            if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
+            if (!data.daily) data.daily = {};
+            if (!data.daily[dayKey]) data.daily[dayKey] = {};
             const day = data.daily[dayKey];
+            if (!day.seen_hashes) day.seen_hashes = [];
+            if (!day.unique_today) day.unique_today = 0;
 
             if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
                 day.seen_hashes.push(pendingUserHash);
@@ -160,9 +163,9 @@ class StatsTracker {
 
             // Track all-time unique users
             if (pendingUserHash) {
-                if (!data.all_time) {
-                    data.all_time = { unique_hashes: [], unique_users: 0 };
-                }
+                if (!data.all_time) data.all_time = {};
+                if (!data.all_time.unique_hashes) data.all_time.unique_hashes = [];
+                if (!data.all_time.unique_users) data.all_time.unique_users = 0;
                 if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
                     data.all_time.unique_hashes.push(pendingUserHash);
                     data.all_time.unique_users++;

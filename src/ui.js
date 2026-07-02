@@ -43,7 +43,7 @@ export function injectUI() {
                 <div class="brand">
                     <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}<span style="font-size:0.55em;opacity:0.6;margin-left:4px">{{COMMIT_HASH}}</span></small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -193,7 +193,7 @@ export function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}}</span>
+                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}} <span style="font-size:0.8em;opacity:0.6">{{COMMIT_HASH}}</span></span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">

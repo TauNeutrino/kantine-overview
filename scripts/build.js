@@ -157,9 +157,12 @@ function stepReadAndInject() {
   const GIST_PAT  = process.env.GIST_PAT || '';
   const GIST_ID   = process.env.GIST_ID  || '';
   const GIST_SALT = process.env.GIST_SALT || '';
+  let COMMIT_HASH = '';
+  try { COMMIT_HASH = exec('git rev-parse --short HEAD').trim(); } catch (_) {}
 
   const JS_INJECTED = JS_BUNDLE_CONTENT
     .replace(/\{\{VERSION\}\}/g, VERSION)
+    .replace(/\{\{COMMIT_HASH\}\}/g, COMMIT_HASH)
     .replace(/\{\{FAVICON_DATA_URI\}\}/g, FAVICON_URL)
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
