@@ -1853,8 +1853,11 @@ class StatsTracker {
 
             // Track daily unique users via stable user hash
             const dayKey = pendingDate;
-            if (!data.daily[dayKey]) data.daily[dayKey] = { seen_hashes: [], unique_today: 0 };
+            if (!data.daily) data.daily = {};
+            if (!data.daily[dayKey]) data.daily[dayKey] = {};
             const day = data.daily[dayKey];
+            if (!day.seen_hashes) day.seen_hashes = [];
+            if (!day.unique_today) day.unique_today = 0;
 
             if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
                 day.seen_hashes.push(pendingUserHash);
@@ -1869,9 +1872,9 @@ class StatsTracker {
 
             // Track all-time unique users
             if (pendingUserHash) {
-                if (!data.all_time) {
-                    data.all_time = { unique_hashes: [], unique_users: 0 };
-                }
+                if (!data.all_time) data.all_time = {};
+                if (!data.all_time.unique_hashes) data.all_time.unique_hashes = [];
+                if (!data.all_time.unique_users) data.all_time.unique_users = 0;
                 if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
                     data.all_time.unique_hashes.push(pendingUserHash);
                     data.all_time.unique_users++;
@@ -4868,7 +4871,7 @@ function injectUI() {
                 <div class="brand">
                     <img src="{{FAVICON_DATA_URI}}" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}</small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">{{VERSION}}<span style="font-size:0.55em;opacity:0.6;margin-left:4px">{{COMMIT_HASH}}</span></small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -5018,7 +5021,7 @@ function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}}</span>
+                        <strong>Aktuell:</strong> <span id="version-current">{{VERSION}} <span style="font-size:0.8em;opacity:0.6">{{COMMIT_HASH}}</span></span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -5501,6 +5504,20 @@ function bindEvents() {
 ;// ./src/stats-hash.js
 const STORAGE_KEY_ANON = '_kstats_anon_id';
 
+function generateUUID() {
+    try {
+        return crypto.randomUUID();
+    } catch (_) {
+        // Fallback for older browsers: crypto.getRandomValues is widely supported
+        const arr = new Uint8Array(16);
+        crypto.getRandomValues(arr);
+        arr[6] = (arr[6] & 0x0f) | 0x40;
+        arr[8] = (arr[8] & 0x3f) | 0x80;
+        const hex = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+        return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    }
+}
+
 /**
  * Stable user hash – does NOT change over time.
  * Used to count both daily and total unique users.
@@ -5513,7 +5530,7 @@ async function computeUserHash(authToken, currentUser, GIST_SALT) {
     } else {
         let anonUUID = localStorage.getItem(STORAGE_KEY_ANON);
         if (!anonUUID) {
-            anonUUID = crypto.randomUUID();
+            anonUUID = generateUUID();
             localStorage.setItem(STORAGE_KEY_ANON, anonUUID);
         }
         identity = anonUUID;
