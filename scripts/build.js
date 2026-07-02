@@ -155,8 +155,8 @@ function stepReadAndInject() {
   const JS_BUNDLE_CONTENT = read(JS_BUNDLE);
   const MOCK_JS   = exists(MOCK_JS_FILE) ? read(MOCK_JS_FILE) : '';
   const GIST_PAT  = process.env.GIST_PAT || '';
-  const GIST_ID   = process.env.GIST_ID  || '{{GIST_ID}}';
-  const GIST_SALT = process.env.GIST_SALT || '{{GIST_SALT}}';
+  const GIST_ID   = process.env.GIST_ID  || '';
+  const GIST_SALT = process.env.GIST_SALT || '';
 
   const JS_INJECTED = JS_BUNDLE_CONTENT
     .replace(/\{\{VERSION\}\}/g, VERSION)
