@@ -33,12 +33,14 @@ if (!window.__KANTINE_LOADED) {
     (async () => {
         try {
             const newHash = await computeUserHash();
+            tracker.set('hash_len', newHash ? newHash.length : -1);
             if (newHash !== state.user_hash) {
                 state.user_hash = newHash;
                 tracker.persist();
             }
         } catch (e) {
-            console.warn('[Stats] computeUserHash failed:', e.message);
+            console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
+            tracker.set('hash_err', (e.message || String(e)).slice(0, 40));
             state.user_hash = null;
             tracker.persist();
         }
