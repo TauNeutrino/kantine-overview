@@ -82,14 +82,12 @@ class StatsTracker {
     setUserHash(hash) {
         this.load();
         this._state.user_hash = hash;
-        this._state.daily.hash_len = hash ? hash.length : -1;
         this.persist();
     }
 
-    setUserHashError(errMsg) {
+    setUserHashError() {
         this.load();
         this._state.user_hash = null;
-        this._state.daily.hash_err = (errMsg || '').slice(0, 40);
         this.persist();
     }
 
@@ -161,6 +159,11 @@ class StatsTracker {
             if (!data.daily) data.daily = {};
             if (!data.daily[dayKey]) data.daily[dayKey] = {};
             const day = data.daily[dayKey];
+            // Self-contained day metadata
+            day.date = pendingDate;
+            if (pendingUserHash) {
+                day.user_hash = pendingUserHash;
+            }
             if (!day.seen_hashes) day.seen_hashes = [];
             if (!day.unique_today) day.unique_today = 0;
 

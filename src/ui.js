@@ -270,5 +270,4 @@ export function injectUI() {
         document.body.appendChild(script);
     }
 
-    tracker.increment('browser_load');
 }

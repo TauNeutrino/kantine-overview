@@ -22,23 +22,20 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     tracker.increment('starts');
     tracker.set('version', '{{VERSION}}');
-    tracker.set('commit_hash', COMMIT_HASH);
+    tracker.set('version_commit_hash', COMMIT_HASH);
     tracker.set('hour', new Date().getHours());
     tracker.set('day', new Date().getDay());
     tracker.set('mobile', window.innerWidth < 768);
     tracker.set('lang', langMode);
     tracker.set('logged_in', !!authToken);
     
-    const state = tracker.load();
     (async () => {
         try {
             const newHash = await computeUserHash();
             tracker.setUserHash(newHash);
-            state.user_hash = newHash;
         } catch (e) {
             console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
-            tracker.setUserHashError(e.message || String(e));
-            state.user_hash = null;
+            tracker.setUserHashError();
         }
         const pending = tracker.getPendingFlush();
         if (pending) {
