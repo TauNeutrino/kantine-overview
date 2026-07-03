@@ -1120,9 +1120,12 @@ async function loadMenuDataFromAPI() {
         });
     } finally {
         loading.classList.add('hidden');
-        _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.set('api_latency_ms', Date.now() - __apiStart);
+        _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.incrementValue('api_latency_sum', Date.now() - __apiStart);
+        _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.increment('api_latency_count');
         if (window.__kantine_load_start) {
-            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.set('load_time_ms', Date.now() - window.__kantine_load_start);
+            const loadMs = Date.now() - window.__kantine_load_start;
+            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.incrementValue('load_time_sum', loadMs);
+            _stats_tracker_js__WEBPACK_IMPORTED_MODULE_6__/* .tracker */ .F.increment('load_time_count');
         }
     }
 }
@@ -1728,7 +1731,8 @@ class StatsTracker {
             user_hash: null,
             session: { start_ms: Date.now() },
             has_flushed: false,
-            pendingFlush: null
+            pendingFlush: null,
+            pendingFlushes: []
         };
     }
 
@@ -1745,7 +1749,8 @@ class StatsTracker {
                     user_hash: parsed.user_hash || null,
                     session: parsed.session || { start_ms: Date.now() },
                     has_flushed: parsed.has_flushed || false,
-                    pendingFlush: parsed.pendingFlush || null
+                    pendingFlush: null,
+                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : [])
                 };
             } catch (e) {
                 this._state = this._freshState(today);
@@ -1755,11 +1760,11 @@ class StatsTracker {
         }
 
         if (this._state.date !== today) {
-            this._state.pendingFlush = {
+            this._state.pendingFlushes.push({
                 date: this._state.date,
                 daily: { ...this._state.daily },
                 user_hash: this._state.user_hash
-            };
+            });
             this._state.daily = {};
             this._state.session = { start_ms: Date.now() };
             this._state.date = today;
@@ -1779,6 +1784,12 @@ class StatsTracker {
         this.load();
         if (!this._state.daily[key]) this._state.daily[key] = 0;
         this._state.daily[key]++;
+        this.persist();
+    }
+
+    incrementValue(key, val) {
+        this.load();
+        this._state.daily[key] = (this._state.daily[key] || 0) + val;
         this.persist();
     }
 
@@ -1812,13 +1823,17 @@ class StatsTracker {
 
     getPendingFlush() {
         this.load();
-        return this._state.pendingFlush ? { ...this._state.pendingFlush } : null;
+        const list = this._state.pendingFlushes;
+        return list.length > 0 ? { ...list[0] } : null;
     }
 
     markFlushed() {
         this.load();
         this._state.has_flushed = true;
         this._state.pendingFlush = null;
+        if (this._state.pendingFlushes.length > 0) {
+            this._state.pendingFlushes.shift();
+        }
         this.persist();
     }
 
@@ -1882,8 +1897,28 @@ class StatsTracker {
             }
 
             for (const [key, val] of Object.entries(pendingDaily)) {
+                if (key.endsWith('_sum') || key.endsWith('_count')) continue;
                 if (typeof val === 'number') {
                     day[key] = (day[key] || 0) + val;
+                } else {
+                    day[key] = val;
+                }
+            }
+
+            // Compute averages from sum/count pairs
+            const AVG_PAIRS = [
+                { sum: 'session_duration_sum', count: 'session_duration_count', avg: 'session_duration_avg' },
+                { sum: 'load_time_sum', count: 'load_time_count', avg: 'load_time_avg' },
+                { sum: 'api_latency_sum', count: 'api_latency_count', avg: 'api_latency_avg' },
+            ];
+            for (const pair of AVG_PAIRS) {
+                const sum = pendingDaily[pair.sum];
+                const count = pendingDaily[pair.count];
+                if (typeof sum === 'number' && typeof count === 'number' && count > 0) {
+                    const oldCount = day[pair.count] || 0;
+                    const oldAvg = day[pair.avg] || 0;
+                    day[pair.avg] = (oldAvg * oldCount + sum) / (oldCount + count);
+                    day[pair.count] = oldCount + count;
                 }
             }
 
@@ -5554,10 +5589,10 @@ if (!window.__KANTINE_LOADED) {
 
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');
+    stats_tracker/* tracker */.F.increment('session_count');
     stats_tracker/* tracker */.F.set('version', '{{VERSION}}');
     stats_tracker/* tracker */.F.set('version_commit_hash', constants/* COMMIT_HASH */.X9);
-    stats_tracker/* tracker */.F.set('hour', new Date().getHours());
-    stats_tracker/* tracker */.F.set('day', new Date().getDay());
+    stats_tracker/* tracker */.F.increment('hour_' + new Date().getHours());
     stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
     stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
     stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
@@ -5586,7 +5621,9 @@ if (!window.__KANTINE_LOADED) {
     const hadCache = (0,actions/* loadMenuCache */.KG)();
     if (hadCache) {
         document.getElementById('loading').classList.add('hidden');
-        stats_tracker/* tracker */.F.set('load_time_ms', Date.now() - window.__kantine_load_start);
+        const loadMs = Date.now() - window.__kantine_load_start;
+        stats_tracker/* tracker */.F.incrementValue('load_time_sum', loadMs);
+        stats_tracker/* tracker */.F.increment('load_time_count');
         if (!(0,actions/* isCacheFresh */.VL)()) {
             (0,actions/* loadMenuDataFromAPI */.m9)();
         }
@@ -5605,7 +5642,9 @@ if (!window.__KANTINE_LOADED) {
 window.addEventListener('beforeunload', () => {
     const startMs = stats_tracker/* tracker */.F.load().session?.start_ms;
     if (startMs) {
-        stats_tracker/* tracker */.F.set('session_duration_s', Math.round((Date.now() - startMs) / 1000));
+        const dur = Math.round((Date.now() - startMs) / 1000);
+        stats_tracker/* tracker */.F.incrementValue('session_duration_sum', dur);
+        stats_tracker/* tracker */.F.increment('session_duration_count');
     }
 });
 
