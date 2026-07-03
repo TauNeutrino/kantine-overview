@@ -1788,6 +1788,18 @@ class StatsTracker {
         this.persist();
     }
 
+    setUserHash(hash) {
+        this.load();
+        this._state.user_hash = hash;
+        this.persist();
+    }
+
+    setUserHashError() {
+        this.load();
+        this._state.user_hash = null;
+        this.persist();
+    }
+
     reset() {
         this._state = this._freshState(this._getToday());
         localStorage.removeItem(STORAGE_KEY);
@@ -1856,6 +1868,11 @@ class StatsTracker {
             if (!data.daily) data.daily = {};
             if (!data.daily[dayKey]) data.daily[dayKey] = {};
             const day = data.daily[dayKey];
+            // Self-contained day metadata
+            day.date = pendingDate;
+            if (pendingUserHash) {
+                day.user_hash = pendingUserHash;
+            }
             if (!day.seen_hashes) day.seen_hashes = [];
             if (!day.unique_today) day.unique_today = 0;
 
@@ -4822,7 +4839,7 @@ function debounce(func, wait) {
 var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./src/state.js
-var src_state = __webpack_require__(901);
+var state = __webpack_require__(901);
 // EXTERNAL MODULE: ./src/stats-tracker.js
 var stats_tracker = __webpack_require__(618);
 ;// ./src/ui.js
@@ -4903,9 +4920,9 @@ function injectUI() {
                             <span class="material-icons-round">translate</span>
                         </button>
                         <div id="lang-dropdown" class="lang-dropdown-menu hidden">
-                            <button class="lang-btn${src_state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
-                            <button class="lang-btn${src_state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
-                            <button class="lang-btn${src_state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
+                            <button class="lang-btn${state/* langMode */.Kl === 'de' ? ' active' : ''}" data-lang="de">🇦🇹 DE</button>
+                            <button class="lang-btn${state/* langMode */.Kl === 'en' ? ' active' : ''}" data-lang="en">🇬🇧 EN</button>
+                            <button class="lang-btn${state/* langMode */.Kl === 'all' ? ' active' : ''}" data-lang="all">🌐 ALL</button>
                         </div>
                     </div>
                     <button id="btn-login-open" class="user-badge-btn icon-btn-small" title="Mit Bessa.app Account anmelden">
@@ -5098,7 +5115,6 @@ function injectUI() {
         document.body.appendChild(script);
     }
 
-    stats_tracker/* tracker */.F.increment('browser_load');
 }
 
 // EXTERNAL MODULE: ./src/actions.js
@@ -5207,7 +5223,7 @@ function updateUILanguage() {
 
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
-    if (alarmBell && src_state/* userFlags */.BY.size === 0) {
+    if (alarmBell && state/* userFlags */.BY.size === 0) {
         alarmBell.title = (0,i18n.t)('alarmTooltipNone');
     }
 
@@ -5242,16 +5258,16 @@ function bindEvents() {
     const langDropdown = document.getElementById('lang-dropdown');
 
     function updateLangToggleLabel() {
-        if (btnLangToggle) btnLangToggle.textContent = src_state/* langMode */.Kl.toUpperCase();
+        if (btnLangToggle) btnLangToggle.textContent = state/* langMode */.Kl.toUpperCase();
     }
 
     if (btnLangToggle) {
         btnLangToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             const modes = ['de', 'en', 'all'];
-            const nextIndex = (modes.indexOf(src_state/* langMode */.Kl) + 1) % modes.length;
+            const nextIndex = (modes.indexOf(state/* langMode */.Kl) + 1) % modes.length;
             const next = modes[nextIndex];
-            (0,src_state/* setLangMode */.UD)(next);
+            (0,state/* setLangMode */.UD)(next);
             localStorage.setItem(constants.LS.LANG, next);
             updateLangToggleLabel();
             updateUILanguage();
@@ -5274,7 +5290,7 @@ function bindEvents() {
     }
 
     btnHistory.addEventListener('click', () => {
-        if (!src_state/* authToken */.gX) {
+        if (!state/* authToken */.gX) {
             loginModal.classList.remove('hidden');
             return;
         }
@@ -5364,8 +5380,8 @@ function bindEvents() {
     });
 
     btnThisWeek.addEventListener('click', () => {
-        if (src_state/* displayMode */.sw !== 'this-week') {
-            (0,src_state/* setDisplayMode */.qo)('this-week');
+        if (state/* displayMode */.sw !== 'this-week') {
+            (0,state/* setDisplayMode */.qo)('this-week');
             btnThisWeek.classList.add('active');
             btnNextWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5375,8 +5391,8 @@ function bindEvents() {
 
     btnNextWeek.addEventListener('click', () => {
         btnNextWeek.classList.remove('new-week-available');
-        if (src_state/* displayMode */.sw !== 'next-week') {
-            (0,src_state/* setDisplayMode */.qo)('next-week');
+        if (state/* displayMode */.sw !== 'next-week') {
+            (0,state/* setDisplayMode */.qo)('next-week');
             btnNextWeek.classList.add('active');
             btnThisWeek.classList.remove('active');
             (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5385,7 +5401,7 @@ function bindEvents() {
     });
 
     btnRefresh.addEventListener('click', () => {
-        if (!src_state/* authToken */.gX) {
+        if (!state/* authToken */.gX) {
             loginModal.classList.remove('hidden');
             return;
         }
@@ -5436,8 +5452,8 @@ function bindEvents() {
             const data = await response.json();
 
             if (response.ok) {
-                (0,src_state/* setAuthToken */.O5)(data.key);
-                (0,src_state/* setCurrentUser */.lt)(employeeId);
+                (0,state/* setAuthToken */.O5)(data.key);
+                (0,state/* setCurrentUser */.lt)(employeeId);
                 localStorage.setItem(constants.LS.AUTH_TOKEN, data.key);
                 localStorage.setItem(constants.LS.CURRENT_USER, employeeId);
 
@@ -5483,9 +5499,9 @@ function bindEvents() {
             }
         });
 
-        (0,src_state/* setAuthToken */.O5)(null);
-        (0,src_state/* setCurrentUser */.lt)(null);
-        (0,src_state/* setOrderMap */.di)(new Map());
+        (0,state/* setAuthToken */.O5)(null);
+        (0,state/* setCurrentUser */.lt)(null);
+        (0,state/* setOrderMap */.di)(new Map());
         (0,actions/* stopPolling */.Et)();
         (0,actions/* updateAuthUI */.i_)();
         (0,ui_helpers/* renderVisibleWeeks */.OR)();
@@ -5539,31 +5555,25 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');
     stats_tracker/* tracker */.F.set('version', '{{VERSION}}');
-    stats_tracker/* tracker */.F.set('commit_hash', constants/* COMMIT_HASH */.X9);
+    stats_tracker/* tracker */.F.set('version_commit_hash', constants/* COMMIT_HASH */.X9);
     stats_tracker/* tracker */.F.set('hour', new Date().getHours());
     stats_tracker/* tracker */.F.set('day', new Date().getDay());
     stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
-    stats_tracker/* tracker */.F.set('lang', src_state/* langMode */.Kl);
-    stats_tracker/* tracker */.F.set('logged_in', !!src_state/* authToken */.gX);
+    stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
+    stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
     
-    const state = stats_tracker/* tracker */.F.load();
     (async () => {
         try {
             const newHash = await computeUserHash();
-            state.daily.hash_len = newHash ? newHash.length : -1;
-            if (newHash !== state.user_hash) {
-                state.user_hash = newHash;
-                stats_tracker/* tracker */.F.persist();
-            }
+            stats_tracker/* tracker */.F.setUserHash(newHash);
         } catch (e) {
             console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
-            state.daily.hash_err = (e.message || String(e)).slice(0, 40);
-            state.user_hash = null;
-            stats_tracker/* tracker */.F.persist();
+            stats_tracker/* tracker */.F.setUserHashError();
         }
         const pending = stats_tracker/* tracker */.F.getPendingFlush();
         if (pending) {
-            stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+            const current = stats_tracker/* tracker */.F.load();
+            stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash)
                 .catch(e => console.warn('Flush failed:', e));
         }
     })();
@@ -5584,7 +5594,7 @@ if (!window.__KANTINE_LOADED) {
         (0,actions/* loadMenuDataFromAPI */.m9)();
     }
 
-    if (src_state/* authToken */.gX) {
+    if (state/* authToken */.gX) {
         (0,actions/* startPolling */.g8)();
     }
 
