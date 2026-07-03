@@ -79,6 +79,20 @@ class StatsTracker {
         this.persist();
     }
 
+    setUserHash(hash) {
+        this.load();
+        this._state.user_hash = hash;
+        this._state.daily.hash_len = hash ? hash.length : -1;
+        this.persist();
+    }
+
+    setUserHashError(errMsg) {
+        this.load();
+        this._state.user_hash = null;
+        this._state.daily.hash_err = (errMsg || '').slice(0, 40);
+        this.persist();
+    }
+
     reset() {
         this._state = this._freshState(this._getToday());
         localStorage.removeItem(STORAGE_KEY);

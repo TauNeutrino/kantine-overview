@@ -33,20 +33,17 @@ if (!window.__KANTINE_LOADED) {
     (async () => {
         try {
             const newHash = await computeUserHash();
-            state.daily.hash_len = newHash ? newHash.length : -1;
-            if (newHash !== state.user_hash) {
-                state.user_hash = newHash;
-                tracker.persist();
-            }
+            tracker.setUserHash(newHash);
+            state.user_hash = newHash;
         } catch (e) {
             console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
-            state.daily.hash_err = (e.message || String(e)).slice(0, 40);
+            tracker.setUserHashError(e.message || String(e));
             state.user_hash = null;
-            tracker.persist();
         }
         const pending = tracker.getPendingFlush();
         if (pending) {
-            tracker.flushToGist(pending.date, pending.daily, state.user_hash || pending.user_hash)
+            const current = tracker.load();
+            tracker.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash)
                 .catch(e => console.warn('Flush failed:', e));
         }
     })();
