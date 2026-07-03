@@ -7,7 +7,7 @@ import { checkForUpdates } from './ui_helpers.js';
 import { authToken } from './state.js';
 import { tracker } from './stats-tracker.js';
 import { computeUserHash } from './stats-hash.js';
-import { GIST_ID } from './constants.js';
+import { GIST_ID, COMMIT_HASH } from './constants.js';
 import { langMode } from './state.js';
 
 if (!window.__KANTINE_LOADED) {
@@ -22,6 +22,7 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     tracker.increment('starts');
     tracker.set('version', '{{VERSION}}');
+    tracker.set('commit_hash', COMMIT_HASH);
     tracker.set('hour', new Date().getHours());
     tracker.set('day', new Date().getDay());
     tracker.set('mobile', window.innerWidth < 768);
@@ -38,6 +39,8 @@ if (!window.__KANTINE_LOADED) {
             }
         } catch (e) {
             console.warn('[Stats] computeUserHash failed:', e.message);
+            state.user_hash = null;
+            tracker.persist();
         }
         const pending = tracker.getPendingFlush();
         if (pending) {

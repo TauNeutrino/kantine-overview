@@ -9,6 +9,7 @@ export const API_BASE = 'https://api.bessa.app/v1';
 
 /** The client version injected into every API request header. */
 export const CLIENT_VERSION = '{{VERSION}}';
+export const COMMIT_HASH = '{{COMMIT_HASH}}';
 
 /** Bessa venue ID for Knapp-Kantine. */
 export const VENUE_ID = 591;
