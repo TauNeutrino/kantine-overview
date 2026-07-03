@@ -21,10 +21,10 @@ if (!window.__KANTINE_LOADED) {
 
     // Stats: baseline metrics
     tracker.increment('starts');
+    tracker.increment('session_count');
     tracker.set('version', '{{VERSION}}');
     tracker.set('version_commit_hash', COMMIT_HASH);
-    tracker.set('hour', new Date().getHours());
-    tracker.set('day', new Date().getDay());
+    tracker.increment('hour_' + new Date().getHours());
     tracker.set('mobile', window.innerWidth < 768);
     tracker.set('lang', langMode);
     tracker.set('logged_in', !!authToken);
@@ -53,7 +53,9 @@ if (!window.__KANTINE_LOADED) {
     const hadCache = loadMenuCache();
     if (hadCache) {
         document.getElementById('loading').classList.add('hidden');
-        tracker.set('load_time_ms', Date.now() - window.__kantine_load_start);
+        const loadMs = Date.now() - window.__kantine_load_start;
+        tracker.incrementValue('load_time_sum', loadMs);
+        tracker.increment('load_time_count');
         if (!isCacheFresh()) {
             loadMenuDataFromAPI();
         }
@@ -72,6 +74,8 @@ if (!window.__KANTINE_LOADED) {
 window.addEventListener('beforeunload', () => {
     const startMs = tracker.load().session?.start_ms;
     if (startMs) {
-        tracker.set('session_duration_s', Math.round((Date.now() - startMs) / 1000));
+        const dur = Math.round((Date.now() - startMs) / 1000);
+        tracker.incrementValue('session_duration_sum', dur);
+        tracker.increment('session_duration_count');
     }
 });

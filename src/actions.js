@@ -1086,9 +1086,12 @@ export async function loadMenuDataFromAPI() {
         });
     } finally {
         loading.classList.add('hidden');
-        tracker.set('api_latency_ms', Date.now() - __apiStart);
+        tracker.incrementValue('api_latency_sum', Date.now() - __apiStart);
+        tracker.increment('api_latency_count');
         if (window.__kantine_load_start) {
-            tracker.set('load_time_ms', Date.now() - window.__kantine_load_start);
+            const loadMs = Date.now() - window.__kantine_load_start;
+            tracker.incrementValue('load_time_sum', loadMs);
+            tracker.increment('load_time_count');
         }
     }
 }
