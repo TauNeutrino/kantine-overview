@@ -1235,6 +1235,7 @@ function githubHeaders(etag) {
 /* harmony export */   IY: () => (/* binding */ RAW_INSTALLER_BASE),
 /* harmony export */   KJ: () => (/* binding */ GIST_ID),
 /* harmony export */   LS: () => (/* binding */ LS),
+/* harmony export */   X9: () => (/* binding */ COMMIT_HASH),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
 /* harmony export */   fK: () => (/* binding */ GITHUB_FILE_BASE),
@@ -1256,6 +1257,7 @@ const API_BASE = 'https://api.bessa.app/v1';
 
 /** The client version injected into every API request header. */
 const CLIENT_VERSION = '{{VERSION}}';
+const COMMIT_HASH = '{{COMMIT_HASH}}';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -5537,6 +5539,7 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');
     stats_tracker/* tracker */.F.set('version', '{{VERSION}}');
+    stats_tracker/* tracker */.F.set('commit_hash', constants/* COMMIT_HASH */.X9);
     stats_tracker/* tracker */.F.set('hour', new Date().getHours());
     stats_tracker/* tracker */.F.set('day', new Date().getDay());
     stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
@@ -5553,6 +5556,8 @@ if (!window.__KANTINE_LOADED) {
             }
         } catch (e) {
             console.warn('[Stats] computeUserHash failed:', e.message);
+            state.user_hash = null;
+            stats_tracker/* tracker */.F.persist();
         }
         const pending = stats_tracker/* tracker */.F.getPendingFlush();
         if (pending) {
