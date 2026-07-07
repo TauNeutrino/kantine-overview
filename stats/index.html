@@ -5,61 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kantine Usage Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --md-primary: #029AA8;
+            --md-primary-dark: #017a85;
+            --md-primary-light: #e0f7fa;
+            --md-surface: #1e1e2e;
+            --md-surface-2: #2a2a3e;
+            --md-surface-3: #363650;
+            --md-on-surface: #e8e8f0;
+            --md-on-surface-variant: #a0a0b8;
+            --md-elevation-1: 0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.24);
+            --md-elevation-2: 0 3px 6px rgba(0,0,0,.32), 0 3px 6px rgba(0,0,0,.28);
+            --md-elevation-4: 0 10px 20px rgba(0,0,0,.38), 0 6px 6px rgba(0,0,0,.34);
+            --md-border-radius: 12px;
+            --md-transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: #1a1a2e; color: #eee; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #029AA8; margin-bottom: 5px; }
-        .subtitle { color: #a0aec0; margin-bottom: 30px; font-size: 0.9em; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #16162a;
+            color: var(--md-on-surface);
+            padding: 24px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1280px; margin: 0 auto; }
 
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
-        .kpi-card { background: #16213e; border-radius: 12px; padding: 20px; text-align: center; }
-        .kpi-card .value { font-size: 2em; font-weight: 700; color: #029AA8; }
-        .kpi-card .label { color: #a0aec0; font-size: 0.85em; margin-top: 4px; }
+        /* Header */
+        header { margin-bottom: 32px; }
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--md-primary);
+            letter-spacing: -0.01em;
+        }
+        .subtitle {
+            color: var(--md-on-surface-variant);
+            font-size: 0.875rem;
+            margin-top: 4px;
+            font-weight: 400;
+        }
 
-        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 30px; }
-        .chart-card { background: #16213e; border-radius: 12px; padding: 20px; }
+        /* KPI Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .kpi-card {
+            background: var(--md-surface);
+            border-radius: var(--md-border-radius);
+            padding: 20px 24px;
+            box-shadow: var(--md-elevation-1);
+            transition: box-shadow var(--md-transition), transform var(--md-transition);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--md-primary), #48d1d0);
+            opacity: 0.7;
+        }
+        .kpi-card:hover {
+            box-shadow: var(--md-elevation-2);
+            transform: translateY(-2px);
+        }
+        .kpi-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--md-primary);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        .kpi-card .label {
+            color: var(--md-on-surface-variant);
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Chart Cards */
+        .chart-card {
+            background: var(--md-surface);
+            border-radius: var(--md-border-radius);
+            padding: 20px 24px;
+            box-shadow: var(--md-elevation-1);
+            transition: box-shadow var(--md-transition);
+        }
+        .chart-card:hover {
+            box-shadow: var(--md-elevation-2);
+        }
+        .chart-card h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--md-primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
         .chart-card.full { grid-column: 1 / -1; }
-        .chart-card h2 { color: #029AA8; font-size: 1em; margin-bottom: 15px; }
-        .chart-wrap { position: relative; height: 300px; }
-        .chart-row .chart-card .chart-wrap { height: 280px; }
-        .chart-wrap canvas { display: block; width: 100%; height: 100%; }
+        .chart-wrap { position: relative; height: 320px; }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: #a0aec0; }
-        .empty-state h2 { color: #029AA8; margin-bottom: 10px; }
-        .error-state { text-align: center; padding: 60px 20px; color: #e95454; }
-
-        .loading { text-align: center; padding: 60px; color: #a0aec0; }
-        .spinner { width: 40px; height: 40px; border: 3px solid #16213e; border-top-color: #029AA8; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+        /* Loading & States */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--md-on-surface-variant);
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid var(--md-surface-2);
+            border-top-color: var(--md-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 768px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .chart-row { grid-template-columns: 1fr; } }
-        @media (max-width: 480px) { .kpi-grid { grid-template-columns: 1fr; } }
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--md-on-surface-variant);
+        }
+        .empty-state h2 { color: var(--md-primary); margin-bottom: 8px; font-weight: 600; }
+        .error-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: #ef5350;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-row { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .kpi-grid { grid-template-columns: 1fr; }
+            body { padding: 12px; }
+            h1 { font-size: 1.35rem; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Kantine Usage Dashboard</h1>
-    <p class="subtitle">Nutzungsstatistiken &mdash; <span id="last-updated">-</span></p>
+    <header>
+        <h1>Kantine Usage Dashboard</h1>
+        <p class="subtitle">Nutzungsstatistiken &mdash; <span id="last-updated">-</span></p>
+    </header>
 
     <div id="kpi-container" class="kpi-grid"></div>
     <div id="charts-container"></div>
     <div id="loading" class="loading">
         <div class="spinner"></div>
-        <p>Lade Daten...</p>
+        <p>Lade Daten&hellip;</p>
     </div>
 </div>
 
 <script>
-// Public raw URL — auch für secret Gists ohne Auth lesbar (CORS erlaubt)
 const GIST_OWNER = 'TauNeutrino';
 const GIST_ID = '1e8de3cc6c9dcb90cf0905d502ce2fa4';
 
 async function fetchGistData() {
-    const resp = await fetch(`https://gist.githubusercontent.com/${GIST_OWNER}/${GIST_ID}/raw/stats.json`);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const resp = await fetch('https://gist.githubusercontent.com/' + GIST_OWNER + '/' + GIST_ID + '/raw/stats.json');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     return resp.json();
 }
+
+const COLORS = ['#029AA8','#E95454','#FFB347','#48C774','#A855F7','#3B82F6','#F59E0B','#EC4899','#14B8A6','#8B5CF6','#F97316','#06B6D4','#84CC16','#D946EF'];
+const WEEKDAY = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
+const FEATURES = ['starts','highlight','order','lang_switch','theme_switch','week_nav','refresh','login','logout','order_history','highlights_mgr','order_placed','order_cancelled'];
 
 function renderDashboard(data) {
     const days = Object.keys(data.daily).sort();
@@ -69,99 +207,185 @@ function renderDashboard(data) {
         ? 'Zuletzt aktualisiert: ' + new Date(data.last_updated).toLocaleString('de-DE')
         : '-';
 
-    const latest = data.daily[days[days.length - 1]];
+    // ── Aggregate data ──────────────────────────────────────────────────
     const allTime = data.all_time || { unique_users: 0 };
-    let totalUnique = 0, totalActions = 0;
+    let totalUnique = 0;
+    for (const d of days) totalUnique += data.daily[d].unique_today || 0;
+
+    const avgUsers = days.length > 0 ? (totalUnique / days.length).toFixed(1) : 0;
+
+    // Weekday stats
+    const wdCount = [0, 0, 0, 0, 0, 0, 0];
+    const wdSum   = [0, 0, 0, 0, 0, 0, 0];
     for (const d of days) {
-        totalUnique += data.daily[d].unique_today || 0;
-        for (const [k, v] of Object.entries(data.daily[d])) {
-            if (typeof v === 'number' && k !== 'unique_today') totalActions += v;
-        }
+        const wd = new Date(d + 'T12:00:00').getDay();
+        wdCount[wd]++;
+        wdSum[wd] += data.daily[d].unique_today || 0;
     }
+    const wdAvg = wdSum.map((s, i) => wdCount[i] > 0 ? +(s / wdCount[i]).toFixed(1) : 0);
 
-    document.getElementById('kpi-container').innerHTML = [
-        { value: latest.unique_today || 0, label: 'Heute aktiv (DAU)' },
-        { value: allTime.unique_users, label: 'Einzigartige Nutzer (gesamt)' },
-        { value: totalUnique, label: 'Tagesnutzer (\u2211)' },
-        { value: totalActions, label: 'Aktionen gesamt' },
-        { value: days.length, label: 'Tage mit Daten' }
-    ].map(k => `<div class="kpi-card"><div class="value">${k.value}</div><div class="label">${k.label}</div></div>`).join('');
+    // Version distribution (last 30 days)
+    const last30 = days.slice(-30);
+    const verCounts = {};
+    for (const d of last30) {
+        const v = data.daily[d].version;
+        if (v) verCounts[v] = (verCounts[v] || 0) + 1;
+    }
+    const versionLabels = Object.keys(verCounts);
+    const versionData   = versionLabels.map(v => verCounts[v]);
+    const versionActive = versionLabels.length;
 
-    const container = document.getElementById('charts-container');
-    const featureKeys = ['starts','highlight','order','lang_switch','theme_switch','week_nav','refresh','login','logout','browser_load','order_history','highlights_mgr','order_placed','order_cancelled'];
-
-    const activeFeatures = [];
-    for (const fk of featureKeys) {
+    // Active features
+    const active = [];
+    for (const fk of FEATURES) {
         let sum = 0;
         for (const d of days) if (data.daily[d][fk]) sum += data.daily[d][fk];
-        if (sum > 0) activeFeatures.push(fk);
+        if (sum > 0) active.push(fk);
     }
 
-    container.innerHTML = '<div class="chart-card full"><h2>Starts &uuml;ber Zeit</h2><div class="chart-wrap"><canvas id="line-chart"></canvas></div></div>';
+    // Feature × weekday averages (grouped bar)
+    const fwSum   = active.map(() => [0, 0, 0, 0, 0, 0, 0]);
+    for (let fi = 0; fi < active.length; fi++) {
+        const fk = active[fi];
+        for (const d of days) {
+            const wd = new Date(d + 'T12:00:00').getDay();
+            fwSum[fi][wd] += data.daily[d][fk] || 0;
+        }
+    }
+    const fwAvg = fwSum.map(row => row.map((s, i) => wdCount[i] > 0 ? +(s / wdCount[i]).toFixed(1) : 0));
 
-    if (activeFeatures.length > 0) {
-        container.innerHTML += '<div class="chart-row"><div class="chart-card"><h2>Feature-Nutzung (aggregiert)</h2><div class="chart-wrap"><canvas id="bar-chart"></canvas></div></div><div class="chart-card"><h2>Feature-Verteilung</h2><div class="chart-wrap"><canvas id="pie-chart"></canvas></div></div></div>';
+    // ── KPI Cards ───────────────────────────────────────────────────────
+    document.getElementById('kpi-container').innerHTML = [
+        { value: avgUsers, label: 'Nutzer/Tag \u2205' },
+        { value: allTime.unique_users, label: 'Einzigartige Nutzer (gesamt)' },
+        { value: versionActive, label: 'Versionen aktiv' },
+        { value: days.length, label: 'Tage mit Daten' }
+    ].map(k => '<div class="kpi-card"><div class="value">' + k.value + '</div><div class="label">' + k.label + '</div></div>').join('');
+
+    // ── Charts Container ────────────────────────────────────────────────
+    const container = document.getElementById('charts-container');
+
+    // Row 1: Feature usage over time (line)
+    container.innerHTML = '<div class="chart-card full"><h2>Featurenutzung \u00fcber Zeit</h2><div class="chart-wrap"><canvas id="line-chart"></canvas></div></div>';
+
+    // Row 2: Users per weekday + Version distribution
+    container.innerHTML += '<div class="chart-row">' +
+        '<div class="chart-card"><h2>Nutzer pro Wochentag</h2><div class="chart-wrap"><canvas id="weekday-chart"></canvas></div></div>' +
+        '<div class="chart-card"><h2>Versionen (letzte 30 Tage)</h2><div class="chart-wrap"><canvas id="version-chart"></canvas></div></div>' +
+        '</div>';
+
+    // Row 3: Feature usage per weekday (grouped bar)
+    if (active.length > 0) {
+        container.innerHTML += '<div class="chart-card full"><h2>Feature-Nutzung pro Wochentag</h2><div class="chart-wrap"><canvas id="feature-weekday-chart"></canvas></div></div>';
     }
 
-    const colors = ['#029AA8','#E95454','#FFB347','#48C774','#A855F7','#3B82F6','#F59E0B','#EC4899','#14B8A6','#8B5CF6','#F97316','#06B6D4','#84CC16','#D946EF'];
+    // ── Chart.js Options ────────────────────────────────────────────────
+    const chartOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 11 } } }
+        },
+        scales: {
+            x: { ticks: { color: '#a0a0b8', font: { family: 'Inter' } }, grid: { color: '#2a2a3e' } },
+            y: { ticks: { color: '#a0a0b8', font: { family: 'Inter' } }, grid: { color: '#2a2a3e' } }
+        }
+    };
 
+    // ── 1. Line Chart - Feature usage over time ─────────────────────────
     new Chart(document.getElementById('line-chart'), {
         type: 'line',
         data: {
             labels: days,
-            datasets: activeFeatures.slice(0, 8).map((fk, i) => ({
+            datasets: active.slice(0, 8).map((fk, i) => ({
                 label: fk,
                 data: days.map(d => data.daily[d][fk] || 0),
-                borderColor: colors[i % colors.length],
-                backgroundColor: colors[i % colors.length] + '20',
+                borderColor: COLORS[i % COLORS.length],
+                backgroundColor: COLORS[i % COLORS.length] + '18',
                 borderWidth: 2,
-                pointRadius: 2,
-                tension: 0.3
+                pointRadius: 1.5,
+                pointHitRadius: 8,
+                tension: 0.3,
+                fill: false
             }))
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#a0aec0' } } },
-            scales: { x: { ticks: { color: '#a0aec0' } }, y: { ticks: { color: '#a0aec0' } } }
-        }
+        options: Object.assign({}, chartOpts, {
+            interaction: { intersect: false, mode: 'index' },
+            plugins: Object.assign({}, chartOpts.plugins, {
+                legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
+            })
+        })
     });
 
-    if (activeFeatures.length > 0) {
-        new Chart(document.getElementById('bar-chart'), {
-            type: 'bar',
+    // ── 2. Bar Chart - Users per weekday ────────────────────────────────
+    new Chart(document.getElementById('weekday-chart'), {
+        type: 'bar',
+        data: {
+            labels: WEEKDAY,
+            datasets: [{
+                label: 'Nutzer \u2205',
+                data: wdAvg,
+                backgroundColor: wdAvg.map(() => '#029AA888'),
+                borderColor: wdAvg.map(() => '#029AA8'),
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: Object.assign({}, chartOpts, {
+            plugins: Object.assign({}, chartOpts.plugins, { legend: { display: false } })
+        })
+    });
+
+    // ── 3. Pie Chart - Version distribution ─────────────────────────────
+    if (versionLabels.length > 0) {
+        new Chart(document.getElementById('version-chart'), {
+            type: 'doughnut',
             data: {
-                labels: activeFeatures,
+                labels: versionLabels,
                 datasets: [{
-                    label: 'Gesamt',
-                    data: activeFeatures.map(fk => { let s = 0; for (const d of days) s += data.daily[d][fk] || 0; return s; }),
-                    backgroundColor: activeFeatures.map((_, i) => colors[i % colors.length] + '80'),
-                    borderColor: activeFeatures.map((_, i) => colors[i % colors.length]),
-                    borderWidth: 1
+                    data: versionData,
+                    backgroundColor: versionLabels.map((_, i) => COLORS[i % COLORS.length] + 'cc'),
+                    borderColor: '#1e1e2e',
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { ticks: { color: '#a0aec0' } }, y: { ticks: { color: '#a0aec0' } } }
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#a0a0b8', font: { family: 'Inter', size: 11 }, padding: 12, boxWidth: 12 }
+                    }
+                }
             }
         });
+    }
 
-        new Chart(document.getElementById('pie-chart'), {
-            type: 'pie',
+    // ── 4. Grouped Bar - Feature usage per weekday ──────────────────────
+    if (active.length > 0) {
+        new Chart(document.getElementById('feature-weekday-chart'), {
+            type: 'bar',
             data: {
-                labels: activeFeatures,
-                datasets: [{
-                    data: activeFeatures.map(fk => { let s = 0; for (const d of days) s += data.daily[d][fk] || 0; return s; }),
-                    backgroundColor: activeFeatures.map((_, i) => colors[i % colors.length])
-                }]
+                labels: WEEKDAY,
+                datasets: active.slice(0, 8).map((fk, i) => ({
+                    label: fk,
+                    data: fwAvg[i],
+                    backgroundColor: COLORS[i % COLORS.length] + '99',
+                    borderColor: COLORS[i % COLORS.length],
+                    borderWidth: 1,
+                    borderRadius: 2
+                }))
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: '#a0aec0', boxWidth: 12 } } }
-            }
+            options: Object.assign({}, chartOpts, {
+                interaction: { intersect: false, mode: 'index' },
+                plugins: Object.assign({}, chartOpts.plugins, {
+                    legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
+                }),
+                scales: Object.assign({}, chartOpts.scales, {
+                    x: Object.assign({}, chartOpts.scales.x, { grid: { display: false } })
+                })
+            })
         });
     }
 }
