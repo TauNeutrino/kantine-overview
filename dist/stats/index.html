@@ -94,6 +94,11 @@
         }
 
         /* Chart Cards */
+        #charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
         .chart-card {
             background: var(--md-surface);
             border-radius: var(--md-border-radius);
@@ -113,12 +118,11 @@
             letter-spacing: 0.05em;
         }
         .chart-card.full { grid-column: 1 / -1; }
-        .chart-wrap { position: relative; height: 320px; }
+        .chart-wrap { position: relative; height: 320px; overflow: hidden; }
         .chart-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-bottom: 28px;
         }
 
         /* Loading & States */
