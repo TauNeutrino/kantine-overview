@@ -42,7 +42,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Copy dashboard into dist
-        run: cp -r stats dist/stats
+        run: mkdir -p dist/stats && cp -r stats/. dist/stats/
       
       - name: Commit bump and build artifacts
         if: github.ref == 'refs/heads/main'
