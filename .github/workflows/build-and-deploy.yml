@@ -49,12 +49,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin "https://x-access-token:${GIT_PAT}@github.com/TauNeutrino/kantine-overview.git"
           git add version.txt dist/
           if ! git diff --staged --quiet; then
             git commit -m "chore: bump version to $BUMPED_VERSION [skip ci]"
             git pull --rebase --autostash
-            git push
+            git push "https://x-access-token:${{ secrets.GIT_PAT }}@github.com/${GITHUB_REPOSITORY}.git" main
           fi
       
       - name: Upload Pages artifact
