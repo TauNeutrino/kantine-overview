@@ -94,13 +94,17 @@
         }
 
         /* Chart Cards */
+        #charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
         .chart-card {
             background: var(--md-surface);
             border-radius: var(--md-border-radius);
             padding: 20px 24px;
             box-shadow: var(--md-elevation-1);
             transition: box-shadow var(--md-transition);
-            margin-bottom: 28px;
         }
         .chart-card:hover {
             box-shadow: var(--md-elevation-2);
@@ -114,13 +118,11 @@
             letter-spacing: 0.05em;
         }
         .chart-card.full { grid-column: 1 / -1; }
-        .chart-wrap { position: relative; height: 320px; }
-        .chart-row .chart-card { margin-bottom: 0; }
+        .chart-wrap { position: relative; height: 320px; overflow: hidden; }
         .chart-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-bottom: 28px;
         }
 
         /* Loading & States */
