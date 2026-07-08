@@ -1240,6 +1240,7 @@ function githubHeaders(etag) {
 /* harmony export */   LS: () => (/* binding */ LS),
 /* harmony export */   X9: () => (/* binding */ COMMIT_HASH),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
+/* harmony export */   Z7: () => (/* binding */ DEV_MODE_PW_HASH),
 /* harmony export */   eW: () => (/* binding */ VENUE_ID),
 /* harmony export */   fK: () => (/* binding */ GITHUB_FILE_BASE),
 /* harmony export */   fZ: () => (/* binding */ CLIENT_VERSION),
@@ -1311,6 +1312,9 @@ const LS = {
 const GIST_ID = '{{GIST_ID}}';
 const GIST_SALT = '{{GIST_SALT}}';
 const GIST_PAT = '{{GIST_PAT}}';
+
+/** SHA-256 (UTF-8, lowercase hex) of the password required to enable Dev-Mode. */
+const DEV_MODE_PW_HASH = '1d79c4226fdd41df94698643b006eaada305d85871d80ca75fb0bf218ab189f4';
 
 
 /***/ },
@@ -1386,6 +1390,7 @@ const TRANSLATIONS = {
         // Menu item labels
         available: 'Verfügbar',
         soldOut: 'Ausverkauft',
+        lowStock: 'Wenig verfügbar',
         ordered: 'Bestellt',
         orderButton: 'Bestellen',
         orderAgainTooltip: 'nochmal bestellen',
@@ -1521,6 +1526,7 @@ const TRANSLATIONS = {
         // Menu item labels
         available: 'Available',
         soldOut: 'Sold out',
+        lowStock: 'Low availability',
         ordered: 'Ordered',
         orderButton: 'Order',
         orderAgainTooltip: 'order again',
@@ -2061,6 +2067,14 @@ function updateNextWeekBadge() {
             if (!localStorage.getItem(storageKey)) {
                 localStorage.setItem(storageKey, 'true');
                 (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .showToast */ .P0)((0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'), 'info');
+                if (Notification.permission === 'granted') {
+                    new Notification('Kantine Wrapper', {
+                        body: (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'),
+                        icon: '🍽️'
+                    });
+                } else if (Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
             }
         } else {
             btnNextWeek.classList.remove('new-week-available');
@@ -2276,8 +2290,18 @@ function createDayCard(day) {
         const orderIds = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(orderKey) || [];
         const orderCount = orderIds.length;
 
+        const dm = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+
+        const isLowStock = item.available && item.amountTracking
+            && typeof item.availableAmount === 'number'
+            && item.availableAmount > 0 && item.availableAmount < 10;
+
         let statusBadge = '';
-        if (item.available) {
+        if (isLowStock) {
+            statusBadge = dm
+                ? `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`
+                : `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('lowStock')}</span>`;
+        } else if (item.available) {
             statusBadge = item.amountTracking
                 ? `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`
                 : `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
@@ -2285,7 +2309,6 @@ function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
         }
 
-        const dm = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
         const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
         const lbl = split.label || 'fallback';
         
@@ -2611,8 +2634,29 @@ function openVersionMenu() {
 
     loadVersions(false);
 
-    devToggle.onchange = () => {
-        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, devToggle.checked);
+    devToggle.onchange = async () => {
+        if (devToggle.checked) {
+            const promptText = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'Dev-Mode password:' : 'Dev-Mode Passwort:';
+            const entered = prompt(promptText);
+            if (entered === null) {
+                devToggle.checked = false;
+                console.warn('[Kantine] Dev-Mode activation cancelled.');
+                return;
+            }
+            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(entered));
+            const hashHex = Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+            if (hashHex !== _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .DEV_MODE_PW_HASH */ .Z7) {
+                devToggle.checked = false;
+                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
+                console.warn('[Kantine] Dev-Mode activation rejected: wrong password.');
+                return;
+            }
+            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'true');
+        } else {
+            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
+        }
         localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
         localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
         loadVersions(true);
@@ -4807,6 +4851,10 @@ function getRelativeTime(date) {
 function getLocalizedText(text) {
     if (state/* langMode */.Kl === 'all') return text || '';
     const split = splitLanguage(text);
+    // Low-confidence splits: show raw source text instead of a guessed translation
+    if (split.label === 'low' || split.label === 'fallback') {
+        return split.raw || text || '';
+    }
     if (state/* langMode */.Kl === 'en') return split.en || split.raw;
     return split.de || split.raw;
 }
