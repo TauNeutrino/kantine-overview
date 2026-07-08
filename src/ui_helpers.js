@@ -309,17 +309,21 @@ export function createDayCard(day) {
             && typeof item.availableAmount === 'number'
             && item.availableAmount > 0 && item.availableAmount < 10;
 
+        // Normal mode deliberately hides the Stückzahl; dev mode shows it.
+        // Stock below 10 switches to the "wenig verfügbar" label + green-yellow color.
         let statusBadge = '';
-        if (isLowStock) {
+        if (!item.available) {
+            statusBadge = `<span class="badge sold-out">${t('soldOut')}</span>`;
+        } else if (isLowStock) {
             statusBadge = dm
                 ? `<span class="badge available-low">${t('available')} (${item.availableAmount})</span>`
                 : `<span class="badge available-low">${t('lowStock')}</span>`;
-        } else if (item.available) {
-            statusBadge = item.amountTracking
-                ? `<span class="badge available">${t('available')} (${item.availableAmount})</span>`
-                : `<span class="badge available">${t('available')}</span>`;
+        } else if (!item.amountTracking) {
+            statusBadge = `<span class="badge available">${t('available')}</span>`;
+        } else if (dm) {
+            statusBadge = `<span class="badge available">${t('available')} (${item.availableAmount})</span>`;
         } else {
-            statusBadge = `<span class="badge sold-out">${t('soldOut')}</span>`;
+            statusBadge = `<span class="badge available">${t('available')}</span>`;
         }
 
         const split = splitLanguage(item.description || '');
