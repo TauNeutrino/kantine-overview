@@ -677,6 +677,7 @@ export function openVersionMenu() {
         localStorage.removeItem(LS.VERSION_CACHE);
         localStorage.removeItem(LS.VERSION_ETAG);
         loadVersions(true);
+        renderVisibleWeeks();
     };
 }
 
