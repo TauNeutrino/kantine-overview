@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS } from './constants.js';
+import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
@@ -80,6 +80,14 @@ export function updateNextWeekBadge() {
             if (!localStorage.getItem(storageKey)) {
                 localStorage.setItem(storageKey, 'true');
                 showToast(t('newMenuDataAvailable'), 'info');
+                if (Notification.permission === 'granted') {
+                    new Notification('Kantine Wrapper', {
+                        body: t('newMenuDataAvailable'),
+                        icon: '🍽️'
+                    });
+                } else if (Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
             }
         } else {
             btnNextWeek.classList.remove('new-week-available');
@@ -295,8 +303,18 @@ export function createDayCard(day) {
         const orderIds = orderMap.get(orderKey) || [];
         const orderCount = orderIds.length;
 
+        const dm = localStorage.getItem(LS.DEV_MODE) === 'true';
+
+        const isLowStock = item.available && item.amountTracking
+            && typeof item.availableAmount === 'number'
+            && item.availableAmount > 0 && item.availableAmount < 10;
+
         let statusBadge = '';
-        if (item.available) {
+        if (isLowStock) {
+            statusBadge = dm
+                ? `<span class="badge available-low">${t('available')} (${item.availableAmount})</span>`
+                : `<span class="badge available-low">${t('lowStock')}</span>`;
+        } else if (item.available) {
             statusBadge = item.amountTracking
                 ? `<span class="badge available">${t('available')} (${item.availableAmount})</span>`
                 : `<span class="badge available">${t('available')}</span>`;
@@ -304,7 +322,6 @@ export function createDayCard(day) {
             statusBadge = `<span class="badge sold-out">${t('soldOut')}</span>`;
         }
 
-        const dm = localStorage.getItem(LS.DEV_MODE) === 'true';
         const split = splitLanguage(item.description || '');
         const lbl = split.label || 'fallback';
         
@@ -630,8 +647,29 @@ export function openVersionMenu() {
 
     loadVersions(false);
 
-    devToggle.onchange = () => {
-        localStorage.setItem(LS.DEV_MODE, devToggle.checked);
+    devToggle.onchange = async () => {
+        if (devToggle.checked) {
+            const promptText = langMode === 'en' ? 'Dev-Mode password:' : 'Dev-Mode Passwort:';
+            const entered = prompt(promptText);
+            if (entered === null) {
+                devToggle.checked = false;
+                console.warn('[Kantine] Dev-Mode activation cancelled.');
+                return;
+            }
+            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(entered));
+            const hashHex = Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+            if (hashHex !== DEV_MODE_PW_HASH) {
+                devToggle.checked = false;
+                localStorage.setItem(LS.DEV_MODE, 'false');
+                console.warn('[Kantine] Dev-Mode activation rejected: wrong password.');
+                return;
+            }
+            localStorage.setItem(LS.DEV_MODE, 'true');
+        } else {
+            localStorage.setItem(LS.DEV_MODE, 'false');
+        }
         localStorage.removeItem(LS.VERSION_CACHE);
         localStorage.removeItem(LS.VERSION_ETAG);
         loadVersions(true);

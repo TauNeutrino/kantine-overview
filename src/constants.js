@@ -60,3 +60,6 @@ export const LS = {
 export const GIST_ID = '{{GIST_ID}}';
 export const GIST_SALT = '{{GIST_SALT}}';
 export const GIST_PAT = '{{GIST_PAT}}';
+
+/** SHA-256 (UTF-8, lowercase hex) of the password required to enable Dev-Mode. */
+export const DEV_MODE_PW_HASH = '1d79c4226fdd41df94698643b006eaada305d85871d80ca75fb0bf218ab189f4';

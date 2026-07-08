@@ -1092,6 +1092,13 @@ body {
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
+.badge.available-low {
+    background-color: rgba(163, 190, 35, 0.15);
+    /* Green-yellow / 15% */
+    color: #7a8b1a;
+    border: 1px solid rgba(163, 190, 35, 0.35);
+}
+
 .badge.sold-out {
     background-color: rgba(239, 68, 68, 0.1);
     /* Red 500 / 10% */

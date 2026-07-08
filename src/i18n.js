@@ -60,6 +60,7 @@ const TRANSLATIONS = {
         // Menu item labels
         available: 'Verfügbar',
         soldOut: 'Ausverkauft',
+        lowStock: 'Wenig verfügbar',
         ordered: 'Bestellt',
         orderButton: 'Bestellen',
         orderAgainTooltip: 'nochmal bestellen',
@@ -195,6 +196,7 @@ const TRANSLATIONS = {
         // Menu item labels
         available: 'Available',
         soldOut: 'Sold out',
+        lowStock: 'Low availability',
         ordered: 'Ordered',
         orderButton: 'Order',
         orderAgainTooltip: 'order again',

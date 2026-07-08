@@ -157,6 +157,22 @@ function stepReadAndInject() {
   const GIST_PAT  = process.env.GIST_PAT || '';
   const GIST_ID   = process.env.GIST_ID  || '';
   const GIST_SALT = process.env.GIST_SALT || '';
+
+  // Fail loudly if any required Gist credential is missing — otherwise the
+  // {{GIST_*}} placeholders stay literal in the bundle and every Gist API
+  // call returns 401.
+  const missingGist = [
+    ['GIST_PAT', GIST_PAT],
+    ['GIST_ID', GIST_ID],
+    ['GIST_SALT', GIST_SALT],
+  ].filter(([, v]) => !v).map(([k]) => k);
+  if (missingGist.length) {
+    const msg = `[build] FATAL: ${missingGist.join(', ')} environment variable(s) not set. ` +
+      `Gist stats sync will fail with 401. Set GIST_PAT, GIST_ID, GIST_SALT before running npm run build.`;
+    console.error(msg);
+    process.exit(1);
+  }
+
   let COMMIT_HASH = '';
   try { COMMIT_HASH = exec('git rev-parse --short HEAD').trim(); } catch (_) {}
 
@@ -167,6 +183,16 @@ function stepReadAndInject() {
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
     .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT);
+
+  // Defensive guard: no Gist placeholder may survive injection in the shipped bundle.
+  const survivors = ['{{GIST_PAT}}', '{{GIST_ID}}', '{{GIST_SALT}}']
+    .filter((p) => JS_INJECTED.includes(p));
+  if (survivors.length) {
+    const msg = `[build] FATAL: placeholder(s) ${survivors.join(', ')} survived injection in the JS bundle. ` +
+      `Refusing to ship a broken bundle. Check that src/ uses the exact placeholder strings.`;
+    console.error(msg);
+    process.exit(1);
+  }
 
   return { VERSION, CSS, FAVICON_URL, JS_INJECTED, MOCK_JS, COMMIT_HASH };
 }
