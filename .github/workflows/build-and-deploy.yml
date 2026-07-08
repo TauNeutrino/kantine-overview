@@ -33,30 +33,6 @@ jobs:
       - name: Copy dashboard into dist
         run: mkdir -p dist/stats && cp -r stats/. dist/stats/
 
-      - name: Tag release from version.txt
-        if: github.ref == 'refs/heads/main'
-        env:
-          TRIGGER_SHA: ${{ github.sha }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          VERSION=$(cat version.txt | tr -d '[:space:]')
-          echo "Version from version.txt: $VERSION"
-          PREV=$(git show "${TRIGGER_SHA}^:version.txt" 2>/dev/null | tr -d '[:space:]' || true)
-          echo "Previous version: ${PREV:-<none>}"
-          if [ "$VERSION" = "$PREV" ]; then
-            echo "version.txt unchanged on this commit — skipping tag."
-            exit 0
-          fi
-          if git rev-parse "$VERSION" >/dev/null 2>&1; then
-            git tag -f "$VERSION" "$TRIGGER_SHA"
-            echo "Moved existing tag $VERSION to $TRIGGER_SHA"
-          else
-            git tag "$VERSION" "$TRIGGER_SHA"
-            echo "Created tag $VERSION at $TRIGGER_SHA"
-          fi
-          git push origin --force "$VERSION"
-      
       - name: Commit build artifacts
         if: github.ref == 'refs/heads/main'
         run: |
@@ -67,6 +43,25 @@ jobs:
             git commit -m "chore: update build artifacts for $(cat version.txt | tr -d '[:space:]') [skip ci]"
             git push origin main
           fi
+
+      - name: Tag release from version.txt
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          VERSION=$(cat version.txt | tr -d '[:space:]')
+          echo "Version from version.txt: $VERSION"
+          # Always point the tag at the commit that contains the built artifacts
+          # (current HEAD = the dist-commit created just above). Rebuilds of the
+          # same version move the tag forward instead of failing.
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            git tag -f "$VERSION"
+            echo "Moved existing tag $VERSION to current commit"
+          else
+            git tag "$VERSION"
+            echo "Created tag $VERSION at current commit"
+          fi
+          git push origin --force "$VERSION"
       
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
