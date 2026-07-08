@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.5] - 2026-07-08
+
+### Added
+- Dev-Mode now requires a password (SHA-256 gate) before it can be enabled.
+- System notification (browser `Notification`) when next-week menus become orderable, mirroring the flagged-menu behaviour.
+
+### Changed
+- Low-stock indicator: menus with stock below 10 now show "Wenig verfügbar" in a green-yellow badge (normal mode); dev mode keeps showing the number.
+- Translations with low confidence (`low`/`fallback`) now fall back to the raw source text instead of a guessed split.
+
+### Fixed
+- Build now fails loudly if `GIST_PAT`/`GIST_ID`/`GIST_SALT` are missing, preventing the Gist-sync `401` caused by un-injected placeholders.
+
 ## [1.9.4] - 2026-06-24
 
 ### Fixed
@@ -494,25 +507,10 @@ No changes.
 
 ---
 
-## Android App
+> Android app changelog: [android/CHANGELOG.md](android/CHANGELOG.md)
 
-## [1.0.0] - 2026-06-26
-
-### Added
-- Android native app with Jetpack Compose + Material 3.
-- Login screen with Bessa API authentication.
-- Weekly menu overview with DE/EN language detection.
-- Week navigation (swipe or arrow buttons).
-- Hilt dependency injection.
-- Room local database for menu caching.
-- Retrofit + OkHttp networking with TLS 1.3.
-- Moshi JSON parsing with KSP code generation.
-- EncryptedSharedPreferences for secure token storage.
-- RTL/language support (DE/EN).
-- ProGuard/R8 minification and resource shrinking.
-- Fastlane metadata for Play Store listing.
-
-[Unreleased]: https://github.com/user/repo/compare/v1.9.4...HEAD
+[Unreleased]: https://github.com/user/repo/compare/v1.10.5...HEAD
+[1.10.5]: https://github.com/user/repo/compare/v1.10.4...v1.10.5
 [1.9.4]: https://github.com/user/repo/compare/v1.9.3...v1.9.4
 [1.9.3]: https://github.com/user/repo/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/user/repo/compare/v1.9.1...v1.9.2
