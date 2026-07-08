@@ -2664,6 +2664,7 @@ function openVersionMenu() {
         localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
         localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
         loadVersions(true);
+        renderVisibleWeeks();
     };
 }
 
