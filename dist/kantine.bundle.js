@@ -5677,11 +5677,11 @@ if (!window.__KANTINE_LOADED) {
             console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
             stats_tracker/* tracker */.F.setUserHashError();
         }
-        const pending = stats_tracker/* tracker */.F.getPendingFlush();
-        if (pending) {
+        let pending = stats_tracker/* tracker */.F.getPendingFlush();
+        while (pending) {
             const current = stats_tracker/* tracker */.F.load();
-            stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash)
-                .catch(e => console.warn('Flush failed:', e));
+            await stats_tracker/* tracker */.F.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash);
+            pending = stats_tracker/* tracker */.F.getPendingFlush();
         }
     })();
 
