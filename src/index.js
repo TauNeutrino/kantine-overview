@@ -37,11 +37,11 @@ if (!window.__KANTINE_LOADED) {
             console.warn('[Stats] computeUserHash failed:', e.message, e.stack);
             tracker.setUserHashError();
         }
-        const pending = tracker.getPendingFlush();
-        if (pending) {
+        let pending = tracker.getPendingFlush();
+        while (pending) {
             const current = tracker.load();
-            tracker.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash)
-                .catch(e => console.warn('Flush failed:', e));
+            await tracker.flushToGist(pending.date, pending.daily, current.user_hash || pending.user_hash);
+            pending = tracker.getPendingFlush();
         }
     })();
 
