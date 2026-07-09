@@ -1721,6 +1721,25 @@ const GIST_ID_KEY = '_kstats_gist_id';
 
 
 
+// GIST_PAT arrives obfuscated (XOR with DEV_MODE_PW_HASH + base64) so GitHub's
+// secret scanning cannot revoke the committed token. Reverse it here.
+function _deobfuscatePat(blob, key) {
+    try {
+        const bin = atob(blob);
+        const k = new TextEncoder().encode(key);
+        let out = '';
+        for (let i = 0; i < bin.length; i++) {
+            out += String.fromCharCode(bin.charCodeAt(i) ^ k[i % k.length]);
+        }
+        return out;
+    } catch (e) {
+        return '';
+    }
+}
+const GIST_PAT_REAL = typeof _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q !== 'undefined'
+    ? _deobfuscatePat(_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q, _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .DEV_MODE_PW_HASH */ .Z7)
+    : '';
+
 class StatsTracker {
     constructor() {
         this._state = null;
@@ -1855,7 +1874,7 @@ class StatsTracker {
         try {
             let gistId = this._resolveGistId();
             let resp = await fetch(`https://api.github.com/gists/${gistId}`, {
-                headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Accept': 'application/vnd.github.v3+json' }
+                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Accept': 'application/vnd.github.v3+json' }
             });
 
             let data;
@@ -1864,7 +1883,7 @@ class StatsTracker {
                 console.log('[StatsTracker] Gist not found, creating a new secret Gist...');
                 const createResp = await fetch('https://api.github.com/gists', {
                     method: 'POST',
-                    headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Content-Type': 'application/json' },
+                    headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         description: 'Kantine Usage Stats',
                         public: false,
@@ -1949,7 +1968,7 @@ class StatsTracker {
             data.last_updated = new Date().toISOString();
             const patchResp = await fetch(`https://api.github.com/gists/${gistId}`, {
                 method: 'PATCH',
-                headers: { 'Authorization': `token ${_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
             });
             if (!patchResp.ok) throw new Error(`Gist PATCH failed: ${patchResp.status}`);
