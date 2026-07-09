@@ -299,7 +299,7 @@ function renderDashboard(data) {
         }
     };
 
-    // ── 1. Line Chart - Feature usage over time ─────────────────────────
+    // ── 1. Stacked Area Chart - Feature usage over time ────────────────
     new Chart(document.getElementById('line-chart'), {
         type: 'line',
         data: {
@@ -308,18 +308,21 @@ function renderDashboard(data) {
                 label: fk,
                 data: days.map(d => data.daily[d][fk] || 0),
                 borderColor: COLORS[i % COLORS.length],
-                backgroundColor: COLORS[i % COLORS.length] + '18',
-                borderWidth: 2,
-                pointRadius: 1.5,
+                backgroundColor: COLORS[i % COLORS.length] + '55',
+                borderWidth: 1.5,
+                pointRadius: 1,
                 pointHitRadius: 8,
                 tension: 0.3,
-                fill: false
+                fill: true
             }))
         },
         options: Object.assign({}, chartOpts, {
             interaction: { intersect: false, mode: 'index' },
             plugins: Object.assign({}, chartOpts.plugins, {
                 legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
+            }),
+            scales: Object.assign({}, chartOpts.scales, {
+                y: Object.assign({}, chartOpts.scales.y, { stacked: true, beginAtZero: true })
             })
         })
     });
