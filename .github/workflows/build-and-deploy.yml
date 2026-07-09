@@ -33,27 +33,21 @@ jobs:
       - name: Copy dashboard into dist
         run: mkdir -p dist/stats && cp -r stats/. dist/stats/
 
-      - name: Commit build artifacts
-        if: github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: update build artifacts for $(cat version.txt | tr -d '[:space:]') [skip ci]"
-            git push origin main
-          fi
-
-      - name: Tag release from version.txt
+      - name: Tag release with build artifacts
         if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           VERSION=$(cat version.txt | tr -d '[:space:]')
           echo "Version from version.txt: $VERSION"
-          # Always point the tag at the commit that contains the built artifacts
-          # (current HEAD = the dist-commit created just above). Rebuilds of the
-          # same version move the tag forward instead of failing.
+
+          git add dist/
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update build artifacts for $VERSION [skip ci]"
+          fi
+
+          # Tag the local commit (with dist/ if changed) and push ONLY the tag.
+          # main itself is never pushed here, so no extra commits appear on the branch.
           if git rev-parse "$VERSION" >/dev/null 2>&1; then
             git tag -f "$VERSION"
             echo "Moved existing tag $VERSION to current commit"
