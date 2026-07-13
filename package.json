@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": ">=24"
+  },
   "devDependencies": {
     "jsdom": "^28.1.0",
     "terser": "^5.39.0",
