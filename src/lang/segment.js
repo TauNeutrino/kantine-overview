@@ -15,7 +15,7 @@ export function segment(normalizedText) {
   }
 
   const courses = [];
-  const parenRegex = /\(([^)]+)\)\s*(?!\s*\/)/g;
+  const parenRegex = /\(([^()]+)\)\s*(?!\s*\/)/g;
   let match;
   let lastScanIndex = 0;
 
