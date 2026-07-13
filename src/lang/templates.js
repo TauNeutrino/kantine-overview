@@ -13,6 +13,30 @@ const TEMPLATES = [
       notes: [],
     },
   },
+  {
+    test: (t) => /^Suppe\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s*\/\s*Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
+  {
+    test: (t) => /^Suppr\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s+Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
 ];
 
 export function matchTemplate(normalizedText) {

@@ -6,6 +6,7 @@ import { splitDishes } from './dishes.js';
 import { scoreSplit } from './score.js';
 import { createLangModel } from './langModel.js';
 import { LANG_MODEL_SEED } from './langModelSeed.js';
+import { alignTrailingEnglish } from './alignTrailing.js';
 
 function stripAllergen(text, allergen) {
     if (!text) return '';
@@ -114,6 +115,7 @@ export function splitLanguage(text, options = {}) {
     const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
 
     let courses = segment(normText);
+    courses = alignTrailingEnglish(courses, langModel);
     courses = repairMergedCourses(courses, langModel);
     courses = peelGluedTailFromUnanchored(courses, langModel);
     courses = peelTrailingMonoCourse(courses);

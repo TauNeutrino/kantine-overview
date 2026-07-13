@@ -116,11 +116,12 @@ try {
       'langModelSeed.js', // no deps — exports LANG_MODEL_SEED
       'langModel.js',     // createLangModel(seed) — seed passed by caller
       'loanwords.js',
+      'alignTrailing.js', // depends: loanwords
       'segment.js',       // depends: normalize
       'boundary.js',      // resolveBoundary(fragment, langModel) — langModel passed in
       'score.js',         // depends: LABELS from types.js
       'dishes.js',
-      'splitter.js',      // depends: normalize, templates, segment, boundary, score, langModel, LANG_MODEL_SEED
+      'splitter.js',      // depends: normalize, templates, segment, boundary, score, langModel, LANG_MODEL_SEED, alignTrailing
     ];
     for (const file of langModules) {
       const code = require('fs').readFileSync(require('path').join(langDir, file), 'utf8');

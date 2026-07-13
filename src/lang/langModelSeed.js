@@ -2,8 +2,8 @@
 // Regenerate via: node tools/train-langmodel.js tests/test_kantine_menuCache.json src/lang/langModelSeed.js (then wrap in export const)
 // @ts-check
 
-export var LANG_MODEL_SEED = {
-  "version": "v1.8.9",
+export const LANG_MODEL_SEED = {
+  "version": "v1.10.6",
   "trigramsDe": {
     "ack": 24,
     "ade": 7,
