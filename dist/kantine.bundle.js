@@ -1235,6 +1235,7 @@ function githubHeaders(etag) {
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   HC: () => (/* binding */ BUNDLED_CSS),
 /* harmony export */   IY: () => (/* binding */ RAW_INSTALLER_BASE),
 /* harmony export */   KJ: () => (/* binding */ GIST_ID),
 /* harmony export */   LS: () => (/* binding */ LS),
@@ -1262,6 +1263,9 @@ const API_BASE = 'https://api.bessa.app/v1';
 /** The client version injected into every API request header. */
 const CLIENT_VERSION = '{{VERSION}}';
 const COMMIT_HASH = '{{COMMIT_HASH}}';
+
+/** CSS content injected at build time; the install-time #kantine-style is replaced by the bundle. */
+const BUNDLED_CSS = '{{CSS}}';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -3673,10 +3677,10 @@ function createDayCard(day) {
             const descText = item.description || '';
             const affinities = heatmapLangModel.scoreCharAffinities(descText);
             const chars = affinities.map(({char, affinity}) => {
-                let cls = 'heatmap-neutral';
-                if (affinity > 0.2) cls = 'heatmap-de';
-                else if (affinity < -0.2) cls = 'heatmap-en';
-                return `<span class="heatmap-char ${cls}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
+                const hue = affinity > 0 ? 210 : 0;
+                const saturation = Math.round(Math.min(80, Math.abs(affinity) * 80));
+                const color = `hsl(${hue}, ${saturation}%, 50%)`;
+                return `<span class="heatmap-char" style="color: ${color}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
             }).join('');
             heatmapHtml = `<div class="heatmap-row">${chars}</div>`;
         }
@@ -4394,7 +4398,7 @@ function segment(normalizedText) {
   }
 
   const courses = [];
-  const parenRegex = /\(([^)]+)\)\s*(?!\s*\/)/g;
+  const parenRegex = /\(([^()]+)\)\s*(?!\s*\/)/g;
   let match;
   let lastScanIndex = 0;
 
@@ -4448,6 +4452,17 @@ function processSegment(segmentText, allergen, anchored) {
     if (ch === '(') parenDepth++;
     else if (ch === ')') parenDepth--;
     else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+  }
+  if (slashIdx === -1 && parenDepth > 0) {
+    const openIdx = textWithoutAllergen.indexOf('(');
+    parenDepth = 0;
+    for (let i = 0; i < textWithoutAllergen.length; i++) {
+      const ch = textWithoutAllergen[i];
+      if (i === openIdx) continue;
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth--;
+      else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+    }
   }
   if (slashIdx !== -1) {
     // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
@@ -5964,6 +5979,17 @@ if (!window.__KANTINE_LOADED) {
     }
 
     window.__KANTINE_LOADED = true;
+
+    // Inject/replace CSS — the install-time style had id="kantine-style";
+    // the bundle replaces it with the bundled (possibly newer) CSS.
+    (function(){
+      var old = document.getElementById('kantine-style');
+      if (old) old.remove();
+      var s = document.createElement('style');
+      s.id = 'kantine-style';
+      s.textContent = constants/* BUNDLED_CSS */.HC;
+      document.head.appendChild(s);
+    })();
 
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');

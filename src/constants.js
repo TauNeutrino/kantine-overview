@@ -11,6 +11,9 @@ export const API_BASE = 'https://api.bessa.app/v1';
 export const CLIENT_VERSION = '{{VERSION}}';
 export const COMMIT_HASH = '{{COMMIT_HASH}}';
 
+/** CSS content injected at build time; the install-time #kantine-style is replaced by the bundle. */
+export const BUNDLED_CSS = '{{CSS}}';
+
 /** Bessa venue ID for Knapp-Kantine. */
 export const VENUE_ID = 591;
 

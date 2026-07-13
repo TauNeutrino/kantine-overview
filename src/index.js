@@ -7,7 +7,7 @@ import { checkForUpdates } from './ui_helpers.js';
 import { authToken } from './state.js';
 import { tracker } from './stats-tracker.js';
 import { computeUserHash } from './stats-hash.js';
-import { GIST_ID, COMMIT_HASH } from './constants.js';
+import { GIST_ID, COMMIT_HASH, BUNDLED_CSS } from './constants.js';
 import { langMode } from './state.js';
 
 if (!window.__KANTINE_LOADED) {
@@ -18,6 +18,17 @@ if (!window.__KANTINE_LOADED) {
     }
 
     window.__KANTINE_LOADED = true;
+
+    // Inject/replace CSS — the install-time style had id="kantine-style";
+    // the bundle replaces it with the bundled (possibly newer) CSS.
+    (function(){
+      var old = document.getElementById('kantine-style');
+      if (old) old.remove();
+      var s = document.createElement('style');
+      s.id = 'kantine-style';
+      s.textContent = BUNDLED_CSS;
+      document.head.appendChild(s);
+    })();
 
     // Stats: baseline metrics
     tracker.increment('starts');

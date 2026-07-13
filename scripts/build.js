@@ -192,16 +192,23 @@ function stepReadAndInject() {
   let COMMIT_HASH = '';
   try { COMMIT_HASH = exec('git rev-parse --short HEAD').trim(); } catch (_) {}
 
+  // Compute escaped CSS for both the runtime bundle and the bookmarklet payload.
+  const CSS_ONE_LINE = CSS
+    .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+    .replace(/\n/g, ' ').replace(/  +/g, ' ');
+  const CSS_ESC = CSS_ONE_LINE.replace(/'/g, "\\'");
+
   const JS_INJECTED = JS_BUNDLE_CONTENT
     .replace(/\{\{VERSION\}\}/g, VERSION)
     .replace(/\{\{COMMIT_HASH\}\}/g, COMMIT_HASH)
+    .replace(/\{\{CSS\}\}/g, CSS_ESC)
     .replace(/\{\{FAVICON_DATA_URI\}\}/g, FAVICON_URL)
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT_OBF)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
     .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT);
 
-  // Defensive guard: no Gist placeholder may survive injection in the shipped bundle.
-  const survivors = ['{{GIST_PAT}}', '{{GIST_ID}}', '{{GIST_SALT}}']
+  // Defensive guard: no placeholder may survive injection in the shipped bundle.
+  const survivors = ['{{GIST_PAT}}', '{{GIST_ID}}', '{{GIST_SALT}}', '{{CSS}}']
     .filter((p) => JS_INJECTED.includes(p));
   if (survivors.length) {
     const msg = `[build] FATAL: placeholder(s) ${survivors.join(', ')} survived injection in the JS bundle. ` +
@@ -216,7 +223,7 @@ function stepReadAndInject() {
     process.exit(1);
   }
 
-  return { VERSION, CSS, FAVICON_URL, JS_INJECTED, MOCK_JS, COMMIT_HASH };
+  return { VERSION, CSS, CSS_ESC, FAVICON_URL, JS_INJECTED, MOCK_JS, COMMIT_HASH };
 }
 
 // ── 6. Standalone HTML ────────────────────────────────────────────────────
@@ -262,11 +269,11 @@ function stepInstaller(ctx) {
     changelogHtml = changelogHtml.replace(/<\/h3>\n?<ul>/g, '</h3><ul>');
   }
 
-  // Build bookmarklet URL for install page
-  const cssInjection =
-    `var s=document.createElement('style');s.textContent='${ctx.CSS_ESC}';document.head.appendChild(s);`;
-  const bookmarkletCode = 'javascript:(function(){' + cssInjection + ctx.JS_MIN + '})();';
-  const encodedUrl = 'javascript:' + encodeURIComponent(bookmarkletCode.slice(11));
+  const encodedUrl = ctx.BOOKMARKLET_URL || (() => {
+    const cssInjection = `var s=document.createElement('style');s.id='kantine-style';s.textContent='${ctx.CSS_ESC}';document.head.appendChild(s);`;
+    const bc = 'javascript:(function(){' + cssInjection + ctx.JS_MIN + '})();';
+    return 'javascript:' + encodeURIComponent(bc.slice(11));
+  })();
 
   const html = `<!DOCTYPE html>
 <html lang="de">
@@ -525,24 +532,148 @@ async function main() {
 
   // 7. Bookmarklet (async inside — use promise)
   const terser = require('terser');
-  const CSS = read(CSS_FILE);
-  const CSS_ONE_LINE = CSS
-    .replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-    .replace(/\n/g, ' ').replace(/  +/g, ' ');
+  const CSS_ESC = ctx.CSS_ESC;
 
   const minifyResult = await terser.minify(ctx.JS_INJECTED, { compress: true, mangle: true });
   if (minifyResult.error) { fail(`Terser: ${minifyResult.error}`); process.exit(1); }
 
   const JS_MIN = minifyResult.code;
-  const CSS_ESC = CSS_ONE_LINE.replace(/'/g, "\\'");
+  const BOOT_VERSION = ctx.VERSION;
+  const VERSION_JSON_URL = 'https://tauneutrino.github.io/kantine-overview/version.json';
+  const CACHE_KEY = '_k_au_cache';
+  const VERSION_KEY = '_k_au_version';
 
   const payload = `javascript:(function(){
 if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
-var s=document.createElement('style');s.textContent='${CSS_ESC}';document.head.appendChild(s);
-var sc=document.createElement('script');
-sc.textContent=${JSON.stringify(JS_MIN)};
-document.head.appendChild(sc);
+
+// ── CSS injection (initial bake — replaced by bundle's BUNDLED_CSS when it loads) ──
+(function(){
+  var s=document.createElement('style');s.id='kantine-style';s.textContent='${CSS_ESC}';document.head.appendChild(s);
+})();
+
+// ── Auto-update bootloader ──
+(async function(){
+  var CURRENT_VER = '${BOOT_VERSION}';
+  var FALLBACK = ${JSON.stringify(JS_MIN)};
+  var CACHE_KEY = '${CACHE_KEY}';
+  var VER_KEY = '${VERSION_KEY}';
+
+  function isNewer(a, b){
+    var va = a.replace(/^v/,'').split('.').map(Number);
+    var vb = b.replace(/^v/,'').split('.').map(Number);
+    for(var i=0;i<Math.max(va.length,vb.length);i++){
+      if((va[i]||0) > (vb[i]||0)) return true;
+      if((va[i]||0) < (vb[i]||0)) return false;
+    }
+    return false;
+  }
+
+  function loadBundle(code){
+    var sc = document.createElement('script');
+    sc.textContent = code;
+    document.head.appendChild(sc);
+  }
+
+  // Cross-browser timeout helper (no AbortSignal.timeout on older browsers)
+  function fetchWithTimeout(url, ms){
+    try {
+      if(typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'){
+        return fetch(url, { signal: AbortSignal.timeout(ms) });
+      }
+    } catch(e){}
+    var ctrl = new AbortController();
+    setTimeout(function(){ ctrl.abort(); }, ms);
+    return fetch(url, { signal: ctrl.signal });
+  }
+
+  // Persist version + bundleUrl + bundleCode to cache for offline use.
+  function cacheVersion(version, bundleUrl, code){
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({
+        version: version,
+        bundleUrl: bundleUrl,
+        bundleCode: code,
+        timestamp: Date.now()
+      }));
+    } catch(e){ /* quota exceeded — code still loads this session, just not persisted */ }
+  }
+
+  // Offline-safe: if a newer bundle's CODE is cached, load it (no network needed).
+  // Returns true if a cached newer bundle was loaded.
+  function tryLoadCachedNewer(){
+    try {
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return false;
+      var c = JSON.parse(raw);
+      if (c && c.bundleCode && c.version && isNewer(c.version, CURRENT_VER)) {
+        try { localStorage.setItem(VER_KEY, c.version); } catch(e){}
+        loadBundle(c.bundleCode);
+        return true;
+      }
+    } catch(e){}
+    return false;
+  }
+
+  // Read cache
+  var cache = null;
+  try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch(e){}
+  var cacheValid = cache && cache.timestamp && (Date.now() - cache.timestamp < 3600000);
+
+  if (cacheValid && cache.version && isNewer(cache.version, CURRENT_VER)) {
+    // Recent cache with a newer version
+    if (cache.bundleCode) {
+      // Code already cached — load offline, no network needed
+      try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
+      loadBundle(cache.bundleCode);
+      return;
+    }
+    // Have URL but not code yet — fetch it, then persist code for offline reuse
+    try {
+      var bResp = await fetchWithTimeout(cache.bundleUrl, 10000);
+      if (bResp.ok) {
+        var newCode = await bResp.text();
+        cacheVersion(cache.version, cache.bundleUrl, newCode);
+        try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
+        loadBundle(newCode);
+        return;
+      }
+    } catch(e) { console.warn('[Kantine] CDN fetch failed, trying cached:', e); }
+    // Fetch failed — use any previously cached code
+    if (tryLoadCachedNewer()) return;
+  } else {
+    // Cache stale / missing / not newer — check live
+    try {
+      var resp = await fetchWithTimeout('${VERSION_JSON_URL}?t=' + Date.now(), 5000);
+      if (resp.ok) {
+        var manifest = await resp.json();
+        if (manifest && manifest.version && manifest.bundleUrl) {
+          if (isNewer(manifest.version, CURRENT_VER)) {
+            var bResp2 = await fetchWithTimeout(manifest.bundleUrl, 10000);
+            if (bResp2.ok) {
+              var newCode2 = await bResp2.text();
+              cacheVersion(manifest.version, manifest.bundleUrl, newCode2);
+              try { localStorage.setItem(VER_KEY, manifest.version); } catch(e){}
+              loadBundle(newCode2);
+              return;
+            }
+          } else {
+            try { localStorage.removeItem(VER_KEY); } catch(e){}
+          }
+        }
+      }
+    } catch(e) { console.warn('[Kantine] Version check failed, trying cached:', e); }
+    // Network failed — fall back to cached newer code if available
+    if (tryLoadCachedNewer()) return;
+  }
+
+  // Final fallback: baked-in bundle
+  try { localStorage.removeItem(VER_KEY); } catch(e){}
+  loadBundle(FALLBACK);
+})();
 })();`;
+
+  const encodedUrl = 'javascript:' + encodeURIComponent(payload.slice(11));
+  ctx.BOOKMARKLET_URL = encodedUrl;
 
   fs.writeFileSync(path.join(DIST, 'bookmarklet-payload.js'), payload);
   ok(`Bookmarklet payload: ${(payload.length / 1024).toFixed(0)} KB`);
@@ -551,7 +682,6 @@ document.head.appendChild(sc);
   fs.writeFileSync(path.join(DIST, 'bookmarklet.txt'), encoded);
   ok(`Bookmarklet URL: ${(encoded.length / 1024).toFixed(0)} KB`);
 
-  ctx.CSS_ESC = CSS_ESC;
   ctx.JS_MIN  = JS_MIN;
   ctx.BOOKMARKLET_SIZE = encoded.length;
   abortIfFailed();
