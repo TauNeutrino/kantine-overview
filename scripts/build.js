@@ -36,6 +36,8 @@ const CHANGELOG_MD = path.join(ROOT, 'changelog.md');
 
 // ── State ──────────────────────────────────────────────────────────────────
 let EXIT_CODE = 0;
+const BASELINE_BOOKMARKLET_SIZE = 286504; // measured after Todos 1+2 (CSS bundling + bootloader)
+const MAX_GROWTH = 6144;
 const log   = (...a) => console.log(...a);
 const warn  = (...a) => console.warn('⚠️ ', ...a);
 const fail  = (...a) => { console.error('❌', ...a); EXIT_CODE = 1; };
@@ -481,9 +483,35 @@ function stepTests(ctx) {
   else { fail('Some tests failed — see above.'); EXIT_CODE = 1; }
 }
 
-// ── 10. Smoke check ─────────────────────────────────────────────────────────
-function stepSmokeCheck(ctx) {
-  log('\n■ Smoke check...');
+// Verify auto-update CDN artifacts: used both before overwriting (to catch
+// corrupted dist files from a previous build) and in the final smoke check.
+function verifyAutoUpdateArtifacts() {
+  const autoBundle = path.join(DIST, 'kantine-auto-update-bundle.js');
+  const verManifest = path.join(DIST, 'version.json');
+
+  if (!exists(autoBundle)) { fail('Auto-update bundle missing'); }
+  else if (fs.statSync(autoBundle).size < 10240) { fail('Auto-update bundle too small (< 10 KB)'); }
+  else {
+    const auContent = read(autoBundle);
+    if (/{{/.test(auContent)) { fail('Auto-update bundle has surviving placeholders'); }
+    else { ok('Auto-update bundle present, no placeholders'); }
+  }
+
+  if (!exists(verManifest)) { fail('Version manifest missing'); }
+  else {
+    try {
+      const v = JSON.parse(read(verManifest));
+      if (!v.version) { fail('Version manifest missing version field'); }
+      else if (!v.bundleUrl) { fail('Version manifest missing bundleUrl field'); }
+      else if (v.version !== read(VERSION_FILE).trim()) { fail('Version manifest version mismatch'); }
+      else { ok('Version manifest valid: ' + v.version); }
+    } catch (e) { fail('Version manifest not valid JSON: ' + e.message); }
+  }
+}
+
+// ── 10. Smoke check + size guard ──────────────────────────────────────────
+function stepSmokeAndSize(ctx) {
+  log('\n■ Smoke check + size guard...');
 
   // Smoke: baked language model in bundle
   const bundleContent = read(JS_BUNDLE);
@@ -492,6 +520,17 @@ function stepSmokeCheck(ctx) {
   } else {
     ok('Smoke check: baked model present in bundle');
   }
+
+  // Size guard: bookmarklet must not grow beyond baseline + MAX_GROWTH
+  const size = ctx.BOOKMARKLET_SIZE || 0;
+  if (size > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {
+    fail(`Size guard: bookmarklet.txt ${size} bytes, growth ${size - BASELINE_BOOKMARKLET_SIZE} > ${MAX_GROWTH}`);
+  } else {
+    ok(`Size guard: ${size} bytes (growth ${size - BASELINE_BOOKMARKLET_SIZE}/${MAX_GROWTH})`);
+  }
+
+  // Auto-update artifacts
+  verifyAutoUpdateArtifacts();
 
   // Gist injection status
   const GP = process.env.GIST_PAT;
@@ -692,6 +731,13 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
 
   // ── Auto-update CDN artifacts ───────────────────────────────────────────
   const AUTO_UPDATE_BUNDLE = path.join(DIST, 'kantine-auto-update-bundle.js');
+
+  // Guard against corrupted existing artifacts before overwriting evidence.
+  if (exists(AUTO_UPDATE_BUNDLE) && exists(path.join(DIST, 'version.json'))) {
+    verifyAutoUpdateArtifacts();
+    abortIfFailed();
+  }
+
   fs.writeFileSync(AUTO_UPDATE_BUNDLE, ctx.JS_INJECTED);
   ok(`Auto-update bundle: ${(ctx.JS_INJECTED.length / 1024).toFixed(0)} KB`);
 
@@ -705,7 +751,7 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
   stepTests(ctx);
 
   // 10. Smoke + size
-  stepSmokeCheck(ctx);
+  stepSmokeAndSize(ctx);
 
   // ── Summary ────────────────────────────────────────────────────────────
   console.log('\n=== Build Complete ===');
