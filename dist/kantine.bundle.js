@@ -1818,6 +1818,15 @@ class StatsTracker {
         this.persist();
     }
 
+    incrementCategory(key, value) {
+        this.load();
+        const safe = String(value).replace(/[^a-zA-Z0-9]/g, '_');
+        const composite = key + '_' + safe;
+        if (!this._state.daily[composite]) this._state.daily[composite] = 0;
+        this._state.daily[composite]++;
+        this.persist();
+    }
+
     set(key, value) {
         this.load();
         this._state.daily[key] = value;
@@ -5662,12 +5671,12 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');
     stats_tracker/* tracker */.F.increment('session_count');
-    stats_tracker/* tracker */.F.set('version', '{{VERSION}}');
+    stats_tracker/* tracker */.F.incrementCategory('version', '{{VERSION}}');
     stats_tracker/* tracker */.F.set('version_commit_hash', constants/* COMMIT_HASH */.X9);
     stats_tracker/* tracker */.F.increment('hour_' + new Date().getHours());
-    stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
-    stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
-    stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
+    stats_tracker/* tracker */.F.incrementCategory('mobile', window.innerWidth < 768);
+    stats_tracker/* tracker */.F.incrementCategory('lang', state/* langMode */.Kl);
+    stats_tracker/* tracker */.F.incrementCategory('logged_in', !!state/* authToken */.gX);
     
     (async () => {
         try {
