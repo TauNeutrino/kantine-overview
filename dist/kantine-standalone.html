@@ -2018,6 +2018,9 @@ body {
 .confidence-low { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
 .confidence-fallback { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
 .confidence-template { background: rgba(52, 152, 219, 0.25); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
+
+.heatmap-row { margin-top: 6px; font-family: monospace; font-size: 0.75em; line-height: 1.4; letter-spacing: 0.5px; word-break: break-all; }
+.heatmap-char { display: inline; }
     </style>
 </head>
 <body>
@@ -2258,7 +2261,7 @@ body {
 /* harmony export */ });
 /* unused harmony exports renderHistory, saveFlags, refreshMenuForDate, pollFlaggedItems, saveHighlightTags, removeHighlightTag, saveMenuCache, updateLastUpdatedTime */
 /* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(930);
 /* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
 /* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
 /* harmony import */ var _ui_helpers_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(842);
@@ -3492,8 +3495,8 @@ function githubHeaders(etag) {
 const API_BASE = 'https://api.bessa.app/v1';
 
 /** The client version injected into every API request header. */
-const CLIENT_VERSION = 'v1.10.5';
-const COMMIT_HASH = 'dabccb4';
+const CLIENT_VERSION = 'v1.10.11';
+const COMMIT_HASH = 'bbf0359';
 
 /** Bessa venue ID for Knapp-Kantine. */
 const VENUE_ID = 591;
@@ -3866,1777 +3869,12 @@ function getUILang() {
 
 /***/ },
 
-/***/ 901
+/***/ 152
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   BT: () => (/* binding */ currentWeekNumber),
-/* harmony export */   BY: () => (/* binding */ userFlags),
-/* harmony export */   K8: () => (/* binding */ pollIntervalId),
-/* harmony export */   Kl: () => (/* binding */ langMode),
-/* harmony export */   L: () => (/* binding */ orderMap),
-/* harmony export */   Ny: () => (/* binding */ currentUser),
-/* harmony export */   O5: () => (/* binding */ setAuthToken),
-/* harmony export */   UD: () => (/* binding */ setLangMode),
-/* harmony export */   Xt: () => (/* binding */ setCurrentWeekNumber),
-/* harmony export */   cc: () => (/* binding */ setPollIntervalId),
-/* harmony export */   di: () => (/* binding */ setOrderMap),
-/* harmony export */   gX: () => (/* binding */ authToken),
-/* harmony export */   iw: () => (/* binding */ setHighlightTags),
-/* harmony export */   lt: () => (/* binding */ setCurrentUser),
-/* harmony export */   pK: () => (/* binding */ setCurrentYear),
-/* harmony export */   p_: () => (/* binding */ allWeeks),
-/* harmony export */   qo: () => (/* binding */ setDisplayMode),
-/* harmony export */   sw: () => (/* binding */ displayMode),
-/* harmony export */   tn: () => (/* binding */ setAllWeeks),
-/* harmony export */   vW: () => (/* binding */ currentYear),
-/* harmony export */   yz: () => (/* binding */ highlightTags)
+/* harmony export */   C: () => (/* binding */ createLangModel)
 /* harmony export */ });
-/* unused harmony export setUserFlags */
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(160);
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(521);
-
-
-
-let allWeeks = [];
-let currentWeekNumber = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getISOWeek */ .sn)(new Date());
-let currentYear = new Date().getFullYear();
-let displayMode = 'this-week';
-let authToken = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.AUTH_TOKEN);
-let currentUser = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.CURRENT_USER);
-let orderMap = new Map();
-let userFlags = new Set(JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.FLAGS) || '[]'));
-let pollIntervalId = null;
-let langMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.LANG) || 'de';
-let highlightTags = JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.HIGHLIGHT_TAGS) || '[]');
-
-function setAllWeeks(weeks) { allWeeks = weeks; }
-function setCurrentWeekNumber(week) { currentWeekNumber = week; }
-function setCurrentYear(year) { currentYear = year; }
-function setAuthToken(token) { authToken = token; }
-function setCurrentUser(user) { currentUser = user; }
-function setOrderMap(map) { orderMap = map; }
-function setUserFlags(flags) { userFlags = flags; }
-function setPollIntervalId(id) { pollIntervalId = id; }
-function setHighlightTags(tags) { highlightTags = tags; }
-
-/** Only 'this-week' and 'next-week' are valid display modes. */
-function setDisplayMode(mode) {
-    if (mode !== 'this-week' && mode !== 'next-week') {
-        console.warn(`[state] Invalid displayMode: "${mode}". Ignoring.`);
-        return;
-    }
-    displayMode = mode;
-}
-
-/** Only 'de', 'en', and 'all' are valid language modes. */
-function setLangMode(lang) {
-    if (!['de', 'en', 'all'].includes(lang)) {
-        console.warn(`[state] Invalid langMode: "${lang}". Ignoring.`);
-        return;
-    }
-    langMode = lang;
-}
-
-
-/***/ },
-
-/***/ 618
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   F: () => (/* binding */ tracker)
-/* harmony export */ });
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
-const STORAGE_KEY = '_kstats_state';
-const GIST_ID_KEY = '_kstats_gist_id';
-
-
-
-// GIST_PAT arrives obfuscated (XOR with DEV_MODE_PW_HASH + base64) so GitHub's
-// secret scanning cannot revoke the committed token. Reverse it here.
-function _deobfuscatePat(blob, key) {
-    try {
-        const bin = atob(blob);
-        const k = new TextEncoder().encode(key);
-        let out = '';
-        for (let i = 0; i < bin.length; i++) {
-            out += String.fromCharCode(bin.charCodeAt(i) ^ k[i % k.length]);
-        }
-        return out;
-    } catch (e) {
-        return '';
-    }
-}
-const GIST_PAT_REAL = typeof _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q !== 'undefined'
-    ? _deobfuscatePat(_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q, _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .DEV_MODE_PW_HASH */ .Z7)
-    : '';
-
-class StatsTracker {
-    constructor() {
-        this._state = null;
-    }
-
-    _getToday() {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    _freshState(today) {
-        return {
-            date: today,
-            daily: {},
-            user_hash: null,
-            session: { start_ms: Date.now() },
-            has_flushed: false,
-            pendingFlush: null,
-            pendingFlushes: []
-        };
-    }
-
-    load() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const today = this._getToday();
-
-        if (raw) {
-            try {
-                const parsed = JSON.parse(raw);
-                this._state = {
-                    date: parsed.date || today,
-                    daily: parsed.daily || {},
-                    user_hash: parsed.user_hash || null,
-                    session: parsed.session || { start_ms: Date.now() },
-                    has_flushed: parsed.has_flushed || false,
-                    pendingFlush: null,
-                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : [])
-                };
-            } catch (e) {
-                this._state = this._freshState(today);
-            }
-        } else {
-            this._state = this._freshState(today);
-        }
-
-        if (this._state.date !== today) {
-            this._state.pendingFlushes.push({
-                date: this._state.date,
-                daily: { ...this._state.daily },
-                user_hash: this._state.user_hash
-            });
-            this._state.daily = {};
-            this._state.session = { start_ms: Date.now() };
-            this._state.date = today;
-            this._state.has_flushed = false;
-            this.persist();
-        }
-
-        return this._state;
-    }
-
-    persist() {
-        if (!this._state) this.load();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
-    }
-
-    increment(key) {
-        this.load();
-        if (!this._state.daily[key]) this._state.daily[key] = 0;
-        this._state.daily[key]++;
-        this.persist();
-    }
-
-    incrementValue(key, val) {
-        this.load();
-        this._state.daily[key] = (this._state.daily[key] || 0) + val;
-        this.persist();
-    }
-
-    set(key, value) {
-        this.load();
-        this._state.daily[key] = value;
-        this.persist();
-    }
-
-    setUserHash(hash) {
-        this.load();
-        this._state.user_hash = hash;
-        this.persist();
-    }
-
-    setUserHashError() {
-        this.load();
-        this._state.user_hash = null;
-        this.persist();
-    }
-
-    reset() {
-        this._state = this._freshState(this._getToday());
-        localStorage.removeItem(STORAGE_KEY);
-    }
-
-    getLocalStats() {
-        this.load();
-        return { ...this._state.daily };
-    }
-
-    getPendingFlush() {
-        this.load();
-        const list = this._state.pendingFlushes;
-        return list.length > 0 ? { ...list[0] } : null;
-    }
-
-    markFlushed() {
-        this.load();
-        this._state.has_flushed = true;
-        this._state.pendingFlush = null;
-        if (this._state.pendingFlushes.length > 0) {
-            this._state.pendingFlushes.shift();
-        }
-        this.persist();
-    }
-
-    _resolveGistId() {
-        return localStorage.getItem(GIST_ID_KEY) || _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ;
-    }
-
-    _saveGistId(id) {
-        localStorage.setItem(GIST_ID_KEY, id);
-    }
-
-    async flushToGist(pendingDate, pendingDaily, pendingUserHash) {
-        try {
-            let gistId = this._resolveGistId();
-            let resp = await fetch(`https://api.github.com/gists/${gistId}`, {
-                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Accept': 'application/vnd.github.v3+json' }
-            });
-
-            let data;
-            if (resp.status === 404 && !localStorage.getItem(GIST_ID_KEY)) {
-                // Gist doesn't exist and we haven't saved an ID yet — auto-create
-                console.log('[StatsTracker] Gist not found, creating a new secret Gist...');
-                const createResp = await fetch('https://api.github.com/gists', {
-                    method: 'POST',
-                    headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        description: 'Kantine Usage Stats',
-                        public: false,
-                        files: { 'stats.json': { content: '{}' } }
-                    })
-                });
-                if (!createResp.ok) throw new Error(`Gist CREATE failed: ${createResp.status}`);
-                const created = await createResp.json();
-                gistId = created.id;
-                this._saveGistId(gistId);
-                data = {};
-                console.log('[StatsTracker] Created Gist:', gistId);
-            } else if (!resp.ok) {
-                throw new Error(`Gist GET failed: ${resp.status}`);
-            } else {
-                const gist = await resp.json();
-                data = JSON.parse(gist.files['stats.json'].content);
-            }
-
-            // Track daily unique users via stable user hash
-            const dayKey = pendingDate;
-            if (!data.daily) data.daily = {};
-            if (!data.daily[dayKey]) data.daily[dayKey] = {};
-            const day = data.daily[dayKey];
-            // Self-contained day metadata
-            day.date = pendingDate;
-            if (pendingUserHash) {
-                day.user_hash = pendingUserHash;
-            }
-            if (!day.seen_hashes) day.seen_hashes = [];
-            if (!day.unique_today) day.unique_today = 0;
-
-            if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
-                day.seen_hashes.push(pendingUserHash);
-                day.unique_today++;
-            }
-
-            for (const [key, val] of Object.entries(pendingDaily)) {
-                if (key.endsWith('_sum') || key.endsWith('_count')) continue;
-                if (typeof val === 'number') {
-                    day[key] = (day[key] || 0) + val;
-                } else {
-                    day[key] = val;
-                }
-            }
-
-            // Compute averages from sum/count pairs
-            const AVG_PAIRS = [
-                { sum: 'session_duration_sum', count: 'session_duration_count', avg: 'session_duration_avg' },
-                { sum: 'load_time_sum', count: 'load_time_count', avg: 'load_time_avg' },
-                { sum: 'api_latency_sum', count: 'api_latency_count', avg: 'api_latency_avg' },
-            ];
-            for (const pair of AVG_PAIRS) {
-                const sum = pendingDaily[pair.sum];
-                const count = pendingDaily[pair.count];
-                if (typeof sum === 'number' && typeof count === 'number' && count > 0) {
-                    const oldCount = day[pair.count] || 0;
-                    const oldAvg = day[pair.avg] || 0;
-                    day[pair.avg] = (oldAvg * oldCount + sum) / (oldCount + count);
-                    day[pair.count] = oldCount + count;
-                }
-            }
-
-            // Track all-time unique users
-            if (pendingUserHash) {
-                if (!data.all_time) data.all_time = {};
-                if (!data.all_time.unique_hashes) data.all_time.unique_hashes = [];
-                if (!data.all_time.unique_users) data.all_time.unique_users = 0;
-                if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
-                    data.all_time.unique_hashes.push(pendingUserHash);
-                    data.all_time.unique_users++;
-                }
-            }
-
-            const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
-            for (const dk of Object.keys(data.daily)) {
-                if (dk < thirtyDaysAgo && data.daily[dk].seen_hashes) {
-                    delete data.daily[dk].seen_hashes;
-                }
-            }
-
-            data.last_updated = new Date().toISOString();
-            const patchResp = await fetch(`https://api.github.com/gists/${gistId}`, {
-                method: 'PATCH',
-                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
-            });
-            if (!patchResp.ok) throw new Error(`Gist PATCH failed: ${patchResp.status}`);
-
-            this.markFlushed();
-        } catch (e) {
-            console.warn('[StatsTracker] Flush failed:', e.message);
-        }
-    }
-}
-
-const tracker = new StatsTracker();
-
-
-/***/ },
-
-/***/ 842
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Gk: () => (/* binding */ openVersionMenu),
-/* harmony export */   Mb: () => (/* binding */ updateAlarmBell),
-/* harmony export */   OR: () => (/* binding */ renderVisibleWeeks),
-/* harmony export */   Ux: () => (/* binding */ checkForUpdates),
-/* harmony export */   gJ: () => (/* binding */ updateNextWeekBadge),
-/* harmony export */   showErrorModal: () => (/* binding */ showErrorModal),
-/* harmony export */   wy: () => (/* binding */ syncMenuItemHeights)
-/* harmony export */ });
-/* unused harmony exports createDayCard, fetchVersions, openInstallPage, updateCountdown, removeCountdown */
-/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(160);
-/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
-/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
-/* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(367);
-/* harmony import */ var _i18n_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(646);
-
-
-
-
-
-
-
-/**
- * Updates the "Next Week" button tooltip and glow state.
- * Tooltip shows order status summary and highlight count.
- * Glow activates only if Mon-Thu have orderable menus without orders (Friday exempt).
- */
-function updateNextWeekBadge() {
-    const btnNextWeek = document.getElementById('btn-next-week');
-    let nextWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT + 1;
-    let nextYear = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentYear */ .vW;
-    if (nextWeek > 52) { nextWeek = 1; nextYear++; }
-
-    const nextWeekData = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.find(w => w.weekNumber === nextWeek && w.year === nextYear);
-    let totalDataCount = 0;
-    let orderableCount = 0;
-    let daysWithOrders = 0;
-    let monThuOrderableNoOrder = 0;
-
-    if (nextWeekData && nextWeekData.days) {
-        nextWeekData.days.forEach(day => {
-            if (day.items && day.items.length > 0) {
-                totalDataCount++;
-                const isOrderable = day.items.some(item => item.available);
-                if (isOrderable) orderableCount++;
-
-                let hasOrder = false;
-                day.items.forEach(item => {
-                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-                    const key = `${day.date}_${articleId}`;
-                    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(key) && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(key).length > 0) hasOrder = true;
-                });
-
-                if (hasOrder) daysWithOrders++;
-
-                // Feature 5: Only Mon(1)-Thu(4) count for glow logic, Friday(5) is exempt
-                const dayOfWeek = new Date(day.date).getDay();
-                if (dayOfWeek >= 1 && dayOfWeek <= 4 && isOrderable && !hasOrder) {
-                    monThuOrderableNoOrder++;
-                }
-            }
-        });
-    }
-
-    // Remove any old visible badge element (Feature 3: numbers hidden)
-    const existingBadge = btnNextWeek.querySelector('.nav-badge');
-    if (existingBadge) existingBadge.remove();
-
-    if (totalDataCount > 0) {
-        // Count highlight menus in next week
-        let highlightCount = 0;
-        if (nextWeekData && nextWeekData.days) {
-            nextWeekData.days.forEach(day => {
-                day.items.forEach(item => {
-                    const nameMatches = (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.name);
-                    const descMatches = (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.description);
-                    if (nameMatches.length > 0 || descMatches.length > 0) {
-                        highlightCount++;
-                    }
-                });
-            });
-        }
-
-        // Feature 3: All info goes to button tooltip instead of visible badge
-        let tooltipParts = [`${daysWithOrders} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrdered')} / ${orderableCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrderable')} / ${totalDataCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeTotal')}`];
-        if (highlightCount > 0) {
-            tooltipParts.push(`${highlightCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeHighlights')}`);
-        }
-        btnNextWeek.title = tooltipParts.join(' • ');
-
-        // Feature 5: Glow only if Mon-Thu have orderable days without existing orders
-        if (monThuOrderableNoOrder > 0) {
-            btnNextWeek.classList.add('new-week-available');
-            const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
-            if (!localStorage.getItem(storageKey)) {
-                localStorage.setItem(storageKey, 'true');
-                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .showToast */ .P0)((0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'), 'info');
-                if (Notification.permission === 'granted') {
-                    new Notification('Kantine Wrapper', {
-                        body: (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'),
-                        icon: '🍽️'
-                    });
-                } else if (Notification.permission === 'default') {
-                    Notification.requestPermission();
-                }
-            }
-        } else {
-            btnNextWeek.classList.remove('new-week-available');
-        }
-    } else {
-        btnNextWeek.title = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeekTooltipDefault');
-        btnNextWeek.classList.remove('new-week-available');
-    }
-}
-
-
-function renderVisibleWeeks() {
-    const menuContainer = document.getElementById('menu-container');
-    if (!menuContainer) return;
-
-    // Save scroll position before DOM wipe — .days-grid is the scroll container
-    const oldGrid = menuContainer.querySelector('.days-grid');
-    const savedScrollTop = oldGrid ? oldGrid.scrollTop : 0;
-
-    menuContainer.innerHTML = '';
-
-    let targetWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT;
-    let targetYear = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentYear */ .vW;
-
-    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'next-week') {
-        targetWeek++;
-        if (targetWeek > 52) { targetWeek = 1; targetYear++; }
-    }
-
-    const allDays = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.flatMap(w => w.days || []);
-    const daysInTargetWeek = allDays.filter(day => {
-        const d = new Date(day.date);
-        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getISOWeek */ .sn)(d) === targetWeek && (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getWeekYear */ .Ao)(d) === targetYear;
-    });
-
-    if (daysInTargetWeek.length === 0) {
-        menuContainer.innerHTML = `
-            <div class="empty-state">
-                <p>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuData')} ${targetWeek} (${targetYear}).</p>
-                <small>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuDataHint')}</small>
-            </div>`;
-        return;
-    }
-
-
-    const headerWeekInfo = document.getElementById('header-week-info');
-    const weekTitle = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'this-week' ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('thisWeek') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeek');
-    headerWeekInfo.innerHTML = `
-        <div class="header-week-title">${weekTitle}</div>
-        <div class="header-week-subtitle">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('weekLabel')} ${targetWeek} • ${targetYear}</div>`;
-
-    const grid = document.createElement('div');
-    grid.className = 'days-grid';
-
-    daysInTargetWeek.sort((a, b) => a.date.localeCompare(b.date));
-
-    const workingDays = daysInTargetWeek.filter(d => {
-        const date = new Date(d.date);
-        const day = date.getDay();
-        return day !== 0 && day !== 6;
-    });
-
-    workingDays.forEach(day => {
-        const card = createDayCard(day);
-        if (card) grid.appendChild(card);
-    });
-
-    menuContainer.appendChild(grid);
-
-    // Restore scroll position on the new .days-grid
-    if (savedScrollTop > 0) grid.scrollTop = savedScrollTop;
-
-    setTimeout(() => syncMenuItemHeights(grid), 0);
-}
-
-function syncMenuItemHeights(grid) {
-    const cards = grid.querySelectorAll('.menu-card');
-    if (cards.length === 0) return;
-
-    // 1. Gather all menu-item groups (rows) across cards
-    const itemRows = [];
-    let maxItems = 0;
-
-    const cardItems = Array.from(cards).map(card => {
-        const items = Array.from(card.querySelectorAll('.menu-item'));
-        maxItems = Math.max(maxItems, items.length);
-        return items;
-    });
-
-    for (let i = 0; i < maxItems; i++) {
-        // Collect i-th item from each card (forming a "row")
-        itemRows[i] = cardItems.map(items => items[i]).filter(item => !!item);
-    }
-
-    // 2. Batch Reset (Write phase) - clear old heights to let them flow naturally
-    itemRows.flat().forEach(item => {
-        item.style.height = 'auto';
-    });
-
-    // 3. Batch Read (Read phase) - measure all heights in one pass to avoid layout thrashing
-    const rowMaxHeights = itemRows.map(row => {
-        return Math.max(...row.map(item => item.offsetHeight));
-    });
-
-    // 4. Batch Apply (Write phase) - set synchronized heights
-    itemRows.forEach((row, i) => {
-        const height = `${rowMaxHeights[i]}px`;
-        row.forEach(item => {
-            item.style.height = height;
-        });
-    });
-}
-
-function createDayCard(day) {
-    if (!day.items || day.items.length === 0) return null;
-
-    const card = document.createElement('div');
-    card.className = 'menu-card';
-
-    const now = new Date();
-    const cardDate = new Date(day.date);
-
-    let isPastCutoff = false;
-    if (day.orderCutoff) {
-        isPastCutoff = now >= new Date(day.orderCutoff);
-    } else {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const cd = new Date(day.date);
-        cd.setHours(0, 0, 0, 0);
-        isPastCutoff = cd < today;
-    }
-
-    if (isPastCutoff) card.classList.add('past-day');
-
-    const menuBadges = [];
-    if (day.items) {
-        day.items.forEach(item => {
-            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-            const orderKey = `${day.date}_${articleId}`;
-            const orders = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(orderKey) || [];
-            const count = orders.length;
-
-            if (count > 0) {
-                const match = item.name.match(/([M][1-9][Ff]?)/);
-                if (match) {
-                    let code = match[1];
-                    if (count > 1) code += '+';
-                    menuBadges.push(code);
-                }
-            }
-        });
-    }
-
-    const header = document.createElement('div');
-    header.className = 'card-header';
-    const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-
-    const badgesHtml = menuBadges.reduce((acc, code) => acc + `<span class="menu-code-badge">${code}</span>`, '');
-
-    let headerClass = '';
-    const hasAnyOrder = day.items && day.items.some(item => {
-        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-        const key = `${day.date}_${articleId}`;
-        return _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(key) && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(key).length > 0;
-    });
-
-    const hasOrderable = day.items && day.items.some(item => item.available);
-
-    if (hasAnyOrder) {
-        headerClass = 'header-violet';
-    } else if (hasOrderable && !isPastCutoff) {
-        headerClass = 'header-green';
-    } else {
-        headerClass = 'header-red';
-    }
-
-    if (headerClass) header.classList.add(headerClass);
-
-    header.innerHTML = `
-        <div class="day-header-left">
-            <span class="day-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .translateDay */ .FS)(day.weekday)}</span>
-            <div class="day-badges">${badgesHtml}</div>
-        </div>
-        <span class="day-date">${dateStr}</span>`;
-    card.appendChild(header);
-
-    const body = document.createElement('div');
-    body.className = 'card-body';
-
-    const todayDateStr = new Date().toISOString().split('T')[0];
-    const isToday = day.date === todayDateStr;
-
-    const sortedItems = [...day.items].sort((a, b) => {
-        if (isToday) {
-            const aId = a.articleId || parseInt(a.id.split('_')[1]);
-            const bId = b.articleId || parseInt(b.id.split('_')[1]);
-            const aOrdered = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(`${day.date}_${aId}`);
-            const bOrdered = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(`${day.date}_${bId}`);
-
-            if (aOrdered && !bOrdered) return -1;
-            if (!aOrdered && bOrdered) return 1;
-        }
-        return a.name.localeCompare(b.name);
-    });
-
-    sortedItems.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'menu-item';
-
-        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
-        const orderKey = `${day.date}_${articleId}`;
-        const orderIds = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(orderKey) || [];
-        const orderCount = orderIds.length;
-
-        const dm = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
-
-        const isLowStock = item.available && item.amountTracking
-            && typeof item.availableAmount === 'number'
-            && item.availableAmount > 0 && item.availableAmount < 10;
-
-        // Normal mode deliberately hides the Stückzahl; dev mode shows it.
-        // Stock below 10 switches to the "wenig verfügbar" label + green-yellow color.
-        let statusBadge = '';
-        if (!item.available) {
-            statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
-        } else if (isLowStock) {
-            statusBadge = dm
-                ? `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`
-                : `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('lowStock')}</span>`;
-        } else if (!item.amountTracking) {
-            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
-        } else if (dm) {
-            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`;
-        } else {
-            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
-        }
-
-        const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
-        const lbl = split.label || 'fallback';
-        
-        let dTitle = '';
-        if (lbl !== 'high' && lbl !== 'template') {
-            dTitle = ` title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}"`;
-        }
-
-        let cBadge = '';
-        if (dm) {
-            const c = split.confidence ?? 0;
-            const s = split.subScores || {};
-            const tp = `Split confidence: score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
-            cBadge = `<span class="badge confidence-badge confidence-${lbl}" title="${tp}">${lbl}</span>`;
-        }
-
-        let orderedBadge = '';
-        if (orderCount > 0) {
-            const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
-            orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('ordered')}${countBadge}</span>`;
-            itemEl.classList.add('ordered');
-            if (new Date(day.date).toDateString() === now.toDateString()) {
-                itemEl.classList.add('today-ordered');
-            }
-        }
-
-        const flagId = `${day.date}_${articleId}`;
-        const isFlagged = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(flagId);
-        if (isFlagged) {
-            itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
-        }
-
-        const matchedTags = [...new Set([...(0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.name), ...(0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.description)])];
-        if (matchedTags.length > 0) {
-            itemEl.classList.add('highlight-glow');
-        }
-
-        let orderButton = '';
-        let cancelButton = '';
-        let flagButton = '';
-
-        if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX && !isPastCutoff) {
-            const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
-            const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
-            const flagTitle = isFlagged ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagDeactivate') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagActivate');
-            if (!item.available || isFlagged) {
-                flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
-            }
-
-            if (item.available) {
-                if (orderCount > 0) {
-                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
-                } else {
-                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
-                }
-            }
-
-            if (orderCount > 0) {
-                const cancelIcon = orderCount === 1 ? 'close' : 'remove';
-                const cancelTitle = orderCount === 1 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOrder') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOneOrder');
-                cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
-            }
-        }
-
-        let tagsHtml = '';
-        if (matchedTags.length > 0) {
-            const badges = matchedTags.reduce((acc, t) => acc + `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`, '');
-            tagsHtml = `<div class="matched-tags">${badges}</div>`;
-        }
-
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))} ${cBadge}</p></div>`;
-
-        const orderBtn = itemEl.querySelector('.btn-order');
-        if (orderBtn) {
-            orderBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                btn.disabled = true;
-                btn.classList.add('loading');
-                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .placeOrder */ .wH)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, parseFloat(btn.dataset.price), btn.dataset.desc || '')
-                    .finally(() => { btn.disabled = false; btn.classList.remove('loading'); });
-            });
-        }
-
-        const cancelBtn = itemEl.querySelector('.btn-cancel');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                btn.disabled = true;
-                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .cancelOrder */ .N4)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name)
-                    .finally(() => { btn.disabled = false; });
-            });
-        }
-
-        const flagBtn = itemEl.querySelector('.btn-flag');
-        if (flagBtn) {
-            flagBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const btn = e.currentTarget;
-                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .toggleFlag */ .PQ)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
-            });
-        }
-
-        body.appendChild(itemEl);
-    });
-
-    card.appendChild(body);
-    return card;
-}
-
-async function fetchVersions(devMode) {
-    const endpoint = devMode
-        ? `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/tags?per_page=20`
-        : `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/releases?per_page=20`;
-
-    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost
-    const storedEtag = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
-    const resp = await fetch(endpoint, { headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .githubHeaders */ .O)(storedEtag) });
-
-    // 304 Not Modified — content unchanged, skip processing
-    if (resp.status === 304) return null;
-
-    if (!resp.ok) {
-        if (resp.status === 403) {
-            throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
-        }
-        throw new Error(`GitHub API ${resp.status}`);
-    }
-
-    // Persist new ETag for next conditional request
-    const newEtag = resp.headers.get('ETag');
-    if (newEtag) localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG, newEtag);
-
-    const data = await resp.json();
-
-    return data.map(item => {
-        const tag = devMode ? item.name : item.tag_name;
-        return {
-            tag,
-            name: devMode ? tag : (item.name || tag),
-            // Raw content URL: fetched as blob to bypass firewall blocking htmlpreview
-            rawUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .RAW_INSTALLER_BASE */ .IY}/${tag}/dist/install.html`,
-            // GitHub file browser URL: opened directly in new tab
-            githubUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_FILE_BASE */ .fK}/${tag}/dist/install.html`,
-            body: item.body || ''
-        };
-    });
-}
-
-/**
- * Fetches an install.html from raw GitHub content and opens it as a Blob URL.
- * Falls back to opening the raw URL directly if fetch fails.
- * @param {string} rawUrl - The raw.githubusercontent.com URL of the installer HTML.
- */
-async function openInstallPage(rawUrl) {
-    try {
-        const resp = await fetch(rawUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const html = await resp.text();
-        const blob = new Blob([html], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        const win = window.open(blobUrl, '_blank');
-        if (!win) throw new Error('Popup blocked');
-        // Revoke blob URL after 5 minutes to free memory
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5 * 60 * 1000);
-    } catch (e) {
-        console.warn('[Kantine] Blob open failed, falling back to raw URL:', e);
-        window.open(rawUrl, '_blank');
-    }
-}
-
-async function checkForUpdates() {
-    const currentVersion = 'v1.10.5';
-    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
-
-    // Cache-first: use cached versions if ≤1h old to avoid hitting GitHub API rate limit
-    const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
-    if (cachedRaw) {
-        try {
-            const cached = JSON.parse(cachedRaw);
-            if (cached && cached.timestamp && cached.devMode === devMode && cached.versions && cached.versions.length) {
-                const age = Date.now() - cached.timestamp;
-                if (age < 60 * 60 * 1000) {
-                    const latest = cached.versions[0].tag;
-                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) {
-                        showUpdateBadge(cached.versions[0]);
-                    }
-                    return; // skip API call entirely
-                }
-            }
-        } catch (_) {}
-    }
-
-    try {
-        const versions = await fetchVersions(devMode);
-        if (!versions || !versions.length) return;
-
-        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
-            timestamp: Date.now(), devMode, versions
-        }));
-
-        const latest = versions[0].tag;
-
-        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) return;
-
-        showUpdateBadge(versions[0]);
-    } catch (e) {
-        console.warn('[Kantine] Version check failed:', e);
-    }
-}
-
-/** Helper: show/cache the 🆕 badge in the header. Extracted so cache-first path can also show it. */
-function showUpdateBadge(version) {
-    const headerTitle = document.querySelector('.header-left h1');
-    if (headerTitle && !headerTitle.querySelector('.update-icon')) {
-        const icon = document.createElement('span');
-        icon.className = 'update-icon';
-        icon.role = 'button';
-        icon.innerHTML = '🆕';
-        icon.title = `Update: ${version.tag} — Klick zum Installieren`;
-        icon.addEventListener('click', () => openInstallPage(version.rawUrl));
-        headerTitle.appendChild(icon);
-    }
-}
-
-function openVersionMenu() {
-    const modal = document.getElementById('version-modal');
-    const container = document.getElementById('version-list-container');
-    const devToggle = document.getElementById('dev-mode-toggle');
-    const currentVersion = 'v1.10.5';
-
-    if (!modal) return;
-    modal.classList.remove('hidden');
-
-    const cur = document.getElementById('version-current');
-    if (cur) cur.textContent = currentVersion;
-
-    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
-    devToggle.checked = devMode;
-
-    async function loadVersions(forceRefresh) {
-        const dm = devToggle.checked;
-        container.innerHTML = '<p style="color:var(--text-secondary);">Lade Versionen...</p>';
-
-        function renderVersionsList(versions) {
-            if (!versions || !versions.length) {
-                container.innerHTML = '<p style="color:var(--text-secondary);">Keine Versionen gefunden.</p>';
-                return;
-            }
-
-            container.innerHTML = '<ul class="version-list"></ul>';
-            const list = container.querySelector('.version-list');
-
-            versions.forEach(v => {
-                const isCurrent = v.tag === currentVersion;
-                const isNew = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(v.tag, currentVersion);
-                const li = document.createElement('li');
-                li.className = 'version-item' + (isCurrent ? ' current' : '');
-
-                let badge = '';
-                if (isCurrent) badge = '<span class="badge-current">✓ Installiert</span>';
-                else if (isNew) badge = '<span class="badge-new">⬆ Neu!</span>';
-
-                li.innerHTML = `
-                    <div class="version-info">
-                        <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
-                        ${badge}
-                    </div>
-                    <div class="version-actions">
-                        <button class="btn-install-raw"
-                            data-raw-url="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.rawUrl)}"
-                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren (laedt Install-Seite aus GitHub Raw-Content)">
-                            Installieren
-                        </button>
-                        <a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.githubUrl)}" target="_blank" class="btn-github-link"
-                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} auf GitHub ansehen">
-                            &rarr; Github
-                        </a>
-                    </div>
-                `;
-
-                // Attach click handler for Blob-based install
-                const installBtn = li.querySelector('.btn-install-raw');
-                if (installBtn) {
-                    installBtn.addEventListener('click', () => {
-                        openInstallPage(installBtn.dataset.rawUrl);
-                    });
-                }
-
-                list.appendChild(li);
-            });
-        }
-
-        try {
-            const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
-            let cached = null;
-            if (cachedRaw) {
-                try { cached = JSON.parse(cachedRaw); } catch (e) { }
-            }
-
-            if (cached && cached.devMode === dm && cached.versions) {
-                renderVersionsList(cached.versions);
-            }
-
-            const liveVersions = await fetchVersions(dm);
-            if (liveVersions !== null) {
-                const liveVersionsStr = JSON.stringify(liveVersions);
-                const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
-
-                if (liveVersionsStr !== cachedVersionsStr) {
-                    localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
-                        timestamp: Date.now(), devMode: dm, versions: liveVersions
-                    }));
-                    renderVersionsList(liveVersions);
-                }
-            }
-
-        } catch (e) {
-            container.innerHTML = `<p style="color:#e94560;">Fehler: ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(e.message)}</p>`;
-        }
-    }
-
-    loadVersions(false);
-
-    devToggle.onchange = async () => {
-        if (devToggle.checked) {
-            const promptText = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'Dev-Mode password:' : 'Dev-Mode Passwort:';
-            const entered = prompt(promptText);
-            if (entered === null) {
-                devToggle.checked = false;
-                console.warn('[Kantine] Dev-Mode activation cancelled.');
-                return;
-            }
-            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(entered));
-            const hashHex = Array.from(new Uint8Array(hashBuffer))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
-            if (hashHex !== _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .DEV_MODE_PW_HASH */ .Z7) {
-                devToggle.checked = false;
-                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
-                console.warn('[Kantine] Dev-Mode activation rejected: wrong password.');
-                return;
-            }
-            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'true');
-        } else {
-            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
-        }
-        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
-        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
-        loadVersions(true);
-        renderVisibleWeeks();
-    };
-}
-
-function updateCountdown() {
-    if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny) {
-        removeCountdown();
-        return;
-    }
-
-    const now = new Date();
-    const currentDay = now.getDay();
-    if (currentDay === 0 || currentDay === 6) {
-        removeCountdown();
-        return;
-    }
-
-    const todayStr = now.toISOString().split('T')[0];
-
-    let hasOrder = false;
-    for (const key of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.keys()) {
-        if (key.startsWith(todayStr)) {
-            hasOrder = true;
-            break;
-        }
-    }
-
-    if (hasOrder) {
-        removeCountdown();
-        return;
-    }
-
-    const cutoff = new Date();
-    cutoff.setHours(10, 0, 0, 0);
-
-    const diff = cutoff - now;
-
-    if (diff <= 0) {
-        removeCountdown();
-        return;
-    }
-
-    const diffHrs = Math.floor(diff / 3600000);
-    const diffMins = Math.floor((diff % 3600000) / 60000);
-
-    const headerCenter = document.querySelector('.header-center-wrapper');
-    if (!headerCenter) return;
-
-    let countdownEl = document.getElementById('order-countdown');
-    if (!countdownEl) {
-        countdownEl = document.createElement('div');
-        countdownEl.id = 'order-countdown';
-        headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
-    }
-
-    countdownEl.innerHTML = `<span>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderDeadline')}:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
-
-    if (diff < 3600000) {
-        countdownEl.classList.add('urgent');
-
-        const notifiedKey = `kantine_notified_${todayStr}`;
-        if (!localStorage.getItem(notifiedKey)) {
-            if (Notification.permission === 'granted') {
-                new Notification('Kantine: Bestellschluss naht!', {
-                    body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
-                    icon: '⏳'
-                });
-            } else if (Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-            localStorage.setItem(notifiedKey, 'true');
-        }
-    } else {
-        countdownEl.classList.remove('urgent');
-    }
-}
-
-function removeCountdown() {
-    const el = document.getElementById('order-countdown');
-    if (el) el.remove();
-}
-
-setInterval(updateCountdown, 60000);
-setTimeout(updateCountdown, 1000);
-
-function showErrorModal(title, message, details, btnText, url) {
-    const modalId = 'error-modal';
-    let modal = document.getElementById(modalId);
-    if (modal) modal.remove();
-
-    modal = document.createElement('div');
-    modal.id = modalId;
-    modal.className = 'modal'; // Removed hidden because we are showing it now
-    
-    const content = document.createElement('div');
-    content.className = 'modal-content';
-    
-    const header = document.createElement('div');
-    header.className = 'modal-header';
-    const h2 = document.createElement('h2');
-    h2.style.cssText = 'color: var(--error-color); display: flex; align-items: center; gap: 10px;';
-    
-    const icon = document.createElement('span');
-    icon.className = 'material-icons-round';
-    icon.textContent = 'signal_wifi_off';
-    h2.appendChild(icon);
-    
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = title;
-    h2.appendChild(titleSpan);
-    
-    header.appendChild(h2);
-    content.appendChild(header);
-    
-    const body = document.createElement('div');
-    body.style.padding = '20px';
-    
-    const p = document.createElement('p');
-    p.style.cssText = 'margin-bottom: 15px; color: var(--text-primary);';
-    p.textContent = message;
-    body.appendChild(p);
-    
-    if (details) {
-        const small = document.createElement('small');
-        small.style.cssText = 'display: block; margin-top: 10px; color: var(--text-secondary);';
-        small.textContent = details;
-        body.appendChild(small);
-    }
-    
-    const footer = document.createElement('div');
-    footer.style.cssText = 'margin-top: 20px; display: flex; justify-content: center;';
-    
-    const btn = document.createElement('button');
-    btn.style.cssText = `
-        background-color: var(--accent-color);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
-    `;
-    btn.textContent = btnText || 'Zur Original-Seite';
-    btn.onclick = () => {
-        window.open(url || 'https://web.bessa.app/knapp-kantine', '_blank');
-        modal.classList.add('hidden');
-    };
-    
-    footer.appendChild(btn);
-    body.appendChild(footer);
-    content.appendChild(body);
-    modal.appendChild(content);
-    document.body.appendChild(modal);
-}
-
-function updateAlarmBell() {
-    const bellBtn = document.getElementById('alarm-bell');
-    const bellIcon = document.getElementById('alarm-bell-icon');
-    if (!bellBtn || !bellIcon) return;
-
-    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0) {
-        bellBtn.classList.add('hidden');
-        bellBtn.style.display = 'none';
-        bellIcon.style.color = 'var(--text-secondary)';
-        bellIcon.style.textShadow = 'none';
-        return;
-    }
-
-    bellBtn.classList.remove('hidden');
-    bellBtn.style.display = 'inline-flex';
-
-    let anyAvailable = false;
-    for (const wk of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
-        if (!wk.days) continue;
-        for (const d of wk.days) {
-            if (!d.items) continue;
-            for (const item of d.items) {
-                if (item.available && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(item.id)) {
-                    anyAvailable = true;
-                    break;
-                }
-            }
-            if (anyAvailable) break;
-        }
-        if (anyAvailable) break;
-    }
-
-    const lastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED);
-    const flaggedLastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.FLAGGED_LAST_CHECKED);
-
-    let latestTime = 0;
-    if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
-    if (flaggedLastCheckedStr) latestTime = Math.max(latestTime, new Date(flaggedLastCheckedStr).getTime());
-
-    let timeStr = 'gerade eben';
-    if (latestTime === 0) {
-        const now = new Date().toISOString();
-        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED, now);
-        latestTime = new Date(now).getTime();
-    }
-
-    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(new Date(latestTime));
-
-    bellBtn.title = `${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('alarmLastChecked')}: ${timeStr}`;
-
-    if (anyAvailable) {
-        bellIcon.style.color = '#10b981';
-        bellIcon.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
-    } else {
-        bellIcon.style.color = '#f59e0b';
-        bellIcon.style.textShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
-    }
-}
-
-
-/***/ },
-
-/***/ 160
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  sg: () => (/* binding */ debounce),
-  ZD: () => (/* binding */ escapeHtml),
-  sn: () => (/* binding */ getISOWeek),
-  PC: () => (/* binding */ getLocalizedText),
-  gs: () => (/* binding */ getRelativeTime),
-  Ao: () => (/* binding */ getWeekYear),
-  U4: () => (/* binding */ isNewer),
-  dk: () => (/* reexport */ splitLanguage),
-  FS: () => (/* binding */ translateDay)
-});
-
-// EXTERNAL MODULE: ./src/state.js
-var state = __webpack_require__(901);
-;// ./src/lang/normalize.js
-function isValidAllergen(content) {
-    if (typeof content !== 'string' || !content) return false;
-    return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
-}
-
-function normalize(text) {
-    let modifiedText = text;
-    let notes = [];
-
-    // 1. Repair allergen-internal slashes: (A/F/N) -> (AFN)
-    modifiedText = modifiedText.replace(/\(([A-Z](?:\/[A-Z])+)\)/g, (match, p1) => {
-        return '(' + p1.replace(/\//g, '') + ')';
-    });
-
-    // 2. Repair slash-before-allergen: /ACLM) -> (ACLM)
-    modifiedText = modifiedText.replace(/\/([A-Z]{1,8})\)/g, '($1)');
-
-    // 4. Detect and park notes (doing it before step 3 to use the 6 spaces rule)
-    
-    // Pass 1: Extract "Achtung Änderung" specifically as requested
-    const aaRegex = /Achtung Änderung/gi;
-    const aaMatches = modifiedText.match(aaRegex);
-    if (aaMatches) {
-        aaMatches.forEach(m => {
-            notes.push(m.trim());
-            modifiedText = modifiedText.replace(m, ' ');
-        });
-    }
-
-    // Pass 2: Detect based on combinations
-    let parts = modifiedText.split(/ {6,}/);
-    if (parts.length > 1) {
-        let lastPart = parts[parts.length - 1];
-        let hasA = /!!!|!{3,}/.test(lastPart);
-        let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
-        let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
-        let hasD = !lastPart.includes(' / ') && !isValidAllergen(lastPart.replace(/[()]/g, ''));
-        
-        if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
-            notes.push(lastPart.trim());
-            modifiedText = modifiedText.substring(0, modifiedText.lastIndexOf(lastPart)).trim();
-        }
-    } else {
-        let exclIndex = modifiedText.indexOf('!!!');
-        if (exclIndex !== -1) {
-            let lastPart = modifiedText.substring(exclIndex);
-            let hasA = true;
-            let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
-            let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
-            let hasD = false;
-            
-            if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
-                notes.push(lastPart.trim());
-                modifiedText = modifiedText.substring(0, exclIndex).trim();
-            }
-        }
-    }
-
-    // 3. Collapse whitespace
-    modifiedText = modifiedText.replace(/\s{2,}/g, ' ').trim();
-
-    return {
-        text: modifiedText,
-        notes: notes
-    };
-}
-;// ./src/lang/templates.js
-// @ts-check
-
-const TEMPLATES = [
-  {
-    test: (t) => /^Suppe\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s+Dessert$/i.test(String(t).trim()),
-    result: {
-      de: '• Suppe\n• Salat\n• Dessert',
-      en: '• Soup\n• Salad\n• Dessert',
-      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
-      label: 'template',
-      confidence: 1.0,
-      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
-      notes: [],
-    },
-  },
-];
-
-function matchTemplate(normalizedText) {
-  if (typeof normalizedText !== 'string' || !normalizedText) return null;
-
-  for (const tpl of TEMPLATES) {
-    if (tpl.test(normalizedText)) return tpl.result;
-  }
-
-  return null;
-}
-
-;// ./src/lang/segment.js
-function segment_isValidAllergen(content) {
-  if (typeof content !== 'string' || !content) return false;
-  return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
-}
-
-/**
- * Segments a normalized menu text into separate course objects.
- * 
- * @param {string} normalizedText 
- * @returns {Array<{de: string, en: string, allergen: string, mono: boolean, anchored: boolean}>}
- */
-function segment(normalizedText) {
-  if (!normalizedText || typeof normalizedText !== 'string') {
-    return [];
-  }
-
-  const courses = [];
-  const parenRegex = /\(([^)]+)\)\s*(?!\s*\/)/g;
-  let match;
-  let lastScanIndex = 0;
-
-  while ((match = parenRegex.exec(normalizedText)) !== null) {
-    const content = match[1];
-    if (segment_isValidAllergen(content)) {
-      // End of this course segment is at the end of the matched parenthesis
-      const segmentEndIndex = match.index + match[0].length;
-      let segmentText = normalizedText.substring(lastScanIndex, segmentEndIndex);
-      
-      courses.push(processSegment(segmentText, content, true));
-      lastScanIndex = segmentEndIndex;
-    }
-  }
-
-  // Any remaining text after the last valid allergen is an unanchored segment
-  if (lastScanIndex < normalizedText.length) {
-    const remainingText = normalizedText.substring(lastScanIndex).trim();
-    if (remainingText) {
-      courses.push(processSegment(remainingText, "", false));
-    }
-  }
-
-  return courses;
-}
-
-function processSegment(segmentText, allergen, anchored) {
-  // 1. Strip the allergen code from the end of the segment text if it exists
-  let textWithoutAllergen = segmentText;
-  if (allergen) {
-    const suffix = `(${allergen})`;
-    if (textWithoutAllergen.endsWith(suffix)) {
-      textWithoutAllergen = textWithoutAllergen.substring(0, textWithoutAllergen.length - suffix.length);
-    } else {
-      // In case of whitespace before the parenthesis in the raw segment
-      const lastParenIndex = textWithoutAllergen.lastIndexOf(`(${allergen})`);
-      if (lastParenIndex !== -1) {
-        textWithoutAllergen = textWithoutAllergen.substring(0, lastParenIndex);
-      }
-    }
-  }
-  textWithoutAllergen = textWithoutAllergen.trim();
-
-  // 2. Split DE|EN at the FIRST slash that is NOT inside parentheses
-  //    (skips slashes in e.g. "(Schwein/Rind)" or "(pork/beef)")
-  let de, en, mono;
-  let slashIdx = -1;
-  let parenDepth = 0;
-  for (let i = 0; i < textWithoutAllergen.length; i++) {
-    const ch = textWithoutAllergen[i];
-    if (ch === '(') parenDepth++;
-    else if (ch === ')') parenDepth--;
-    else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
-  }
-  if (slashIdx !== -1) {
-    // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
-    let left = slashIdx;
-    let right = slashIdx + 1;
-    while (left > 0 && textWithoutAllergen[left - 1] === ' ') left--;
-    while (right < textWithoutAllergen.length && textWithoutAllergen[right] === ' ') right++;
-    de = textWithoutAllergen.substring(0, left).trim();
-    en = textWithoutAllergen.substring(right).trim();
-    mono = false;
-  } else {
-    de = textWithoutAllergen;
-    en = textWithoutAllergen;
-    mono = true;
-  }
-
-  // 3. Re-attach allergen if it exists and not already present
-  if (allergen) {
-    const aSuffix = ` (${allergen})`;
-    de = de.includes(`(${allergen})`) ? de : `${de}${aSuffix}`;
-    en = en.includes(`(${allergen})`) ? en : `${en}${aSuffix}`;
-  }
-
-  return {
-    de,
-    en,
-    allergen,
-    mono,
-    anchored
-  };
-}
-
-;// ./src/lang/boundary.js
-function resolveBoundary(fragment, langModel) {
-    const MIN_BOUNDARY_CONFIDENCE = 1.5;
-    const MIN_LEFT_ENGLISH = 1.0;
-    
-    // Handle empty fragment
-    if (!fragment || fragment.trim() === '') {
-        return { enPart: '', deCut: '' };
-    }
-
-    const words = fragment.trim().split(/\s+/);
-    
-    if (words.length < 2) {
-        return { enPart: fragment, deCut: '' };
-    }
-
-    let bestK = -1;
-    let maxScore = -9999;
-
-    for (let k = 1; k < words.length; k++) {
-        const leftWords = words.slice(0, k);
-        const rightWords = words.slice(k);
-
-        const leftText = leftWords.join(' ');
-        const rightText = rightWords.join(' ');
-
-        const leftScore = langModel.scoreLang(leftText);
-        const rightScore = langModel.scoreLang(rightText);
-
-        const leftLooksEnglish = leftScore < -MIN_LEFT_ENGLISH;
-        const rightLooksGerman = rightScore > 0;
-
-        const boundaryScore = (-leftScore) + rightScore;
-
-        if (leftLooksEnglish && rightLooksGerman && boundaryScore > maxScore) {
-            maxScore = boundaryScore;
-            bestK = k;
-        }
-    }
-
-    if (bestK !== -1 && maxScore > MIN_BOUNDARY_CONFIDENCE) {
-        return {
-            enPart: words.slice(0, bestK).join(' '),
-            deCut: words.slice(bestK).join(' ')
-        };
-    }
-
-    return { enPart: fragment, deCut: '' };
-}
-
-;// ./src/lang/loanwords.js
-// Cross-lingual food loanwords that appear (often capitalized) in BOTH German and
-// English menu descriptions and may score "German-ish" on the trigram model.
-//
-// Used for two purposes:
-//  1. dishes.js  — avoid mistaking a loanword inside an English dish name for the
-//                  start of the next German dish (small tie-breaker penalty).
-//  2. score.js   — exempt these from the asymmetric "German-word-inside-English"
-//                  purity penalty, so a legit English dish name isn't punished.
-const LOANWORDS = new Set([
-    'gnocchi', 'risotto', 'tiramisu', 'ravioli', 'lasagne', 'lasagna', 'pasta', 'penne',
-    'spaghetti', 'pesto', 'ratatouille', 'stifado', 'gulasch', 'goulash', 'couscous',
-    'bulgur', 'falafel', 'hummus', 'masala', 'chana', 'ravaya', 'yakitori', 'donut',
-    'muffin', 'parmesan', 'mozzarella', 'feta', 'focaccia', 'baguette', 'panini',
-    'gyros', 'baklava', 'wrap', 'bowl', 'dip', 'wok', 'sushi', 'curry', 'chili',
-    'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
-    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio'
-]);
-
-function isLoanword(token) {
-    if (!token) return false;
-    const w = String(token).toLowerCase().replace(/[^a-zäöüß]/g, '');
-    return w.length > 0 && LOANWORDS.has(w);
-}
-
-;// ./src/lang/dishes.js
-
-
-// Split a reconstructed bilingual segment "DE1 / EN1 DE2 / EN2 ..." into individual
-// dishes. The separator-slash count is the structural skeleton (every bilingual dish
-// is "German / English"); allergens are optional anchors handled by the caller.
-//
-// Each returned dish = { de, en, mono }. The caller (splitter.js) reattaches the
-// allergen to the LAST dish and assigns the `anchored` flag.
-function splitDishes(text, langModel) {
-    const t = String(text || '').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim();
-    if (!t) return [];
-
-    const tokens = t.split(' ');
-    const slashIdxs = [];
-    for (let i = 0; i < tokens.length; i++) {
-        if (tokens[i] === '/') slashIdxs.push(i);
-    }
-
-    // No slash -> a single mono dish (e.g. "Vanillapudding").
-    if (slashIdxs.length === 0) {
-        return [{ de: t, en: t, mono: true }];
-    }
-
-    // Exactly one slash -> a single bilingual dish.
-    if (slashIdxs.length === 1) {
-        const si = slashIdxs[0];
-        const de = tokens.slice(0, si).join(' ').trim();
-        const en = tokens.slice(si + 1).join(' ').trim();
-        if (!de || !en) {
-            const solo = de || en;
-            return [{ de: solo, en: solo, mono: true }];
-        }
-        return [{ de, en, mono: false }];
-    }
-
-    // Two or more slashes -> peel the first dish, recurse on the remainder.
-    // Structure between the first two slashes is "EN_1 ... DE_2"; the EN_1 -> DE_2
-    // boundary is resolved via the multi-signal detector below.
-    const s1 = slashIdxs[0];
-    const s2 = slashIdxs[1];
-    const de1 = tokens.slice(0, s1).join(' ').trim();
-    const mid = tokens.slice(s1 + 1, s2); // EN_1 ... DE_2
-    const k = findDishBoundary(mid, langModel);
-    const en1 = mid.slice(0, k).join(' ').trim();
-    const de2 = mid.slice(k).join(' ').trim();
-    const tail = tokens.slice(s2 + 1).join(' ').trim();
-
-    const first = { de: de1, en: en1 || de1, mono: false };
-    const remainder = (de2 ? de2 + ' / ' : '/ ') + tail;
-    return [first, ...splitDishes(remainder, langModel)];
-}
-
-function classifyToken(token, langModel, isFirst) {
-    if (isLoanword(token)) return 'ambig';
-    if (!isFirst && /^[A-ZÄÖÜ]/.test(token)) return 'de';
-    const s = langModel.scoreLang(token);
-    if (s > 0.5) return 'de';
-    if (s < -0.5) return 'en';
-    return 'ambig';
-}
-
-function findDishBoundary(midTokens, langModel) {
-    const n = midTokens.length;
-    if (n <= 1) return n;
-
-    const tags = midTokens.map((t, i) => classifyToken(t, langModel, i === 0));
-
-    let bestK = 1;
-    let bestPenalty = Infinity;
-    let bestCap = -1;
-
-    for (let k = 1; k < n; k++) {
-        let leftGerman = 0;
-        for (let i = 0; i < k; i++) if (tags[i] === 'de') leftGerman++;
-        let rightEnglish = 0;
-        for (let i = k; i < n; i++) if (tags[i] === 'en') rightEnglish++;
-
-        const penalty = leftGerman + rightEnglish;
-        const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
-
-        if (penalty < bestPenalty || (penalty === bestPenalty && cap > bestCap)) {
-            bestPenalty = penalty;
-            bestCap = cap;
-            bestK = k;
-        }
-    }
-
-    return bestK;
-}
-
-;// ./src/lang/score.js
-
-
-const WEIGHT_ANCHOR = 0.35;
-const WEIGHT_PURITY = 0.30;
-const WEIGHT_COURSE = 0.20;
-const WEIGHT_COVERAGE = 0.15;
-
-const THRESHOLD_HIGH = 0.80;
-const THRESHOLD_MEDIUM = 0.55;
-
-function tokenize(text) {
-  return (text || '').toLowerCase().match(/[a-zäöüß]{2,}/g) || [];
-}
-
-function countGermanIntrusionsInEnglish(enClean) {
-  const tokens = enClean.split(/\s+/);
-  let count = 0;
-  for (let i = 1; i < tokens.length; i++) {
-    const tok = tokens[i];
-    if (!/^[A-ZÄÖÜ]/.test(tok)) continue;
-    const word = tok.toLowerCase().replace(/[^a-zäöüß]/g, '');
-    if (word.length < 3 || isLoanword(tok)) continue;
-    count++;
-  }
-  return count;
-}
-
-function hasSeparatorSlash(text) {
-  return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
-}
-
-function scoreSplit({ courses, notes, raw, langModel }) {
-  // anchor score
-  const anchoredCount = courses.filter(c => c.anchored).length;
-  const anchor = anchoredCount / Math.max(courses.length, 1);
-
-  // purity score
-  let puritySum = 0;
-  let purityCount = 0;
-  for (const course of courses) {
-    if (!course.mono) {
-      const deClean = (course.de || '').replace(/\([^)]*\)/g, '').trim();
-      const enClean = (course.en || '').replace(/\([^)]*\)/g, '').trim();
-      
-      const deScoreLang = langModel.scoreLang(deClean);
-      const enScoreLang = langModel.scoreLang(enClean);
-      
-      const de_purity = Math.max(0, deScoreLang) / (Math.abs(deScoreLang) + 1);
-      let en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
-      if (countGermanIntrusionsInEnglish(enClean) > 0) {
-        en_purity = Math.min(en_purity, 0.2);
-      }
-
-      puritySum += de_purity + en_purity;
-      purityCount += 2;
-    }
-  }
-  const purity = purityCount > 0 ? puritySum / purityCount : 1.0;
-
-  // course score
-  const baseCourseScore = (courses.length === 1 || courses.length === 3) ? 1.0 : 0.0;
-  let penalties = 0;
-  for (const course of courses) {
-    if (!course.mono) {
-      if (!course.de || course.de.length === 0 || !course.en || course.en.length === 0) {
-        penalties += 0.3;
-      }
-    }
-  }
-  const courseScore = Math.max(0, baseCourseScore - penalties);
-
-  // coverage score
-  const rawTokens = tokenize(raw);
-  const splitText = courses.map(c => (c.de || '') + ' ' + (c.en || '')).join(' ') + ' ' + (notes || []).join(' ');
-  const splitTokenSet = new Set(tokenize(splitText));
-  const covered = rawTokens.filter(t => splitTokenSet.has(t)).length;
-  const coverage = covered / Math.max(rawTokens.length, 1);
-
-  // composite confidence
-  const confidence = Math.max(0, Math.min(1,
-    anchor * WEIGHT_ANCHOR +
-    purity * WEIGHT_PURITY +
-    courseScore * WEIGHT_COURSE +
-    coverage * WEIGHT_COVERAGE
-  ));
-
-  const corrupted = courses.some(c => hasSeparatorSlash(c.en) || hasSeparatorSlash(c.de));
-  const suspiciousCourseCount = courses.length === 2;
-
-  let label = 'low';
-  if (!corrupted && !suspiciousCourseCount && confidence >= THRESHOLD_HIGH) {
-    label = 'high';
-  } else if (!corrupted && confidence >= THRESHOLD_MEDIUM) {
-    label = 'medium';
-  }
-
-  let finalConfidence = confidence;
-  if (corrupted) {
-    finalConfidence = Math.min(finalConfidence, THRESHOLD_MEDIUM - 0.05);
-  } else if (suspiciousCourseCount) {
-    finalConfidence = Math.min(finalConfidence, THRESHOLD_HIGH - 0.01);
-  }
-
-  return {
-    confidence: finalConfidence,
-    subScores: {
-      anchor,
-      purity,
-      course: courseScore,
-      coverage
-    },
-    label
-  };
-}
-;// ./src/lang/langModel.js
 function createLangModel(seed) {
     const FUNC_WEIGHT = 2.0;
 
@@ -5710,6 +3948,47 @@ function createLangModel(seed) {
     function scoreLang(text) {
         const scores = scorePhrase(text);
         return scores.de - scores.en;
+    }
+
+    function scoreCharAffinities(text) {
+        if (!text) return [];
+
+        const lowerText = text.toLowerCase();
+        const len = lowerText.length;
+        const rawScores = new Array(len).fill(0);
+        const counts = new Array(len).fill(0);
+
+        for (let i = 0; i <= len - 3; i++) {
+            const tri = lowerText.substring(i, i + 3);
+            
+            if (!/^[a-zäöüß]{3}$/.test(tri)) continue;
+
+            const countDe = trigramsDe[tri] || 0;
+            const countEn = trigramsEn[tri] || 0;
+            const logDe = Math.log((countDe + 1) / (totalDe + 2));
+            const logEn = Math.log((countEn + 1) / (totalEn + 2));
+            const signedDiff = logDe - logEn;
+
+            for (let j = 0; j < 3; j++) {
+                rawScores[i + j] += signedDiff;
+                counts[i + j]++;
+            }
+        }
+
+        const averaged = rawScores.map((sum, i) => counts[i] > 0 ? sum / counts[i] : 0);
+
+        const maxAbs = Math.max(...averaged.map(Math.abs), 1e-9);
+        const normalized = averaged.map(v => v / maxAbs);
+
+        const result = [];
+        for (let i = 0; i < len; i++) {
+            result.push({
+                char: text[i],
+                affinity: normalized[i]
+            });
+        }
+
+        return result;
     }
 
     function getModel() {
@@ -5829,6 +4108,7 @@ function createLangModel(seed) {
     const modelObj = {
         scorePhrase,
         scoreLang,
+        scoreCharAffinities,
         getModel,
         mergeDelta,
         learnFromCourse,
@@ -5839,13 +4119,21 @@ function createLangModel(seed) {
     return modelObj;
 }
 
-;// ./src/lang/langModelSeed.js
+
+/***/ },
+
+/***/ 977
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   x: () => (/* binding */ LANG_MODEL_SEED)
+/* harmony export */ });
 // GENERATED by tools/train-langmodel.js — do not edit by hand.
 // Regenerate via: node tools/train-langmodel.js tests/test_kantine_menuCache.json src/lang/langModelSeed.js (then wrap in export const)
 // @ts-check
 
-var LANG_MODEL_SEED = {
-  "version": "v1.8.9",
+const LANG_MODEL_SEED = {
+  "version": "v1.10.6",
   "trigramsDe": {
     "ack": 24,
     "ade": 7,
@@ -6883,7 +5171,2038 @@ var LANG_MODEL_SEED = {
   ]
 };
 
+
+/***/ },
+
+/***/ 901
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   BT: () => (/* binding */ currentWeekNumber),
+/* harmony export */   BY: () => (/* binding */ userFlags),
+/* harmony export */   K8: () => (/* binding */ pollIntervalId),
+/* harmony export */   Kl: () => (/* binding */ langMode),
+/* harmony export */   L: () => (/* binding */ orderMap),
+/* harmony export */   Ny: () => (/* binding */ currentUser),
+/* harmony export */   O5: () => (/* binding */ setAuthToken),
+/* harmony export */   UD: () => (/* binding */ setLangMode),
+/* harmony export */   Xt: () => (/* binding */ setCurrentWeekNumber),
+/* harmony export */   cc: () => (/* binding */ setPollIntervalId),
+/* harmony export */   di: () => (/* binding */ setOrderMap),
+/* harmony export */   gX: () => (/* binding */ authToken),
+/* harmony export */   iw: () => (/* binding */ setHighlightTags),
+/* harmony export */   lt: () => (/* binding */ setCurrentUser),
+/* harmony export */   pK: () => (/* binding */ setCurrentYear),
+/* harmony export */   p_: () => (/* binding */ allWeeks),
+/* harmony export */   qo: () => (/* binding */ setDisplayMode),
+/* harmony export */   sw: () => (/* binding */ displayMode),
+/* harmony export */   tn: () => (/* binding */ setAllWeeks),
+/* harmony export */   vW: () => (/* binding */ currentYear),
+/* harmony export */   yz: () => (/* binding */ highlightTags)
+/* harmony export */ });
+/* unused harmony export setUserFlags */
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(930);
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(521);
+
+
+
+let allWeeks = [];
+let currentWeekNumber = (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__/* .getISOWeek */ .sn)(new Date());
+let currentYear = new Date().getFullYear();
+let displayMode = 'this-week';
+let authToken = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.AUTH_TOKEN);
+let currentUser = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.CURRENT_USER);
+let orderMap = new Map();
+let userFlags = new Set(JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.FLAGS) || '[]'));
+let pollIntervalId = null;
+let langMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.LANG) || 'de';
+let highlightTags = JSON.parse(localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_1__.LS.HIGHLIGHT_TAGS) || '[]');
+
+function setAllWeeks(weeks) { allWeeks = weeks; }
+function setCurrentWeekNumber(week) { currentWeekNumber = week; }
+function setCurrentYear(year) { currentYear = year; }
+function setAuthToken(token) { authToken = token; }
+function setCurrentUser(user) { currentUser = user; }
+function setOrderMap(map) { orderMap = map; }
+function setUserFlags(flags) { userFlags = flags; }
+function setPollIntervalId(id) { pollIntervalId = id; }
+function setHighlightTags(tags) { highlightTags = tags; }
+
+/** Only 'this-week' and 'next-week' are valid display modes. */
+function setDisplayMode(mode) {
+    if (mode !== 'this-week' && mode !== 'next-week') {
+        console.warn(`[state] Invalid displayMode: "${mode}". Ignoring.`);
+        return;
+    }
+    displayMode = mode;
+}
+
+/** Only 'de', 'en', and 'all' are valid language modes. */
+function setLangMode(lang) {
+    if (!['de', 'en', 'all'].includes(lang)) {
+        console.warn(`[state] Invalid langMode: "${lang}". Ignoring.`);
+        return;
+    }
+    langMode = lang;
+}
+
+
+/***/ },
+
+/***/ 618
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   F: () => (/* binding */ tracker)
+/* harmony export */ });
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
+const STORAGE_KEY = '_kstats_state';
+const GIST_ID_KEY = '_kstats_gist_id';
+
+
+
+// GIST_PAT arrives obfuscated (XOR with DEV_MODE_PW_HASH + base64) so GitHub's
+// secret scanning cannot revoke the committed token. Reverse it here.
+function _deobfuscatePat(blob, key) {
+    try {
+        const bin = atob(blob);
+        const k = new TextEncoder().encode(key);
+        let out = '';
+        for (let i = 0; i < bin.length; i++) {
+            out += String.fromCharCode(bin.charCodeAt(i) ^ k[i % k.length]);
+        }
+        return out;
+    } catch (e) {
+        return '';
+    }
+}
+const GIST_PAT_REAL = typeof _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q !== 'undefined'
+    ? _deobfuscatePat(_constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_PAT */ .q, _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .DEV_MODE_PW_HASH */ .Z7)
+    : '';
+
+class StatsTracker {
+    constructor() {
+        this._state = null;
+    }
+
+    _getToday() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    _freshState(today) {
+        return {
+            date: today,
+            daily: {},
+            user_hash: null,
+            session: { start_ms: Date.now() },
+            has_flushed: false,
+            pendingFlush: null,
+            pendingFlushes: []
+        };
+    }
+
+    load() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const today = this._getToday();
+
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                this._state = {
+                    date: parsed.date || today,
+                    daily: parsed.daily || {},
+                    user_hash: parsed.user_hash || null,
+                    session: parsed.session || { start_ms: Date.now() },
+                    has_flushed: parsed.has_flushed || false,
+                    pendingFlush: null,
+                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : [])
+                };
+            } catch (e) {
+                this._state = this._freshState(today);
+            }
+        } else {
+            this._state = this._freshState(today);
+        }
+
+        if (this._state.date !== today) {
+            this._state.pendingFlushes.push({
+                date: this._state.date,
+                daily: { ...this._state.daily },
+                user_hash: this._state.user_hash
+            });
+            this._state.daily = {};
+            this._state.session = { start_ms: Date.now() };
+            this._state.date = today;
+            this._state.has_flushed = false;
+            this.persist();
+        }
+
+        return this._state;
+    }
+
+    persist() {
+        if (!this._state) this.load();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+    }
+
+    increment(key) {
+        this.load();
+        if (!this._state.daily[key]) this._state.daily[key] = 0;
+        this._state.daily[key]++;
+        this.persist();
+    }
+
+    incrementValue(key, val) {
+        this.load();
+        this._state.daily[key] = (this._state.daily[key] || 0) + val;
+        this.persist();
+    }
+
+    incrementCategory(key, value) {
+        this.load();
+        const safe = String(value).replace(/[^a-zA-Z0-9]/g, '_');
+        const composite = key + '_' + safe;
+        if (!this._state.daily[composite]) this._state.daily[composite] = 0;
+        this._state.daily[composite]++;
+        this.persist();
+    }
+
+    set(key, value) {
+        this.load();
+        this._state.daily[key] = value;
+        this.persist();
+    }
+
+    setUserHash(hash) {
+        this.load();
+        this._state.user_hash = hash;
+        this.persist();
+    }
+
+    setUserHashError() {
+        this.load();
+        this._state.user_hash = null;
+        this.persist();
+    }
+
+    reset() {
+        this._state = this._freshState(this._getToday());
+        localStorage.removeItem(STORAGE_KEY);
+    }
+
+    getLocalStats() {
+        this.load();
+        return { ...this._state.daily };
+    }
+
+    getPendingFlush() {
+        this.load();
+        const list = this._state.pendingFlushes;
+        return list.length > 0 ? { ...list[0] } : null;
+    }
+
+    markFlushed() {
+        this.load();
+        this._state.has_flushed = true;
+        this._state.pendingFlush = null;
+        if (this._state.pendingFlushes.length > 0) {
+            this._state.pendingFlushes.shift();
+        }
+        this.persist();
+    }
+
+    _resolveGistId() {
+        return localStorage.getItem(GIST_ID_KEY) || _constants_js__WEBPACK_IMPORTED_MODULE_0__/* .GIST_ID */ .KJ;
+    }
+
+    _saveGistId(id) {
+        localStorage.setItem(GIST_ID_KEY, id);
+    }
+
+    async flushToGist(pendingDate, pendingDaily, pendingUserHash) {
+        try {
+            let gistId = this._resolveGistId();
+            let resp = await fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Accept': 'application/vnd.github.v3+json' }
+            });
+
+            let data;
+            if (resp.status === 404 && !localStorage.getItem(GIST_ID_KEY)) {
+                // Gist doesn't exist and we haven't saved an ID yet — auto-create
+                console.log('[StatsTracker] Gist not found, creating a new secret Gist...');
+                const createResp = await fetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: 'Kantine Usage Stats',
+                        public: false,
+                        files: { 'stats.json': { content: '{}' } }
+                    })
+                });
+                if (!createResp.ok) throw new Error(`Gist CREATE failed: ${createResp.status}`);
+                const created = await createResp.json();
+                gistId = created.id;
+                this._saveGistId(gistId);
+                data = {};
+                console.log('[StatsTracker] Created Gist:', gistId);
+            } else if (!resp.ok) {
+                throw new Error(`Gist GET failed: ${resp.status}`);
+            } else {
+                const gist = await resp.json();
+                data = JSON.parse(gist.files['stats.json'].content);
+            }
+
+            // Track daily unique users via stable user hash
+            const dayKey = pendingDate;
+            if (!data.daily) data.daily = {};
+            if (!data.daily[dayKey]) data.daily[dayKey] = {};
+            const day = data.daily[dayKey];
+            // Self-contained day metadata
+            day.date = pendingDate;
+            if (pendingUserHash) {
+                day.user_hash = pendingUserHash;
+            }
+            if (!day.seen_hashes) day.seen_hashes = [];
+            if (!day.unique_today) day.unique_today = 0;
+
+            if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
+                day.seen_hashes.push(pendingUserHash);
+                day.unique_today++;
+            }
+
+            for (const [key, val] of Object.entries(pendingDaily)) {
+                if (key.endsWith('_sum') || key.endsWith('_count')) continue;
+                if (typeof val === 'number') {
+                    day[key] = (day[key] || 0) + val;
+                } else {
+                    day[key] = val;
+                }
+            }
+
+            // Compute averages from sum/count pairs
+            const AVG_PAIRS = [
+                { sum: 'session_duration_sum', count: 'session_duration_count', avg: 'session_duration_avg' },
+                { sum: 'load_time_sum', count: 'load_time_count', avg: 'load_time_avg' },
+                { sum: 'api_latency_sum', count: 'api_latency_count', avg: 'api_latency_avg' },
+            ];
+            for (const pair of AVG_PAIRS) {
+                const sum = pendingDaily[pair.sum];
+                const count = pendingDaily[pair.count];
+                if (typeof sum === 'number' && typeof count === 'number' && count > 0) {
+                    const oldCount = day[pair.count] || 0;
+                    const oldAvg = day[pair.avg] || 0;
+                    day[pair.avg] = (oldAvg * oldCount + sum) / (oldCount + count);
+                    day[pair.count] = oldCount + count;
+                }
+            }
+
+            // Track all-time unique users
+            if (pendingUserHash) {
+                if (!data.all_time) data.all_time = {};
+                if (!data.all_time.unique_hashes) data.all_time.unique_hashes = [];
+                if (!data.all_time.unique_users) data.all_time.unique_users = 0;
+                if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
+                    data.all_time.unique_hashes.push(pendingUserHash);
+                    data.all_time.unique_users++;
+                }
+            }
+
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+            for (const dk of Object.keys(data.daily)) {
+                if (dk < thirtyDaysAgo && data.daily[dk].seen_hashes) {
+                    delete data.daily[dk].seen_hashes;
+                }
+            }
+
+            data.last_updated = new Date().toISOString();
+            const patchResp = await fetch(`https://api.github.com/gists/${gistId}`, {
+                method: 'PATCH',
+                headers: { 'Authorization': `token ${GIST_PAT_REAL}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ files: { 'stats.json': { content: JSON.stringify(data, null, 2) } } })
+            });
+            if (!patchResp.ok) throw new Error(`Gist PATCH failed: ${patchResp.status}`);
+
+            this.markFlushed();
+        } catch (e) {
+            console.warn('[StatsTracker] Flush failed:', e.message);
+        }
+    }
+}
+
+const tracker = new StatsTracker();
+
+
+/***/ },
+
+/***/ 842
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Gk: () => (/* binding */ openVersionMenu),
+/* harmony export */   Mb: () => (/* binding */ updateAlarmBell),
+/* harmony export */   OR: () => (/* binding */ renderVisibleWeeks),
+/* harmony export */   Ux: () => (/* binding */ checkForUpdates),
+/* harmony export */   gJ: () => (/* binding */ updateNextWeekBadge),
+/* harmony export */   showErrorModal: () => (/* binding */ showErrorModal),
+/* harmony export */   wy: () => (/* binding */ syncMenuItemHeights)
+/* harmony export */ });
+/* unused harmony exports createDayCard, fetchVersions, openInstallPage, updateCountdown, removeCountdown */
+/* harmony import */ var _state_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(901);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(930);
+/* harmony import */ var _constants_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(521);
+/* harmony import */ var _api_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(672);
+/* harmony import */ var _actions_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(367);
+/* harmony import */ var _i18n_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(646);
+/* harmony import */ var _lang_langModel_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(152);
+/* harmony import */ var _lang_langModelSeed_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(977);
+
+
+
+
+
+
+
+
+
+const heatmapLangModel = (0,_lang_langModel_js__WEBPACK_IMPORTED_MODULE_6__/* .createLangModel */ .C)(_lang_langModelSeed_js__WEBPACK_IMPORTED_MODULE_7__/* .LANG_MODEL_SEED */ .x);
+
+/**
+ * Updates the "Next Week" button tooltip and glow state.
+ * Tooltip shows order status summary and highlight count.
+ * Glow activates only if Mon-Thu have orderable menus without orders (Friday exempt).
+ */
+function updateNextWeekBadge() {
+    const btnNextWeek = document.getElementById('btn-next-week');
+    let nextWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT + 1;
+    let nextYear = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentYear */ .vW;
+    if (nextWeek > 52) { nextWeek = 1; nextYear++; }
+
+    const nextWeekData = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.find(w => w.weekNumber === nextWeek && w.year === nextYear);
+    let totalDataCount = 0;
+    let orderableCount = 0;
+    let daysWithOrders = 0;
+    let monThuOrderableNoOrder = 0;
+
+    if (nextWeekData && nextWeekData.days) {
+        nextWeekData.days.forEach(day => {
+            if (day.items && day.items.length > 0) {
+                totalDataCount++;
+                const isOrderable = day.items.some(item => item.available);
+                if (isOrderable) orderableCount++;
+
+                let hasOrder = false;
+                day.items.forEach(item => {
+                    const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+                    const key = `${day.date}_${articleId}`;
+                    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(key) && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(key).length > 0) hasOrder = true;
+                });
+
+                if (hasOrder) daysWithOrders++;
+
+                // Feature 5: Only Mon(1)-Thu(4) count for glow logic, Friday(5) is exempt
+                const dayOfWeek = new Date(day.date).getDay();
+                if (dayOfWeek >= 1 && dayOfWeek <= 4 && isOrderable && !hasOrder) {
+                    monThuOrderableNoOrder++;
+                }
+            }
+        });
+    }
+
+    // Remove any old visible badge element (Feature 3: numbers hidden)
+    const existingBadge = btnNextWeek.querySelector('.nav-badge');
+    if (existingBadge) existingBadge.remove();
+
+    if (totalDataCount > 0) {
+        // Count highlight menus in next week
+        let highlightCount = 0;
+        if (nextWeekData && nextWeekData.days) {
+            nextWeekData.days.forEach(day => {
+                day.items.forEach(item => {
+                    const nameMatches = (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.name);
+                    const descMatches = (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.description);
+                    if (nameMatches.length > 0 || descMatches.length > 0) {
+                        highlightCount++;
+                    }
+                });
+            });
+        }
+
+        // Feature 3: All info goes to button tooltip instead of visible badge
+        let tooltipParts = [`${daysWithOrders} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrdered')} / ${orderableCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeOrderable')} / ${totalDataCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeTotal')}`];
+        if (highlightCount > 0) {
+            tooltipParts.push(`${highlightCount} ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('badgeHighlights')}`);
+        }
+        btnNextWeek.title = tooltipParts.join(' • ');
+
+        // Feature 5: Glow only if Mon-Thu have orderable days without existing orders
+        if (monThuOrderableNoOrder > 0) {
+            btnNextWeek.classList.add('new-week-available');
+            const storageKey = `kantine_notified_nextweek_${nextYear}_${nextWeek}`;
+            if (!localStorage.getItem(storageKey)) {
+                localStorage.setItem(storageKey, 'true');
+                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .showToast */ .P0)((0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'), 'info');
+                if (Notification.permission === 'granted') {
+                    new Notification('Kantine Wrapper', {
+                        body: (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('newMenuDataAvailable'),
+                        icon: '🍽️'
+                    });
+                } else if (Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+            }
+        } else {
+            btnNextWeek.classList.remove('new-week-available');
+        }
+    } else {
+        btnNextWeek.title = (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeekTooltipDefault');
+        btnNextWeek.classList.remove('new-week-available');
+    }
+}
+
+
+function renderVisibleWeeks() {
+    const menuContainer = document.getElementById('menu-container');
+    if (!menuContainer) return;
+
+    // Save scroll position before DOM wipe — .days-grid is the scroll container
+    const oldGrid = menuContainer.querySelector('.days-grid');
+    const savedScrollTop = oldGrid ? oldGrid.scrollTop : 0;
+
+    menuContainer.innerHTML = '';
+
+    let targetWeek = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentWeekNumber */ .BT;
+    let targetYear = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentYear */ .vW;
+
+    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'next-week') {
+        targetWeek++;
+        if (targetWeek > 52) { targetWeek = 1; targetYear++; }
+    }
+
+    const allDays = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_.flatMap(w => w.days || []);
+    const daysInTargetWeek = allDays.filter(day => {
+        const d = new Date(day.date);
+        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getISOWeek */ .sn)(d) === targetWeek && (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getWeekYear */ .Ao)(d) === targetYear;
+    });
+
+    if (daysInTargetWeek.length === 0) {
+        menuContainer.innerHTML = `
+            <div class="empty-state">
+                <p>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuData')} ${targetWeek} (${targetYear}).</p>
+                <small>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('noMenuDataHint')}</small>
+            </div>`;
+        return;
+    }
+
+
+    const headerWeekInfo = document.getElementById('header-week-info');
+    const weekTitle = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .displayMode */ .sw === 'this-week' ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('thisWeek') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('nextWeek');
+    headerWeekInfo.innerHTML = `
+        <div class="header-week-title">${weekTitle}</div>
+        <div class="header-week-subtitle">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('weekLabel')} ${targetWeek} • ${targetYear}</div>`;
+
+    const grid = document.createElement('div');
+    grid.className = 'days-grid';
+
+    daysInTargetWeek.sort((a, b) => a.date.localeCompare(b.date));
+
+    const workingDays = daysInTargetWeek.filter(d => {
+        const date = new Date(d.date);
+        const day = date.getDay();
+        return day !== 0 && day !== 6;
+    });
+
+    workingDays.forEach(day => {
+        const card = createDayCard(day);
+        if (card) grid.appendChild(card);
+    });
+
+    menuContainer.appendChild(grid);
+
+    // Restore scroll position on the new .days-grid
+    if (savedScrollTop > 0) grid.scrollTop = savedScrollTop;
+
+    setTimeout(() => syncMenuItemHeights(grid), 0);
+}
+
+function syncMenuItemHeights(grid) {
+    const cards = grid.querySelectorAll('.menu-card');
+    if (cards.length === 0) return;
+
+    // 1. Gather all menu-item groups (rows) across cards
+    const itemRows = [];
+    let maxItems = 0;
+
+    const cardItems = Array.from(cards).map(card => {
+        const items = Array.from(card.querySelectorAll('.menu-item'));
+        maxItems = Math.max(maxItems, items.length);
+        return items;
+    });
+
+    for (let i = 0; i < maxItems; i++) {
+        // Collect i-th item from each card (forming a "row")
+        itemRows[i] = cardItems.map(items => items[i]).filter(item => !!item);
+    }
+
+    // 2. Batch Reset (Write phase) - clear old heights to let them flow naturally
+    itemRows.flat().forEach(item => {
+        item.style.height = 'auto';
+    });
+
+    // 3. Batch Read (Read phase) - measure all heights in one pass to avoid layout thrashing
+    const rowMaxHeights = itemRows.map(row => {
+        return Math.max(...row.map(item => item.offsetHeight));
+    });
+
+    // 4. Batch Apply (Write phase) - set synchronized heights
+    itemRows.forEach((row, i) => {
+        const height = `${rowMaxHeights[i]}px`;
+        row.forEach(item => {
+            item.style.height = height;
+        });
+    });
+}
+
+function createDayCard(day) {
+    if (!day.items || day.items.length === 0) return null;
+
+    const card = document.createElement('div');
+    card.className = 'menu-card';
+
+    const now = new Date();
+    const cardDate = new Date(day.date);
+
+    let isPastCutoff = false;
+    if (day.orderCutoff) {
+        isPastCutoff = now >= new Date(day.orderCutoff);
+    } else {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const cd = new Date(day.date);
+        cd.setHours(0, 0, 0, 0);
+        isPastCutoff = cd < today;
+    }
+
+    if (isPastCutoff) card.classList.add('past-day');
+
+    const menuBadges = [];
+    if (day.items) {
+        day.items.forEach(item => {
+            const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+            const orderKey = `${day.date}_${articleId}`;
+            const orders = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(orderKey) || [];
+            const count = orders.length;
+
+            if (count > 0) {
+                const match = item.name.match(/([M][1-9][Ff]?)/);
+                if (match) {
+                    let code = match[1];
+                    if (count > 1) code += '+';
+                    menuBadges.push(code);
+                }
+            }
+        });
+    }
+
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    const dateStr = cardDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+
+    const badgesHtml = menuBadges.reduce((acc, code) => acc + `<span class="menu-code-badge">${code}</span>`, '');
+
+    let headerClass = '';
+    const hasAnyOrder = day.items && day.items.some(item => {
+        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+        const key = `${day.date}_${articleId}`;
+        return _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(key) && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(key).length > 0;
+    });
+
+    const hasOrderable = day.items && day.items.some(item => item.available);
+
+    if (hasAnyOrder) {
+        headerClass = 'header-violet';
+    } else if (hasOrderable && !isPastCutoff) {
+        headerClass = 'header-green';
+    } else {
+        headerClass = 'header-red';
+    }
+
+    if (headerClass) header.classList.add(headerClass);
+
+    header.innerHTML = `
+        <div class="day-header-left">
+            <span class="day-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .translateDay */ .FS)(day.weekday)}</span>
+            <div class="day-badges">${badgesHtml}</div>
+        </div>
+        <span class="day-date">${dateStr}</span>`;
+    card.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    const todayDateStr = new Date().toISOString().split('T')[0];
+    const isToday = day.date === todayDateStr;
+
+    const sortedItems = [...day.items].sort((a, b) => {
+        if (isToday) {
+            const aId = a.articleId || parseInt(a.id.split('_')[1]);
+            const bId = b.articleId || parseInt(b.id.split('_')[1]);
+            const aOrdered = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(`${day.date}_${aId}`);
+            const bOrdered = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.has(`${day.date}_${bId}`);
+
+            if (aOrdered && !bOrdered) return -1;
+            if (!aOrdered && bOrdered) return 1;
+        }
+        return a.name.localeCompare(b.name);
+    });
+
+    sortedItems.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'menu-item';
+
+        const articleId = item.articleId || parseInt(item.id.split('_')[1]);
+        const orderKey = `${day.date}_${articleId}`;
+        const orderIds = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.get(orderKey) || [];
+        const orderCount = orderIds.length;
+
+        const dm = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+
+        const isLowStock = item.available && item.amountTracking
+            && typeof item.availableAmount === 'number'
+            && item.availableAmount > 0 && item.availableAmount < 10;
+
+        // Normal mode deliberately hides the Stückzahl; dev mode shows it.
+        // Stock below 10 switches to the "wenig verfügbar" label + green-yellow color.
+        let statusBadge = '';
+        if (!item.available) {
+            statusBadge = `<span class="badge sold-out">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('soldOut')}</span>`;
+        } else if (isLowStock) {
+            statusBadge = dm
+                ? `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`
+                : `<span class="badge available-low">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('lowStock')}</span>`;
+        } else if (!item.amountTracking) {
+            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
+        } else if (dm) {
+            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')} (${item.availableAmount})</span>`;
+        } else {
+            statusBadge = `<span class="badge available">${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('available')}</span>`;
+        }
+
+        const split = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .splitLanguage */ .dk)(item.description || '');
+        const lbl = split.label || 'fallback';
+        
+        let dTitle = '';
+        if (lbl !== 'high' && lbl !== 'template') {
+            dTitle = ` title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}"`;
+        }
+
+        let cBadge = '';
+        if (dm) {
+            const c = split.confidence ?? 0;
+            const s = split.subScores || {};
+            const tp = `Split confidence: score ${c.toFixed(2)} · anchor ${(s.anchor||0).toFixed(2)} · purity ${(s.purity||0).toFixed(2)} · courses ${(s.course||0).toFixed(2)} · coverage ${(s.coverage||0).toFixed(2)}`;
+            cBadge = `<span class="badge confidence-badge confidence-${lbl}" title="${tp}">${lbl}</span>`;
+        }
+
+        let heatmapHtml = '';
+        if (dm && lbl !== 'high') {
+            const descText = item.description || '';
+            const affinities = heatmapLangModel.scoreCharAffinities(descText);
+            const chars = affinities.map(({char, affinity}) => {
+                const hue = affinity > 0 ? 210 : 0;
+                const saturation = Math.round(Math.min(80, Math.abs(affinity) * 80));
+                const color = `hsl(${hue}, ${saturation}%, 50%)`;
+                return `<span class="heatmap-char" style="color: ${color}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
+            }).join('');
+            heatmapHtml = `<div class="heatmap-row">${chars}</div>`;
+        }
+
+        let orderedBadge = '';
+        if (orderCount > 0) {
+            const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
+            orderedBadge = `<span class="badge ordered"><span class="material-icons-round">check_circle</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('ordered')}${countBadge}</span>`;
+            itemEl.classList.add('ordered');
+            if (new Date(day.date).toDateString() === now.toDateString()) {
+                itemEl.classList.add('today-ordered');
+            }
+        }
+
+        const flagId = `${day.date}_${articleId}`;
+        const isFlagged = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(flagId);
+        if (isFlagged) {
+            itemEl.classList.add(item.available ? 'flagged-available' : 'flagged-sold-out');
+        }
+
+        const matchedTags = [...new Set([...(0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.name), ...(0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .checkHighlight */ .BM)(item.description)])];
+        if (matchedTags.length > 0) {
+            itemEl.classList.add('highlight-glow');
+        }
+
+        let orderButton = '';
+        let cancelButton = '';
+        let flagButton = '';
+
+        if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX && !isPastCutoff) {
+            const flagIcon = isFlagged ? 'notifications_active' : 'notifications_none';
+            const flagClass = isFlagged ? 'btn-flag active' : 'btn-flag';
+            const flagTitle = isFlagged ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagDeactivate') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('flagActivate');
+            if (!item.available || isFlagged) {
+                flagButton = `<button class="${flagClass}" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-cutoff="${day.orderCutoff}" title="${flagTitle}"><span class="material-icons-round">${flagIcon}</span></button>`;
+            }
+
+            if (item.available) {
+                if (orderCount > 0) {
+                    orderButton = `<button class="btn-order btn-order-compact" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderAgainTooltip')}"><span class="material-icons-round">add</span></button>`;
+                } else {
+                    orderButton = `<button class="btn-order" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" data-price="${item.price}" data-desc="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.description || '')}" title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)} – ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderTooltip')}"><span class="material-icons-round">add_shopping_cart</span> ${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderButton')}</button>`;
+                }
+            }
+
+            if (orderCount > 0) {
+                const cancelIcon = orderCount === 1 ? 'close' : 'remove';
+                const cancelTitle = orderCount === 1 ? (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOrder') : (0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('cancelOneOrder');
+                cancelButton = `<button class="btn-cancel" data-date="${day.date}" data-article="${articleId}" data-name="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}" title="${cancelTitle}"><span class="material-icons-round">${cancelIcon}</span></button>`;
+            }
+        }
+
+        let tagsHtml = '';
+        if (matchedTags.length > 0) {
+            const badges = matchedTags.reduce((acc, t) => acc + `<span class="tag-badge-small"><span class="material-icons-round" style="font-size:10px;margin-right:2px">star</span>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(t)}</span>`, '');
+            tagsHtml = `<div class="matched-tags">${badges}</div>`;
+        }
+
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getLocalizedText */ .PC)(item.description))} ${cBadge}</p>${heatmapHtml}</div>`;
+
+        const orderBtn = itemEl.querySelector('.btn-order');
+        if (orderBtn) {
+            orderBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.classList.add('loading');
+                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .placeOrder */ .wH)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, parseFloat(btn.dataset.price), btn.dataset.desc || '')
+                    .finally(() => { btn.disabled = false; btn.classList.remove('loading'); });
+            });
+        }
+
+        const cancelBtn = itemEl.querySelector('.btn-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .cancelOrder */ .N4)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name)
+                    .finally(() => { btn.disabled = false; });
+            });
+        }
+
+        const flagBtn = itemEl.querySelector('.btn-flag');
+        if (flagBtn) {
+            flagBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const btn = e.currentTarget;
+                (0,_actions_js__WEBPACK_IMPORTED_MODULE_4__/* .toggleFlag */ .PQ)(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
+            });
+        }
+
+        body.appendChild(itemEl);
+    });
+
+    card.appendChild(body);
+    return card;
+}
+
+async function fetchVersions(devMode) {
+    const endpoint = devMode
+        ? `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/tags?per_page=20`
+        : `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_API */ .pe}/releases?per_page=20`;
+
+    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost
+    const storedEtag = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
+    const resp = await fetch(endpoint, { headers: (0,_api_js__WEBPACK_IMPORTED_MODULE_3__/* .githubHeaders */ .O)(storedEtag) });
+
+    // 304 Not Modified — content unchanged, skip processing
+    if (resp.status === 304) return null;
+
+    if (!resp.ok) {
+        if (resp.status === 403) {
+            throw new Error('API Rate Limit erreicht (403). Bitte später erneut versuchen.');
+        }
+        throw new Error(`GitHub API ${resp.status}`);
+    }
+
+    // Persist new ETag for next conditional request
+    const newEtag = resp.headers.get('ETag');
+    if (newEtag) localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG, newEtag);
+
+    const data = await resp.json();
+
+    return data.map(item => {
+        const tag = devMode ? item.name : item.tag_name;
+        return {
+            tag,
+            name: devMode ? tag : (item.name || tag),
+            // Raw content URL: fetched as blob to bypass firewall blocking htmlpreview
+            rawUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .RAW_INSTALLER_BASE */ .IY}/${tag}/dist/install.html`,
+            // GitHub file browser URL: opened directly in new tab
+            githubUrl: `${_constants_js__WEBPACK_IMPORTED_MODULE_2__/* .GITHUB_FILE_BASE */ .fK}/${tag}/dist/install.html`,
+            body: item.body || ''
+        };
+    });
+}
+
+/**
+ * Fetches an install.html from raw GitHub content and opens it as a Blob URL.
+ * Falls back to opening the raw URL directly if fetch fails.
+ * @param {string} rawUrl - The raw.githubusercontent.com URL of the installer HTML.
+ */
+async function openInstallPage(rawUrl) {
+    try {
+        const resp = await fetch(rawUrl);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const html = await resp.text();
+        const blob = new Blob([html], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        const win = window.open(blobUrl, '_blank');
+        if (!win) throw new Error('Popup blocked');
+        // Revoke blob URL after 5 minutes to free memory
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5 * 60 * 1000);
+    } catch (e) {
+        console.warn('[Kantine] Blob open failed, falling back to raw URL:', e);
+        window.open(rawUrl, '_blank');
+    }
+}
+
+async function checkForUpdates() {
+    const currentVersion = 'v1.10.11';
+    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+
+    // Cache-first: use cached versions if ≤1h old to avoid hitting GitHub API rate limit
+    const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
+    if (cachedRaw) {
+        try {
+            const cached = JSON.parse(cachedRaw);
+            if (cached && cached.timestamp && cached.devMode === devMode && cached.versions && cached.versions.length) {
+                const age = Date.now() - cached.timestamp;
+                if (age < 60 * 60 * 1000) {
+                    const latest = cached.versions[0].tag;
+                    if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) {
+                        showUpdateBadge(cached.versions[0]);
+                    }
+                    return; // skip API call entirely
+                }
+            }
+        } catch (_) {}
+    }
+
+    try {
+        const versions = await fetchVersions(devMode);
+        if (!versions || !versions.length) return;
+
+        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
+            timestamp: Date.now(), devMode, versions
+        }));
+
+        const latest = versions[0].tag;
+
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(latest, currentVersion)) return;
+
+        showUpdateBadge(versions[0]);
+    } catch (e) {
+        console.warn('[Kantine] Version check failed:', e);
+    }
+}
+
+/** Helper: show/cache the 🆕 badge in the header. Extracted so cache-first path can also show it. */
+function showUpdateBadge(version) {
+    const headerTitle = document.querySelector('.header-left h1');
+    if (headerTitle && !headerTitle.querySelector('.update-icon')) {
+        const icon = document.createElement('span');
+        icon.className = 'update-icon';
+        icon.role = 'button';
+        icon.innerHTML = '🆕';
+        icon.title = `Update: ${version.tag} — Klick zum Installieren`;
+        icon.addEventListener('click', () => openInstallPage(version.rawUrl));
+        headerTitle.appendChild(icon);
+    }
+}
+
+function openVersionMenu() {
+    const modal = document.getElementById('version-modal');
+    const container = document.getElementById('version-list-container');
+    const devToggle = document.getElementById('dev-mode-toggle');
+    const currentVersion = 'v1.10.11';
+
+    if (!modal) return;
+    modal.classList.remove('hidden');
+
+    const cur = document.getElementById('version-current');
+    if (cur) cur.textContent = currentVersion;
+
+    const devMode = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE) === 'true';
+    devToggle.checked = devMode;
+
+    async function loadVersions(forceRefresh) {
+        const dm = devToggle.checked;
+        container.innerHTML = '<p style="color:var(--text-secondary);">Lade Versionen...</p>';
+
+        function renderVersionsList(versions) {
+            if (!versions || !versions.length) {
+                container.innerHTML = '<p style="color:var(--text-secondary);">Keine Versionen gefunden.</p>';
+                return;
+            }
+
+            container.innerHTML = '<ul class="version-list"></ul>';
+            const list = container.querySelector('.version-list');
+
+            versions.forEach(v => {
+                const isCurrent = v.tag === currentVersion;
+                const isNew = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .isNewer */ .U4)(v.tag, currentVersion);
+                const li = document.createElement('li');
+                li.className = 'version-item' + (isCurrent ? ' current' : '');
+
+                let badge = '';
+                if (isCurrent) badge = '<span class="badge-current">✓ Installiert</span>';
+                else if (isNew) badge = '<span class="badge-new">⬆ Neu!</span>';
+
+                li.innerHTML = `
+                    <div class="version-info">
+                        <strong>${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)}</strong>
+                        ${badge}
+                    </div>
+                    <div class="version-actions">
+                        <button class="btn-install-raw"
+                            data-raw-url="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.rawUrl)}"
+                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} installieren (laedt Install-Seite aus GitHub Raw-Content)">
+                            Installieren
+                        </button>
+                        <a href="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.githubUrl)}" target="_blank" class="btn-github-link"
+                            title="${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(v.tag)} auf GitHub ansehen">
+                            &rarr; Github
+                        </a>
+                    </div>
+                `;
+
+                // Attach click handler for Blob-based install
+                const installBtn = li.querySelector('.btn-install-raw');
+                if (installBtn) {
+                    installBtn.addEventListener('click', () => {
+                        openInstallPage(installBtn.dataset.rawUrl);
+                    });
+                }
+
+                list.appendChild(li);
+            });
+        }
+
+        try {
+            const cachedRaw = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
+            let cached = null;
+            if (cachedRaw) {
+                try { cached = JSON.parse(cachedRaw); } catch (e) { }
+            }
+
+            if (cached && cached.devMode === dm && cached.versions) {
+                renderVersionsList(cached.versions);
+            }
+
+            const liveVersions = await fetchVersions(dm);
+            if (liveVersions !== null) {
+                const liveVersionsStr = JSON.stringify(liveVersions);
+                const cachedVersionsStr = cached ? JSON.stringify(cached.versions) : '';
+
+                if (liveVersionsStr !== cachedVersionsStr) {
+                    localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE, JSON.stringify({
+                        timestamp: Date.now(), devMode: dm, versions: liveVersions
+                    }));
+                    renderVersionsList(liveVersions);
+                }
+            }
+
+        } catch (e) {
+            container.innerHTML = `<p style="color:#e94560;">Fehler: ${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(e.message)}</p>`;
+        }
+    }
+
+    loadVersions(false);
+
+    devToggle.onchange = async () => {
+        if (devToggle.checked) {
+            const promptText = _state_js__WEBPACK_IMPORTED_MODULE_0__/* .langMode */ .Kl === 'en' ? 'Dev-Mode password:' : 'Dev-Mode Passwort:';
+            const entered = prompt(promptText);
+            if (entered === null) {
+                devToggle.checked = false;
+                console.warn('[Kantine] Dev-Mode activation cancelled.');
+                return;
+            }
+            const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(entered));
+            const hashHex = Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+            if (hashHex !== _constants_js__WEBPACK_IMPORTED_MODULE_2__/* .DEV_MODE_PW_HASH */ .Z7) {
+                devToggle.checked = false;
+                localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
+                console.warn('[Kantine] Dev-Mode activation rejected: wrong password.');
+                return;
+            }
+            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'true');
+        } else {
+            localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.DEV_MODE, 'false');
+        }
+        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_CACHE);
+        localStorage.removeItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.VERSION_ETAG);
+        loadVersions(true);
+        renderVisibleWeeks();
+    };
+}
+
+function updateCountdown() {
+    if (!_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .currentUser */ .Ny) {
+        removeCountdown();
+        return;
+    }
+
+    const now = new Date();
+    const currentDay = now.getDay();
+    if (currentDay === 0 || currentDay === 6) {
+        removeCountdown();
+        return;
+    }
+
+    const todayStr = now.toISOString().split('T')[0];
+
+    let hasOrder = false;
+    for (const key of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .orderMap */ .L.keys()) {
+        if (key.startsWith(todayStr)) {
+            hasOrder = true;
+            break;
+        }
+    }
+
+    if (hasOrder) {
+        removeCountdown();
+        return;
+    }
+
+    const cutoff = new Date();
+    cutoff.setHours(10, 0, 0, 0);
+
+    const diff = cutoff - now;
+
+    if (diff <= 0) {
+        removeCountdown();
+        return;
+    }
+
+    const diffHrs = Math.floor(diff / 3600000);
+    const diffMins = Math.floor((diff % 3600000) / 60000);
+
+    const headerCenter = document.querySelector('.header-center-wrapper');
+    if (!headerCenter) return;
+
+    let countdownEl = document.getElementById('order-countdown');
+    if (!countdownEl) {
+        countdownEl = document.createElement('div');
+        countdownEl.id = 'order-countdown';
+        headerCenter.insertBefore(countdownEl, headerCenter.firstChild);
+    }
+
+    countdownEl.innerHTML = `<span>${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('orderDeadline')}:</span> <strong>${diffHrs}h ${diffMins}m</strong>`;
+
+    if (diff < 3600000) {
+        countdownEl.classList.add('urgent');
+
+        const notifiedKey = `kantine_notified_${todayStr}`;
+        if (!localStorage.getItem(notifiedKey)) {
+            if (Notification.permission === 'granted') {
+                new Notification('Kantine: Bestellschluss naht!', {
+                    body: 'Du hast heute noch nichts bestellt. Nur noch 1 Stunde!',
+                    icon: '⏳'
+                });
+            } else if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            localStorage.setItem(notifiedKey, 'true');
+        }
+    } else {
+        countdownEl.classList.remove('urgent');
+    }
+}
+
+function removeCountdown() {
+    const el = document.getElementById('order-countdown');
+    if (el) el.remove();
+}
+
+setInterval(updateCountdown, 60000);
+setTimeout(updateCountdown, 1000);
+
+function showErrorModal(title, message, details, btnText, url) {
+    const modalId = 'error-modal';
+    let modal = document.getElementById(modalId);
+    if (modal) modal.remove();
+
+    modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal'; // Removed hidden because we are showing it now
+    
+    const content = document.createElement('div');
+    content.className = 'modal-content';
+    
+    const header = document.createElement('div');
+    header.className = 'modal-header';
+    const h2 = document.createElement('h2');
+    h2.style.cssText = 'color: var(--error-color); display: flex; align-items: center; gap: 10px;';
+    
+    const icon = document.createElement('span');
+    icon.className = 'material-icons-round';
+    icon.textContent = 'signal_wifi_off';
+    h2.appendChild(icon);
+    
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = title;
+    h2.appendChild(titleSpan);
+    
+    header.appendChild(h2);
+    content.appendChild(header);
+    
+    const body = document.createElement('div');
+    body.style.padding = '20px';
+    
+    const p = document.createElement('p');
+    p.style.cssText = 'margin-bottom: 15px; color: var(--text-primary);';
+    p.textContent = message;
+    body.appendChild(p);
+    
+    if (details) {
+        const small = document.createElement('small');
+        small.style.cssText = 'display: block; margin-top: 10px; color: var(--text-secondary);';
+        small.textContent = details;
+        body.appendChild(small);
+    }
+    
+    const footer = document.createElement('div');
+    footer.style.cssText = 'margin-top: 20px; display: flex; justify-content: center;';
+    
+    const btn = document.createElement('button');
+    btn.style.cssText = `
+        background-color: var(--accent-color);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+    `;
+    btn.textContent = btnText || 'Zur Original-Seite';
+    btn.onclick = () => {
+        window.open(url || 'https://web.bessa.app/knapp-kantine', '_blank');
+        modal.classList.add('hidden');
+    };
+    
+    footer.appendChild(btn);
+    body.appendChild(footer);
+    content.appendChild(body);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+}
+
+function updateAlarmBell() {
+    const bellBtn = document.getElementById('alarm-bell');
+    const bellIcon = document.getElementById('alarm-bell-icon');
+    if (!bellBtn || !bellIcon) return;
+
+    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0) {
+        bellBtn.classList.add('hidden');
+        bellBtn.style.display = 'none';
+        bellIcon.style.color = 'var(--text-secondary)';
+        bellIcon.style.textShadow = 'none';
+        return;
+    }
+
+    bellBtn.classList.remove('hidden');
+    bellBtn.style.display = 'inline-flex';
+
+    let anyAvailable = false;
+    for (const wk of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .allWeeks */ .p_) {
+        if (!wk.days) continue;
+        for (const d of wk.days) {
+            if (!d.items) continue;
+            for (const item of d.items) {
+                if (item.available && _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.has(item.id)) {
+                    anyAvailable = true;
+                    break;
+                }
+            }
+            if (anyAvailable) break;
+        }
+        if (anyAvailable) break;
+    }
+
+    const lastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED);
+    const flaggedLastCheckedStr = localStorage.getItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.FLAGGED_LAST_CHECKED);
+
+    let latestTime = 0;
+    if (lastCheckedStr) latestTime = Math.max(latestTime, new Date(lastCheckedStr).getTime());
+    if (flaggedLastCheckedStr) latestTime = Math.max(latestTime, new Date(flaggedLastCheckedStr).getTime());
+
+    let timeStr = 'gerade eben';
+    if (latestTime === 0) {
+        const now = new Date().toISOString();
+        localStorage.setItem(_constants_js__WEBPACK_IMPORTED_MODULE_2__.LS.LAST_CHECKED, now);
+        latestTime = new Date(now).getTime();
+    }
+
+    timeStr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .getRelativeTime */ .gs)(new Date(latestTime));
+
+    bellBtn.title = `${(0,_i18n_js__WEBPACK_IMPORTED_MODULE_5__.t)('alarmLastChecked')}: ${timeStr}`;
+
+    if (anyAvailable) {
+        bellIcon.style.color = '#10b981';
+        bellIcon.style.textShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
+    } else {
+        bellIcon.style.color = '#f59e0b';
+        bellIcon.style.textShadow = '0 0 10px rgba(245, 158, 11, 0.4)';
+    }
+}
+
+
+/***/ },
+
+/***/ 930
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  sg: () => (/* binding */ debounce),
+  ZD: () => (/* binding */ escapeHtml),
+  sn: () => (/* binding */ getISOWeek),
+  PC: () => (/* binding */ getLocalizedText),
+  gs: () => (/* binding */ getRelativeTime),
+  Ao: () => (/* binding */ getWeekYear),
+  U4: () => (/* binding */ isNewer),
+  dk: () => (/* reexport */ splitLanguage),
+  FS: () => (/* binding */ translateDay)
+});
+
+// EXTERNAL MODULE: ./src/state.js
+var state = __webpack_require__(901);
+;// ./src/lang/normalize.js
+function isValidAllergen(content) {
+    if (typeof content !== 'string' || !content) return false;
+    return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
+}
+
+function normalize(text) {
+    let modifiedText = text;
+    let notes = [];
+
+    // 1. Repair allergen-internal slashes: (A/F/N) -> (AFN)
+    modifiedText = modifiedText.replace(/\(([A-Z](?:\/[A-Z])+)\)/g, (match, p1) => {
+        return '(' + p1.replace(/\//g, '') + ')';
+    });
+
+    // 2. Repair slash-before-allergen: /ACLM) -> (ACLM)
+    modifiedText = modifiedText.replace(/\/([A-Z]{1,8})\)/g, '($1)');
+
+    // 4. Detect and park notes (doing it before step 3 to use the 6 spaces rule)
+    
+    // Pass 1: Extract "Achtung Änderung" specifically as requested
+    const aaRegex = /Achtung Änderung/gi;
+    const aaMatches = modifiedText.match(aaRegex);
+    if (aaMatches) {
+        aaMatches.forEach(m => {
+            notes.push(m.trim());
+            modifiedText = modifiedText.replace(m, ' ');
+        });
+    }
+
+    // Pass 2: Detect based on combinations
+    let parts = modifiedText.split(/ {6,}/);
+    if (parts.length > 1) {
+        let lastPart = parts[parts.length - 1];
+        let hasA = /!!!|!{3,}/.test(lastPart);
+        let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
+        let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
+        let hasD = !lastPart.includes(' / ') && !isValidAllergen(lastPart.replace(/[()]/g, ''));
+        
+        if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
+            notes.push(lastPart.trim());
+            modifiedText = modifiedText.substring(0, modifiedText.lastIndexOf(lastPart)).trim();
+        }
+    } else {
+        let exclIndex = modifiedText.indexOf('!!!');
+        if (exclIndex !== -1) {
+            let lastPart = modifiedText.substring(exclIndex);
+            let hasA = true;
+            let hasB = /[A-ZÄÖÜ]{6,}/.test(lastPart);
+            let hasC = /ACHTUNG|Achtung|Änderung|ABHOLUNG|WERKSRESTAURANT/i.test(lastPart);
+            let hasD = false;
+            
+            if ((hasA && hasB) || (hasA && hasC) || (hasB && hasC) || (hasD && hasC)) {
+                notes.push(lastPart.trim());
+                modifiedText = modifiedText.substring(0, exclIndex).trim();
+            }
+        }
+    }
+
+    // 3. Collapse whitespace
+    modifiedText = modifiedText.replace(/\s{2,}/g, ' ').trim();
+
+    return {
+        text: modifiedText,
+        notes: notes
+    };
+}
+;// ./src/lang/templates.js
+// @ts-check
+
+const TEMPLATES = [
+  {
+    test: (t) => /^Suppe\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s+Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
+  {
+    test: (t) => /^Suppe\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s*\/\s*Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
+  {
+    test: (t) => /^Suppr\s*\/\s*Soup\s+Salat\s*\/\s*Salad\s+Dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe\n• Salat\n• Dessert',
+      en: '• Soup\n• Salad\n• Dessert',
+      raw: '• Suppe / Soup\n• Salat / Salad\n• Dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
+];
+
+function matchTemplate(normalizedText) {
+  if (typeof normalizedText !== 'string' || !normalizedText) return null;
+
+  for (const tpl of TEMPLATES) {
+    if (tpl.test(normalizedText)) return tpl.result;
+  }
+
+  return null;
+}
+
+;// ./src/lang/segment.js
+function segment_isValidAllergen(content) {
+  if (typeof content !== 'string' || !content) return false;
+  return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
+}
+
+/**
+ * Segments a normalized menu text into separate course objects.
+ * 
+ * @param {string} normalizedText 
+ * @returns {Array<{de: string, en: string, allergen: string, mono: boolean, anchored: boolean}>}
+ */
+function segment(normalizedText) {
+  if (!normalizedText || typeof normalizedText !== 'string') {
+    return [];
+  }
+
+  const courses = [];
+  const parenRegex = /\(([^()]+)\)\s*(?!\s*\/)/g;
+  let match;
+  let lastScanIndex = 0;
+
+  while ((match = parenRegex.exec(normalizedText)) !== null) {
+    const content = match[1];
+    if (segment_isValidAllergen(content)) {
+      // End of this course segment is at the end of the matched parenthesis
+      const segmentEndIndex = match.index + match[0].length;
+      let segmentText = normalizedText.substring(lastScanIndex, segmentEndIndex);
+      
+      courses.push(processSegment(segmentText, content, true));
+      lastScanIndex = segmentEndIndex;
+    }
+  }
+
+  // Any remaining text after the last valid allergen is an unanchored segment
+  if (lastScanIndex < normalizedText.length) {
+    const remainingText = normalizedText.substring(lastScanIndex).trim();
+    if (remainingText) {
+      courses.push(processSegment(remainingText, "", false));
+    }
+  }
+
+  return courses;
+}
+
+function processSegment(segmentText, allergen, anchored) {
+  // 1. Strip the allergen code from the end of the segment text if it exists
+  let textWithoutAllergen = segmentText;
+  if (allergen) {
+    const suffix = `(${allergen})`;
+    if (textWithoutAllergen.endsWith(suffix)) {
+      textWithoutAllergen = textWithoutAllergen.substring(0, textWithoutAllergen.length - suffix.length);
+    } else {
+      // In case of whitespace before the parenthesis in the raw segment
+      const lastParenIndex = textWithoutAllergen.lastIndexOf(`(${allergen})`);
+      if (lastParenIndex !== -1) {
+        textWithoutAllergen = textWithoutAllergen.substring(0, lastParenIndex);
+      }
+    }
+  }
+  textWithoutAllergen = textWithoutAllergen.trim();
+
+  // 2. Split DE|EN at the FIRST slash that is NOT inside parentheses
+  //    (skips slashes in e.g. "(Schwein/Rind)" or "(pork/beef)")
+  let de, en, mono;
+  let slashIdx = -1;
+  let parenDepth = 0;
+  for (let i = 0; i < textWithoutAllergen.length; i++) {
+    const ch = textWithoutAllergen[i];
+    if (ch === '(') parenDepth++;
+    else if (ch === ')') parenDepth--;
+    else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+  }
+  if (slashIdx === -1 && parenDepth > 0) {
+    const openIdx = textWithoutAllergen.indexOf('(');
+    parenDepth = 0;
+    for (let i = 0; i < textWithoutAllergen.length; i++) {
+      const ch = textWithoutAllergen[i];
+      if (i === openIdx) continue;
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth--;
+      else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+    }
+  }
+  if (slashIdx !== -1) {
+    // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
+    let left = slashIdx;
+    let right = slashIdx + 1;
+    while (left > 0 && textWithoutAllergen[left - 1] === ' ') left--;
+    while (right < textWithoutAllergen.length && textWithoutAllergen[right] === ' ') right++;
+    de = textWithoutAllergen.substring(0, left).trim();
+    en = textWithoutAllergen.substring(right).trim();
+    mono = false;
+  } else {
+    de = textWithoutAllergen;
+    en = textWithoutAllergen;
+    mono = true;
+  }
+
+  // 3. Re-attach allergen if it exists and not already present
+  if (allergen) {
+    const aSuffix = ` (${allergen})`;
+    de = de.includes(`(${allergen})`) ? de : `${de}${aSuffix}`;
+    en = en.includes(`(${allergen})`) ? en : `${en}${aSuffix}`;
+  }
+
+  return {
+    de,
+    en,
+    allergen,
+    mono,
+    anchored
+  };
+}
+
+;// ./src/lang/boundary.js
+function resolveBoundary(fragment, langModel) {
+    const MIN_BOUNDARY_CONFIDENCE = 1.5;
+    const MIN_LEFT_ENGLISH = 1.0;
+    
+    // Handle empty fragment
+    if (!fragment || fragment.trim() === '') {
+        return { enPart: '', deCut: '' };
+    }
+
+    const words = fragment.trim().split(/\s+/);
+    
+    if (words.length < 2) {
+        return { enPart: fragment, deCut: '' };
+    }
+
+    let bestK = -1;
+    let maxScore = -9999;
+
+    for (let k = 1; k < words.length; k++) {
+        const leftWords = words.slice(0, k);
+        const rightWords = words.slice(k);
+
+        const leftText = leftWords.join(' ');
+        const rightText = rightWords.join(' ');
+
+        const leftScore = langModel.scoreLang(leftText);
+        const rightScore = langModel.scoreLang(rightText);
+
+        const leftLooksEnglish = leftScore < -MIN_LEFT_ENGLISH;
+        const rightLooksGerman = rightScore > 0;
+
+        const boundaryScore = (-leftScore) + rightScore;
+
+        if (leftLooksEnglish && rightLooksGerman && boundaryScore > maxScore) {
+            maxScore = boundaryScore;
+            bestK = k;
+        }
+    }
+
+    if (bestK !== -1 && maxScore > MIN_BOUNDARY_CONFIDENCE) {
+        return {
+            enPart: words.slice(0, bestK).join(' '),
+            deCut: words.slice(bestK).join(' ')
+        };
+    }
+
+    return { enPart: fragment, deCut: '' };
+}
+
+;// ./src/lang/loanwords.js
+// Cross-lingual food loanwords that appear (often capitalized) in BOTH German and
+// English menu descriptions and may score "German-ish" on the trigram model.
+//
+// Used for two purposes:
+//  1. dishes.js  — avoid mistaking a loanword inside an English dish name for the
+//                  start of the next German dish (small tie-breaker penalty).
+//  2. score.js   — exempt these from the asymmetric "German-word-inside-English"
+//                  purity penalty, so a legit English dish name isn't punished.
+const LOANWORDS = new Set([
+    'gnocchi', 'risotto', 'tiramisu', 'ravioli', 'lasagne', 'lasagna', 'pasta', 'penne',
+    'spaghetti', 'pesto', 'ratatouille', 'stifado', 'gulasch', 'goulash', 'couscous',
+    'bulgur', 'falafel', 'hummus', 'masala', 'chana', 'ravaya', 'yakitori', 'donut',
+    'muffin', 'parmesan', 'mozzarella', 'feta', 'focaccia', 'baguette', 'panini',
+    'gyros', 'baklava', 'wrap', 'bowl', 'dip', 'wok', 'sushi', 'curry', 'chili',
+    'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
+    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio'
+]);
+
+function isLoanword(token) {
+    if (!token) return false;
+    const w = String(token).toLowerCase().replace(/[^a-zäöüß]/g, '');
+    return w.length > 0 && LOANWORDS.has(w);
+}
+
+;// ./src/lang/dishes.js
+
+
+// Split a reconstructed bilingual segment "DE1 / EN1 DE2 / EN2 ..." into individual
+// dishes. The separator-slash count is the structural skeleton (every bilingual dish
+// is "German / English"); allergens are optional anchors handled by the caller.
+//
+// Each returned dish = { de, en, mono }. The caller (splitter.js) reattaches the
+// allergen to the LAST dish and assigns the `anchored` flag.
+function splitDishes(text, langModel) {
+    const t = String(text || '').replace(/\s*\/\s*/g, ' / ').replace(/\s+/g, ' ').trim();
+    if (!t) return [];
+
+    const tokens = t.split(' ');
+    const slashIdxs = [];
+    for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i] === '/') slashIdxs.push(i);
+    }
+
+    // No slash -> a single mono dish (e.g. "Vanillapudding").
+    if (slashIdxs.length === 0) {
+        return [{ de: t, en: t, mono: true }];
+    }
+
+    // Exactly one slash -> a single bilingual dish.
+    if (slashIdxs.length === 1) {
+        const si = slashIdxs[0];
+        const de = tokens.slice(0, si).join(' ').trim();
+        const en = tokens.slice(si + 1).join(' ').trim();
+        if (!de || !en) {
+            const solo = de || en;
+            return [{ de: solo, en: solo, mono: true }];
+        }
+        return [{ de, en, mono: false }];
+    }
+
+    // Two or more slashes -> peel the first dish, recurse on the remainder.
+    // Structure between the first two slashes is "EN_1 ... DE_2"; the EN_1 -> DE_2
+    // boundary is resolved via the multi-signal detector below.
+    const s1 = slashIdxs[0];
+    const s2 = slashIdxs[1];
+    const de1 = tokens.slice(0, s1).join(' ').trim();
+    const mid = tokens.slice(s1 + 1, s2); // EN_1 ... DE_2
+    const k = findDishBoundary(mid, langModel);
+    const en1 = mid.slice(0, k).join(' ').trim();
+    const de2 = mid.slice(k).join(' ').trim();
+    const tail = tokens.slice(s2 + 1).join(' ').trim();
+
+    const first = { de: de1, en: en1 || de1, mono: false };
+    const remainder = (de2 ? de2 + ' / ' : '/ ') + tail;
+    return [first, ...splitDishes(remainder, langModel)];
+}
+
+function classifyToken(token, langModel, isFirst) {
+    if (isLoanword(token)) return 'ambig';
+    if (!isFirst && /^[A-ZÄÖÜ]/.test(token)) return 'de';
+    const s = langModel.scoreLang(token);
+    if (s > 0.5) return 'de';
+    if (s < -0.5) return 'en';
+    return 'ambig';
+}
+
+function findDishBoundary(midTokens, langModel) {
+    const n = midTokens.length;
+    if (n <= 1) return n;
+
+    const tags = midTokens.map((t, i) => classifyToken(t, langModel, i === 0));
+
+    let bestK = 1;
+    let bestPenalty = Infinity;
+    let bestCap = -1;
+
+    for (let k = 1; k < n; k++) {
+        let leftGerman = 0;
+        for (let i = 0; i < k; i++) if (tags[i] === 'de') leftGerman++;
+        let rightEnglish = 0;
+        for (let i = k; i < n; i++) if (tags[i] === 'en') rightEnglish++;
+
+        const penalty = leftGerman + rightEnglish;
+        const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
+
+        if (penalty < bestPenalty || (penalty === bestPenalty && cap > bestCap)) {
+            bestPenalty = penalty;
+            bestCap = cap;
+            bestK = k;
+        }
+    }
+
+    return bestK;
+}
+
+;// ./src/lang/score.js
+
+
+const WEIGHT_ANCHOR = 0.35;
+const WEIGHT_PURITY = 0.30;
+const WEIGHT_COURSE = 0.20;
+const WEIGHT_COVERAGE = 0.15;
+
+const THRESHOLD_HIGH = 0.80;
+const THRESHOLD_MEDIUM = 0.55;
+
+function tokenize(text) {
+  return (text || '').toLowerCase().match(/[a-zäöüß]{2,}/g) || [];
+}
+
+function countGermanIntrusionsInEnglish(enClean) {
+  const tokens = enClean.split(/\s+/);
+  let count = 0;
+  for (let i = 1; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (!/^[A-ZÄÖÜ]/.test(tok)) continue;
+    const word = tok.toLowerCase().replace(/[^a-zäöüß]/g, '');
+    if (word.length < 3 || isLoanword(tok)) continue;
+    count++;
+  }
+  return count;
+}
+
+function hasSeparatorSlash(text) {
+  return (text || '').replace(/\([^)]*\)/g, '').indexOf('/') !== -1;
+}
+
+function scoreSplit({ courses, notes, raw, langModel }) {
+  // anchor score
+  const anchoredCount = courses.filter(c => c.anchored).length;
+  const anchor = anchoredCount / Math.max(courses.length, 1);
+
+  // purity score
+  let puritySum = 0;
+  let purityCount = 0;
+  for (const course of courses) {
+    if (!course.mono) {
+      const deClean = (course.de || '').replace(/\([^)]*\)/g, '').trim();
+      const enClean = (course.en || '').replace(/\([^)]*\)/g, '').trim();
+      
+      const deScoreLang = langModel.scoreLang(deClean);
+      const enScoreLang = langModel.scoreLang(enClean);
+      
+      const de_purity = Math.max(0, deScoreLang) / (Math.abs(deScoreLang) + 1);
+      let en_purity = Math.max(0, -enScoreLang) / (Math.abs(enScoreLang) + 1);
+      if (countGermanIntrusionsInEnglish(enClean) > 0) {
+        en_purity = Math.min(en_purity, 0.2);
+      }
+
+      puritySum += de_purity + en_purity;
+      purityCount += 2;
+    }
+  }
+  const purity = purityCount > 0 ? puritySum / purityCount : 1.0;
+
+  // course score
+  const baseCourseScore = (courses.length === 1 || courses.length === 3) ? 1.0 : 0.0;
+  let penalties = 0;
+  for (const course of courses) {
+    if (!course.mono) {
+      if (!course.de || course.de.length === 0 || !course.en || course.en.length === 0) {
+        penalties += 0.3;
+      }
+    }
+  }
+  const courseScore = Math.max(0, baseCourseScore - penalties);
+
+  // coverage score
+  const rawTokens = tokenize(raw);
+  const splitText = courses.map(c => (c.de || '') + ' ' + (c.en || '')).join(' ') + ' ' + (notes || []).join(' ');
+  const splitTokenSet = new Set(tokenize(splitText));
+  const covered = rawTokens.filter(t => splitTokenSet.has(t)).length;
+  const coverage = covered / Math.max(rawTokens.length, 1);
+
+  // composite confidence
+  const confidence = Math.max(0, Math.min(1,
+    anchor * WEIGHT_ANCHOR +
+    purity * WEIGHT_PURITY +
+    courseScore * WEIGHT_COURSE +
+    coverage * WEIGHT_COVERAGE
+  ));
+
+  const corrupted = courses.some(c => hasSeparatorSlash(c.en) || hasSeparatorSlash(c.de));
+  const suspiciousCourseCount = courses.length === 2;
+
+  let label = 'low';
+  if (!corrupted && !suspiciousCourseCount && confidence >= THRESHOLD_HIGH) {
+    label = 'high';
+  } else if (!corrupted && confidence >= THRESHOLD_MEDIUM) {
+    label = 'medium';
+  }
+
+  let finalConfidence = confidence;
+  if (corrupted) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_MEDIUM - 0.05);
+  } else if (suspiciousCourseCount) {
+    finalConfidence = Math.min(finalConfidence, THRESHOLD_HIGH - 0.01);
+  }
+
+  return {
+    confidence: finalConfidence,
+    subScores: {
+      anchor,
+      purity,
+      course: courseScore,
+      coverage
+    },
+    label
+  };
+}
+// EXTERNAL MODULE: ./src/lang/langModel.js
+var lang_langModel = __webpack_require__(152);
+// EXTERNAL MODULE: ./src/lang/langModelSeed.js
+var langModelSeed = __webpack_require__(977);
+;// ./src/lang/alignTrailing.js
+// @ts-check
+
+
+
+const MIN_ENGLISH_SCORE = -0.8;
+const MIN_DETECT_CONFIDENCE = 0.7;
+
+const GERMAN_FUNCTION_WORDS = new Set([
+    'mit', 'und', 'auf', 'von', 'vom', 'nach', 'in', 'an', 'zu', 'aus',
+    'bei', 'für', 'über', 'unter', 'der', 'die', 'das', 'des', 'dem', 'den',
+]);
+
+function splitTopLevel(text) {
+    if (!text || typeof text !== 'string') return [];
+
+    const phrases = [];
+    let current = '';
+    let parenDepth = 0;
+
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '(' || ch === '[' || ch === '{') {
+            parenDepth++;
+            current += ch;
+        } else if (ch === ')' || ch === ']' || ch === '}') {
+            parenDepth--;
+            current += ch;
+        } else if (parenDepth === 0 && (ch === ',' || ch === '/')) {
+            const trimmed = current.trim();
+            if (trimmed) phrases.push(trimmed);
+            current = '';
+        } else {
+            current += ch;
+        }
+    }
+
+    const trimmed = current.trim();
+    if (trimmed) phrases.push(trimmed);
+    return phrases;
+}
+
+function stripAllergenFromEnd(text, allergen) {
+    if (!allergen) return text;
+    const suffix = ` (${allergen})`;
+    if (text.endsWith(suffix)) return text.slice(0, -suffix.length).trim();
+    const idx = text.lastIndexOf(`(${allergen})`);
+    if (idx !== -1) return text.slice(0, idx).trim();
+    return text;
+}
+
+function hasGermanMarker(text) {
+    if (/[äöüßÄÖÜ]/.test(text)) return true;
+    const words = text.toLowerCase().match(/[a-zäöüß]+/g) || [];
+    return words.some(w => GERMAN_FUNCTION_WORDS.has(w) && !isLoanword(w));
+}
+
+function isStronglyEnglish(text, langModel) {
+    if (!text || hasGermanMarker(text)) return false;
+    return langModel.scoreLang(text) <= MIN_ENGLISH_SCORE;
+}
+
+function looksLikeAllergenParens(text) {
+    return /\(\s*[A-Z](\s*,?\s*[A-Z])*\s*\)\s*$/.test(text.trim());
+}
+
+function attachAllergenToPhrase(phrase, allergen) {
+    let enPhrase = phrase.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    if (allergen && !looksLikeAllergenParens(enPhrase)) {
+        enPhrase = `${enPhrase} (${allergen})`;
+    }
+    return enPhrase;
+}
+
+function repairMonoTail(courses, langModel) {
+    const last = courses[courses.length - 1];
+    if (!last || last.anchored || !last.mono) return courses;
+
+    const tailText = last.de || '';
+    const phrases = splitTopLevel(tailText);
+    if (phrases.length < 2) return courses;
+
+    const germanCourses = courses.slice(0, -1);
+    if (germanCourses.length !== phrases.length) return courses;
+    if (germanCourses.some(c => !c.mono)) return courses;
+
+    let detectConfidence = 1.0;
+    for (const phrase of phrases) {
+        if (!isStronglyEnglish(phrase, langModel)) return courses;
+        if (langModel.scoreLang(phrase) > MIN_ENGLISH_SCORE - 0.5) detectConfidence -= 0.2;
+    }
+    if (detectConfidence < MIN_DETECT_CONFIDENCE) return courses;
+
+    return germanCourses.map((course, i) => ({
+        de: course.de,
+        en: attachAllergenToPhrase(phrases[i], course.allergen),
+        allergen: course.allergen,
+        mono: false,
+        anchored: course.anchored,
+    }));
+}
+
+function repairInterleavedEnglish(courses, langModel) {
+    if (courses.length < 2) return courses;
+
+    const changed = courses.slice();
+    let modified = false;
+
+    for (let i = 0; i < changed.length - 1; i++) {
+        const course = changed[i];
+        const next = changed[i + 1];
+        if (!course.mono || !next.mono) continue;
+
+        const nextText = stripAllergenFromEnd(next.de, next.allergen);
+        const phrases = splitTopLevel(nextText);
+        if (phrases.length === 0) continue;
+
+        const leading = phrases[0];
+        if (!isStronglyEnglish(leading, langModel)) continue;
+
+        const rest = phrases.slice(1).join(', ').trim();
+        if (!rest) continue;
+        const restHasGerman = !isStronglyEnglish(rest, langModel) && /[a-zäöüß]{3,}/i.test(rest);
+        if (!restHasGerman) continue;
+
+        changed[i] = {
+            de: course.de,
+            en: attachAllergenToPhrase(leading, course.allergen),
+            allergen: course.allergen,
+            mono: false,
+            anchored: course.anchored,
+        };
+
+        if (rest) {
+            const newAllergen = next.allergen ? ` (${next.allergen})` : '';
+            changed[i + 1] = {
+                ...next,
+                de: `${rest}${newAllergen}`,
+                en: `${rest}${newAllergen}`,
+                mono: true,
+            };
+        } else {
+            changed.splice(i + 1, 1);
+            i--;
+        }
+        modified = true;
+    }
+
+    return modified ? changed : courses;
+}
+
+function repairSlashTail(courses, langModel) {
+    if (courses.length < 2) return courses;
+
+    const last = courses[courses.length - 1];
+    if (!last || last.anchored || last.mono) return courses;
+
+    const lastDe = stripAllergenFromEnd(last.de, last.allergen);
+    const lastEn = stripAllergenFromEnd(last.en, last.allergen);
+    if (!lastDe || !lastEn || lastDe === lastEn) return courses;
+
+    const slashPhrases = splitTopLevel(lastEn);
+    if (slashPhrases.length < 2) return courses;
+
+    const germanCourses = courses.slice(0, -1);
+    if (germanCourses.length !== slashPhrases.length) return courses;
+    if (germanCourses.some(c => !c.mono)) return courses;
+
+    for (const phrase of slashPhrases) {
+        if (!isStronglyEnglish(phrase, langModel)) return courses;
+    }
+
+    return germanCourses.map((course, i) => ({
+        de: course.de,
+        en: attachAllergenToPhrase(slashPhrases[i], course.allergen),
+        allergen: course.allergen,
+        mono: false,
+        anchored: course.anchored,
+    }));
+}
+
+function alignTrailingEnglish(courses, langModel) {
+    if (!Array.isArray(courses) || courses.length < 2) return courses;
+
+    let result = repairInterleavedEnglish(courses, langModel);
+    result = repairMonoTail(result, langModel);
+    result = repairSlashTail(result, langModel);
+    return result;
+}
+
 ;// ./src/lang/splitter.js
+
 
 
 
@@ -6997,9 +7316,10 @@ function splitLanguage(text, options = {}) {
         return tplResult;
     }
 
-    const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
+    const langModel = (options && options.langModel) ? options.langModel : (0,lang_langModel/* createLangModel */.C)(langModelSeed/* LANG_MODEL_SEED */.x);
 
     let courses = segment(normText);
+    courses = alignTrailingEnglish(courses, langModel);
     courses = repairMergedCourses(courses, langModel);
     courses = peelGluedTailFromUnanchored(courses, langModel);
     courses = peelTrailingMonoCourse(courses);
@@ -7227,7 +7547,7 @@ function injectUI() {
                 <div class="brand">
                     <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAOUElEQVR4nNWYaXRVRbbH//tMd0xITAISyASBAGGSOYJP6fdEhAAiMjiAAxDoVsCWtpu0jdcrrUQFGYI2CQg8RIYwCQiCtjIIChImISASSJgTSYiZ7niqdn+4AQEbaIcP7+21zqqzzqmq86tdtXf96wD/x41+gz4UANylS5dE5mDU3r0H8uueyas1XC6l7tntLTWVgZXAkJXiN2ADAKhEhIg7IpaGhYWdZGYCoOIXDJ6uua6Y9mvhAIjOnTu3y8/Pf0RKqSckJDwD4L26d5IAbrtofs9LJOJVnxcCZGeGBcRWgKwsySpIWAXDQlAsDLZrBLVdzB3PfjpoxPe/FhCqpuLIkSPTwsPD9fDwcFlSUvLapEmT1mRlZVXi3ntV3r5dsCKp2uud57NadcUfBLTQbBOHhsFQwWAQQutClxI+gT8D/+m6uAkbAJHaNjXd4/H8T2bmJLFq1UoZCAQaLFy4cDIRSWzfznC56JsRGZ8319WOVr//ogwEGLW1fng8Jtdd8NSa8HhNeDxB8vpMGQjUBj21gZ8LSDfcMzMbxwuOvxnbKJbHjh1LnTt3Ufv37ydLS0uf7devXysAEm434HJp+54Zd7iFrvax6XoZGxYLGAoAjcGaCdYAaGBoADQCVNht+LmAXBeNV9rJpKSk3/v9/pavv/Z3GR5eT5FS0syZs9hqtRpbt259W9M0BkBwu024XNrep5872FzVHrABhawqBGYmEFQoodETIdSAYL/mQ7fBYgoVTHC7Je69VwMgMzMzY86cOTO5Y6cOcvjwJxUhBIQQSEpKUidOnCiqq6sfaNOmVT8AAoBaB2nsG/WHAw6FtsEwCAQJuiHciUBgGfSr8vaALpcCIr5r3rzk6AXvnmm28N1h2L7dJFXlhQsXTpZSRs2aOUsSEQkhQASYpolJkyZR47jGfPTo8beY2VLnfU1xuwMNc2e/Xk40Cj6/hKKEogPMVyiJADCkrvpuA1jnsYy8vHr7R406yVLsv2BYliW8P/+Z6Y2aNSwpKRn38MMDZffuPVQigmEY0DQdmqbB6XQqWVOzpN/vT0lISpgAIklut9lwXvYr5aqWKb0+wcwKJMAAsaJSKIx/zIQOOELAN4Uj4r4ffBC5q6r0lFXXZpaPGu+ul5v9vveOek/EnP9+evLy1W1yli7pFR+XIE+eLFRKS0ohhED9BvWRmJAIh8PB/Qf05w0bPqKcO++s75r68lM/SH5LeDwmARqYmUmBBpACeAKaaleDQSFVTdVZVt0TE5e8eciQS/8+DxJxv6VLG3z82GOlkTmz3qtyhr8SmTvLWpExbrj1HzMqizk48Ymc7EvVlyvQ7eFHyOP3w2qxAAT4fX4IIdC6TWtu2769svuTT9e/MemPf6wQ8q/S4zPBUgWIWVGkZrOqMVKOjrPY9x7y1mz1a3okCcEMljK0dm/YSeo8l5eXZ4y9dPZwZG72moqMcWOj5s7kmpjoScac6Vpx+86nXvPW8t83rI85mNwc8xctohbNmsFqs13t5vjx41i6YgVdPn2aB29co7xbcORFq8/PBKiAAkmQutWqNhBy/OmMcfPPAOg8f26v4/B/7FGNaAoEgvVQiZ8CEjFcLmXw4MHBF3JmT6kIc8yOzM3G5YxxY6NyZhkluvqnzKoKzOmUhsYR9fiFf24hpV44lrRMwf5du+DxeRHXuDGSU1rA/fLLtOpcMZ7ctD5dV1RIliCAhQKpWS1qAynHn84Yl80ul4b7gL09x+Z3zp1z/1GWnwnAHl8v3v9TQABwuyUBiuJ2ZzeeO8N6KTLyzbB/zKKLGePH9lmx5J7cQ/vbC0XhB5OaKobNjvUH98Ol62hy8CgulpfjYmkpurVOha33/Rjx4WroNrskVVXq5geaYVHrm3L86bETQnButwk3AJdL25vx3MGU+dkPlAtlWX5ZmQ1A7c0VRygtmHE5s6act1n/1pnp6y8GDE51HzvsmLLtc8CwwGrRETBNNI2IxHdPZlxturjgEJ7ashG6ZoAolEYlgdnQzcTI6LEnhzy+8CrctZaXp2LIEDF02bJEr81Wvv6hh6pvJYkILpequt1m7PJFr56tqJj8fGob9E9qigfXroKiKmBm+KRAQ7sdB4eOQITFhhWF32Lkp5tD6UGhkAAQUioOm9Lph9plF17MXFasqRvYFNdrxh8do8Dtvvr8VomaXa+8IgURHv54qzkqsWlw5hfbZa/VeSCFAMnQiEBSItbuRH1nOHws4f5yJ4LBIAxdD6kVyTCFUBb+d29e3LvvgHOGsb5Du/ZtANRpmRvM7ZbXbKm3FJUqABEZHd3H0NSNhceOyb8c2qe8u3c3oGqhllJC03UYRPhrlzS81KU7jpZdQt8P81BcXQOHocFjBjGlbQf8pWt3aHYHp6Wl0Z49e7bput4zEAioqEsnN7ObefCKWtErysreTE5Ols6ISH6tXUe4O3RC99hYpEREIL1pM8TYbPBIE3/buQ0Ttn2CVtEx2DJoGOLDHKitqsSygUPQ4lwJchYvBjNT9+53CwD3paQkP4Yr+/QvAFQAyObNk8cQUWqTpCbMzOrq1WuQXHQeO4eOQP6wEdgwYDDWpg9EpGbAolswe18+Ht+0Ds0jo/DRQ0OQ22cAhsY3gaNBA5w9fRpEhORmzYiZuaj4zFsTJkyIAOoEzM8AVADwo48+Gn3+wkUXM0u7w05EBI/XgxqWkMxwGlb4hYmudzbCugGPQFcAm8WCpceO4MG1y9E8Mgqj23WEKSXqhYUhGAyGemco9evHSCFk7KJFi14lInkLR/3bF0REctOmTS6FlOgnhj/OpaWlCgBER0ehrKwMChFqzCB6rVmBiTv+iXsaxWN1+iBACtgtVmw+dRI9VizG6apKaIqC0rIyOB0OMDNOnTqJoUOHKBmjR4rKyso/9OzZswNuMdU3AqoAZHp6emplZeWYJ4Y/Ll/660vKkcOHAQAdO3bGt0cOw2MG0f/DldhRfApv5+/BS19uQ6+EJKzqNwjCNOGwWJFfWoLfLV+MMz4PThw8iJatW4OIcPjIETRp2pRee30qHA6HumfPnuy6k+B/ZGqdXPrY4XTw+fPnTCEEx8fH8d59+czMvPPLnfy7lUsY06Zw+DvT2TlnGuOtV3nCtk+YmfnDwm9ZmzGVHXOmszJjKjd+7x1evP0zNr1e/qGqihvHNeZ9+0N9vT1jugmAU1KSn7nGQTf1oApAtG7duk9NTU3vF198UcTGNlIVRUHvB/tgissFE8DU8lJ8XlyEMJsdJjMkh/RmjNUGU0oMaJqC9x9Ih8fvhV03UFJdjQlHv8FuXy22rFqFiDsi0eGujggGgxg/fgK1b99OFhYWZblcrmiEAua6WaVrSmJm1TCMgw0b3tny2LFjbLXaFBBwuqgYWz7Zgs0JsVh36ADCwsMhZAjMKwVye6djVErqdSNfXVSIR9asgNNmQyAQhGax4IXGcRjZrBXimqdACBOGbmD37q9EWtrdalRM1LyK8ooMKeV1ufGGQ1DC2GAw2CorK0va7Q7FFAIEQlyTJHzePBHrjnwDZ71wmCwBlvAIE5NSWiLNE0DJ99+jrLwMBQUFmDF7Fs4uy8P8B/qgpqYGuq5BmkFknS7CRzIAVVGgajqCZhDduqWpo0aNEuWXykf16NEjDTcEDF2BzMzMjHrjjTeOde3aJfLLL79CwAwquqrBLwUGrF+FT747jrDwcJhCAmB4g0HM7Z2O3qqBN7Oz4fN6AWZYLBakpKRgwMCBSIxPwIqzpzBs5XI4LFYwS3i8Hvw57R680aMnhBRgBqoqK0VKSopaU1Oz3+v1dqkTGBJA6D8KEYmoqKg5ZeVlz369Z4/ZsVNnjYVAkICBG1Zjc+EJOO0OCCFBxPAEg3C17YDJ3e+FarXeNOL+d8kSHNr5BRo98yT+9MU2OKxWKESorq3BU+3uwvz7+wCSoaoqFixYIEaOHKkmJiZOKC4unn0lJggA9e3bN3Xjxo0Hhj06TFm2dBmxlORniYEb1mBz4XdwOuwQpgQR4KmqQs7Dg6F+uhXuadPRo3t3dOvWFQmJidBUDRcunMfevfnYtWsnQITxzz+PMU8/jaz8r5C57XM4nE6oRKiqrUXfZs2xvO9AOHUDADjt7jTe/dXu6jFjxqTm5ORcAECk6xoMw7Le6XSmF54sNJ0Op1oT8CuDN63D5sLvEO5wQAiBoBAiIAUtHDAITzVJAQCcOHEC69Z9iP37D+Dy5cuQLBEeFo4WLVugb5++SEtLu86jc747jHEb1sNmWFhXFbXKU4u0uASs7vsQGjrD+ey5c8HWqakGES2rqal5TAihUnx8/ONnzpxZEhsbi65du+L+nvfhWMe2nL19K4XXi0BQmCCG1Jx2ZXLrdihbsgKHi4qhqQrsNjscDgdM00QgEAAzwzAM6LoOv9+PyqpKCFNA0zQIKdGpVQsogwbg9QP7oAZNqSuKUlldhf9q0ZInWsJoUe487NixA+Xl5UhKSupfVFS0QfP7/cPtdntBxQ8/8Nq1a9G0VQvrZxcik1WrRZhSgBWiILMyslnKx6ULlzSYNjfHWpevfrZt/OgjyrJagsN63uP7oOBIV0gh7Dab/Pr7Uv2A03dx7dq15RarFXannbw+7xP5+fmbr+Q+AQIURYXP69XvzM3eUWmzdIPXC9UwECPly8Ujn5sCANZbBMXtjAH4fT7oRIiaOzO3ymoZzULC6vN7erVskbruwYHFXq+XDMPgQCCgEpG8cQ9UAMge773X5AR7p5ng2AjGgqLR43JlXp7KgwdLIvpF3rsKyUxEBBXguPnvTPAbets7/GJBwejf70KdDr1tB6ireTVbXiPBf6XRDeWPNz8Khuuc9pNjJ9WdjRmAcLsZeXkKhgz5rX5o83VlXp7KBQWhH6shXXhtnf8f9i8ccK5KeMWwRQAAAABJRU5ErkJggg==" alt="Logo" class="logo-img" style="height: 2em; width: 2em; object-fit: contain;">
                     <div class="header-left">
-                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.10.5<span style="font-size:0.55em;opacity:0.6;margin-left:4px">dabccb4</span></small></h1>
+                        <h1>Kantinen Übersicht <small class="version-tag" style="font-size: 0.6em; opacity: 0.7; font-weight: 400; cursor: pointer;" title="Klick für Versionsmenü">v1.10.11<span style="font-size:0.55em;opacity:0.6;margin-left:4px">bbf0359</span></small></h1>
                         <div id="last-updated-subtitle" class="subtitle"></div>
                     </div>
                     <div class="nav-group" style="margin-left: 1rem;">
@@ -7377,7 +7697,7 @@ function injectUI() {
                 </div>
                 <div class="modal-body">
                     <div style="margin-bottom: 1rem;">
-                        <strong>Aktuell:</strong> <span id="version-current">v1.10.5 <span style="font-size:0.8em;opacity:0.6">dabccb4</span></span>
+                        <strong>Aktuell:</strong> <span id="version-current">v1.10.11 <span style="font-size:0.8em;opacity:0.6">bbf0359</span></span>
                     </div>
                     <div class="dev-toggle">
                         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
@@ -7466,8 +7786,8 @@ var constants = __webpack_require__(521);
 var api = __webpack_require__(672);
 // EXTERNAL MODULE: ./src/i18n.js
 var i18n = __webpack_require__(646);
-// EXTERNAL MODULE: ./src/utils.js + 10 modules
-var utils = __webpack_require__(160);
+// EXTERNAL MODULE: ./src/utils.js + 9 modules
+var utils = __webpack_require__(930);
 ;// ./src/events.js
 
 
@@ -7894,12 +8214,12 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     stats_tracker/* tracker */.F.increment('starts');
     stats_tracker/* tracker */.F.increment('session_count');
-    stats_tracker/* tracker */.F.set('version', 'v1.10.5');
+    stats_tracker/* tracker */.F.incrementCategory('version', 'v1.10.11');
     stats_tracker/* tracker */.F.set('version_commit_hash', constants/* COMMIT_HASH */.X9);
     stats_tracker/* tracker */.F.increment('hour_' + new Date().getHours());
-    stats_tracker/* tracker */.F.set('mobile', window.innerWidth < 768);
-    stats_tracker/* tracker */.F.set('lang', state/* langMode */.Kl);
-    stats_tracker/* tracker */.F.set('logged_in', !!state/* authToken */.gX);
+    stats_tracker/* tracker */.F.incrementCategory('mobile', window.innerWidth < 768);
+    stats_tracker/* tracker */.F.incrementCategory('lang', state/* langMode */.Kl);
+    stats_tracker/* tracker */.F.incrementCategory('logged_in', !!state/* authToken */.gX);
     
     (async () => {
         try {

@@ -3673,10 +3673,10 @@ function createDayCard(day) {
             const descText = item.description || '';
             const affinities = heatmapLangModel.scoreCharAffinities(descText);
             const chars = affinities.map(({char, affinity}) => {
-                let cls = 'heatmap-neutral';
-                if (affinity > 0.2) cls = 'heatmap-de';
-                else if (affinity < -0.2) cls = 'heatmap-en';
-                return `<span class="heatmap-char ${cls}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
+                const hue = affinity > 0 ? 210 : 0;
+                const saturation = Math.round(Math.min(80, Math.abs(affinity) * 80));
+                const color = `hsl(${hue}, ${saturation}%, 50%)`;
+                return `<span class="heatmap-char" style="color: ${color}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
             }).join('');
             heatmapHtml = `<div class="heatmap-row">${chars}</div>`;
         }
@@ -4394,7 +4394,7 @@ function segment(normalizedText) {
   }
 
   const courses = [];
-  const parenRegex = /\(([^)]+)\)\s*(?!\s*\/)/g;
+  const parenRegex = /\(([^()]+)\)\s*(?!\s*\/)/g;
   let match;
   let lastScanIndex = 0;
 
@@ -4448,6 +4448,17 @@ function processSegment(segmentText, allergen, anchored) {
     if (ch === '(') parenDepth++;
     else if (ch === ')') parenDepth--;
     else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+  }
+  if (slashIdx === -1 && parenDepth > 0) {
+    const openIdx = textWithoutAllergen.indexOf('(');
+    parenDepth = 0;
+    for (let i = 0; i < textWithoutAllergen.length; i++) {
+      const ch = textWithoutAllergen[i];
+      if (i === openIdx) continue;
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth--;
+      else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+    }
   }
   if (slashIdx !== -1) {
     // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
