@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.6] - 2026-07-13
+
+### Fixed
+- Category counters (`version`, `mobile`, `lang`, `logged_in`) now track per-session counts instead of overwriting on each `set()`. Enables proper version-adoption and device/language distribution charts.
+- GitHub Pages dashboard: versions-over-time stacked area, unique-users-over-time line, and hourly-usage horizontal bar charts added.
+- CI no longer pushes `dist/` commits to `main` — tags point to a detached dist commit, eliminating the need to rebase before each push.
+- Android CI scoped to `android/` path changes only, skipping unnecessary builds on web-only pushes.
+
 ## [1.10.5] - 2026-07-08
 
 ### Added
