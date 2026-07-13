@@ -598,6 +598,8 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
   var CACHE_KEY = '${CACHE_KEY}';
   var VER_KEY = '${VERSION_KEY}';
 
+  console.log('[Kantine] Bootloader v' + CURRENT_VER + ' — checking for updates...');
+
   function isNewer(a, b){
     var va = a.replace(/^v/,'').split('.').map(Number);
     var vb = b.replace(/^v/,'').split('.').map(Number);
@@ -647,6 +649,7 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
       var c = JSON.parse(raw);
       if (c && c.bundleCode && c.version && isNewer(c.version, CURRENT_VER)) {
         try { localStorage.setItem(VER_KEY, c.version); } catch(e){}
+        console.log('[Kantine] → cache v' + c.version + ' (offline fallback)');
         loadBundle(c.bundleCode);
         return true;
       }
@@ -654,60 +657,71 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
     return false;
   }
 
-  // Read cache
+  // ── Report initial state ──
+  var cacheReport = 'none';
   var cache = null;
-  try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch(e){}
-  var cacheValid = cache && cache.timestamp && (Date.now() - cache.timestamp < 3600000);
-
-  if (cacheValid && cache.version && isNewer(cache.version, CURRENT_VER)) {
-    // Recent cache with a newer version
-    if (cache.bundleCode) {
-      // Code already cached — load offline, no network needed
-      try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
-      loadBundle(cache.bundleCode);
-      return;
+  try {
+    cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (cache && cache.version) {
+      var ageMin = cache.timestamp ? Math.round((Date.now() - cache.timestamp) / 60000) : '?';
+      cacheReport = 'v' + cache.version + ' (' + ageMin + 'min old)';
     }
-    // Have URL but not code yet — fetch it, then persist code for offline reuse
-    try {
-      var bResp = await fetchWithTimeout(cache.bundleUrl, 10000);
-      if (bResp.ok) {
-        var newCode = await bResp.text();
-        cacheVersion(cache.version, cache.bundleUrl, newCode);
-        try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
-        loadBundle(newCode);
-        return;
-      }
-    } catch(e) { console.warn('[Kantine] CDN fetch failed, trying cached:', e); }
-    // Fetch failed — use any previously cached code
-    if (tryLoadCachedNewer()) return;
-  } else {
-    // Cache stale / missing / not newer — check live
-    try {
-      var resp = await fetchWithTimeout('${VERSION_JSON_URL}?t=' + Date.now(), 5000);
-      if (resp.ok) {
-        var manifest = await resp.json();
-        if (manifest && manifest.version && manifest.bundleUrl) {
-          if (isNewer(manifest.version, CURRENT_VER)) {
-            var bResp2 = await fetchWithTimeout(manifest.bundleUrl, 10000);
-            if (bResp2.ok) {
-              var newCode2 = await bResp2.text();
-              cacheVersion(manifest.version, manifest.bundleUrl, newCode2);
-              try { localStorage.setItem(VER_KEY, manifest.version); } catch(e){}
-              loadBundle(newCode2);
-              return;
-            }
-          } else {
-            try { localStorage.removeItem(VER_KEY); } catch(e){}
-          }
+  } catch(e){}
+  console.log('[Kantine]   cache: ' + cacheReport);
+
+  // ── Fetch remote version.json ──
+  var remoteVer = null;
+  try {
+    var resp = await fetchWithTimeout('${VERSION_JSON_URL}?t=' + Date.now(), 5000);
+    if (resp.ok) {
+      var manifest = await resp.json();
+      if (manifest && manifest.version) remoteVer = manifest.version;
+    }
+  } catch(e){ /* ignored — will show as unreachable below */ }
+  console.log('[Kantine]   remote: ' + (remoteVer || 'unreachable'));
+
+  // ── Decision ──
+  if (remoteVer && isNewer(remoteVer, CURRENT_VER)) {
+    // Remote has a newer version — try to fetch the bundle
+    var bundleUrl = (manifest && manifest.bundleUrl) ? manifest.bundleUrl : null;
+    if (!bundleUrl) {
+      console.log('[Kantine]   ✗ remote version manifest has no bundleUrl — using baked-in');
+    } else {
+      try {
+        var bResp = await fetchWithTimeout(bundleUrl, 10000);
+        if (bResp.ok) {
+          var newCode = await bResp.text();
+          cacheVersion(remoteVer, bundleUrl, newCode);
+          try { localStorage.setItem(VER_KEY, remoteVer); } catch(e){}
+          console.log('[Kantine] ✅ CDN update v' + remoteVer + ' → loaded');
+          loadBundle(newCode);
+          return;
+        } else {
+          console.log('[Kantine]   ✗ CDN fetch failed (HTTP ' + bResp.status + ')');
         }
+      } catch(e) {
+        console.log('[Kantine]   ✗ CDN fetch error: ' + e.message);
       }
-    } catch(e) { console.warn('[Kantine] Version check failed, trying cached:', e); }
-    // Network failed — fall back to cached newer code if available
-    if (tryLoadCachedNewer()) return;
+    }
   }
 
-  // Final fallback: baked-in bundle
+  // No remote update — try localStorage cache
+  var cache = null;
+  try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch(e){}
+  if (cache && cache.bundleCode && cache.version && isNewer(cache.version, CURRENT_VER)) {
+    try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
+    console.log('[Kantine] ✅ Cache update v' + cache.version + ' → loaded');
+    loadBundle(cache.bundleCode);
+    return;
+  }
+
+  // No newer version at all — baked-in fallback
   try { localStorage.removeItem(VER_KEY); } catch(e){}
+  if (remoteVer && !isNewer(remoteVer, CURRENT_VER)) {
+    console.log('[Kantine]   ✓ up-to-date (remote ' + remoteVer + ' matches baked-in) — using baked-in');
+  } else {
+    console.log('[Kantine] → using baked-in v' + CURRENT_VER + ' (no update available)');
+  }
   loadBundle(FALLBACK);
 })();
 })();`;
