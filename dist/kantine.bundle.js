@@ -3673,10 +3673,10 @@ function createDayCard(day) {
             const descText = item.description || '';
             const affinities = heatmapLangModel.scoreCharAffinities(descText);
             const chars = affinities.map(({char, affinity}) => {
-                let cls = 'heatmap-neutral';
-                if (affinity > 0.2) cls = 'heatmap-de';
-                else if (affinity < -0.2) cls = 'heatmap-en';
-                return `<span class="heatmap-char ${cls}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
+                const hue = affinity > 0 ? 210 : 0;
+                const saturation = Math.round(Math.min(80, Math.abs(affinity) * 80));
+                const color = `hsl(${hue}, ${saturation}%, 50%)`;
+                return `<span class="heatmap-char" style="color: ${color}">${(0,_utils_js__WEBPACK_IMPORTED_MODULE_1__/* .escapeHtml */ .ZD)(char)}</span>`;
             }).join('');
             heatmapHtml = `<div class="heatmap-row">${chars}</div>`;
         }
