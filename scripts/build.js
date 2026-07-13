@@ -677,7 +677,7 @@ if(window.__KANTINE_LOADED){
     cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
     if (cache && cache.version) {
       var ageMin = cache.timestamp ? Math.round((Date.now() - cache.timestamp) / 60000) : '?';
-      cacheReport = 'v' + cache.version + ' (' + ageMin + 'min old)';
+      cacheReport = cache.version + ' (' + ageMin + 'min old)';
     }
   } catch(e){}
   console.log('[Kantine]   cache: ' + cacheReport);
