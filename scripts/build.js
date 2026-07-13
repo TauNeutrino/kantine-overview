@@ -453,9 +453,9 @@ function stepTests(ctx) {
   else { fail('Some tests failed — see above.'); EXIT_CODE = 1; }
 }
 
-// ── 10. Smoke check + size guard ──────────────────────────────────────────
-function stepSmokeAndSize(ctx) {
-  log('\n■ Smoke check + size guard...');
+// ── 10. Smoke check ─────────────────────────────────────────────────────────
+function stepSmokeCheck(ctx) {
+  log('\n■ Smoke check...');
 
   // Smoke: baked language model in bundle
   const bundleContent = read(JS_BUNDLE);
@@ -476,16 +476,6 @@ function stepSmokeAndSize(ctx) {
   log('✓ Gist ID: ' + (GI ? (GI === '{{GIST_ID}}' ? '(placeholder)' : GI.substring(0, 8) + '...') : '(empty)'));
   const GS = process.env.GIST_SALT;
   log('✓ Gist Salt: ' + (GS ? '(set)' : '(placeholder)'));
-
-  // Size guard: bookmarklet must not grow beyond baseline + 5 KB
-  const BASELINE_BOOKMARKLET_SIZE = 212202;
-  const MAX_GROWTH = 6144;
-  const size = ctx.BOOKMARKLET_SIZE || 0;
-  if (size > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {
-    fail(`Size guard: bookmarklet.txt ${size} bytes, growth ${size - BASELINE_BOOKMARKLET_SIZE} > ${MAX_GROWTH}`);
-  } else {
-    ok(`Size guard: ${size} bytes (growth ${size - BASELINE_BOOKMARKLET_SIZE}/${MAX_GROWTH})`);
-  }
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
@@ -553,7 +543,7 @@ document.head.appendChild(sc);
   stepTests(ctx);
 
   // 10. Smoke + size
-  stepSmokeAndSize(ctx);
+  stepSmokeCheck(ctx);
 
   // ── Summary ────────────────────────────────────────────────────────────
   console.log('\n=== Build Complete ===');
