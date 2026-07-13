@@ -738,6 +738,8 @@ if(window.__KANTINE_LOADED){
   }
   if (window.__KANTINE_REINIT && remoteVer && !isNewer(remoteVer, CURRENT_VER)) {
     console.log('[Kantine]   (re-init: no update, keeping current UI)');
+    var skipSplash = document.getElementById('kantine-splash');
+    if (skipSplash) skipSplash.remove();
     return;
   }
   loadBundle(FALLBACK);
