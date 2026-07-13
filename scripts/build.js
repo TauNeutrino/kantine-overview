@@ -449,6 +449,27 @@ function stepTests(ctx) {
     }
   }
 
+  // Verify auto-update CDN artifacts
+  const autoBundlePath = path.join(DIST, 'kantine-auto-update-bundle.js');
+  if (!exists(autoBundlePath)) { fail('Auto-update bundle missing'); allPassed = false; }
+  else if (fs.statSync(autoBundlePath).size < 1024) { fail('Auto-update bundle too small (< 1 KB)'); allPassed = false; }
+  else { ok('Auto-update bundle present (> 1 KB)'); }
+
+  const verManifestPath = path.join(DIST, 'version.json');
+  if (!exists(verManifestPath)) { fail('Version manifest missing'); allPassed = false; }
+  else {
+    try {
+      const v = JSON.parse(read(verManifestPath));
+      if (!v.version) { fail('Version manifest missing version field'); allPassed = false; }
+      else if (!v.bundleUrl) { fail('Version manifest missing bundleUrl field'); allPassed = false; }
+      else if (v.version !== VERSION) { fail('Version manifest version mismatch'); allPassed = false; }
+      else if (!v.bundleUrl.includes(`cdn.jsdelivr.net/gh/TauNeutrino/kantine-overview@${VERSION}/dist/kantine-auto-update-bundle.js`)) {
+        fail('Version manifest bundleUrl does not match expected jsDelivr URL'); allPassed = false;
+      }
+      else { ok(`Version manifest valid: ${v.version}`); }
+    } catch (e) { fail(`Version manifest not valid JSON: ${e.message}`); allPassed = false; }
+  }
+
   if (allPassed) log('🎉 All tests passed.');
   else { fail('Some tests failed — see above.'); EXIT_CODE = 1; }
 }
@@ -538,6 +559,17 @@ document.head.appendChild(sc);
   // 8. Installer
   stepInstaller(ctx);
   abortIfFailed();
+
+  // ── Auto-update CDN artifacts ───────────────────────────────────────────
+  const AUTO_UPDATE_BUNDLE = path.join(DIST, 'kantine-auto-update-bundle.js');
+  fs.writeFileSync(AUTO_UPDATE_BUNDLE, ctx.JS_INJECTED);
+  ok(`Auto-update bundle: ${(ctx.JS_INJECTED.length / 1024).toFixed(0)} KB`);
+
+  const VERSION_FOR_MANIFEST = read(VERSION_FILE).trim();
+  const BUNDLE_URL = `https://cdn.jsdelivr.net/gh/TauNeutrino/kantine-overview@${VERSION_FOR_MANIFEST}/dist/kantine-auto-update-bundle.js`;
+  const VERSION_MANIFEST = JSON.stringify({ version: VERSION_FOR_MANIFEST, bundleUrl: BUNDLE_URL }, null, 2);
+  fs.writeFileSync(path.join(DIST, 'version.json'), VERSION_MANIFEST);
+  ok(`Version manifest: ${(VERSION_MANIFEST.length / 1024).toFixed(0)} KB`);
 
   // 9. Tests
   stepTests(ctx);
