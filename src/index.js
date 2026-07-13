@@ -1,5 +1,10 @@
 window.__kantine_load_start = Date.now();
 
+(function(){
+    var splash = document.getElementById('kantine-splash');
+    if (splash) splash.remove();
+})();
+
 import { injectUI } from './ui.js';
 import { bindEvents } from './events.js';
 import { updateAuthUI, cleanupExpiredFlags, loadMenuCache, isCacheFresh, loadMenuDataFromAPI, startPolling } from './actions.js';

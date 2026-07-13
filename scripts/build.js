@@ -586,9 +586,13 @@ async function main() {
   const payload = `javascript:(function(){
 if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
 
-// ── CSS injection (initial bake — replaced by bundle's BUNDLED_CSS when it loads) ──
+// ── CSS injection + splash screen (replaced/removed by bundle when it loads) ──
 (function(){
   var s=document.createElement('style');s.id='kantine-style';s.textContent='${CSS_ESC}';document.head.appendChild(s);
+  var splash=document.createElement('div');splash.id='kantine-splash';
+  splash.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483647;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif;color:#eee;transition:opacity .25s ease;';
+  splash.innerHTML='<div style="font-size:1.75rem;font-weight:600;color:#029AA8;margin-bottom:.5rem;">Kantine Wrapper</div><div id="kantine-splash-status" style="font-size:.9rem;color:#a0aec0;">Initialisiere...</div>';
+  if(document.body){document.body.appendChild(splash);}else{window.addEventListener('DOMContentLoaded',function(){document.body.appendChild(splash);});}
 })();
 
 // ── Auto-update bootloader ──
@@ -614,6 +618,11 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
     var sc = document.createElement('script');
     sc.textContent = code;
     document.head.appendChild(sc);
+  }
+
+  function setSplashStatus(text){
+    var el = document.getElementById('kantine-splash-status');
+    if (el) el.textContent = text;
   }
 
   // Cross-browser timeout helper (no AbortSignal.timeout on older browsers)
@@ -687,6 +696,7 @@ if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
     if (!bundleUrl) {
       console.log('[Kantine]   ✗ remote version manifest has no bundleUrl — using baked-in');
     } else {
+      setSplashStatus('Update wird geladen...');
       try {
         var bResp = await fetchWithTimeout(bundleUrl, 10000);
         if (bResp.ok) {
