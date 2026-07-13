@@ -5519,16 +5519,25 @@ function injectUI() {
             </div>
         </footer>
     </div>`;
-    document.body.innerHTML = htmlContent;
 
-    // Initialize PayPal Donation Button
-    if (!document.getElementById('paypal-sdk')) {
-        const script = document.createElement('script');
-        script.id = 'paypal-sdk';
-        script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
-        script.charset = "UTF-8";
-        script.onload = () => {
-            if (window.PayPal && PayPal.Donation) {
+    // On first load we take over the whole page; on re-init we only replace
+    // the wrapper so external scripts (e.g. PayPal donate SDK) stay intact.
+    var existingWrapper = document.getElementById('kantine-wrapper');
+    if (existingWrapper) {
+        existingWrapper.remove();
+        var temp = document.createElement('div');
+        temp.innerHTML = htmlContent;
+        while (temp.firstChild) {
+            document.body.appendChild(temp.firstChild);
+        }
+    } else {
+        document.body.innerHTML = htmlContent;
+    }
+
+    // Initialize or re-initialize PayPal Donation Button.
+    function renderPaypalButton() {
+        if (window.PayPal && PayPal.Donation) {
+            try {
                 PayPal.Donation.Button({
                     env: 'production',
                     hosted_button_id: 'R5G9H9TFGQNUY',
@@ -5538,9 +5547,21 @@ function injectUI() {
                         title: 'PayPal - The safer, easier way to pay online!',
                     }
                 }).render('#donate-button');
+            } catch (e) {
+                console.warn('[Kantine] PayPal donate button render skipped:', e.message);
             }
-        };
+        }
+    }
+
+    if (!document.getElementById('paypal-sdk')) {
+        const script = document.createElement('script');
+        script.id = 'paypal-sdk';
+        script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
+        script.charset = "UTF-8";
+        script.onload = renderPaypalButton;
         document.body.appendChild(script);
+    } else {
+        renderPaypalButton();
     }
 
 }
@@ -5960,6 +5981,13 @@ async function computeUserHash() {
 
 ;// ./src/index.js
 window.__kantine_load_start = Date.now();
+
+(function(){
+    var splash = document.getElementById('kantine-splash');
+    if (splash) splash.remove();
+    var oldWrapper = document.getElementById('kantine-wrapper');
+    if (oldWrapper) oldWrapper.remove();
+})();
 
 
 
