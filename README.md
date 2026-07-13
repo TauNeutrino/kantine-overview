@@ -1,8 +1,9 @@
 # Kantine
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/)
+[![Web Build & Deploy](https://github.com/TauNeutrino/kantine-overview/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/TauNeutrino/kantine-overview/actions/workflows/build-and-deploy.yml)
+[![Android CI](https://github.com/TauNeutrino/kantine-overview/actions/workflows/android-ci.yml/badge.svg)](https://github.com/TauNeutrino/kantine-overview/actions/workflows/android-ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![version](https://img.shields.io/badge/version-1.10.0-blue)](changelog.md)
+[![version](https://img.shields.io/github/v/tag/TauNeutrino/kantine-overview?label=version&color=blue)](changelog.md)
 [![Android](https://img.shields.io/badge/Android-Kotlin-green)](android/)
 [![Web](https://img.shields.io/badge/Web-ES6-yellow)](src/)
 
@@ -63,7 +64,6 @@ Das Bookmarklet injiziert eine vollständige UI-Overlay in die Bessa-Webseite. D
 npm install
 npm run build    # Webpack + Terser + Bookmarklet + Standalone HTML
 npm test         # Test Suite (test_utils, test_actions, test_logic)
-npm run release  # Build + Commit + Tag + Push
 ```
 
 Die Build-Artefakte liegen in `dist/`:
@@ -71,6 +71,20 @@ Die Build-Artefakte liegen in `dist/`:
 - `bookmarklet.txt` – Bookmarklet-Code zum Einfügen
 - `install.html` – Installer mit Changelog
 - `kantine-standalone.html` – Standalone UI-Test mit Mock-Daten
+- `kantine-auto-update-bundle.js` – CDN-Bundle für Auto-Updates
+- `version.json` – Versions-Manifest für Auto-Updates
+
+### CI/CD (GitHub Actions)
+
+Der Web-Build wird automatisch über den [`Build & Deploy`](.github/workflows/build-and-deploy.yml) Workflow auf GitHub Actions ausgeführt:
+- **Trigger:** Push/PR auf `main` sowie manueller Dispatch
+- Erzeugt automatisch Git-Tags aus `version.txt` und deployed `dist/` auf GitHub Pages
+- Secrets (`GIST_PAT`, `GIST_ID`, `GIST_SALT`, `GIT_PAT`) sind als Repository Secrets hinterlegt
+- Ein Release erfolgt durch einfaches Pushen auf `main` – `npm run release` ist **nicht mehr nötig**
+
+### Auto-Update
+
+Das Bookmarklet ist ein minimaler Bootloader. Beim Start prüft es gegen `version.json` auf GitHub Pages, ob auf jsDelivr eine neuere Version des Haupt-Bundles liegt, und lädt diese im Hintergrund nach. Bei Fehlern fällt es automatisch auf das eingebettete Fallback-Bundle zurück. Details zum Deployment-Flow und dazu, wann ein Nutzer das Lesezeichen neu installieren muss, stehen in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#deployment--auto-update).
 
 ### Features
 
@@ -112,6 +126,7 @@ Die App folgt der **MVVM-Architektur** mit Repository-Pattern:
 
 ### Build & Test
 
+**Lokal (Debug only):**
 ```bash
 # Debug APK
 cd android && ./gradlew assembleDebug
@@ -119,11 +134,14 @@ cd android && ./gradlew assembleDebug
 # Unit Tests
 ./gradlew test
 
-# Release AAB (benötigt Keystore)
-./gradlew bundleRelease
+# Lint
+./gradlew lint
 ```
 
-Voraussetzungen: JDK 17, Android SDK (API 31–35), Android Studio empfohlen.
+Voraussetzungen: JDK 21, Android SDK (API 31–35), Android Studio empfohlen.
+
+**Release AAB (via GitHub Actions):**
+Der Release-Build wird über den [`Android CI`](.github/workflows/android-ci.yml) Workflow ausgeführt. Das Signing-Keystore liegt als Base64-Secret (`SIGNING_KEY_BASE64`) auf GitHub – ein lokaler `./gradlew bundleRelease` schlägt ohne die Secrets fehl.
 
 **MVP Features:**
 - Login mit Bessa API Authentifizierung

@@ -49,6 +49,9 @@ Das Verzeichnis `tests/` enthält 19 Testdateien:
 | `test_boundary.js` | Grenzfälle |
 | `test_no_info_lost.js` | Informationsverlust |
 | `test_templates.js` | Templates |
+| `auto-update-bootloader.test.js` | Auto-Update Bootloader (Version-Check, Cache, CDN-Pfade) |
+| `stats-tracker.test.js` | Stats-Tracking & Gist-Flush |
+| `stats-integration.test.js` | Stats-Integration |
 | `benchmark_tags.js` | Performance-Benchmarks |
 
 ### Manuelles UI-Testing
@@ -133,6 +136,29 @@ fun `fetch menu updates state correctly`() = runTest {
 
 ---
 
-## CI
+## CI (GitHub Actions)
 
-Aktuell ist kein CI-System konfiguriert. Tests werden lokal ausgeführt. Für zukünftige CI-Integrationen müssen die Build-Skripte (`npm test`, `./gradlew test`) als Pipeline-Schritte definiert werden.
+Das Projekt verwendet **GitHub Actions** für Continuous Integration. Zwei Workflows sind konfiguriert:
+
+### Web: `Build & Deploy` (`.github/workflows/build-and-deploy.yml`)
+
+- **Trigger:** Push/PR auf `main`, manueller Dispatch
+- **Schritte:**
+  - `npm ci` + `npm run build` (Webpack + Bookmarklet)
+  - Erzeugt Git-Tag aus `version.txt`
+  - Deployed `dist/` auf GitHub Pages
+- **Secrets:** `GIST_PAT`, `GIST_ID`, `GIST_SALT`, `GIT_PAT`
+
+### Android: `Android CI` (`.github/workflows/android-ci.yml`)
+
+- **Trigger:** Push/PR auf `main` (nur bei Änderungen an `android/**`)
+- **Schritte:**
+  - Debug APK: `./gradlew assembleDebug`
+  - Lint: `./gradlew lint`
+  - Unit Tests: `./gradlew test`
+  - Release AAB: `./gradlew bundleRelease` (nur bei Push, nicht PR)
+- **Secrets:** `SIGNING_KEY_BASE64` (Base64-kodiertes Keystore für Release-Builds)
+
+### Hinweis
+
+Release-Builds (Web-Tagging, Android AAB mit Signing) sind auf GitHub Actions angewiesen, da die benötigten Secrets nur dort hinterlegt sind. Lokal können nur Debug-Builds und Tests ausgeführt werden.
