@@ -4,6 +4,10 @@ import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, D
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
+import { createLangModel } from './lang/langModel.js';
+import { LANG_MODEL_SEED } from './lang/langModelSeed.js';
+
+const heatmapLangModel = createLangModel(LANG_MODEL_SEED);
 
 /**
  * Updates the "Next Week" button tooltip and glow state.
@@ -342,6 +346,19 @@ export function createDayCard(day) {
             cBadge = `<span class="badge confidence-badge confidence-${lbl}" title="${tp}">${lbl}</span>`;
         }
 
+        let heatmapHtml = '';
+        if (dm && lbl !== 'high') {
+            const descText = item.description || '';
+            const affinities = heatmapLangModel.scoreCharAffinities(descText);
+            const chars = affinities.map(({char, affinity}) => {
+                let cls = 'heatmap-neutral';
+                if (affinity > 0.2) cls = 'heatmap-de';
+                else if (affinity < -0.2) cls = 'heatmap-en';
+                return `<span class="heatmap-char ${cls}">${escapeHtml(char)}</span>`;
+            }).join('');
+            heatmapHtml = `<div class="heatmap-row">${chars}</div>`;
+        }
+
         let orderedBadge = '';
         if (orderCount > 0) {
             const countBadge = orderCount > 1 ? `<span class="order-count-badge">${orderCount}</span>` : '';
@@ -396,7 +413,7 @@ export function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description))} ${cBadge}</p></div>`;
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description))} ${cBadge}</p>${heatmapHtml}</div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {

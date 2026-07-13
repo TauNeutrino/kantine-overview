@@ -2007,3 +2007,9 @@ body {
 .confidence-low { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
 .confidence-fallback { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
 .confidence-template { background: rgba(52, 152, 219, 0.25); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
+
+.heatmap-row { margin-top: 6px; font-family: monospace; font-size: 0.75em; line-height: 1.4; letter-spacing: 0.5px; word-break: break-all; }
+.heatmap-char { display: inline; }
+.heatmap-de { color: hsl(210, 80%, 50%); }
+.heatmap-en { color: hsl(0, 80%, 50%); }
+.heatmap-neutral { color: hsl(0, 0%, 60%); }

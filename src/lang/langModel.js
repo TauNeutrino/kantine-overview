@@ -73,6 +73,47 @@ export function createLangModel(seed) {
         return scores.de - scores.en;
     }
 
+    function scoreCharAffinities(text) {
+        if (!text) return [];
+
+        const lowerText = text.toLowerCase();
+        const len = lowerText.length;
+        const rawScores = new Array(len).fill(0);
+        const counts = new Array(len).fill(0);
+
+        for (let i = 0; i <= len - 3; i++) {
+            const tri = lowerText.substring(i, i + 3);
+            
+            if (!/^[a-zäöüß]{3}$/.test(tri)) continue;
+
+            const countDe = trigramsDe[tri] || 0;
+            const countEn = trigramsEn[tri] || 0;
+            const logDe = Math.log((countDe + 1) / (totalDe + 2));
+            const logEn = Math.log((countEn + 1) / (totalEn + 2));
+            const signedDiff = logDe - logEn;
+
+            for (let j = 0; j < 3; j++) {
+                rawScores[i + j] += signedDiff;
+                counts[i + j]++;
+            }
+        }
+
+        const averaged = rawScores.map((sum, i) => counts[i] > 0 ? sum / counts[i] : 0);
+
+        const maxAbs = Math.max(...averaged.map(Math.abs), 1e-9);
+        const normalized = averaged.map(v => v / maxAbs);
+
+        const result = [];
+        for (let i = 0; i < len; i++) {
+            result.push({
+                char: text[i],
+                affinity: normalized[i]
+            });
+        }
+
+        return result;
+    }
+
     function getModel() {
         return {
             version: seed.version,
@@ -190,6 +231,7 @@ export function createLangModel(seed) {
     const modelObj = {
         scorePhrase,
         scoreLang,
+        scoreCharAffinities,
         getModel,
         mergeDelta,
         learnFromCourse,
