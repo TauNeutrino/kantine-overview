@@ -100,6 +100,15 @@ class StatsTracker {
         this.persist();
     }
 
+    incrementCategory(key, value) {
+        this.load();
+        const safe = String(value).replace(/[^a-zA-Z0-9]/g, '_');
+        const composite = key + '_' + safe;
+        if (!this._state.daily[composite]) this._state.daily[composite] = 0;
+        this._state.daily[composite]++;
+        this.persist();
+    }
+
     set(key, value) {
         this.load();
         this._state.daily[key] = value;

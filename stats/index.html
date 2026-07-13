@@ -235,8 +235,18 @@ function renderDashboard(data) {
     const last30 = days.slice(-30);
     const verCounts = {};
     for (const d of last30) {
-        const v = data.daily[d].version;
-        if (v) verCounts[v] = (verCounts[v] || 0) + 1;
+        const dayData = data.daily[d];
+        let hasNewFormat = false;
+        for (const key in dayData) {
+            if (key.startsWith('version_') && !key.startsWith('version_commit') && typeof dayData[key] === 'number') {
+                const v = key.slice(8).replace(/_/g, '.');
+                verCounts[v] = (verCounts[v] || 0) + dayData[key];
+                hasNewFormat = true;
+            }
+        }
+        if (!hasNewFormat && dayData.version && typeof dayData.version === 'string') {
+            verCounts[dayData.version] = (verCounts[dayData.version] || 0) + 1;
+        }
     }
     const versionLabels = Object.keys(verCounts);
     const versionData   = versionLabels.map(v => verCounts[v]);
@@ -275,13 +285,45 @@ function renderDashboard(data) {
     // Row 1: Feature usage over time (line)
     container.innerHTML = '<div class="chart-card full"><h2>Featurenutzung \u00fcber Zeit</h2><div class="chart-wrap"><canvas id="line-chart"></canvas></div></div>';
 
-    // Row 2: Users per weekday + Version distribution
+    // Row 2: Unique users over time + Hourly usage
+    container.innerHTML += '<div class="chart-row">' +
+        '<div class="chart-card"><h2>Unique Nutzer \u00fcber Zeit</h2><div class="chart-wrap"><canvas id="unique-chart"></canvas></div></div>' +
+        '<div class="chart-card"><h2>Nutzung nach Tageszeit</h2><div class="chart-wrap"><canvas id="hourly-chart"></canvas></div></div>' +
+        '</div>';
+
+    // Row 3: Versions over time (stacked area)
+    const versionsSet = new Set();
+    const versionKeyMap = {};
+    for (const d of days) {
+        const dayData = data.daily[d];
+        for (const key in dayData) {
+            if (key.startsWith('version_') && !key.startsWith('version_commit') && typeof dayData[key] === 'number' && dayData[key] > 0) {
+                const v = key.slice(8).replace(/_/g, '.');
+                versionsSet.add(v);
+                versionKeyMap[v] = key;
+            }
+        }
+    }
+    const versionsList = Array.from(versionsSet).sort((a, b) => {
+        const pa = a.split('.').map(Number);
+        const pb = b.split('.').map(Number);
+        for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const diff = (pb[i] || 0) - (pa[i] || 0);
+            if (diff !== 0) return diff;
+        }
+        return 0;
+    });
+    if (versionsList.length > 0) {
+        container.innerHTML += '<div class="chart-card full"><h2>Versionen \u00fcber Zeit</h2><div class="chart-wrap"><canvas id="version-time-chart"></canvas></div></div>';
+    }
+
+    // Row 4: Users per weekday + Version distribution
     container.innerHTML += '<div class="chart-row">' +
         '<div class="chart-card"><h2>Nutzer pro Wochentag</h2><div class="chart-wrap"><canvas id="weekday-chart"></canvas></div></div>' +
         '<div class="chart-card"><h2>Versionen (letzte 30 Tage)</h2><div class="chart-wrap"><canvas id="version-chart"></canvas></div></div>' +
         '</div>';
 
-    // Row 3: Feature usage per weekday (grouped bar)
+    // Row 5: Feature usage per weekday (grouped bar)
     if (active.length > 0) {
         container.innerHTML += '<div class="chart-card full"><h2>Feature-Nutzung pro Wochentag</h2><div class="chart-wrap"><canvas id="feature-weekday-chart"></canvas></div></div>';
     }
@@ -327,7 +369,92 @@ function renderDashboard(data) {
         })
     });
 
-    // ── 2. Bar Chart - Users per weekday ────────────────────────────────
+    // ── 2. Line Chart - Unique users over time ─────────────────────────
+    new Chart(document.getElementById('unique-chart'), {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Unique Nutzer',
+                data: days.map(d => data.daily[d].unique_today || 0),
+                borderColor: COLORS[0],
+                backgroundColor: COLORS[0] + '22',
+                borderWidth: 2,
+                pointRadius: 2,
+                pointHitRadius: 8,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: Object.assign({}, chartOpts, {
+            plugins: Object.assign({}, chartOpts.plugins, { legend: { display: false } })
+        })
+    });
+
+    // ── 3. Horizontal Bar - Hourly usage ──────────────────────────────
+    const hourLabels = Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0') + ':00');
+    const hourData = [];
+    for (let h = 0; h < 24; h++) {
+        let sum = 0;
+        for (const d of days) sum += data.daily[d]['hour_' + h] || 0;
+        hourData.push(sum);
+    }
+    new Chart(document.getElementById('hourly-chart'), {
+        type: 'bar',
+        data: {
+            labels: hourLabels,
+            datasets: [{
+                label: 'Sessions',
+                data: hourData,
+                backgroundColor: '#029AA888',
+                borderColor: '#029AA8',
+                borderWidth: 1,
+                borderRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: '#a0a0b8', font: { family: 'Inter' } }, grid: { color: '#2a2a3e' }, beginAtZero: true },
+                y: { ticks: { color: '#a0a0b8', font: { family: 'Inter' } }, grid: { display: false } }
+            }
+        }
+    });
+
+    // ── 4. Stacked Area Chart - Versions over time ─────────────────────
+    if (versionsList.length > 0) {
+        new Chart(document.getElementById('version-time-chart'), {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: versionsList.map((v, i) => ({
+                    label: v,
+                    data: days.map(d => data.daily[d][versionKeyMap[v]] || 0),
+                    borderColor: COLORS[i % COLORS.length],
+                    backgroundColor: COLORS[i % COLORS.length] + '55',
+                    borderWidth: 1.5,
+                    pointRadius: 1,
+                    pointHitRadius: 8,
+                    tension: 0.3,
+                    fill: '-1'
+                }))
+            },
+            options: Object.assign({}, chartOpts, {
+                interaction: { intersect: false, mode: 'index' },
+                plugins: Object.assign({}, chartOpts.plugins, {
+                    legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
+                }),
+                scales: Object.assign({}, chartOpts.scales, {
+                    y: Object.assign({}, chartOpts.scales.y, { stacked: true, beginAtZero: true })
+                })
+            })
+        });
+    }
+
+    // ── 5. Bar Chart - Users per weekday ────────────────────────────────
     new Chart(document.getElementById('weekday-chart'), {
         type: 'bar',
         data: {
@@ -346,7 +473,7 @@ function renderDashboard(data) {
         })
     });
 
-    // ── 3. Pie Chart - Version distribution ─────────────────────────────
+    // ── 6. Pie Chart - Version distribution ─────────────────────────────
     if (versionLabels.length > 0) {
         new Chart(document.getElementById('version-chart'), {
             type: 'doughnut',
@@ -372,7 +499,7 @@ function renderDashboard(data) {
         });
     }
 
-    // ── 4. Grouped Bar - Feature usage per weekday ──────────────────────
+    // ── 7. Grouped Bar - Feature usage per weekday ──────────────────────
     if (active.length > 0) {
         new Chart(document.getElementById('feature-weekday-chart'), {
             type: 'bar',

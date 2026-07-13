@@ -121,6 +121,20 @@ assertEquals(sandbox.tracker.getLocalStats().version, '1.9.4', "version should b
 sandbox.tracker.set('version', '2.0.0');
 assertEquals(sandbox.tracker.getLocalStats().version, '2.0.0', "version should be '2.0.0' after update");
 
+// --- Test incrementCategory ---
+console.log("Testing incrementCategory...");
+clearStorage();
+sandbox.tracker.incrementCategory('version', '1.9.4');
+sandbox.tracker.incrementCategory('version', '1.9.4');
+sandbox.tracker.incrementCategory('version', '2.0.0');
+assertEquals(sandbox.tracker.getLocalStats().version_1_9_4, 2, "version_1_9_4 should be 2 after two incrementCategory calls");
+assertEquals(sandbox.tracker.getLocalStats().version_2_0_0, 1, "version_2_0_0 should be 1 after one incrementCategory call");
+sandbox.tracker.incrementCategory('mobile', true);
+sandbox.tracker.incrementCategory('mobile', false);
+sandbox.tracker.incrementCategory('mobile', true);
+assertEquals(sandbox.tracker.getLocalStats().mobile_true, 2, "mobile_true should be 2");
+assertEquals(sandbox.tracker.getLocalStats().mobile_false, 1, "mobile_false should be 1");
+
 // --- Test load with old date (pendingFlush) ---
 console.log("Testing load with old date (pendingFlush)...");
 clearStorage();

@@ -22,12 +22,12 @@ if (!window.__KANTINE_LOADED) {
     // Stats: baseline metrics
     tracker.increment('starts');
     tracker.increment('session_count');
-    tracker.set('version', '{{VERSION}}');
+    tracker.incrementCategory('version', '{{VERSION}}');
     tracker.set('version_commit_hash', COMMIT_HASH);
     tracker.increment('hour_' + new Date().getHours());
-    tracker.set('mobile', window.innerWidth < 768);
-    tracker.set('lang', langMode);
-    tracker.set('logged_in', !!authToken);
+    tracker.incrementCategory('mobile', window.innerWidth < 768);
+    tracker.incrementCategory('lang', langMode);
+    tracker.incrementCategory('logged_in', !!authToken);
     
     (async () => {
         try {
