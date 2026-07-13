@@ -586,10 +586,7 @@ async function main() {
   const payload = `javascript:(function(){
 if(window.__KANTINE_LOADED){
   console.log('[Kantine] Re-init triggered');
-  var old = document.getElementById('kantine-wrapper');
-  if(old) old.remove();
-  var oldSplash = document.getElementById('kantine-splash');
-  if(oldSplash) oldSplash.remove();
+  window.__KANTINE_REINIT = true;
   window.__KANTINE_LOADED = false;
 }
 
@@ -609,7 +606,7 @@ if(window.__KANTINE_LOADED){
   var CACHE_KEY = '${CACHE_KEY}';
   var VER_KEY = '${VERSION_KEY}';
 
-  console.log('[Kantine] Bootloader v' + CURRENT_VER + ' — checking for updates...');
+  console.log('[Kantine] Bootloader ' + CURRENT_VER + ' — checking for updates...');
 
   function isNewer(a, b){
     var va = a.replace(/^v/,'').split('.').map(Number);
@@ -665,7 +662,7 @@ if(window.__KANTINE_LOADED){
       var c = JSON.parse(raw);
       if (c && c.bundleCode && c.version && isNewer(c.version, CURRENT_VER)) {
         try { localStorage.setItem(VER_KEY, c.version); } catch(e){}
-        console.log('[Kantine] → cache v' + c.version + ' (offline fallback)');
+        console.log('[Kantine] → cache ' + c.version + ' (offline fallback)');
         loadBundle(c.bundleCode);
         return true;
       }
@@ -710,7 +707,7 @@ if(window.__KANTINE_LOADED){
           var newCode = await bResp.text();
           cacheVersion(remoteVer, bundleUrl, newCode);
           try { localStorage.setItem(VER_KEY, remoteVer); } catch(e){}
-          console.log('[Kantine] ✅ CDN update v' + remoteVer + ' → loaded');
+          console.log('[Kantine] ✅ CDN update ' + remoteVer + ' → loaded');
           loadBundle(newCode);
           return;
         } else {
@@ -727,7 +724,7 @@ if(window.__KANTINE_LOADED){
   try { cache = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch(e){}
   if (cache && cache.bundleCode && cache.version && isNewer(cache.version, CURRENT_VER)) {
     try { localStorage.setItem(VER_KEY, cache.version); } catch(e){}
-    console.log('[Kantine] ✅ Cache update v' + cache.version + ' → loaded');
+      console.log('[Kantine] ✅ Cache update ' + cache.version + ' → loaded');
     loadBundle(cache.bundleCode);
     return;
   }
@@ -737,7 +734,11 @@ if(window.__KANTINE_LOADED){
   if (remoteVer && !isNewer(remoteVer, CURRENT_VER)) {
     console.log('[Kantine]   ✓ up-to-date (remote ' + remoteVer + ' matches baked-in) — using baked-in');
   } else {
-    console.log('[Kantine] → using baked-in v' + CURRENT_VER + ' (no update available)');
+    console.log('[Kantine] → using baked-in ' + CURRENT_VER + ' (no update available)');
+  }
+  if (window.__KANTINE_REINIT && remoteVer && !isNewer(remoteVer, CURRENT_VER)) {
+    console.log('[Kantine]   (re-init: no update, keeping current UI)');
+    return;
   }
   loadBundle(FALLBACK);
 })();

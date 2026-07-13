@@ -3,6 +3,8 @@ window.__kantine_load_start = Date.now();
 (function(){
     var splash = document.getElementById('kantine-splash');
     if (splash) splash.remove();
+    var oldWrapper = document.getElementById('kantine-wrapper');
+    if (oldWrapper) oldWrapper.remove();
 })();
 
 import { injectUI } from './ui.js';
