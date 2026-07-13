@@ -584,7 +584,14 @@ async function main() {
   const VERSION_KEY = '_k_au_version';
 
   const payload = `javascript:(function(){
-if(window.__KANTINE_LOADED){alert('Kantine Wrapper already loaded!');return;}
+if(window.__KANTINE_LOADED){
+  console.log('[Kantine] Re-init triggered');
+  var old = document.getElementById('kantine-wrapper');
+  if(old) old.remove();
+  var oldSplash = document.getElementById('kantine-splash');
+  if(oldSplash) oldSplash.remove();
+  window.__KANTINE_LOADED = false;
+}
 
 // ── CSS injection + splash screen (replaced/removed by bundle when it loads) ──
 (function(){
