@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-13
+
+### Added
+
+- **Auto-Update**: Bookmarklet ist jetzt ein Bootloader mit automatischen CDN-Updates.
+  - `scripts/build.js` erzeugt neben den bisherigen Artefakten ein CDN-Bundle (`kantine-auto-update-bundle.js`) und ein Versions-Manifest (`version.json`).
+  - Beim Start prüft der Bootloader `version.json` auf GitHub Pages, lädt das aktuelle Bundle von jsDelivr und cached es in `localStorage` (1h Gültigkeit).
+  - Bei Netzwerkfehlern fällt er automatisch auf ein eingebettetes Fallback-Bundle zurück.
+  - Splash-Screen (`#kantine-splash`) zeigt den Ladevorgang an ("Initialisiere...", "Update wird geladen...").
+  - Console-Reporting: Loggt gebackene Version, Cache-Version, CDN-Version und Entscheidung (update/cache/baked-in).
+  - Reinit bei wiederholtem Klick: Statt eines `alert()` wird die App sauber neu initialisiert, bei Bedarf mit Update.
+- **Bookmarklet-Tests**: `auto-update-bootloader.test.js` mit strukturellen Bootloader-Tests und E2E-Verifikation.
+- **Stats-Tracking**: `stats-tracker.test.js` und `stats-integration.test.js` für das Gist-basierte Nutzungs-Tracking.
+
+### Changed
+
+- **CI auf Node 24 migriert**: GitHub Actions auf `checkout@v7`, `setup-node@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`, `setup-java@v5`, `cache@v6`, `setup-android@v4` aktualisiert. `package.json` deklariert `"node": ">=24"`.
+- CI erzeugt Git-Tags automatisch aus `version.txt` und pusht sie — `npm run release` ist obsolet.
+- **DE/EN Splitter verbessert** – erkennt jetzt interleaved und trailing English Formate.
+- Dev-Mode: Trigramm-Heatmap pro Zeichen für Low-Confidence-Splits (Farbintensität nach Affinitätsstärke).
+- **Dokumentation**:
+  - `docs/ARCHITECTURE.md`: Neuer Abschnitt "Deployment & Auto-Update" mit Komponententabelle, ASCII-Ablaufdiagramm und Einschränkungshinweis.
+  - `README.md`: CI/CD-Sektion, Auto-Update-Beschreibung, dynamischer Version-Badge.
+  - `docs/TESTING.md`: Um neue Testdateien ergänzt.
+
+### Fixed
+
+- **Build-Guard**: Version-Check aus `verifyAutoUpdateArtifacts()` entfernt (strukturelle Prüfung reicht vor dem Build), Versionsvergleich bleibt in `stepTests()` post-build.
+- **Doppel-`v` in Logs**: Sowohl im Cache-Report als auch in Bootloader-Logs beseitigt.
+- **Splash beim Reinit**: Splash wird jetzt auch dann entfernt, wenn kein Update verfügbar ist (kein Hängenbleiben).
+- **PayPal SDK Duplicate Listener**: DOM-Ersetzung auf `#kantine-wrapper` beschränkt (statt `body.innerHTML`); PayPal-Render in `try/catch` gewrappt.
+- **Lang-Splitter**: Nested-Paren-Allergen-Schlucken behoben; Slash-Separator-Recovery wenn orphaned `(` ihn verdeckt.
+
 ## [1.10.6] - 2026-07-13
 
 ### Fixed
@@ -517,7 +550,9 @@ No changes.
 
 > Android app changelog: [android/CHANGELOG.md](android/CHANGELOG.md)
 
-[Unreleased]: https://github.com/user/repo/compare/v1.10.5...HEAD
+[Unreleased]: https://github.com/TauNeutrino/kantine-overview/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/TauNeutrino/kantine-overview/compare/v1.10.6...v2.0.0
+[1.10.6]: https://github.com/TauNeutrino/kantine-overview/compare/v1.10.5...v1.10.6
 [1.10.5]: https://github.com/user/repo/compare/v1.10.4...v1.10.5
 [1.9.4]: https://github.com/user/repo/compare/v1.9.3...v1.9.4
 [1.9.3]: https://github.com/user/repo/compare/v1.9.2...v1.9.3
