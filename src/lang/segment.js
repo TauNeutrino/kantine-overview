@@ -70,6 +70,17 @@ function processSegment(segmentText, allergen, anchored) {
     else if (ch === ')') parenDepth--;
     else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
   }
+  if (slashIdx === -1 && parenDepth > 0) {
+    const openIdx = textWithoutAllergen.indexOf('(');
+    parenDepth = 0;
+    for (let i = 0; i < textWithoutAllergen.length; i++) {
+      const ch = textWithoutAllergen[i];
+      if (i === openIdx) continue;
+      if (ch === '(') parenDepth++;
+      else if (ch === ')') parenDepth--;
+      else if (ch === '/' && parenDepth === 0) { slashIdx = i; break; }
+    }
+  }
   if (slashIdx !== -1) {
     // Expand to surrounding whitespace (equivalent to the old /\s*\/\s*/ match)
     let left = slashIdx;
