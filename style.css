@@ -2010,6 +2010,3 @@ body {
 
 .heatmap-row { margin-top: 6px; font-family: monospace; font-size: 0.75em; line-height: 1.4; letter-spacing: 0.5px; word-break: break-all; }
 .heatmap-char { display: inline; }
-.heatmap-de { color: hsl(210, 80%, 50%); }
-.heatmap-en { color: hsl(0, 80%, 50%); }
-.heatmap-neutral { color: hsl(0, 0%, 60%); }
