@@ -485,6 +485,8 @@ function stepTests(ctx) {
 
 // Verify auto-update CDN artifacts: used both before overwriting (to catch
 // corrupted dist files from a previous build) and in the final smoke check.
+// Version consistency is not checked here — it's verified in stepTests()
+// after artifacts are regenerated, to avoid false-positive failures on version bumps.
 function verifyAutoUpdateArtifacts() {
   const autoBundle = path.join(DIST, 'kantine-auto-update-bundle.js');
   const verManifest = path.join(DIST, 'version.json');
@@ -503,8 +505,7 @@ function verifyAutoUpdateArtifacts() {
       const v = JSON.parse(read(verManifest));
       if (!v.version) { fail('Version manifest missing version field'); }
       else if (!v.bundleUrl) { fail('Version manifest missing bundleUrl field'); }
-      else if (v.version !== read(VERSION_FILE).trim()) { fail('Version manifest version mismatch'); }
-      else { ok('Version manifest valid: ' + v.version); }
+      else { ok('Version manifest structurally valid'); }
     } catch (e) { fail('Version manifest not valid JSON: ' + e.message); }
   }
 }
