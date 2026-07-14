@@ -4,6 +4,11 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag to write into rel-version.json (e.g. v2.0.0)'
+        required: true
+        default: ''
 
 permissions:
   contents: write
@@ -19,7 +24,9 @@ jobs:
 
       - name: Write rel-version.json
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then echo "No version provided"; exit 1; fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Release tag: $VERSION"
           node -e "
             const v = process.env.VERSION;
@@ -39,7 +46,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to rel-version.json"
           else
-            git commit -m "chore: update rel-version.json for ${{ github.event.release.tag_name }} [skip ci]"
+            git commit -m "chore: update rel-version.json for ${VERSION} [skip ci]"
             git push origin main
             echo "Pushed rel-version.json update"
           fi
