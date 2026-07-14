@@ -26,9 +26,9 @@ jobs:
         run: |
           VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
           if [ -z "$VERSION" ]; then echo "No version provided"; exit 1; fi
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Release tag: $VERSION"
-          node -e "
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          VERSION="$VERSION" node -e "
             const v = process.env.VERSION;
             const manifest = {
               version: v,
@@ -40,6 +40,7 @@ jobs:
 
       - name: Commit and push
         run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add rel-version.json
