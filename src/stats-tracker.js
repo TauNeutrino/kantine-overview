@@ -39,7 +39,8 @@ class StatsTracker {
             session: { start_ms: Date.now() },
             has_flushed: false,
             pendingFlush: null,
-            pendingFlushes: []
+            pendingFlushes: [],
+            _catCounted: {}
         };
     }
 
@@ -57,7 +58,8 @@ class StatsTracker {
                     session: parsed.session || { start_ms: Date.now() },
                     has_flushed: parsed.has_flushed || false,
                     pendingFlush: null,
-                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : [])
+                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : []),
+                    _catCounted: parsed._catCounted || {}
                 };
             } catch (e) {
                 this._state = this._freshState(today);
@@ -73,6 +75,7 @@ class StatsTracker {
                 user_hash: this._state.user_hash
             });
             this._state.daily = {};
+            this._state._catCounted = {};
             this._state.session = { start_ms: Date.now() };
             this._state.date = today;
             this._state.has_flushed = false;
@@ -104,6 +107,9 @@ class StatsTracker {
         this.load();
         const safe = String(value).replace(/[^a-zA-Z0-9]/g, '_');
         const composite = key + '_' + safe;
+        if (!this._state._catCounted) this._state._catCounted = {};
+        if (this._state._catCounted[composite]) return;
+        this._state._catCounted[composite] = true;
         if (!this._state.daily[composite]) this._state.daily[composite] = 0;
         this._state.daily[composite]++;
         this.persist();
