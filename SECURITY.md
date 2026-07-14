@@ -8,7 +8,6 @@ Die folgenden Versionen erhalten aktuell Sicherheitsupdates:
 
 | Version | Unterstützt |
 |---|---|
-| 1.x (Android) | ✅ |
 | 1.x (Web) | ✅ |
 | < 1.0 | ❌ |
 
@@ -41,8 +40,6 @@ Wir folgen einer koordinierten Offenlegung. Sicherheitslücken werden öffentlic
 - Authentifizierungstoken werden verschlüsselt gespeichert
 - Kein Tracking oder Analytics
 - Keine personenbezogenen Daten werden über das Authentifizierungstoken hinaus gespeichert
-- Code-Obfuskierung für die Android-App
-
 ## Hinweis
 
 Es wurde bisher kein formales Sicherheitsaudit durchgeführt.

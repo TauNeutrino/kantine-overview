@@ -548,7 +548,7 @@ No changes.
 
 ---
 
-> Android app changelog: [android/CHANGELOG.md](android/CHANGELOG.md)
+> Die Android-App wurde in ein eigenes Repository ausgelagert: [github.com/TauNeutrino/kantine-app](https://github.com/TauNeutrino/kantine-app)
 
 [Unreleased]: https://github.com/TauNeutrino/kantine-overview/compare/v2.0.0...HEAD
 [2.0.0]: https://github.com/TauNeutrino/kantine-overview/compare/v1.10.6...v2.0.0

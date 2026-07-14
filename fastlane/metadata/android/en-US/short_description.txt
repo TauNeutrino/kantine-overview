@@ -1,1 +1,0 @@
-Weekly canteen menu with DE/EN language detection.

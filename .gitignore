@@ -7,8 +7,3 @@ __pycache__/
 .omo/
 test_eval*.js
 test_split.js
-
-# Android keystore
-android/keystore/
-android/keystore.properties
-android/android-sdk/

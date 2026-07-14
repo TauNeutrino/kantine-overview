@@ -1,6 +1,6 @@
 # Mitwirkungsrichtlinien
 
-Danke für dein Interesse an diesem Projekt. Diese Richtlinien gelten für das gesamte Monorepo mit den beiden Sub-Projekten Web (Bookmarklet) und Android (App).
+Danke für dein Interesse an diesem Projekt. Diese Richtlinien gelten für das Web-Bookmarklet.
 
 ## Wie du mitwirken kannst
 
@@ -13,7 +13,6 @@ Danke für dein Interesse an diesem Projekt. Diese Richtlinien gelten für das g
 Für detaillierte Setup-Anweisungen siehe `SETUP.md`.
 
 - **Web**: `npm install` und `npm run build`
-- **Android**: Android Studio mit JDK 17, `./gradlew bundleRelease`
 
 ## Code-Stil
 
@@ -24,14 +23,6 @@ Für detaillierte Setup-Anweisungen siehe `SETUP.md`.
 - Einheitliche camelCase-Namen
 - Funktionen klein und fokussiert halten
 - Single-Quotes für Strings
-
-### Android (App)
-
-- Kotlin-Coding-Conventions befolgen
-- Jetpack Compose: Stateless Composables bevorzugen, ViewModels für Logik
-- Hilt: Module in `di/`-Paketen, `@InstallIn(SingletonComponent::class)`
-- Moshi: `@JsonClass(generateAdapter = true)` für DTOs
-- Room: `@Entity` mit expliziten `tableName` und `primaryKeys`
 
 ## Commit-Nachrichten
 
@@ -62,7 +53,6 @@ Wir verwenden Conventional Commits:
 Alle Tests müssen bestanden sein, bevor ein PR gemerged wird:
 
 - **Web**: `npm test`
-- **Android**: `./gradlew test`
 
 ## Verhaltenskodex und Lizenz
 
