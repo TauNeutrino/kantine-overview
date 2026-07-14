@@ -1,3 +1,4 @@
 {
-  "bundleUrl": "https://cdn.jsdelivr.net/gh/TauNeutrino/kantine-overview@undefined/dist/kantine-auto-update-bundle.js"
+  "version": "v2.0.0",
+  "bundleUrl": "https://cdn.jsdelivr.net/gh/TauNeutrino/kantine-overview@v2.0.0/dist/kantine-auto-update-bundle.js"
 }
