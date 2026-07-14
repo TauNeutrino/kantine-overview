@@ -579,7 +579,9 @@ async function main() {
 
   const JS_MIN = minifyResult.code;
   const BOOT_VERSION = ctx.VERSION;
-  const VERSION_JSON_URL = 'https://tauneutrino.github.io/kantine-overview/version.json';
+  const DEV_MODE_KEY = 'kantine_dev_mode';
+  const DEV_VER_URL = 'https://tauneutrino.github.io/kantine-overview/version.json';
+  const STABLE_VER_URL = 'https://raw.githubusercontent.com/TauNeutrino/kantine-overview/main/rel-version.json';
   const CACHE_KEY = '_k_au_cache';
   const VERSION_KEY = '_k_au_version';
 
@@ -670,6 +672,13 @@ if(window.__KANTINE_LOADED){
     return false;
   }
 
+  // ── Choose update channel based on dev mode ──
+  var devMode = localStorage.getItem('${DEV_MODE_KEY}') === 'true';
+  var VERSION_JSON_URL = devMode
+    ? '${DEV_VER_URL}'
+    : '${STABLE_VER_URL}';
+  console.log('[Kantine]   channel: ' + (devMode ? 'dev' : 'stable'));
+
   // ── Report initial state ──
   var cacheReport = 'none';
   var cache = null;
@@ -685,7 +694,7 @@ if(window.__KANTINE_LOADED){
   // ── Fetch remote version.json ──
   var remoteVer = null;
   try {
-    var resp = await fetchWithTimeout('${VERSION_JSON_URL}?t=' + Date.now(), 5000);
+    var resp = await fetchWithTimeout(VERSION_JSON_URL + '?t=' + Date.now(), 5000);
     if (resp.ok) {
       var manifest = await resp.json();
       if (manifest && manifest.version) remoteVer = manifest.version;

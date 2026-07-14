@@ -1,0 +1,42 @@
+name: Update Stable Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          token: ${{ secrets.GIT_PAT }}
+
+      - name: Write rel-version.json
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          echo "Release tag: $VERSION"
+          node -e "
+            const v = process.env.VERSION;
+            const manifest = {
+              version: v,
+              bundleUrl: 'https://cdn.jsdelivr.net/gh/TauNeutrino/kantine-overview@' + v + '/dist/kantine-auto-update-bundle.js'
+            };
+            require('fs').writeFileSync('rel-version.json', JSON.stringify(manifest, null, 2) + '\n');
+            console.log('rel-version.json written for', v);
+          "
+
+      - name: Commit and push
+        run: |
+          git add rel-version.json
+          if git diff --staged --quiet; then
+            echo "No changes to rel-version.json"
+          else
+            git commit -m "chore: update rel-version.json for ${{ github.event.release.tag_name }} [skip ci]"
+            git push origin main
+            echo "Pushed rel-version.json update"
+          fi

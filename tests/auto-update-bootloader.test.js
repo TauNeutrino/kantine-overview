@@ -28,6 +28,10 @@ check('Bundle code caching present (bundleCode)', code.includes('bundleCode'));
 check('tryLoadCachedNewer offline-safe path present', code.includes('tryLoadCachedNewer'));
 check('cacheVersion persists code', code.includes("bundleCode: code"));
 check('try/catch around JSON.parse(localStorage)', code.includes('JSON.parse(localStorage') && code.includes('catch(e){}'));
+check('Dev mode channel selection present', code.includes('kantine_dev_mode'));
+check('Stable URL (rel-version.json) present', code.includes('rel-version.json'));
+check('Dev URL (version.json on Pages) present', code.includes('tauneutrino.github.io/kantine-overview/version.json'));
+check('Channel log present', code.includes('channel:'));
 
 // Test 1b: CSS bundling in CDN bundle
 const bundleCode = readFileSync('dist/kantine-auto-update-bundle.js', 'utf8');
