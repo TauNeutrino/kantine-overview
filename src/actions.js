@@ -718,6 +718,9 @@ export function stopPolling() {
 export async function pollFlaggedItems() {
     if (userFlags.size === 0 || !authToken) return;
 
+    cleanupExpiredFlags();
+    if (userFlags.size === 0) return;
+
     const flagsByDate = {};
     for (const flagId of userFlags) {
         const [date, articleIdStr] = flagId.split('_');
