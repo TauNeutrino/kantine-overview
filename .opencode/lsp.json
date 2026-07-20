@@ -1,0 +1,31 @@
+{
+  "lsp": {
+    "typescript": {
+      "priority": 100
+    },
+    "basedpyright": {
+      "priority": 100
+    },
+    "bash": {
+      "priority": 100
+    },
+    "bash-ls": {
+      "disabled": true
+    },
+    "yaml-ls": {
+      "priority": 100,
+      "initialization": {
+        "yaml": {
+          "schemas": {
+            "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+          },
+          "validate": true,
+          "completion": true,
+          "format": {
+            "enable": true
+          }
+        }
+      }
+    }
+  }
+}
