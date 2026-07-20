@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-20
+
+### Fixed
+
+- **DE/EN-Splitter**: Englische Wörter mit Großbuchstaben (z. B. `Indian:`, `Mix`, `Sabji`, `Vegetables`) werden nicht mehr als Deutsch klassifiziert. Der Boundary-Detektor in `src/lang/dishes.js` verwendet jetzt kontinuierliche Sprachmodell-Scores und Großschreibung nur noch als Tiebreak.
+- **Trailing-English-Block**: `src/lang/alignTrailing.js` erkennt jetzt `DE1 (A) DE2 (B) EN1 / EN2` und verteilt EN1/EN2 korrekt auf die vorherigen deutschen Gänge.
+
+### Added
+
+- **Dokumentation**: `docs/LANGUAGE_SPLITTING.md` beschreibt die logische Pipeline der automatischen Sprach-Split-Funktionen (Module, Verantwortlichkeiten, Grenzen).
+- **Tests**: `tests/test_splitter.js` um zwei Regressionstests erweitert (Sabji-Beispiel und Trailing-English-Block).
+- **Test-Harness**: `tests/test_no_info_lost.js` um fehlendes `alignTrailing.js` im Modul-Eval ergänzt.
+
 ## [2.0.0] - 2026-07-13
 
 ### Added

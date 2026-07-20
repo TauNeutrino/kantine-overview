@@ -4821,7 +4821,7 @@
                         "description": "Legierte Grießsuppe / Semolina soup (ACGLM) S-Steak auf Ratatouille mit Bratkartoffeln / Steak (Pork) on ratatouille fried potatoes(L) Obstgarten(G/O)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 176,
+                        "availableAmount": 174,
                         "amountTracking": true
                     },
                     {
@@ -4851,7 +4851,7 @@
                         "description": "Brokkolicremesuppe / Broccoli cream soup Gnocchi mit Rucolapesto, Zucchini und Oliven / Gnocchi with arugula pesto, zucchini and olives(A)\nMango Joghurt / Mango yogurt(F)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 7,
+                        "availableAmount": 6,
                         "amountTracking": true
                     },
                     {
@@ -4881,7 +4881,7 @@
                         "description": "Legierte Grießsuppe / Semolina soup (ACGLM) Nudeln \" Con Pollo\" mit Huhn und Rucola / Pasta with chicken and argula(ACGL) Obstgarten(G/O)",
                         "price": 4.3,
                         "available": true,
-                        "availableAmount": 4,
+                        "availableAmount": 3,
                         "amountTracking": true
                     }
                 ]
@@ -4897,8 +4897,8 @@
                         "name": "M1 Herzhaftes DI",
                         "description": "Rindsuppe mit Frittaten / Beef soup with sliced pancakes(ACGLM) Rindfleisch \" Stifado\" mit Zwiebeln, Tomaten, Balsamico und Honig / Beef \"stifado\" mit zwiebeln, tomaten, balsamic vinegar, and honey(FLMO) Donut(ACG)",
                         "price": 5.5,
-                        "available": true,
-                        "availableAmount": 186,
+                        "available": false,
+                        "availableAmount": 0,
                         "amountTracking": true
                     },
                     {
@@ -4907,18 +4907,18 @@
                         "name": "M2 Gourmetteller DI",
                         "description": "Rindsuppe mit Frittaten / Beef soup with sliced pancakes(ACGLM) Gnocchi in Käserahmsauce / Gnocchi in cheese cream(ACGL) Donut(ACG)",
                         "price": 5.5,
-                        "available": true,
-                        "availableAmount": 126,
+                        "available": false,
+                        "availableAmount": 0,
                         "amountTracking": true
                     },
                     {
                         "id": "2026-06-23_178727",
                         "articleId": 178727,
                         "name": "M3 Süß DI",
-                        "description": "Rindsuppe mit Frittaten / Beef soup with sliced pancakes(ACGLM) Apfel- Marillen- Auflauf mit Vanille- Honig Sauce / Apple and apricot casserole with vanilla honey sauce Donut(ACG)",
+                        "description": "Rindsuppe mit Frittaten / Beef soup with sliced pancakes(ACGLM) Apfel- Marillen- Auflauf mit Vanille- Honig Sauce / Apple and apricot casserole with vanilla honey sauce(ACGH) Donut(ACG)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 49,
+                        "availableAmount": 7,
                         "amountTracking": true
                     },
                     {
@@ -4927,8 +4927,8 @@
                         "name": "M4 Ginko vegan DI",
                         "description": "Zucchincremesuppe / Zucchini cream soup Kichererbesen - Süßkartoffel- Curry mit Zitronenreis /  Chickpea and sweet potato curry with lemon rice(AFN) Bananenkuchen / Banana cake(AF)",
                         "price": 5.5,
-                        "available": true,
-                        "availableAmount": 14,
+                        "available": false,
+                        "availableAmount": 0,
                         "amountTracking": true
                     },
                     {
@@ -4948,7 +4948,7 @@
                         "description": "Suppe / Soup Salat / Salad Dessert",
                         "price": 3,
                         "available": true,
-                        "availableAmount": 31,
+                        "availableAmount": 7,
                         "amountTracking": true
                     },
                     {
@@ -4958,7 +4958,7 @@
                         "description": "Rindsuppe mit Frittaten / Beef soup with sliced pancakes(ACGLM) Gnocchi in Käserahmsauce / Gnocchi in cheese cream(ACGL) Donut(ACG)",
                         "price": 4.3,
                         "available": true,
-                        "availableAmount": 17,
+                        "availableAmount": 1,
                         "amountTracking": true
                     }
                 ]
@@ -4975,7 +4975,7 @@
                         "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Curryhuhn aus dem Ofen mit Reis / Churry chicken from the oven with rice Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 167,
+                        "availableAmount": 19,
                         "amountTracking": true
                     },
                     {
@@ -4985,17 +4985,17 @@
                         "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Chili con Carne mit Gebäck/ Chili con carne with bread roll(ALM) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 294,
+                        "availableAmount": 205,
                         "amountTracking": true
                     },
                     {
                         "id": "2026-06-24_178731",
                         "articleId": 178731,
                         "name": "M3 Basisch und Glutenarm MI",
-                        "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Panierte Lachsforelle auf Zitronen- Brokkolihirse mit Dilldip / Breaded salom trout on lemon-broccoli millet with dill dip(ACDGL) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
+                        "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Panierte Lachsforelle auf Zitronen- Brokkolihirse mit Dilldip / Breaded salom trout on lemon-broccoli millet with dill dip(ACDGFL) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
                         "price": 5.5,
-                        "available": true,
-                        "availableAmount": 63,
+                        "available": false,
+                        "availableAmount": 0,
                         "amountTracking": true
                     },
                     {
@@ -5005,17 +5005,17 @@
                         "description": "Tomaten- Kokossuppe / Tomato- coconut soup Indisch: Ravaya (Paprika, Melanzani, Kartoffeln), chana Masala (Kichererbsencurry) mit Curcumareis / Indian: Ravaya (Bell peppers, eggplant, potatoes), Chana-Masala  with turmeric rice Vanillapudding",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 85,
+                        "availableAmount": 48,
                         "amountTracking": true
                     },
                     {
                         "id": "2026-06-24_178745",
                         "articleId": 178745,
                         "name": "M5 Salat mit Gebäck MI",
-                        "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Curryhuhn Apfelsalt mit Stangenselleri / Apple salad with celery sticks(ALM) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
+                        "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM)  Apfelsalt mit Stangenselleri, Nüsse / Apple salad with celery sticks and nuts(AGLMH) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 29,
+                        "availableAmount": 35,
                         "amountTracking": true
                     },
                     {
@@ -5025,7 +5025,7 @@
                         "description": "Suppe / Soup Salat / Salad Dessert",
                         "price": 3,
                         "available": true,
-                        "availableAmount": 35,
+                        "availableAmount": 28,
                         "amountTracking": true
                     },
                     {
@@ -5035,7 +5035,7 @@
                         "description": "Karfiolcremesuppe / Cauliflower cream soup(GLM) Chili con Carne mit Gebäck/ Chili con carne with bread roll(ALM) Erdbeer-Rhabarber- Tiramisu / Strawbeery rhubarb tiramisu(ACG)",
                         "price": 4.3,
                         "available": true,
-                        "availableAmount": 21,
+                        "availableAmount": 8,
                         "amountTracking": true
                     }
                 ]
@@ -5052,7 +5052,7 @@
                         "description": "Karotten- Ingwersuppe / Carrot ginger soup(GLM) Grillhendl / Roast chicken Kuchen / Cake(ACGHO)",
                         "price": 6.5,
                         "available": true,
-                        "availableAmount": 340,
+                        "availableAmount": 265,
                         "amountTracking": true
                     },
                     {
@@ -5062,7 +5062,7 @@
                         "description": "Karotten- Ingwersuppe / Carrot ginger soup(GLM) Gebratenes Forellenfilet mit Sesamkruste auf Basilikumrisotto / Fried trout fillet with sesame toffe on basil risotto(ADGLMN) Kuchen / Cake(ACGHO)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 143,
+                        "availableAmount": 115,
                         "amountTracking": true
                     },
                     {
@@ -5072,7 +5072,7 @@
                         "description": "Karotten- Ingwersuppe / Carrot ginger soup(GLM) Mediterrane Bowl mit Bulgur, Grillgemüse und Joghurtdip / Mediterranean  bowl with grilled vegetables and yogurt dip(AGLHN) Kuchen / Cake(ACGHO)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 125,
+                        "availableAmount": 96,
                         "amountTracking": true
                     },
                     {
@@ -5082,7 +5082,7 @@
                         "description": "Gemüsecremesuppe / Vegetable cream soup(L) Spinatlasagne mit Tomatensauce  / Spinach lasagna with tomato sauce(AFO) Waldbeerkuchen / Berry cake(AF)",
                         "price": 5.5,
                         "available": true,
-                        "availableAmount": 86,
+                        "availableAmount": 66,
                         "amountTracking": true
                     },
                     {
@@ -5102,7 +5102,7 @@
                         "description": "Suppe / Soup Salat / Salad Dessert",
                         "price": 3,
                         "available": true,
-                        "availableAmount": 33,
+                        "availableAmount": 31,
                         "amountTracking": true
                     },
                     {
@@ -5112,7 +5112,7 @@
                         "description": "Karotten- Ingwersuppe / Carrot ginger soup(GLM) Mediterrane Bowl mit Bulgur, Grillgemüse und Joghurtdip / Mediterranean  bowl with grilled vegetables and yogurt dip(AGLN) Kuchen / Cake(ACGHO)",
                         "price": 4.3,
                         "available": true,
-                        "availableAmount": 23,
+                        "availableAmount": 22,
                         "amountTracking": true
                     }
                 ]
@@ -5128,8 +5128,1342 @@
                         "name": "M1",
                         "description": "Penne mit \"Mexicansauce\" oder Kräutersauce und Parmesan / Penne with mexican sauce or herb sauce and parmesan(ACGLM)",
                         "price": 4,
+                        "available": true,
+                        "availableAmount": 12,
+                        "amountTracking": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "year": 2026,
+        "weekNumber": 27,
+        "days": [
+            {
+                "date": "2026-06-29",
+                "weekday": "Monday",
+                "orderCutoff": "2026-06-29T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-06-29_178719",
+                        "articleId": 178719,
+                        "name": "M1 Herzhaftes MO",
+                        "description": "Basilikumcremesuppe / Basil cream soup(GLM) Schweinsgeschnetzeltes \" Jäger Art\" mit Serviettenschnitte / Pork strips a la hunter style with bread dumpling(ACGLM) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 92,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178726",
+                        "articleId": 178726,
+                        "name": "M2 Gourmetteller MO",
+                        "description": "Basilikumcremesuppe / Basil cream soup(GLM) Tortelloni mit Fleischfülle (Rind) in Tomatensauce / Tortelloni with meat filling(pork/beef) in tomato sauce(ACGLM) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 56,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178733",
+                        "articleId": 178733,
+                        "name": "M3 Basisch und Glutenarm MO",
+                        "description": "Basilikumcremesuppe / Basil cream soup(GLM) Mediterrane Ofenkartoffel  mit Gemüse, Kräuter-Zitronenöl und Sonnenblumenkerne / Mediterranean baked potaoes with vegetables , lemon herb oil and sunflower seeds(GLMHN) / Corny(ACGHO)",
+                        "price": 5.5,
                         "available": false,
                         "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178740",
+                        "articleId": 178740,
+                        "name": "M4 Ginko vegan MO",
+                        "description": "Erbsen Minz Suppe / Pea mint soup Grünes Gemüsecurry mit Sesamreis / Green vegetable curry with sesame rice(AFN) Waldbeerjoghurt / Forest berry yoghurt(F)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 3,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178747",
+                        "articleId": 178747,
+                        "name": "M5 Salat mit Gebäck MO",
+                        "description": "Basilikumcremesuppe / Basil cream soup(GLM) Salatteller mit Brokkoli-Hirse Laibchen / Salad plate with broccoli millet patties (AC) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178754",
+                        "articleId": 178754,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 10,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-29_178761",
+                        "articleId": 178761,
+                        "name": "M7 Kleines Hauptspeisenmenü MO",
+                        "description": "Basilikumcremesuppe / Basil cream soup(GLM) Schweinsgeschnetzeltes \" Jäger Art\" mit Serviettenschnitte / Pork strips a la hunter style with bread dumpling(ACGLM) Corny(ACGHO)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 12,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-06-30",
+                "weekday": "Tuesday",
+                "orderCutoff": "2026-06-30T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-06-30_178714",
+                        "articleId": 178714,
+                        "name": "M1 Herzhaftes DI",
+                        "description": "Rindsuppe mit Kaspressknödel / Beef soup with cheese dumpling(ACGLM) Puten Cordon bleu mit Erbsenreis / Turkey cordon bleu with pea rice(ACG) Melone / Melon",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178721",
+                        "articleId": 178721,
+                        "name": "M2 Gourmetteller DI",
+                        "description": "Rindsuppe mit Kaspressknödel / Beef soup with cheese dumpling(ACGLM) Gemüselasagne / Vegetable lasagna(ACGL) Melone / Melon",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178728",
+                        "articleId": 178728,
+                        "name": "M3 Süß DI",
+                        "description": "Rindsuppe mit Kaspressknödel / Beef soup with cheese dumpling(ACGLM) Mohnnudeln mit Himbeerragout / Poppy seed noodles with raspberry ragout(ACG) Melone / Melon",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178735",
+                        "articleId": 178735,
+                        "name": "M4 Ginko vegan DI",
+                        "description": "Zucchini- Karotten Suppe / Zucchini- carrot soup Kartoffel- Fisolen Gulasch mit Serviettenknödel / Potato and green bean goulash with bread dumplings(A) Haselnusskuchen / Hazelnut cake(AFH)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178742",
+                        "articleId": 178742,
+                        "name": "M5 Salat mit Gebäck DI",
+                        "description": "Rindsuppe mit Kaspressknödel / Beef soup with cheese dumpling(ACGLM) Salatteller mit Minutensteaks vom Schwein / Salad plate with minute steaks- pork(ALM) Melone / Melon",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178749",
+                        "articleId": 178749,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-06-30_178756",
+                        "articleId": 178756,
+                        "name": "M7 Kleines Hauptspeisenmenü DI",
+                        "description": "Rindsuppe mit Kaspressknödel / Beef soup with cheese dumpling(ACGLM) Gemüselasagne / Vegetable lasagna(ACGL) Melone / Melon",
+                        "price": 4.3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-01",
+                "weekday": "Wednesday",
+                "orderCutoff": "2026-07-01T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-01_178718",
+                        "articleId": 178718,
+                        "name": "M1 Herzhaftes MI",
+                        "description": "Maiscremesuppe / Corn cream soup(GLM) Acht Schätze  mit Rindfleisch und Eiernudeln / Eight treasures with beef and egg noodles(ACFLMN) Ananas- Kokoscreme / Pineapple- coconut cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178725",
+                        "articleId": 178725,
+                        "name": "M2 Gourmetteller MI",
+                        "description": "Maiscremesuppe / Corn cream soup(GLM) Zitronen Gnocchi mit Putenschniken, Spargel und Pangrattato / Lemon gnocchi with turkey slices, asparague and breadcrumbs(ACGLM) Ananas- Kokoscreme / Pineapple- coconut cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178732",
+                        "articleId": 178732,
+                        "name": "M3 Basisch und Glutenarm MI",
+                        "description": "Maiscremesuppe / Corn cream soup(GLM) Blumenkohl- Steaks mit Kräuterstampf und Gemüse / Cauliflower steaks with herb mash and vegetables(GLM) Ananas- Kokoscreme / Pineapple- coconut cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178739",
+                        "articleId": 178739,
+                        "name": "M4 Ginko vegan MI",
+                        "description": "Gemüsescremesupp / Vegetable cream soup(L) Kartoffel- Lauchstrudel mit Kräuterdip / Potato and leek strudel with herb dip(AFM) Schoko- Kokos Pudding / Chocolate coconut pudding(F)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178746",
+                        "articleId": 178746,
+                        "name": "M5 Salat mit Gebäck MI",
+                        "description": "Maiscremesuppe / Corn cream soup(GLM) Schinkenrolle auf Blattsalaten / Ham roll on leaf salads(AGLM) Ananas- Kokoscreme / Pineapple- coconut cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178753",
+                        "articleId": 178753,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 3,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-01_178760",
+                        "articleId": 178760,
+                        "name": "M7 Kleines Hauptspeisenmenü MI",
+                        "description": "Maiscremesuppe / Corn cream soup(GLM) Acht Schätze  mit Rindfleisch und Eiernudeln / Eight treasures with beef and egg noodles(ACFLMN) Ananas- Kokoscreme / Pineapple- coconut cream(G)",
+                        "price": 4.3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-02",
+                "weekday": "Thursday",
+                "orderCutoff": "2026-07-02T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-02_178716",
+                        "articleId": 178716,
+                        "name": "M1 Herzhaftes DO",
+                        "description": "Gemüsebouillon mit Grießnockerl / Vegetable broth with semolina dumpling(ACGLM) Hühnerfleisch \"Süß Sauer\" mit Reis / Sweet and sour chicken with rice(FNLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 58,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178723",
+                        "articleId": 178723,
+                        "name": "M2 Gourmetteller DO",
+                        "description": "Gemüsebouillon mit Grießnockerl / Vegetable broth with semolina dumpling(ACGLM) Zanderfilet mit Nudeln und Orangen- Basilikumsauce / Pike- perch fillet with noodles and ornage basil sauce(ACDGLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 37,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178730",
+                        "articleId": 178730,
+                        "name": "M3 Basisch und Glutenarm  DO",
+                        "description": "Gemüsebouillon mit Grießnockerl / Vegetable broth with semolina dumpling(ACGLM) Sommer Bowl mit Quinoa, Brokkoli, Rotkraut, Paprika, Avocadocreme / Summer bowl with quinoa, broccoli, red cabbage, bell pepper, avocado cream Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178737",
+                        "articleId": 178737,
+                        "name": "M4 Ginko vegan  DO",
+                        "description": "Karotten- Ingwersuppe / Carrot ginger soup Indisch: Dal(rote Linsen)  Soja Chilli / Indian: red Lentils, soja chili(AF) Kirschkuchen / Cherry cake(AF)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 56,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178744",
+                        "articleId": 178744,
+                        "name": "M5 Salat mit Gebäck  DO",
+                        "description": "Gemüsebouillon mit Grießnockerl / Vegetable broth with semolina dumpling(ACGLM) Rindfleischsalat mit Käferbohnen und Ei / Beef salad with beans and egg(ACLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178751",
+                        "articleId": 178751,
+                        "name": "M6 Suppe, kleiner Salat + Dessert  DO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-02_178758",
+                        "articleId": 178758,
+                        "name": "M7 Kleines Hauptspeisenmenü DO",
+                        "description": "Gemüsebouillon mit Grießnockerl / Vegetable broth with semolina dumpling(ACGLM) Hühnerfleisch \"Süß Sauer\" mit Reis / Sweet and sour chicken with rice(FNLM) Kuchen / Cake(ACGHO)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 4,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-03",
+                "weekday": "Friday",
+                "orderCutoff": "2026-07-03T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-03_182378",
+                        "articleId": 182378,
+                        "name": "M1 W",
+                        "description": "Happy Food Buddha Bowl mit  Reis, Tofu, Blattspinat, Avocado",
+                        "price": 4,
+                        "available": true,
+                        "availableAmount": 17,
+                        "amountTracking": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "year": 2026,
+        "weekNumber": 28,
+        "days": [
+            {
+                "date": "2026-07-06",
+                "weekday": "Monday",
+                "orderCutoff": "2026-07-06T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-06_176511",
+                        "articleId": 176511,
+                        "name": "M1 Herzhaftes MO",
+                        "description": "Gemüsebouillon mit Buchstaben / Vegetable broth with noodles(ACLM) Hühnergeschnetzeltes  Jamaikanische Art mit Rote Bohnen- Kokosreis / Jamaican- style chicken with red beans- coconut rice(GLMF) Banane",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 55,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176512",
+                        "articleId": 176512,
+                        "name": "M2 Gourmetteller MO",
+                        "description": "Gemüsebouillon mit Buchstaben / Vegetable broth with noodles(ACLM) Überbackene Schinkenfleckerl mit Sauerrahmdip / baked ham noodles with sour cream dip(ACGL) Banane",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176513",
+                        "articleId": 176513,
+                        "name": "M3 Basisch und Glutenarm MO",
+                        "description": "Gemüsebouillon mit Buchstaben / Vegetable broth with noodles(ACLM) Kürbisrisotto mit Feta und Tomaten / Pumpkin risotto with feta and tomatoes(GLO) Banane",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 11,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176514",
+                        "articleId": 176514,
+                        "name": "M4 Ginko vegan MO",
+                        "description": "Kohlrabicremesuppe / Kohlrabi cream soup Penne mit Süßkartoffel Sauce, Brokkoli und Erdnüssen / Penne with sweet potato sauce, broccoli and peanuts(AEFH) Bananenjoghurt / Banana yogurt(F)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 65,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176515",
+                        "articleId": 176515,
+                        "name": "M5 Salat mit Gebäck MO",
+                        "description": "Gemüsebouillon mit Buchstaben / Vegetable broth with noodles(ACLM) Salatteller mit gebackenem Mozzarella / Salad plate with baked mozzarella(ACGLM) Banane",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 2,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176516",
+                        "articleId": 176516,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 23,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-06_176517",
+                        "articleId": 176517,
+                        "name": "M7 Kleines Hauptspeisenmenü MO",
+                        "description": "Gemüsebouillon mit Buchstaben / Vegetable broth with noodles(ACLM) Überbackene Schinkenfleckerl mit Sauerrahmdip / baked ham noodles with sour cream dip(ACGL) Banane",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-07",
+                "weekday": "Tuesday",
+                "orderCutoff": "2026-07-07T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-07_178713",
+                        "articleId": 178713,
+                        "name": "M1 Herzhaftes DI",
+                        "description": "Zwiebelsuppe /  Onion soup(GLM) Faschierter Braten mit Püree und Gemüse / Faschierter Braten mit Püree und Gemüse / Meatloaf (beef/pork) with mashed potatoes and vegetables(ACGLMF) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 18,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178720",
+                        "articleId": 178720,
+                        "name": "M2 Gourmetteller DI",
+                        "description": "Zwiebelsuppe /  Onion soup(GLM) Teigtaschen gefüllt mit Spinat in Rahmsauce und Gebratener Hühnerbrust / Noodles filled with spinach in cream sauce and fried chicken breast(ACGLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178727",
+                        "articleId": 178727,
+                        "name": "M3 Basisch und Glutenarm DI",
+                        "description": "Zwiebelsuppe /  Onion soup(GLM) Süßkartoffel- Kichererbsen Curry mit Reis / Sweet potato chickpea curry with rice(GLF) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 88,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178734",
+                        "articleId": 178734,
+                        "name": "M4 Ginko vegan DI",
+                        "description": "Gemüsecremesuppe / Vegetable cream soup(L) Indisch: Vindaloo (Kartoffel, Tofu, Paprika) Rajmah (rote Bohnen) mit Reis / Indian: Vindaloo (potatoes, tofu, bell pepper) rajmah (red beans) with rice Ribiselkuchen / Red currant cake(AF)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 31,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178741",
+                        "articleId": 178741,
+                        "name": "M5 Salat mit Gebäck DI",
+                        "description": "Zwiebelsuppe /  Onion soup(GLM) Melonensalat mit Halloumi / Melon salad with halloumi(ACGLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178748",
+                        "articleId": 178748,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 15,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-07_178755",
+                        "articleId": 178755,
+                        "name": "M7 Kleines Hauptspeisenmenü DI",
+                        "description": "Zwiebelsuppe /  Onion soup(GLM) Teigtaschen gefüllt mit Spinat in Rahmsauce und Gebratener Hühnerbrust / Noodles filled with spinach in cream sauce and fried chicken breast(ACGLM) Kuchen / Cake(ACGHO)",
+                        "price": 4.3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-08",
+                "weekday": "Wednesday",
+                "orderCutoff": "2026-07-08T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-08_178717",
+                        "articleId": 178717,
+                        "name": "M1 Herzhaftes MI",
+                        "description": "Rindsuppe mit Backerbsen / Beef soup with backerbsen(ACLM) Pulled Pork Wrap mit BBQ-Creme, Mais, Zwiebel, Tomaten und Wedges / Pulled Pork Wrap with BBQ cream and wedges(AFLM) Milchreis mit Früchten / Milk rice with fruits(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178724",
+                        "articleId": 178724,
+                        "name": "M2 Gourmetteller MI",
+                        "description": "Rindsuppe mit Backerbsen / Beef soup with backerbsen(ACLM) Putenreisfleisch / Turkey rice meat (L) Milchreis mit Früchten / Milk rice with fruits(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 10,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178731",
+                        "articleId": 178731,
+                        "name": "M3 Basisch und Glutenarm MI",
+                        "description": "Rindsuppe mit Backerbsen / Beef soup with backerbsen(ACLM) Gemüsespieße (Tofu) auf Fetacreme und Baguette / Vegetable skewers (tofu) on feta cream with baguette(ACGLF) Milchreis mit Früchten / Milk rice with fruits(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 24,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178738",
+                        "articleId": 178738,
+                        "name": "M4 Ginko vegan MI",
+                        "description": "Rote Linsensuppe / Red lentil soup(L) Hirselaibchen mit Gemüse und Basilikumdip / Millet patties with vegetables and basil dip(ALF) Kokos- Mohn Panna cotta mit Kirschsauce / Coconut poppy seed panna cotta with cherry sauce",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178745",
+                        "articleId": 178745,
+                        "name": "M5 Salat mit Gebäck MI",
+                        "description": "Rindsuppe mit Backerbsen / Beef soup with backerbsen(ACLM) Farfalle Salat mit Schinken, Erbsen und Ei / Noodles salad with ham, peas, egg(ACGLM)  Milchreis mit Früchten / Milk rice with fruits(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178752",
+                        "articleId": 178752,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 5,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-08_178759",
+                        "articleId": 178759,
+                        "name": "M7 Kleines Hauptspeisenmenü MI",
+                        "description": "Rindsuppe mit Backerbsen / Beef soup with backerbsen(ACLM) Putenreisfleisch / Turkey rice meat (L) Milchreis mit Früchten / Milk rice with fruits(G)",
+                        "price": 4.3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-09",
+                "weekday": "Thursday",
+                "orderCutoff": "2026-07-09T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-09_178715",
+                        "articleId": 178715,
+                        "name": "M1 Herzhaftes DO",
+                        "description": "Käserahmsuppe / Cheese cream soup(AGLM) Rindsragout in Biersauce mit Wurzelgemüse und Zitronenpolenta / Beef stew in beer sauce with root vegetables and lemon polenta(AGLM) Mini Plunder / Mini pastry(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 217,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178722",
+                        "articleId": 178722,
+                        "name": "M2 Gourmetteller DO",
+                        "description": "Käserahmsuppe / Cheese cream soup(AGLM) Gebratenes Seehechtfilet mit Schnittlauchbutter auf Kartoffel- Pastinakenmoussse / Fried hake fillet with chive butter on potato- parsnip mousse(ADGL) Mini Plunder / Mini pastry(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 10,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178729",
+                        "articleId": 178729,
+                        "name": "M3 Basisch und Glutenarm DO",
+                        "description": "Käserahmsuppe / Cheese cream soup(AGLM)Vollkorn- Spaghetti mit Pilzen, Zucchini, Tomaten und grünem Pesto / Whole grain spaghetti with mushroos, tomatoes, and green pesto(ACGLH) Mini Plunder / Mini pastry(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 33,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178736",
+                        "articleId": 178736,
+                        "name": "M4 Ginko vegan DO",
+                        "description": "Zucchinicremesuppe / Zucchini cream soup Lasagne \"Bolognese\" mit Tomatensauce / Lasagna \" Bolognese\" with tomato sauce(AFLO) Mango- Kokoskuchen / Mango- coconut cake(AFO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178743",
+                        "articleId": 178743,
+                        "name": "M5 Salat mit Gebäck DO",
+                        "description": "Käserahmsuppe / Cheese cream soup(AGLM) Schweizer Wurstsalat / Swiss sausage salad(ACGLM) Mini Plunder / Mini pastry(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 5,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178750",
+                        "articleId": 178750,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 19,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-09_178757",
+                        "articleId": 178757,
+                        "name": "M7 Kleines Hauptspeisenmenü DO",
+                        "description": "Käserahmsuppe / Cheese cream soup(AGLM) Rindsragout in Biersauce mit Wurzelgemüse und Zitronenpolenta / Beef stew in beer sauce with root vegetables and lemon polenta(AGLM) Mini Plunder / Mini pastry(ACGHO)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 22,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-10",
+                "weekday": "Friday",
+                "orderCutoff": "2026-07-10T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-10_184132",
+                        "articleId": 184132,
+                        "name": "Knapp-Pizza W",
+                        "description": "Pizza mit Thunfisch und Gemüse / Pizza with tuna and vegetables(ADGL)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-10_184134",
+                        "articleId": 184134,
+                        "name": "Knapp-Veggie-Pizza W",
+                        "description": "Pizza mit Gemüse, Artischocken und Oliven / Pizza with vegetables, artichokes and olives(AGL)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "year": 2026,
+        "weekNumber": 29,
+        "days": [
+            {
+                "date": "2026-07-13",
+                "weekday": "Monday",
+                "orderCutoff": "2026-07-13T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-13_178719",
+                        "articleId": 178719,
+                        "name": "M1 Herzhaftes MO",
+                        "description": "Gemüsebouillon mit Schöberl / Vegetable broth with schöberl(ACLM) Gebackene Putenschnitzel mit Polenta / Baked trukey schnitzel with polenta(ACGLM) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 43,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178726",
+                        "articleId": 178726,
+                        "name": "M2 Gourmetteller MO",
+                        "description": "Gemüsebouillon mit Schöberl / Vegetable broth with schöberl(AGCLM)  \"Kronstädter Geschnetzeltes\"(Schwein) mit Wedges / \"Kronstädter  sliced meat\"(Pork) with wedges(GLM) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 72,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178733",
+                        "articleId": 178733,
+                        "name": "M3 Basisch und Glutenarm MO",
+                        "description": "Gemüsebouillon mit Schöberl / Vegetable broth with schöberl(ACLM) Nasi Goreng mit Gemüse und Pilzen / Nasi Goreng with vegetables and mushrooms(L) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178740",
+                        "articleId": 178740,
+                        "name": "M4 Ginko vegan MO",
+                        "description": "Karfiolcremesuppe / Cream of cauliflower soup Chili sin Carne mit Nachos / Chili son carne with nachos(F) Himbeerjoghurt / Raspberry yogurt(F)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178747",
+                        "articleId": 178747,
+                        "name": "M5 Salat mit Gebäck MO",
+                        "description": "Gemüsebouillon mit Schöberl / Vegetable broth with schöberl(ACLM) Salatteller mit Frühlingsrolle / Salad plate with spring roll(AFLM) Corny(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178754",
+                        "articleId": 178754,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 20,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-13_178761",
+                        "articleId": 178761,
+                        "name": "M7 Kleines Hauptspeisenmenü MO",
+                        "description": "Gemüsebouillon mit Schöberl / Vegetable broth with schöberl(ACLM)  \"Kronstädter Geschnetzeltes\"(Schwein) mit Wedges / \"Kronstädter  sliced meat\"(Pork) with wedges(GLM) Corny(ACGHO)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 21,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-14",
+                "weekday": "Tuesday",
+                "orderCutoff": "2026-07-14T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-14_178714",
+                        "articleId": 178714,
+                        "name": "M1 Herzhaftes DI",
+                        "description": "Kräutercremesuppe / Herbal cream soup(GLM) Marokkanischer Nudelauflauf mit Rindfleisch und Joghurtdip / Moroccan pasta bake with beef and yogurt dip(ACGLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 45,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178721",
+                        "articleId": 178721,
+                        "name": "M2 Gourmetteller DI",
+                        "description": "Kräutercremesuppe / Herbal cream soup(GLM) Käsespätzle / Cheese spätzle(ACGL) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 63,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178728",
+                        "articleId": 178728,
+                        "name": "M3 Süß DI",
+                        "description": "Kräutercremesuppe / Herbal cream soup(GLM) Kaiserschmarren mit Apfelmus / Kaiserschmarren with applesauce(ACG) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 1,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178735",
+                        "articleId": 178735,
+                        "name": "M4 Ginko vegan DI",
+                        "description": "Karotten-Ingwersuppe / Carrot ginger soup Indisch:Gobhi- Matar- Masala (Karfiol, Erbsen) Sambhar (Linsen, Gemüse, Senfkerne) mit Kurkumareis / Indian: (cauliflower, peas, lentils, vegetables, mustard seeds) with turmeric rice(M) Nusskuchen / Nut cake(AFH)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 14,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178742",
+                        "articleId": 178742,
+                        "name": "M5 Salat mit Gebäck DI",
+                        "description": "Kräutercremesuppe / Herbal cream soup(GLM) Salat mit Räucherforellenfilet / Salad with smoked trout fillet(ADLM) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178749",
+                        "articleId": 178749,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 32,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-14_178756",
+                        "articleId": 178756,
+                        "name": "M7 Kleines Hauptspeisenmenü DI",
+                        "description": "Kräutercremesuppe / Herbal cream soup(GLM) Käsespätzle / Cheese spätzle(ACGL) Kuchen / Cake(ACGHO)",
+                        "price": 4.3,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-15",
+                "weekday": "Wednesday",
+                "orderCutoff": "2026-07-15T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-15_178718",
+                        "articleId": 178718,
+                        "name": "M1 Herzhaftes MI",
+                        "description": "Rindsuppe mit Reibteig / Beef soup with grated dough dumplings(ACLM) Paprikahuhn mit Kräutern und Reis / Paprika chicken with herbs and rice(G) Fruchtcreme / Fruit cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 171,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178725",
+                        "articleId": 178725,
+                        "name": "M2 Gourmetteller MI",
+                        "description": "Rindsuppe mit Reibteig / Beef soup with grated dough dumplings(ACLM) Gnocchi mit Pesto, Karfiol, Speckstreifen / Gnocchi with pesto, cauliflower, bacon strips (Pork)(ACGLM)  Fruchtcreme / Fruit cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 120,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178732",
+                        "articleId": 178732,
+                        "name": "M3 Basisch und Glutenarm MI",
+                        "description": "Rindsuppe mit Reibteig / Beef soup with grated dough dumplings(ACLM) Geschichteter Süßkartoffel Strudel mit Blattspinat, Feta und Sauerrahmdip / Sweet potato strudel with spinach, feta and sour cream dip(ACGLM) Fruchtcreme / Fruit cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 18,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178739",
+                        "articleId": 178739,
+                        "name": "M4 Ginko vegan MI",
+                        "description": "Selleri- Apfelsuppe / Celeriac- apple soup(L) Buchweizenlaibchen mit Gemüse und Pfefferrahmsauce / Buckwheat patties with vegetables and pepper sauce(AFO) Karamellpuding /  Caramel pudding(F)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 73,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178746",
+                        "articleId": 178746,
+                        "name": "M5 Salat mit Gebäck MI",
+                        "description": "Rindsuppe mit Reibteig / Beef soup with grated dough dumplings(ACLM) Salat \"Brasil\" mit Faschiertem(Schwein/Rind) Bohnen, Käse / Salad \"Brasil\" with ground meat (pork/Beef) beans, cheese(AGLM) Fruchtcreme / Fruit cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178753",
+                        "articleId": 178753,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 41,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-15_178760",
+                        "articleId": 178760,
+                        "name": "M7 Kleines Hauptspeisenmenü MI",
+                        "description": "Rindsuppe mit Reibteig / Beef soup with grated dough dumplings(ACLM) Gnocchi mit Pesto, Karfiol, Speckstreifen / Gnocchi with pesto, cauliflower, bacon strips (Pork)(ACGLM)  Fruchtcreme / Fruit cream(G)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 14,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-16",
+                "weekday": "Thursday",
+                "orderCutoff": "2026-07-16T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-16_178716",
+                        "articleId": 178716,
+                        "name": "M1 Herzhaftes DO",
+                        "description": "Tomaten Basilikumsuppe / Tomato basil soup(GLM) Gebratener Schweinsschopf \"Asia Style\" (Ingwer, Honig, Sojasauce, Limette / Asian - style roasted pork  with ginger, honey, soy sauce, lime(FLMN) Obstgarten(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 265,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178723",
+                        "articleId": 178723,
+                        "name": "M2 Gourmetteller DO",
+                        "description": "Tomaten Basilikumsuppe / Tomato basil soup(GLM) Lachsforellenfilet mit Dillsauce und Nudeln / Salmon trout fillet with dill sauce and pasta(ACDGLM) Obstgarten(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178730",
+                        "articleId": 178730,
+                        "name": "M3 Basisch und Glutenarm  DO",
+                        "description": "Tomaten Basilikumsuppe / Tomato basil soup(GLM) Cremige Parmesanpolenta mit Gemüseragout und Rucola / Parmesan polenta with vegetable ragout and argula(GL) Obstgarten(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 115,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178737",
+                        "articleId": 178737,
+                        "name": "M4 Ginko vegan  DO",
+                        "description": "Kartoffel- Salbeisuppe/ Potato - sage soup Gemüselasagne mit Tomatensauce / Vegetable lasagna with tomato sauce(AFO) Apfel- Haferkuchen / Apple oat cake(AF)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 29,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178744",
+                        "articleId": 178744,
+                        "name": "M5 Salat mit Gebäck  DO",
+                        "description": "Tomaten Basilikumsuppe / Tomato basil soup(GLM) Bunter Salat  mit Pulled pork und Ei / Salad with pulled pork and egg(ACLM) Obstgarten(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178751",
+                        "articleId": 178751,
+                        "name": "M6 Suppe, kleiner Salat + Dessert  DO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 38,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-16_178758",
+                        "articleId": 178758,
+                        "name": "M7 Kleines Hauptspeisenmenü DO",
+                        "description": "Tomaten Basilikumsuppe / Tomato basil soup(GLM) Cremige Parmesanpolenta mit Gemüseragout und Rucola / Parmesan polenta with vegetable ragout and argula(GL) Obstgarten(G)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 18,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-17",
+                "weekday": "Friday",
+                "orderCutoff": "2026-07-17T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-17_182378",
+                        "articleId": 182378,
+                        "name": "M1 Fr",
+                        "description": "Huhn \"Casimir\" mit Reis / Chicken \"Casimir\" with rice(GL)",
+                        "price": 4,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "year": 2026,
+        "weekNumber": 30,
+        "days": [
+            {
+                "date": "2026-07-20",
+                "weekday": "Monday",
+                "orderCutoff": "2026-07-20T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-20_176511",
+                        "articleId": 176511,
+                        "name": "M1 Herzhaftes MO",
+                        "description": "Rindsuppe mit Tropfteig / Beef soup with drip dough(ACGLM) Naturschnitzel (Schwein) mit Gemüsereis Naturschnitzel (Pork)with vegetable rice(LM) Dany&Sahne(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 322,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176512",
+                        "articleId": 176512,
+                        "name": "M2 Gourmetteller MO",
+                        "description": "Rindsuppe mit Tropfteig / Beef soup with drip dough(ACGLM) Tortellini (Rind) mit Salbeibutter und Pinienkernen / Tortellini with sage butter and pine nuts(ACGLMH)   Dany&Sahne(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 120,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176513",
+                        "articleId": 176513,
+                        "name": "M3 Basisch und Glutenarm MO",
+                        "description": "Rindsuppe mit Tropfteig / Beef soup with  drip dough(ACGLM) Schmorkartoffel - Gemüsepfanne mit Kräutertopping / Braised potato vegetable pan with herb topping(GL) Dany&Sahne(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 62,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176514",
+                        "articleId": 176514,
+                        "name": "M4 Ginko vegan MO",
+                        "description": "Erbsen- Minzsuppe / Pea mint soup Gemüsecurry mit Sesamreis / Vegetable curry with sesame rice(AFN) Erdberrjoghurt / Strawberry yogurt(F)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 75,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176515",
+                        "articleId": 176515,
+                        "name": "M5 Salat mit Gebäck MO",
+                        "description": "Rindsuppe mit Tropfteig / Beef soup with drip dough(ACGLM) Salatteller mit Hühnerkebap / Salad plate with chicken kebap(ALM)  Dany&Sahne(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176516",
+                        "articleId": 176516,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 41,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-20_176517",
+                        "articleId": 176517,
+                        "name": "M7 Kleines Hauptspeisenmenü MO",
+                        "description": "Rindsuppe mit Tropfteig / Beef soup with drip dough(ACGLM) Tortellini (Rind) mit Salbeibutter und Pinienkernen / Tortellini with sage butter and pine nuts(ACGLMH)   Dany&Sahne(G)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 26,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-21",
+                "weekday": "Tuesday",
+                "orderCutoff": "2026-07-21T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-21_178713",
+                        "articleId": 178713,
+                        "name": "M1 Herzhaftes DI",
+                        "description": "Kürbis - Kokossuppe / Pumpkin coconut soup(GL) Chili con Carne (Beef, Pork) mit Semmel(ALMF) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 426,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178720",
+                        "articleId": 178720,
+                        "name": "M2 Gourmetteller DI",
+                        "description": "Kürbis - Kokossuppe / Pumpkin coconut soup(GL) Curry Wurst mit Pommes / Curry sausage with fries(M) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 100,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178727",
+                        "articleId": 178727,
+                        "name": "M3 Süß DI",
+                        "description": "Kürbis - Kokossuppe / Pumpkin coconut soup(GL) Topfenknödel mit Erdbeersauce / Quark dumplings with strawberry sauce(ACG) Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 41,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178734",
+                        "articleId": 178734,
+                        "name": "M4 Ginko vegan DI",
+                        "description": "Zucchini- Lauchsuppe / Zucchini- leek soup Hirselaibchen mit Gemüse und Olivendip / Millet patties with vegetables and olive dip(ALF) Karamell- Bananenkuchen / Caramel- banana cake(AF)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 69,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178741",
+                        "articleId": 178741,
+                        "name": "M5 Salat mit Gebäck DI",
+                        "description": "Kürbis - Kokossuppe / Pumpkin coconut soup(GL) Salat \"Nizza\"(Thunfisch, Mais, Gurke) Salad \"Nizza\" (tuna, corn, cucumber(ADLM)  Kuchen / Cake(ACGHO)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178748",
+                        "articleId": 178748,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 39,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-21_178755",
+                        "articleId": 178755,
+                        "name": "M7 Kleines Hauptspeisenmenü DI",
+                        "description": "Kürbis - Kokossuppe / Pumpkin coconut soup(GL) Chili con Carne (Beef, Pork) mit Semmel(ALMF) Kuchen / Cake(ACGHO)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 29,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-22",
+                "weekday": "Wednesday",
+                "orderCutoff": "2026-07-22T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-22_178717",
+                        "articleId": 178717,
+                        "name": "M1 Herzhaftes MI",
+                        "description": "Klare Kohlrabisuppe / Kohlrabi soup(L) Hirschragout mit Serviettenknödel / Venison ragout with bread dumplings(ACGLMO) Buttermilch- Heidelbeercreme / Buttermilk blueberry cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 305,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178724",
+                        "articleId": 178724,
+                        "name": "M2 Gourmetteller MI",
+                        "description": "Klare Kohlrabisuppe / Kohlrabi soup(L) Putenrollbraten mit Thymiansauce und Kartoffel-Zucchinigemüse / Turkey roast with thyme sauce and potato zucchini vegetables(LM) Buttermilch- Heidelbeercreme / Buttermilk blueberry cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 227,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178731",
+                        "articleId": 178731,
+                        "name": "M3 Basisch und Glutenarm MI",
+                        "description": "Klare Kohlrabisuppe / Kohlrabi soup(L) Safrarisotto mit Muscheln, Garnelen und Limettendip / Saffron risotto with mussels, shrimp and lime sauce(BGLD) Buttermilch- Heidelbeercreme / Buttermilk blueberry cream(G)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 131,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178738",
+                        "articleId": 178738,
+                        "name": "M4 Ginko vegan MI",
+                        "description": "Süßkartoffel- Tomatensuppe / Sweet potato- tomato soup Indisch: Mix Sabji (Gemüse in Kokossauce) Kichererbsencurry / Indian: Mix Sabji ( Vegetables in coconut sauce) chickpea curry Vanillepudding / Vanilla pudding(F)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 66,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178745",
+                        "articleId": 178745,
+                        "name": "M5 Salat mit Gebäck MI",
+                        "description": "Klare Kohlrabisuppe / Kohlrabi soup(L)   Nudelsalat mit Prosciutto, Ei, Sardellen / Pasta salad with prosciutto, egg, anchovies(ACDLM)(Pork) Buttermilch- Heidelbeercreme / Buttermilk blueberry cream(G)",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178752",
+                        "articleId": 178752,
+                        "name": "M6 Suppe, kleiner Salat + Dessert MI",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 41,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-22_178759",
+                        "articleId": 178759,
+                        "name": "M7 Kleines Hauptspeisenmenü MI",
+                        "description": "Klare Kohlrabisuppe / Kohlrabi soup(L) Hirschragout mit Serviettenknödel / Venison ragout with bread dumplings(ACGLMO) Buttermilch- Heidelbeercreme / Buttermilk blueberry cream(G)",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 32,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-23",
+                "weekday": "Thursday",
+                "orderCutoff": "2026-07-23T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-23_186306",
+                        "articleId": 186306,
+                        "name": "Menü Grillhendl",
+                        "description": "Erbsencremesuppe / Pea cream soup(GLM) Grillendl mit Semmel / Grilled chicken with bread roll(A) Apfelmus / Applesauce",
+                        "price": 6.5,
+                        "available": true,
+                        "availableAmount": 373,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178722",
+                        "articleId": 178722,
+                        "name": "M2 Gourmetteller DO",
+                        "description": "Erbsencremesuppe / Pea cream soup(GLM) Gebackenes Schollenfilet mit Kartoffelsalat und Sauce Tartare / Baked plaice fillet with potato salad and tartar sauce(ACDGLM) Apfelmus / Applesauce",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 189,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178729",
+                        "articleId": 178729,
+                        "name": "M3 Basisch und Glutenarm DO",
+                        "description": "Erbsencremesuppe / Pea cream soup(GLM) Überbackene Gnocchi mit Tomaten, Basilikum, Käse / Baked gnocchi with tomatoes, basil, cheese(ACGL)  Apfelmus / Applesauce",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 160,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178736",
+                        "articleId": 178736,
+                        "name": "M4 Ginko vegan DO",
+                        "description": "Maiscremesuppe / Corn cream soup Spinatlasagne mit Tomatensauce / Spinach lasagne with tomato sauce(AFO) Schoko- Heidelberrkuchen / Chocolate blueberry cake(AF)",
+                        "price": 5.5,
+                        "available": true,
+                        "availableAmount": 97,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178743",
+                        "articleId": 178743,
+                        "name": "M5 Salat mit Gebäck DO",
+                        "description": "Erbsencremesuppe / Pea cream soup(GLM) Salat \"Fresca\" mit Schinken, Mais, Mozzarella / Salad \"Fresca\" with bacon, corn, mozzarella(AGLM)(Pork) Apfelmus / Applesauce",
+                        "price": 5.5,
+                        "available": false,
+                        "availableAmount": 0,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178750",
+                        "articleId": 178750,
+                        "name": "M6 Suppe, kleiner Salat + Dessert DO",
+                        "description": "Suppe / Soup Salat / Salad Dessert",
+                        "price": 3,
+                        "available": true,
+                        "availableAmount": 47,
+                        "amountTracking": true
+                    },
+                    {
+                        "id": "2026-07-23_178757",
+                        "articleId": 178757,
+                        "name": "M7 Kleines Hauptspeisenmenü DO",
+                        "description": "Erbsencremesuppe / Pea cream soup(GLM) Überbackene Gnocchi mit Tomaten, Basilikum, Käse / Baked gnocchi with tomatoes, basil, cheese(ACGL)  Apfelmus / Applesauce",
+                        "price": 4.3,
+                        "available": true,
+                        "availableAmount": 35,
+                        "amountTracking": true
+                    }
+                ]
+            },
+            {
+                "date": "2026-07-24",
+                "weekday": "Friday",
+                "orderCutoff": "2026-07-24T08:00:00.000Z",
+                "items": [
+                    {
+                        "id": "2026-07-24_182377",
+                        "articleId": 182377,
+                        "name": "M1 Fr",
+                        "description": "Faschierter Braten mit Paprikagemüse und Bratkartoffeln / Mince meat roast with bell pepper vegetables and fried potatoes (ACGLMF)(Beef, Pork)",
+                        "price": 4,
+                        "available": true,
+                        "availableAmount": 34,
                         "amountTracking": true
                     }
                 ]

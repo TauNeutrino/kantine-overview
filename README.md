@@ -31,6 +31,8 @@ Das Bookmarklet injiziert eine vollständige UI als Overlay in die Bessa-Webseit
 |---------|---------|-----------|-------|------|
 | **Web Lesezeichen** | JavaScript (ES6) | Eigenentwicklung | Webpack + Terser | Browser-Overlay via Bookmarklet |
 
+Details zur automatischen DE/EN-Spracherkennung: [`docs/LANGUAGE_SPLITTING.md`](docs/LANGUAGE_SPLITTING.md).
+
 ---
 
 ## Web Lesezeichen (Bookmarklet)
@@ -96,6 +98,7 @@ Das Bookmarklet ist ein minimaler Bootloader. Beim Start prüft es gegen `versio
 ├── tests/                # Web Test Suite
 ├── docs/                 # Dokumentation
 │   ├── ARCHITECTURE.md
+│   ├── LANGUAGE_SPLITTING.md
 │   ├── SETUP.md
 │   ├── TESTING.md
 │   └── design-system.md

@@ -158,10 +158,18 @@ function repairSlashTail(courses, langModel) {
     const lastEn = stripAllergenFromEnd(last.en, last.allergen);
     if (!lastDe || !lastEn || lastDe === lastEn) return courses;
 
-    const slashPhrases = splitTopLevel(lastEn);
-    if (slashPhrases.length < 2) return courses;
-
     const germanCourses = courses.slice(0, -1);
+    let slashPhrases = splitTopLevel(lastEn);
+
+    // Format "DE1 (A) DE2 (B) EN1 / EN2": segmentation cuts the trailing block at
+    // the first slash, so EN1 lands on the course's de-side. When that de-side is
+    // itself strongly English, split the full trailing text to recover every EN dish.
+    if (slashPhrases.length !== germanCourses.length && isStronglyEnglish(lastDe, langModel)) {
+        const fullPhrases = splitTopLevel(lastDe + ' / ' + lastEn);
+        if (fullPhrases.length === germanCourses.length) slashPhrases = fullPhrases;
+    }
+
+    if (slashPhrases.length < 2) return courses;
     if (germanCourses.length !== slashPhrases.length) return courses;
     if (germanCourses.some(c => !c.mono)) return courses;
 

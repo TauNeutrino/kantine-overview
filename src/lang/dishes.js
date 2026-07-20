@@ -50,35 +50,33 @@ export function splitDishes(text, langModel) {
     return [first, ...splitDishes(remainder, langModel)];
 }
 
-function classifyToken(token, langModel, isFirst) {
-    if (isLoanword(token)) return 'ambig';
-    if (!isFirst && /^[A-ZÄÖÜ]/.test(token)) return 'de';
-    const s = langModel.scoreLang(token);
-    if (s > 0.5) return 'de';
-    if (s < -0.5) return 'en';
-    return 'ambig';
-}
-
+// Continuous language evidence per token: the trigram model's signed score
+// (positive = German, negative = English). Loanwords are neutral — they occur
+// on both sides ("Kichererbsencurry" vs "chickpea curry").
+// Capitalization is NOT used as evidence here: English dish text in the source
+// data capitalizes freely ("Indian: Mix Sabji", "Vegetables"), so a hard
+// "capital => German" rule drowns the model signal. It only breaks ties.
 function findDishBoundary(midTokens, langModel) {
     const n = midTokens.length;
     if (n <= 1) return n;
 
-    const tags = midTokens.map((t, i) => classifyToken(t, langModel, i === 0));
+    const EPS = 1e-9;
+    const scores = midTokens.map(t => isLoanword(t) ? 0 : langModel.scoreLang(t));
 
     let bestK = 1;
     let bestPenalty = Infinity;
     let bestCap = -1;
 
     for (let k = 1; k < n; k++) {
-        let leftGerman = 0;
-        for (let i = 0; i < k; i++) if (tags[i] === 'de') leftGerman++;
-        let rightEnglish = 0;
-        for (let i = k; i < n; i++) if (tags[i] === 'en') rightEnglish++;
+        // Left of the boundary should be English, right should be German:
+        // penalize German evidence left + English evidence right.
+        let penalty = 0;
+        for (let i = 0; i < k; i++) if (scores[i] > 0) penalty += scores[i];
+        for (let i = k; i < n; i++) if (scores[i] < 0) penalty -= scores[i];
 
-        const penalty = leftGerman + rightEnglish;
         const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
 
-        if (penalty < bestPenalty || (penalty === bestPenalty && cap > bestCap)) {
+        if (penalty < bestPenalty - EPS || (Math.abs(penalty - bestPenalty) <= EPS && cap > bestCap)) {
             bestPenalty = penalty;
             bestCap = cap;
             bestK = k;

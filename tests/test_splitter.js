@@ -79,4 +79,27 @@ assert(typeof scored.confidence === 'number', 'confidence is number');
 assert(scored.confidence >= 0 && scored.confidence <= 1, 'confidence in [0,1]');
 assert(['high','medium','low','fallback','template'].includes(scored.label), 'valid label');
 
+// Regression: english words with capitals ("Indian: Mix Sabji", "Vegetables")
+// must not be treated as German dish starts in the boundary detector.
+const sabji = splitLanguage('Süßkartoffel- Tomatensuppe / Sweet potato- tomato soup Indisch: Mix Sabji (Gemüse in Kokossauce) Kichererbsencurry / Indian: Mix Sabji ( Vegetables in coconut sauce) chickpea curry Vanillepudding / Vanilla pudding(F)');
+assert(countBullets(sabji.de) === 3, 'sabji de 3 courses');
+assert(countBullets(sabji.en) === 3, 'sabji en 3 courses');
+assert(sabji.de.includes('Indisch: Mix Sabji (Gemüse in Kokossauce) Kichererbsencurry'), 'sabji de main course');
+assert(sabji.en.includes('Indian: Mix Sabji ( Vegetables in coconut sauce) chickpea curry'), 'sabji en main course');
+assert(sabji.de.includes('Vanillepudding (F)'), 'sabji de dessert');
+assert(sabji.en.includes('Vanilla pudding (F)'), 'sabji en dessert');
+assert(!sabji.de.includes('chickpea'), 'sabji de has no english text');
+assert(!sabji.de.includes('Vanilla'), 'sabji de has no vanilla');
+
+// Regression: trailing block "DE1 (A) DE2 (B) EN1 / EN2" distributes EN dishes
+// onto the anchored German courses instead of leaking EN text into the de column.
+const trailEn = splitLanguage('Brokklolicremesuppe (GLM) Quinoa Auflauf mit Rotkraut Cole slaw (CG) broccoli cream soup / quinoa casserole with red cabbage cole slaw');
+assert(countBullets(trailEn.de) === 2, 'trailing EN de 2 courses');
+assert(countBullets(trailEn.en) === 2, 'trailing EN en 2 courses');
+assert(trailEn.de.includes('Brokklolicremesuppe (GLM)'), 'trailing EN de soup');
+assert(trailEn.de.includes('Quinoa Auflauf mit Rotkraut Cole slaw (CG)'), 'trailing EN de main');
+assert(trailEn.en.includes('broccoli cream soup (GLM)'), 'trailing EN en soup');
+assert(trailEn.en.includes('quinoa casserole with red cabbage cole slaw (CG)'), 'trailing EN en main');
+assert(!trailEn.de.includes('broccoli'), 'trailing EN de has no english text');
+
 console.log('✅ All splitter tests passed!');
