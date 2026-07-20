@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-07-20
+
+### Added
+
+- **Agent Knowledge Base**: Hierarchische `AGENTS.md` Dateien für Root, `src/`, `src/lang/` und `tests/` erstellt. Zentralisiert Architektur, Konventionen, Anti-Patterns und Test-Harness für zukünftige Agenten-Sessions.
+
 ## [2.0.1] - 2026-07-20
 
 ### Fixed
