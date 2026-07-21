@@ -102,4 +102,15 @@ assert(trailEn.en.includes('broccoli cream soup (GLM)'), 'trailing EN en soup');
 assert(trailEn.en.includes('quinoa casserole with red cabbage cole slaw (CG)'), 'trailing EN en main');
 assert(!trailEn.de.includes('broccoli'), 'trailing EN de has no english text');
 
+// Regression: trailing non-allergen parenthetical ingredient/meat annotation
+// after an allergen must not become extra courses (Friday single-course menus).
+const fridayMeat = splitLanguage('Faschierter Braten mit Paprikagemüse und Bratkartoffeln / Mince meat roast with bell pepper vegetables and fried potatoes (ACGLMF)(Beef, Pork)');
+assert(countBullets(fridayMeat.de) === 1, 'friday meat annotation de 1 course');
+assert(countBullets(fridayMeat.en) === 1, 'friday meat annotation en 1 course');
+assert(fridayMeat.de.includes('Faschierter Braten'), 'friday meat annotation de dish');
+assert(fridayMeat.de.includes('(Beef, Pork)'), 'friday meat annotation de keeps note');
+assert(fridayMeat.en.includes('Mince meat roast'), 'friday meat annotation en dish');
+assert(fridayMeat.en.includes('(Beef, Pork)'), 'friday meat annotation en keeps note');
+assert(fridayMeat.label === 'high', 'friday meat annotation label high');
+
 console.log('✅ All splitter tests passed!');

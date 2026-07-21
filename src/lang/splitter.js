@@ -100,6 +100,29 @@ function peelTrailingMonoCourse(courses) {
     return courses;
 }
 
+// Merge a trailing mono course that is only a non-allergen parenthetical
+// ingredient/meat annotation back into the previous anchored course.
+// Example (Friday single-course menus): "... (ACGLMF)(Beef, Pork)" should be
+// one course, not three.
+function mergeTrailingAnnotations(courses) {
+    if (courses.length < 2) return courses;
+    const last = courses[courses.length - 1];
+    if (last.anchored || !last.mono) return courses;
+
+    const text = (last.de || '').trim();
+    // Parenthetical with comma- or slash-separated words (meat/ingredient lists).
+    // Must not look like an allergen code (those are handled by segment()).
+    if (!/^\(\s*[A-Za-z][A-Za-z]*(?:\s*[，,\/]\s*[A-Za-z][A-Za-z]*)*\s*\)$/.test(text)) {
+        return courses;
+    }
+
+    const prev = courses[courses.length - 2];
+    prev.de = ((prev.de || '') + ' ' + text).trim();
+    prev.en = ((prev.en || '') + ' ' + text).trim();
+    courses.pop();
+    return courses;
+}
+
 export function splitLanguage(text, options = {}) {
     if (!text) return { de: '', en: '', raw: '', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, label: 'fallback', notes: [] };
 
@@ -115,6 +138,7 @@ export function splitLanguage(text, options = {}) {
     const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
 
     let courses = segment(normText);
+    courses = mergeTrailingAnnotations(courses);
     courses = alignTrailingEnglish(courses, langModel);
     courses = repairMergedCourses(courses, langModel);
     courses = peelGluedTailFromUnanchored(courses, langModel);

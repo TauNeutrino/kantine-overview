@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-07-21
+
+### Fixed
+
+- **DE/EN-Splitter**: Trailinge Zutaten-/Fleisch-Annotationen in Klammern nach einem Allergen (z. B. `(ACGLMF)(Beef, Pork)`) werden nicht mehr als eigene Kurse behandelt. Neue `mergeTrailingAnnotations()`-Heuristik in `src/lang/splitter.js` fasst solche Annotationen mit dem vorherigen Gang zusammen — besonders relevant für Freitags-Einzelgerichte.
+
+### Added
+
+- **Tests**: `tests/test_splitter.js` um Regressionstest für `Faschierter Braten mit Paprikagemüse und Bratkartoffeln / Mince meat roast with bell pepper vegetables and fried potatoes (ACGLMF)(Beef, Pork)` erweitert.
+
 ## [2.0.3] - 2026-07-20
 
 ### Added
