@@ -342,21 +342,18 @@ function renderDashboard(data) {
         }
     };
 
-    // ── 1. Stacked Area Chart - Feature usage over time ────────────────
+    // ── 1. Stacked Bar Chart - Feature usage over time ────────────────
     new Chart(document.getElementById('line-chart'), {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: days,
             datasets: active.slice(0, 8).map((fk, i) => ({
                 label: fk,
                 data: days.map(d => data.daily[d][fk] || 0),
+                backgroundColor: COLORS[i % COLORS.length] + 'cc',
                 borderColor: COLORS[i % COLORS.length],
-                backgroundColor: COLORS[i % COLORS.length] + '55',
-                borderWidth: 1.5,
-                pointRadius: 1,
-                pointHitRadius: 8,
-                tension: 0.3,
-                fill: '-1'
+                borderWidth: 1,
+                borderRadius: 3
             }))
         },
         options: Object.assign({}, chartOpts, {
@@ -365,30 +362,31 @@ function renderDashboard(data) {
                 legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
             }),
             scales: Object.assign({}, chartOpts.scales, {
+                x: Object.assign({}, chartOpts.scales.x, { stacked: true }),
                 y: Object.assign({}, chartOpts.scales.y, { stacked: true, beginAtZero: true })
             })
         })
     });
 
-    // ── 2. Line Chart - Unique users over time ─────────────────────────
+    // ── 2. Bar Chart - Unique users over time ─────────────────────────
     new Chart(document.getElementById('unique-chart'), {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: days,
             datasets: [{
                 label: 'Unique Nutzer',
                 data: days.map(d => data.daily[d].unique_today || 0),
-                borderColor: COLORS[0],
-                backgroundColor: COLORS[0] + '22',
-                borderWidth: 2,
-                pointRadius: 2,
-                pointHitRadius: 8,
-                tension: 0.3,
-                fill: true
+                backgroundColor: '#029AA888',
+                borderColor: '#029AA8',
+                borderWidth: 1,
+                borderRadius: 3
             }]
         },
         options: Object.assign({}, chartOpts, {
-            plugins: Object.assign({}, chartOpts.plugins, { legend: { display: false } })
+            plugins: Object.assign({}, chartOpts.plugins, { legend: { display: false } }),
+            scales: Object.assign({}, chartOpts.scales, {
+                y: Object.assign({}, chartOpts.scales.y, { beginAtZero: true })
+            })
         })
     });
 
@@ -425,10 +423,10 @@ function renderDashboard(data) {
         }
     });
 
-    // ── 4. Stacked Area Chart - Versions over time ─────────────────────
+    // ── 4. Stacked Bar Chart - Versions over time ─────────────────────
     if (versionsList.length > 0) {
         new Chart(document.getElementById('version-time-chart'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: days,
                 datasets: versionsList.map((v, i) => ({
@@ -440,13 +438,10 @@ function renderDashboard(data) {
                         if (dayData.version === v) return 1;
                         return 0;
                     }),
+                    backgroundColor: COLORS[i % COLORS.length] + 'cc',
                     borderColor: COLORS[i % COLORS.length],
-                    backgroundColor: COLORS[i % COLORS.length] + '55',
-                    borderWidth: 1.5,
-                    pointRadius: 1,
-                    pointHitRadius: 8,
-                    tension: 0.3,
-                    fill: '-1'
+                    borderWidth: 1,
+                    borderRadius: 3
                 }))
             },
             options: Object.assign({}, chartOpts, {
@@ -455,6 +450,7 @@ function renderDashboard(data) {
                     legend: { labels: { color: '#a0a0b8', font: { family: 'Inter', size: 10 }, boxWidth: 14, padding: 12 } }
                 }),
                 scales: Object.assign({}, chartOpts.scales, {
+                    x: Object.assign({}, chartOpts.scales.x, { stacked: true }),
                     y: Object.assign({}, chartOpts.scales.y, { stacked: true, beginAtZero: true })
                 })
             })

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-07-21
+
+### Changed
+
+- **Stats-Dashboard**: Die Zeitverlaufs-Charts ("Featurenutzung über Zeit", "Unique Nutzer über Zeit", "Versionen über Zeit") in `stats/index.html` wurden von gestapelten Area/Line-Charts in gestapelte Bar Charts umgewandelt.
+
 ## [2.0.4] - 2026-07-21
 
 ### Fixed
