@@ -752,6 +752,9 @@ function stopPolling() {
 async function pollFlaggedItems() {
     if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0 || !_state_js__WEBPACK_IMPORTED_MODULE_0__/* .authToken */ .gX) return;
 
+    cleanupExpiredFlags();
+    if (_state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY.size === 0) return;
+
     const flagsByDate = {};
     for (const flagId of _state_js__WEBPACK_IMPORTED_MODULE_0__/* .userFlags */ .BY) {
         const [date, articleIdStr] = flagId.split('_');
@@ -3066,7 +3069,8 @@ class StatsTracker {
             session: { start_ms: Date.now() },
             has_flushed: false,
             pendingFlush: null,
-            pendingFlushes: []
+            pendingFlushes: [],
+            _catCounted: {}
         };
     }
 
@@ -3084,7 +3088,8 @@ class StatsTracker {
                     session: parsed.session || { start_ms: Date.now() },
                     has_flushed: parsed.has_flushed || false,
                     pendingFlush: null,
-                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : [])
+                    pendingFlushes: parsed.pendingFlushes || (parsed.pendingFlush ? [parsed.pendingFlush] : []),
+                    _catCounted: parsed._catCounted || {}
                 };
             } catch (e) {
                 this._state = this._freshState(today);
@@ -3100,6 +3105,7 @@ class StatsTracker {
                 user_hash: this._state.user_hash
             });
             this._state.daily = {};
+            this._state._catCounted = {};
             this._state.session = { start_ms: Date.now() };
             this._state.date = today;
             this._state.has_flushed = false;
@@ -3131,6 +3137,9 @@ class StatsTracker {
         this.load();
         const safe = String(value).replace(/[^a-zA-Z0-9]/g, '_');
         const composite = key + '_' + safe;
+        if (!this._state._catCounted) this._state._catCounted = {};
+        if (this._state._catCounted[composite]) return;
+        this._state._catCounted[composite] = true;
         if (!this._state.daily[composite]) this._state.daily[composite] = 0;
         this._state.daily[composite]++;
         this.persist();
@@ -4623,35 +4632,33 @@ function splitDishes(text, langModel) {
     return [first, ...splitDishes(remainder, langModel)];
 }
 
-function classifyToken(token, langModel, isFirst) {
-    if (isLoanword(token)) return 'ambig';
-    if (!isFirst && /^[A-ZÄÖÜ]/.test(token)) return 'de';
-    const s = langModel.scoreLang(token);
-    if (s > 0.5) return 'de';
-    if (s < -0.5) return 'en';
-    return 'ambig';
-}
-
+// Continuous language evidence per token: the trigram model's signed score
+// (positive = German, negative = English). Loanwords are neutral — they occur
+// on both sides ("Kichererbsencurry" vs "chickpea curry").
+// Capitalization is NOT used as evidence here: English dish text in the source
+// data capitalizes freely ("Indian: Mix Sabji", "Vegetables"), so a hard
+// "capital => German" rule drowns the model signal. It only breaks ties.
 function findDishBoundary(midTokens, langModel) {
     const n = midTokens.length;
     if (n <= 1) return n;
 
-    const tags = midTokens.map((t, i) => classifyToken(t, langModel, i === 0));
+    const EPS = 1e-9;
+    const scores = midTokens.map(t => isLoanword(t) ? 0 : langModel.scoreLang(t));
 
     let bestK = 1;
     let bestPenalty = Infinity;
     let bestCap = -1;
 
     for (let k = 1; k < n; k++) {
-        let leftGerman = 0;
-        for (let i = 0; i < k; i++) if (tags[i] === 'de') leftGerman++;
-        let rightEnglish = 0;
-        for (let i = k; i < n; i++) if (tags[i] === 'en') rightEnglish++;
+        // Left of the boundary should be English, right should be German:
+        // penalize German evidence left + English evidence right.
+        let penalty = 0;
+        for (let i = 0; i < k; i++) if (scores[i] > 0) penalty += scores[i];
+        for (let i = k; i < n; i++) if (scores[i] < 0) penalty -= scores[i];
 
-        const penalty = leftGerman + rightEnglish;
         const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
 
-        if (penalty < bestPenalty || (penalty === bestPenalty && cap > bestCap)) {
+        if (penalty < bestPenalty - EPS || (Math.abs(penalty - bestPenalty) <= EPS && cap > bestCap)) {
             bestPenalty = penalty;
             bestCap = cap;
             bestK = k;
@@ -4941,10 +4948,18 @@ function repairSlashTail(courses, langModel) {
     const lastEn = stripAllergenFromEnd(last.en, last.allergen);
     if (!lastDe || !lastEn || lastDe === lastEn) return courses;
 
-    const slashPhrases = splitTopLevel(lastEn);
-    if (slashPhrases.length < 2) return courses;
-
     const germanCourses = courses.slice(0, -1);
+    let slashPhrases = splitTopLevel(lastEn);
+
+    // Format "DE1 (A) DE2 (B) EN1 / EN2": segmentation cuts the trailing block at
+    // the first slash, so EN1 lands on the course's de-side. When that de-side is
+    // itself strongly English, split the full trailing text to recover every EN dish.
+    if (slashPhrases.length !== germanCourses.length && isStronglyEnglish(lastDe, langModel)) {
+        const fullPhrases = splitTopLevel(lastDe + ' / ' + lastEn);
+        if (fullPhrases.length === germanCourses.length) slashPhrases = fullPhrases;
+    }
+
+    if (slashPhrases.length < 2) return courses;
     if (germanCourses.length !== slashPhrases.length) return courses;
     if (germanCourses.some(c => !c.mono)) return courses;
 
@@ -5073,6 +5088,29 @@ function peelTrailingMonoCourse(courses) {
     return courses;
 }
 
+// Merge a trailing mono course that is only a non-allergen parenthetical
+// ingredient/meat annotation back into the previous anchored course.
+// Example (Friday single-course menus): "... (ACGLMF)(Beef, Pork)" should be
+// one course, not three.
+function mergeTrailingAnnotations(courses) {
+    if (courses.length < 2) return courses;
+    const last = courses[courses.length - 1];
+    if (last.anchored || !last.mono) return courses;
+
+    const text = (last.de || '').trim();
+    // Parenthetical with comma- or slash-separated words (meat/ingredient lists).
+    // Must not look like an allergen code (those are handled by segment()).
+    if (!/^\(\s*[A-Za-z][A-Za-z]*(?:\s*[，,\/]\s*[A-Za-z][A-Za-z]*)*\s*\)$/.test(text)) {
+        return courses;
+    }
+
+    const prev = courses[courses.length - 2];
+    prev.de = ((prev.de || '') + ' ' + text).trim();
+    prev.en = ((prev.en || '') + ' ' + text).trim();
+    courses.pop();
+    return courses;
+}
+
 function splitLanguage(text, options = {}) {
     if (!text) return { de: '', en: '', raw: '', confidence: 0, subScores: {anchor:0,purity:0,course:0,coverage:0}, label: 'fallback', notes: [] };
 
@@ -5088,6 +5126,7 @@ function splitLanguage(text, options = {}) {
     const langModel = (options && options.langModel) ? options.langModel : (0,lang_langModel/* createLangModel */.C)(langModelSeed/* LANG_MODEL_SEED */.x);
 
     let courses = segment(normText);
+    courses = mergeTrailingAnnotations(courses);
     courses = alignTrailingEnglish(courses, langModel);
     courses = repairMergedCourses(courses, langModel);
     courses = peelGluedTailFromUnanchored(courses, langModel);
@@ -5519,16 +5558,25 @@ function injectUI() {
             </div>
         </footer>
     </div>`;
-    document.body.innerHTML = htmlContent;
 
-    // Initialize PayPal Donation Button
-    if (!document.getElementById('paypal-sdk')) {
-        const script = document.createElement('script');
-        script.id = 'paypal-sdk';
-        script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
-        script.charset = "UTF-8";
-        script.onload = () => {
-            if (window.PayPal && PayPal.Donation) {
+    // On first load we take over the whole page; on re-init we only replace
+    // the wrapper so external scripts (e.g. PayPal donate SDK) stay intact.
+    var existingWrapper = document.getElementById('kantine-wrapper');
+    if (existingWrapper) {
+        existingWrapper.remove();
+        var temp = document.createElement('div');
+        temp.innerHTML = htmlContent;
+        while (temp.firstChild) {
+            document.body.appendChild(temp.firstChild);
+        }
+    } else {
+        document.body.innerHTML = htmlContent;
+    }
+
+    // Initialize or re-initialize PayPal Donation Button.
+    function renderPaypalButton() {
+        if (window.PayPal && PayPal.Donation) {
+            try {
                 PayPal.Donation.Button({
                     env: 'production',
                     hosted_button_id: 'R5G9H9TFGQNUY',
@@ -5538,9 +5586,21 @@ function injectUI() {
                         title: 'PayPal - The safer, easier way to pay online!',
                     }
                 }).render('#donate-button');
+            } catch (e) {
+                console.warn('[Kantine] PayPal donate button render skipped:', e.message);
             }
-        };
+        }
+    }
+
+    if (!document.getElementById('paypal-sdk')) {
+        const script = document.createElement('script');
+        script.id = 'paypal-sdk';
+        script.src = "https://www.paypalobjects.com/donate/sdk/donate-sdk.js";
+        script.charset = "UTF-8";
+        script.onload = renderPaypalButton;
         document.body.appendChild(script);
+    } else {
+        renderPaypalButton();
     }
 
 }
@@ -5960,6 +6020,13 @@ async function computeUserHash() {
 
 ;// ./src/index.js
 window.__kantine_load_start = Date.now();
+
+(function(){
+    var splash = document.getElementById('kantine-splash');
+    if (splash) splash.remove();
+    var oldWrapper = document.getElementById('kantine-wrapper');
+    if (oldWrapper) oldWrapper.remove();
+})();
 
 
 
