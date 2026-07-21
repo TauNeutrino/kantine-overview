@@ -16,6 +16,7 @@ This is a **live production system** with real financial impact. See `.agent/rul
 .
 ├── src/                  # ES6 source modules
 │   └── lang/             # DE/EN language detection subsystem
+├── stats/                # Chart.js usage dashboard (deployed to dist/stats/)
 ├── dist/                 # Build artifacts (committed, GitHub Pages)
 ├── tests/                # Standalone Node tests (no framework)
 ├── scripts/              # Build & release automation
@@ -36,6 +37,7 @@ This is a **live production system** with real financial impact. See `.agent/rul
 | Add API endpoints / headers | `src/api.js`, `src/constants.js` | Constants registry in `constants.js` |
 | Change build outputs | `scripts/build.js`, `webpack.config.js` | Build is 10 steps, includes tests |
 | Update tests | `tests/`, `test_logic.js` | VM-sandboxed tests; see `tests/AGENTS.md` |
+| Change stats dashboard / usage charts | `stats/index.html` | Chart.js dashboard; CI copies `stats/` to `dist/stats/` |
 | Train language model | `tools/train-langmodel.js` | Writes `src/lang/langModelSeed.js` |
 
 ## CODE MAP
@@ -54,6 +56,8 @@ Highest-centrality symbols (ranked by cross-file references):
 | `authToken` | variable | `src/state.js:8` | 8+ | Auth gate for API calls |
 | `state.js` | module | `src/state.js` | 8 | Imported by most modules |
 | `constants.js` | module | `src/constants.js` | 8 | Constants + LS key registry |
+| `renderDashboard` | function | `stats/index.html:209` | 1 | Renders all Chart.js usage-dashboard charts |
+| `fetchGistData` | function | `stats/index.html:196` | 1 | Loads aggregated stats from the public Gist |
 
 ## CONVENTIONS
 

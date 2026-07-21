@@ -94,6 +94,7 @@ Das Bookmarklet ist ein minimaler Bootloader. Beim Start prüft es gegen `versio
 
 ```
 ├── src/                  # Web Bookmarklet Quellen (ES6)
+├── stats/                # Chart.js Nutzungsstatistik-Dashboard
 ├── dist/                 # Build-Artefakte (Web)
 ├── tests/                # Web Test Suite
 ├── docs/                 # Dokumentation
