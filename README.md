@@ -79,6 +79,10 @@ Der Web-Build wird automatisch über den [`Build & Deploy`](.github/workflows/bu
 
 Das Bookmarklet ist ein minimaler Bootloader. Beim Start prüft es gegen `version.json` auf GitHub Pages, ob auf jsDelivr eine neuere Version des Haupt-Bundles liegt, und lädt diese im Hintergrund nach. Details zum Deployment-Flow stehen in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#deployment--auto-update).
 
+**Bootloader-Update-Erinnerung:** Seit v2.0.6 prüft `checkBootloaderVersion()` in `src/ui_helpers.js` beim Start, ob der Bootloader veraltet ist. Der Bootloader schreibt seine Version beim Laden via `localStorage._k_boot_ver`. Liegt die gespeicherte Version unter `MIN_BOOTLOADER_VERSION` (aktuell `v2.0.5`) oder fehlt der Key ganz (alter Bootloader), erscheint ein animiertes ⚠️-Badge mit Tooltip und "Jetzt aktualisieren"-Button.
+
+**Zukünftiges Update erzwingen:** `MIN_BOOTLOADER_VERSION` in `src/constants.js` erhöhen und sicherstellen, dass der Bootloader in `scripts/build.js` die neue Version auch in `localStorage` schreibt. Alle User mit älterem Bootloader sehen dann die Meldung.
+
 ### Features
 
 - Wochenansicht mit Navigation
