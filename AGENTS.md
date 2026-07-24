@@ -91,6 +91,7 @@ npm run train-langmodel # Regenerate src/lang/langModelSeed.js from fixture data
 ## NOTES
 
 - **Build requires env vars**: `GIST_PAT`, `GIST_ID`, `GIST_SALT` or `scripts/build.js` exits with FATAL.
+- **Lokaler Build nicht zielführend**: Der echte Build mit gültigen GIST-Secrets läuft auf GitHub Actions (CI/CD). Lokale Builds mit Dummy-Werten produzieren unbrauchbare `dist/`-Artefakte. Source-Änderungen committed, CI/CD baut.
 - **dist/ is committed**: CI copies `stats/` into `dist/` and deploys to GitHub Pages.
 - **No test framework**: Tests are plain Node scripts using `vm.runInNewContext` or `jsdom`.
 - **Circular dependency**: `actions.js` ↔ `ui_helpers.js` — both import each other; ES module semantics resolve this at runtime.

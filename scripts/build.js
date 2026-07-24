@@ -611,6 +611,7 @@ if(window.location.protocol === 'blob:' || (window.location.hostname !== 'web.be
 // ── Auto-update bootloader ──
 (async function(){
   var CURRENT_VER = '${BOOT_VERSION}';
+  try { localStorage.setItem('_k_boot_ver', CURRENT_VER); } catch(e){}
   var FALLBACK = ${JSON.stringify(JS_MIN)};
   var CACHE_KEY = '${CACHE_KEY}';
   var VER_KEY = '${VERSION_KEY}';

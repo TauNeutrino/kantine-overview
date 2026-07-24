@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH } from './constants.js';
+import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
@@ -567,6 +567,58 @@ function showUpdateBadge(version) {
         icon.addEventListener('click', () => openInstallPage(version.rawUrl));
         headerTitle.appendChild(icon);
     }
+}
+
+/**
+ * Checks if the bootloader (bookmarklet) version is older than MIN_BOOTLOADER_VERSION (v2.0.5).
+ * The bootloader stashes its version in LS.BOOTLOADER_VERSION_KEY (_k_boot_ver).
+ * If the key is missing (pre-v2.0.6 bootloader) or the version is < v2.0.5,
+ * injects a ⚠️ badge next to the version tag with a hover tooltip
+ * containing an explanation and a link button to the installer page.
+ */
+export function checkBootloaderVersion() {
+    const bootVer = localStorage.getItem(LS.BOOTLOADER_VERSION_KEY);
+    if (bootVer && !isNewer(MIN_BOOTLOADER_VERSION, bootVer)) return;
+
+    const versionTag = document.querySelector('.version-tag');
+    if (!versionTag) return;
+    const parent = versionTag.parentNode;
+    if (!parent) return;
+    if (parent.querySelector('.bootloader-warning-badge')) return;
+
+    const badge = document.createElement('span');
+    badge.className = 'bootloader-warning-badge';
+    badge.innerHTML = '⚠️';
+    badge.title = t('bootloaderUpdateTooltip');
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'bootloader-warning-tooltip hidden';
+    tooltip.innerHTML = `
+        <div class="bootloader-warning-text">${t('bootloaderUpdateTooltip')}</div>
+        <button class="btn-install-bootloader">${t('bootloaderUpdateLink')}</button>
+    `;
+
+    versionTag.parentNode.insertBefore(badge, versionTag.nextSibling);
+
+    badge.addEventListener('mouseenter', () => {
+        tooltip.classList.remove('hidden');
+        document.body.appendChild(tooltip);
+        const rect = badge.getBoundingClientRect();
+        tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+        tooltip.style.left = (rect.left + window.scrollX) + 'px';
+    });
+
+    badge.addEventListener('mouseleave', () => {
+        tooltip.classList.add('hidden');
+        setTimeout(() => {
+            if (tooltip.parentNode) tooltip.remove();
+        }, 200);
+    });
+
+    tooltip.querySelector('.btn-install-bootloader').addEventListener('click', () => {
+        const installerUrl = `${RAW_INSTALLER_BASE}/${CLIENT_VERSION}/dist/install.html`;
+        openInstallPage(installerUrl);
+    });
 }
 
 export function openVersionMenu() {

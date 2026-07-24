@@ -10,7 +10,7 @@ window.__kantine_load_start = Date.now();
 import { injectUI } from './ui.js';
 import { bindEvents } from './events.js';
 import { updateAuthUI, cleanupExpiredFlags, loadMenuCache, isCacheFresh, loadMenuDataFromAPI, startPolling } from './actions.js';
-import { checkForUpdates } from './ui_helpers.js';
+import { checkForUpdates, checkBootloaderVersion } from './ui_helpers.js';
 import { authToken } from './state.js';
 import { tracker } from './stats-tracker.js';
 import { computeUserHash } from './stats-hash.js';
@@ -87,6 +87,8 @@ if (!window.__KANTINE_LOADED) {
 
     checkForUpdates();
     setInterval(checkForUpdates, 60 * 60 * 1000);
+
+    checkBootloaderVersion();
 }
 
 window.addEventListener('beforeunload', () => {

@@ -92,6 +92,11 @@ const TRANSLATIONS = {
         clearCacheConfirm: 'Möchtest du wirklich alle lokalen Daten (inkl. Login-Session, Cache und Einstellungen) löschen? Die Seite wird danach neu geladen.',
         versionMenuTooltip: 'Klick für Versionsmenü',
 
+        // Bootloader update notice
+        bootloaderUpdateNeeded: 'Bookmarklet-Update erforderlich',
+        bootloaderUpdateTooltip: 'Dein Bookmarklet ist veraltet. Bitte aktualisieren, um wichtige Fehlerbehebungen zu erhalten.',
+        bootloaderUpdateLink: 'Jetzt aktualisieren',
+
         // Progress modal
         progressTitle: 'Menüdaten aktualisieren',
         progressInit: 'Initialisierung...',
@@ -227,6 +232,11 @@ const TRANSLATIONS = {
         clearCacheTooltip: 'Deletes all local data & forces a reload',
         clearCacheConfirm: 'Do you really want to delete all local data (including login session, cache, and settings)? The page will reload afterwards.',
         versionMenuTooltip: 'Click for version menu',
+
+        // Bootloader update notice
+        bootloaderUpdateNeeded: 'Bookmarklet update required',
+        bootloaderUpdateTooltip: 'Your bookmarklet is outdated. Please update to get important fixes.',
+        bootloaderUpdateLink: 'Update now',
 
         // Progress modal
         progressTitle: 'Updating menu data',

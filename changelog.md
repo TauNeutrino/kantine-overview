@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
 ## [2.0.5] - 2026-07-21

@@ -58,7 +58,11 @@ export const LS = {
     DEV_MODE:                'kantine_dev_mode',
     LANG_MODEL_DELTA:        'kantine_lang_model_delta',
     STATS_STATE:             '_kstats_state',
+    BOOTLOADER_VERSION_KEY:  '_k_boot_ver',
 };
+
+/** Minimum bootloader version that has the domain guard fix (v2.0.5). */
+export const MIN_BOOTLOADER_VERSION = 'v2.0.5';
 
 export const GIST_ID = '{{GIST_ID}}';
 export const GIST_SALT = '{{GIST_SALT}}';
