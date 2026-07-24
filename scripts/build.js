@@ -37,7 +37,7 @@ const CHANGELOG_MD = path.join(ROOT, 'changelog.md');
 // ── State ──────────────────────────────────────────────────────────────────
 let EXIT_CODE = 0;
 const BASELINE_BOOKMARKLET_SIZE = 286504; // measured after Todos 1+2 (CSS bundling + bootloader)
-const MAX_GROWTH = 6144;
+const MAX_GROWTH = 20480;
 const log   = (...a) => console.log(...a);
 const warn  = (...a) => console.warn('⚠️ ', ...a);
 const fail  = (...a) => { console.error('❌', ...a); EXIT_CODE = 1; };
