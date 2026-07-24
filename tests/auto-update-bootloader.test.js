@@ -33,6 +33,15 @@ check('Stable URL (rel-version.json) present', code.includes('rel-version.json')
 check('Dev URL (version.json on Pages) present', code.includes('tauneutrino.github.io/kantine-overview/version.json'));
 check('Channel log present', code.includes('channel:'));
 
+// Test 1c: Domain guard — must be present and run BEFORE any version.json fetch
+check('Domain guard redirect present', code.includes("window.location.href = 'https://web.bessa.app/knapp-kantine'"));
+check('Domain guard protocol/blob check present', code.includes("window.location.protocol === 'blob:'"));
+check('Domain guard hostname check present', code.includes("window.location.hostname !== 'web.bessa.app'"));
+var domainGuardIdx = code.indexOf("window.location.href = 'https://web.bessa.app/knapp-kantine'");
+var versionFetchIdx = code.indexOf('version.json');
+check('Domain guard appears before version.json fetch', domainGuardIdx !== -1 && versionFetchIdx !== -1 && domainGuardIdx < versionFetchIdx);
+check('Domain guard appears before CSS injection', domainGuardIdx !== -1 && code.indexOf("createElement('style'") > domainGuardIdx);
+
 // Test 1b: CSS bundling in CDN bundle
 const bundleCode = readFileSync('dist/kantine-auto-update-bundle.js', 'utf8');
 check('BUNDLED_CSS in CDN bundle', bundleCode.includes('BUNDLED_CSS'));

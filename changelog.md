@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Bootloader**: Domain-Prüfung (`web.bessa.app`) jetzt vor dem Version-Check im Bootloader, nicht erst nach dem Laden des Bundles. Vermeidet CORS/Netzwerkfehler auf fremden Domains.
+
 ### Added
 
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.

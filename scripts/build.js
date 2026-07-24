@@ -592,6 +592,13 @@ if(window.__KANTINE_LOADED){
   window.__KANTINE_LOADED = false;
 }
 
+// ── Domain guard: redirect to correct domain BEFORE any network requests ──
+// Must run before the auto-update bootloader to avoid CORS/network errors on foreign domains.
+if(window.location.protocol === 'blob:' || (window.location.hostname !== 'web.bessa.app' && window.location.hostname !== '')){
+  window.location.href = 'https://web.bessa.app/knapp-kantine';
+  throw new Error('Redirecting to the correct domain...');
+}
+
 // ── CSS injection + splash screen (replaced/removed by bundle when it loads) ──
 (function(){
   var s=document.createElement('style');s.id='kantine-style';s.textContent='${CSS_ESC}';document.head.appendChild(s);
