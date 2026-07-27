@@ -604,20 +604,27 @@ export function checkBootloaderVersion() {
 
     versionTag.parentNode.insertBefore(badge, versionTag.nextSibling);
 
+    let hideTimeout;
+
+    function scheduleHide() {
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(() => {
+            tooltip.classList.add('hidden');
+            if (tooltip.parentNode) tooltip.remove();
+        }, 200);
+    }
+
     badge.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
         tooltip.classList.remove('hidden');
         document.body.appendChild(tooltip);
         const rect = badge.getBoundingClientRect();
         tooltip.style.top = (rect.bottom + window.scrollY + 8) + 'px';
         tooltip.style.left = (rect.left + window.scrollX) + 'px';
     });
-
-    badge.addEventListener('mouseleave', () => {
-        tooltip.classList.add('hidden');
-        setTimeout(() => {
-            if (tooltip.parentNode) tooltip.remove();
-        }, 200);
-    });
+    badge.addEventListener('mouseleave', scheduleHide);
+    tooltip.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+    tooltip.addEventListener('mouseleave', scheduleHide);
 
     tooltip.querySelector('.btn-install-bootloader').addEventListener('click', () => {
         const installerUrl = `${RAW_INSTALLER_BASE}/${CLIENT_VERSION}/dist/install.html`;
