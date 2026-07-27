@@ -578,7 +578,11 @@ function showUpdateBadge(version) {
  */
 export function checkBootloaderVersion() {
     const bootVer = localStorage.getItem(LS.BOOTLOADER_VERSION_KEY);
-    if (bootVer && !isNewer(MIN_BOOTLOADER_VERSION, bootVer)) return;
+    if (bootVer && !isNewer(MIN_BOOTLOADER_VERSION, bootVer)) {
+        console.log('[Kantine] Bootloader OK (_k_boot_ver=' + bootVer + ')');
+        return;
+    }
+    console.log('[Kantine] ⚠ User bookmarklet update required! (_k_boot_ver=' + (bootVer || 'MISSING') + ')');
 
     const versionTag = document.querySelector('.version-tag');
     if (!versionTag) return;
