@@ -1,6 +1,6 @@
 import { displayMode, authToken, userFlags, langMode, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
-import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights } from './ui_helpers.js';
+import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights, checkBootloaderVersion } from './ui_helpers.js';
 import { API_BASE, LS } from './constants.js';
 import { tracker } from './stats-tracker.js';
 import { apiHeaders } from './api.js';
@@ -99,6 +99,7 @@ function updateUILanguage() {
     renderVisibleWeeks();
     updateNextWeekBadge();
     updateAlarmBell();
+    checkBootloaderVersion();
 }
 
 export function bindEvents() {
