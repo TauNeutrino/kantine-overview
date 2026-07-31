@@ -16,6 +16,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
+## [2.1.0] - 2026-07-31
+
+### Hauptmerkmale
+
+- **Sprachen-Splitter verbessert und Fehler behoben**: Der DE/EN-Splitter (`src/lang/splitter.js`) wurde umfassend überarbeitet. Neue Loanword-Erweiterungen (`schnitzel`, `schöberl`, `pizza`, `zucchini`, `strudel`, `backerbsen`, `bolognese` etc.) und die `mergeTrailingAnnotations()`-Heuristik verhindern das falsche Aufteilen von Zutaten-/Fleisch-Annotationen (z. B. `(ACGLMF)(Beef, Pork)`) als eigenständige Kurse. Besonders für Freitagsmenüs (Single-Course-Gerichte) relevant.
+- **Trainingsbasis massiv verbessert**: Der Trigramm-Classifier (`langModel.js`) wurde von 500 auf 2500 Trigramme pro Sprache erweitert (`train-langmodel.js`) und das Corpus-Rebalancing (`totalDe == totalEn`) beseitigt die strukturelle EN-Bias bei unbekannten Trigrammen. Das Modell behandelt Loanword-Token jetzt explizit als neutral (kein DE-Bias durch Digraphen-Regel `sch`+`tz` bei `schnitzel`).
+- **Build-Policy**: Keine lokalen Bundle-Builds mehr (`dist/` bleibt CI-exklusiv); nur Source-Änderungen committed.
+
+### Fixed
+
+- **DE/EN-Splitter**: Trailinge nicht-allergen-basierte Klammern-Annotationen (z. B. `(Beef, Pork)`) werden korrekt zum vorherigen Gang zusammengefasst. Korrekte 3-Kurs-Aufteilung bei Multi-Course-Menüs mit italienischen Loanwords (`Lasagne Bolognese`, `Spätzle`, `Strudel`).
+- **Model-Smoothing**: Das Corpus-Imbalance (`totalDe` vs `totalEn`) wurde durch Rebalancing behoben — abwesende Trigramme erzeugen keinen systematischen EN-Vorteil mehr.
+- **Funktionswort-Kollision**: `'an'` wurde aus `funcEn` entfernt (Kollision mit deutscher Präposition `an`).
+
+### Added
+
+- **Tests**: `tests/test_splitter.js` um Regressionstests für die Freitag-Multi-Course- und Single-Course-Fälle erweitert (`Faschierter Braten ... (ACGLMF)(Beef, Pork)`, `Zucchinisuppe / Zucchini soup Lasagne Bolognese ...`).
+- **Dokumentation**: `docs/lang-splitter-comparison.md` — Vergleich Alte vs Neue Splitter-Logik (627 Einträge, identische Fallback-Zahl, keine Regression, Schema abgeleitet aus Freitagsdaten).
+
 ## [2.0.5] - 2026-07-21
 
 ### Changed
