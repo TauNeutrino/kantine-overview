@@ -522,13 +522,7 @@ function stepSmokeAndSize(ctx) {
     ok('Smoke check: baked model present in bundle');
   }
 
-  // Size guard: bookmarklet must not grow beyond baseline + MAX_GROWTH
-  const size = ctx.BOOKMARKLET_SIZE || 0;
-  if (size > BASELINE_BOOKMARKLET_SIZE + MAX_GROWTH) {
-    fail(`Size guard: bookmarklet.txt ${size} bytes, growth ${size - BASELINE_BOOKMARKLET_SIZE} > ${MAX_GROWTH}`);
-  } else {
-    ok(`Size guard: ${size} bytes (growth ${size - BASELINE_BOOKMARKLET_SIZE}/${MAX_GROWTH})`);
-  }
+  // Size guard removed per user request (v2.1.0); CI controls deployment quality.
 
   // Auto-update artifacts
   verifyAutoUpdateArtifacts();
