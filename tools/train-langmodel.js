@@ -117,8 +117,8 @@ function main() {
     scoredDe.sort((a, b) => b.score - a.score);
     scoredEn.sort((a, b) => b.score - a.score);
 
-    const selectedDe = scoredDe.slice(0, 500).map(x => x.t).sort();
-    const selectedEn = scoredEn.slice(0, 500).map(x => x.t).sort();
+    const selectedDe = scoredDe.slice(0, 2500).map(x => x.t).sort();
+    const selectedEn = scoredEn.slice(0, 2500).map(x => x.t).sort();
 
     const trigramsDe = {};
     const trigramsEn = {};
@@ -130,8 +130,24 @@ function main() {
         if (enCount[t]) trigramsEn[t] = enCount[t];
     }
 
+    // Rebalance the smoothing denominators: the German menu text in the corpus
+    // is on average longer than the English text, so totalDe is inflated vs
+    // totalEn and an absent trigram gets a HIGHER smoothed probability on the
+    // English side, biasing unknown words toward English. Scale both count
+    // sets to a common total so the trigram smoothing becomes language-neutral.
+    let selTotalDe = 0, selTotalEn = 0;
+    for (const k in trigramsDe) selTotalDe += trigramsDe[k];
+    for (const k in trigramsEn) selTotalEn += trigramsEn[k];
+    const commonTotal = Math.max(selTotalDe, selTotalEn);
+    if (selTotalDe > 0 && selTotalEn > 0) {
+        const deScale = commonTotal / selTotalDe;
+        const enScale = commonTotal / selTotalEn;
+        for (const k in trigramsDe) trigramsDe[k] = trigramsDe[k] * deScale;
+        for (const k in trigramsEn) trigramsEn[k] = trigramsEn[k] * enScale;
+    }
+
     const funcDe = ['mit', 'und', 'auf', 'von', 'vom', 'nach', 'in', 'an', 'zu', 'aus', 'bei', 'für', 'über', 'unter'];
-    const funcEn = ['with', 'and', 'on', 'from', 'the', 'of', 'in', 'a', 'an', 'to', 'at', 'by', 'for'];
+    const funcEn = ['with', 'and', 'on', 'from', 'the', 'of', 'in', 'a', 'to', 'at', 'by', 'for'];
 
     let version = "1.0";
     try {

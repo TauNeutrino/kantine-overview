@@ -1,3 +1,5 @@
+import { isLoanword } from './loanwords.js';
+
 export function createLangModel(seed) {
     const FUNC_WEIGHT = 2.0;
 
@@ -23,7 +25,13 @@ export function createLangModel(seed) {
         let enScore = 0;
 
         const lowerText = text.toLowerCase();
-        const alphaWords = lowerText.match(/[a-zäöüß]+/g) || [];
+        // Filter out loanword tokens: cross-lingual food terms (lasagne, gnocchi,
+        // schnitzel, ...) appear in BOTH German and English descriptions, so they
+        // should not bias the DE/EN evidence either way. Same applies to global
+        // text rules (umlauts, digraphs) — "schnitzel" must not trigger the
+        // "sch"+"tz" DE digitraph bonus.
+        const alphaWords = (lowerText.match(/[a-zäöüß]+/g) || []).filter(w => !isLoanword(w));
+        const filteredText = alphaWords.join(' ');
 
         let deTriLog = 0;
         let enTriLog = 0;
@@ -49,7 +57,7 @@ export function createLangModel(seed) {
             if (funcEn.has(w)) enScore += FUNC_WEIGHT;
         }
 
-        const umlauts = lowerText.match(/[äöüß]/g);
+        const umlauts = filteredText.match(/[äöüß]/g);
         if (umlauts) {
             deScore += 0.5 * umlauts.length;
         }
@@ -60,7 +68,7 @@ export function createLangModel(seed) {
             if (/^th/.test(w)) enScore += 0.5;
         }
 
-        const deDigraphs = lowerText.match(/(sch|pf|tz|ck)/g);
+        const deDigraphs = filteredText.match(/(sch|pf|tz|ck)/g);
         if (deDigraphs) {
             deScore += 0.3 * deDigraphs.length;
         }

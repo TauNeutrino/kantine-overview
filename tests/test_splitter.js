@@ -113,4 +113,16 @@ assert(fridayMeat.en.includes('Mince meat roast'), 'friday meat annotation en di
 assert(fridayMeat.en.includes('(Beef, Pork)'), 'friday meat annotation en keeps note');
 assert(fridayMeat.label === 'high', 'friday meat annotation label high');
 
+// Regression for multi-course menu with Italian loanwords (Lasagne/Bolognese)
+// that split correctly at the first EN/DE boundary instead of leaking.
+const multiCourse = splitLanguage('Zucchinisuppe / Zucchini soup Lasagne Bolognese mit Tomatensauce / Lasagna Bolognese with tomato sauce(AFO) Himbeer- Mandelkuchen / Rasberry- almond cake(AFH)');
+assert(countBullets(multiCourse.de) === 3, 'multi-course de 3');
+assert(countBullets(multiCourse.en) === 3, 'multi-course en 3');
+assert(multiCourse.de.includes('Zucchinisuppe'), 'multi-course de soup');
+assert(multiCourse.de.includes('Lasagne Bolognese'), 'multi-course de main');
+assert(multiCourse.de.includes('Himbeer- Mandelkuchen'), 'multi-course de dessert');
+assert(multiCourse.en.includes('Zucchini soup'), 'multi-course en soup');
+assert(multiCourse.en.includes('Lasagna Bolognese'), 'multi-course en main');
+assert(multiCourse.en.includes('Rasberry- almond cake'), 'multi-course en dessert');
+
 console.log('✅ All splitter tests passed!');

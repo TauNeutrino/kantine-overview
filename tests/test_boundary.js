@@ -11,6 +11,7 @@ function cleanSrc(src) {
 const ROOT = path.join(__dirname, '..');
 
 eval(
+  cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/loanwords.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/langModel.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/langModelSeed.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/boundary.js'), 'utf8'))

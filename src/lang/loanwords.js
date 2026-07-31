@@ -13,7 +13,11 @@ export const LOANWORDS = new Set([
     'muffin', 'parmesan', 'mozzarella', 'feta', 'focaccia', 'baguette', 'panini',
     'gyros', 'baklava', 'wrap', 'bowl', 'dip', 'wok', 'sushi', 'curry', 'chili',
     'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
-    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio'
+    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio', 'bolognese', 'pomodoro',
+    'tagliatelle', 'carbonara', 'arrabiata', 'arabiata',
+    'schnitzel', 'schöberl', 'backerbsen', 'strudel', 'spätzle', 'spaetzle',
+    'pizza', 'zucchini', 'minestrone', 'cheddar', 'tofu', 'croutons', 'quinoa',
+    'harissa', 'prosciutto', 'steak', 'burger'
 ]);
 
 export function isLoanword(token) {
