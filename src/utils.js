@@ -72,15 +72,15 @@ import { splitLanguage } from './lang/splitter.js';
 
 export { splitLanguage };
 
-export function getLocalizedText(text) {
+export function getLocalizedText(text, split) {
     if (langMode === 'all') return text || '';
-    const split = splitLanguage(text);
+    const s = split || splitLanguage(text);
     // Low-confidence splits: show raw source text instead of a guessed translation
-    if (split.label === 'low' || split.label === 'fallback') {
-        return split.raw || text || '';
+    if (s.label === 'low' || s.label === 'fallback') {
+        return s.raw || text || '';
     }
-    if (langMode === 'en') return split.en || split.raw;
-    return split.de || split.raw;
+    if (langMode === 'en') return s.en || s.raw;
+    return s.de || s.raw;
 }
 
 export function debounce(func, wait) {

@@ -8,6 +8,11 @@ import { createLangModel } from './langModel.js';
 import { LANG_MODEL_SEED } from './langModelSeed.js';
 import { alignTrailingEnglish } from './alignTrailing.js';
 
+// The lang model is immutable after construction (no delta/learning mutations),
+// so a single module-level instance is reused across all splits instead of
+// rebuilding the trigram tables on every splitLanguage() call.
+const SHARED_LANG_MODEL = createLangModel(LANG_MODEL_SEED);
+
 function stripAllergen(text, allergen) {
     if (!text) return '';
     let out = text;
@@ -135,7 +140,7 @@ export function splitLanguage(text, options = {}) {
         return tplResult;
     }
 
-    const langModel = (options && options.langModel) ? options.langModel : createLangModel(LANG_MODEL_SEED);
+    const langModel = (options && options.langModel) ? options.langModel : SHARED_LANG_MODEL;
 
     let courses = segment(normText);
     courses = mergeTrailingAnnotations(courses);

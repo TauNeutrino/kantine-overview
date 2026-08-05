@@ -356,11 +356,10 @@ function stepInstaller(ctx) {
     <div style="margin-top: 30px; padding: 15px; background: rgba(0, 154, 168, 0.1); border: 1px solid rgba(0, 154, 168, 0.3); border-radius: 8px; font-size: 0.85em; color: #ddd;">
       <strong>&#x1F4CA; Nutzungsstatistiken:</strong><br>
       Dieses Bookmarklet erfasst pseudonymisierte Nutzungsdaten (z.B. Anzahl der Aufrufe, verwendete Features, Performance-Werte).
-      Die Daten werden <strong>ausschlie&szlig;lich aggregiert</strong> und <strong>ohne Personenbezug</strong> (t&auml;glich wechselnder Hash, keine User-ID im Klartext)
-      an ein GitHub Gist &uuml;bertragen. Eine Identifikation einzelner Nutzer ist nicht m&ouml;glich.
+      Die Daten werden <strong>ausschlie&szlig;lich aggregiert</strong> und <strong>ohne Personenbezug</strong> an ein GitHub Gist &uuml;bertragen. Die User-ID wird nicht im Klartext &uuml;bermittelt; stattdessen dient eine pseudonymisierte Kennung (kryptografischer Hash) als Identifikator.
       Rechtsgrundlage: Ihr Interesse an der Verbesserung dieser Software (Art. 6 Abs. 1 lit. f DSGVO).
       Mit der Installation und Nutzung des Bookmarklets stimmen Sie der Erfassung zu.
-      Sie k&ouml;nnen die Erfassung jederzeit deaktivieren, indem Sie das Bookmarklet nicht mehr nutzen.
+      Ein Opt-out innerhalb der Anwendung ist nicht vorgesehen; die Erfassung endet, wenn Sie das Bookmarklet nicht mehr verwenden.
     </div>
     </div>
 

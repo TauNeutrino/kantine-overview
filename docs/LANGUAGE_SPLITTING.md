@@ -174,7 +174,6 @@ Das Modell ist ein einfacher, statistischer Klassifikator ohne externe Abhängig
 | `funcDe` / `funcEn` | Funktionswörter (z. B. `mit`, `und`, `with`, `and`) |
 | `scorePhrase(text)` | Summiert Log-Likelihoods, Funktionswörter, Umlaute, typische deutsche Digraphen (`sch`, `pf`, `tz`, `ck`) und Endungen (`-ung`, `-ing`, `-ed`) |
 | `scoreLang(text)` | `deScore - enScore` |
-| `learnFromCourse()` | Bei hochvertrauensvollen, verankerten Splits werden die Trigramme aus dem Ergebnis in den lokalen Delta-Cache (`localStorage`) übernommen |
 
 ---
 

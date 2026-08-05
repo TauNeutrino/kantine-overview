@@ -28,7 +28,7 @@ node tests/test_security.js
 
 ## Verfügbare Testdateien
 
-Das Verzeichnis `tests/` enthält 19 Testdateien:
+Das Verzeichnis `tests/` enthält 18 Testdateien:
 
 | Datei | Beschreibung |
 |-------|-------------|
@@ -39,7 +39,6 @@ Das Verzeichnis `tests/` enthält 19 Testdateien:
 | `test_dom.js` | UI-DOM Tests (JSDOM) |
 | `test_security.js` | Sicherheitsrelevante Tests |
 | `test_langmodel.js` | Spracherkennungsmodell |
-| `test_langmodel_learning.js` | Learning-Verhalten |
 | `test_splitter.js` | Text-Splitter |
 | `test_segment.js` | Segmentierung |
 | `test_normalize.js` | Normalisierung |

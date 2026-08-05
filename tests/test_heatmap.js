@@ -2,11 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 
-const srcPath = path.join(__dirname, '../src/lang/langModel.js');
-let code = fs.readFileSync(srcPath, 'utf8');
-code = code.replace(/export function/g, 'function');
+const ROOT = path.join(__dirname, '..');
+function cleanSrc(s) {
+  return s.replace(/export /g, '').replace(/import .*? from .*?;/g, '').replace(/^(const|let) /gm, 'var ');
+}
 
-eval(code);
+const srcPath = path.join(__dirname, '../src/lang/langModel.js');
+
+const code = cleanSrc(fs.readFileSync(srcPath, 'utf8'));
+const loanWordCode = cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/loanwords.js'), 'utf8'));
+
+eval(loanWordCode + '\n' + code);
 
 const TINY_MODEL = {
   version: 'test',

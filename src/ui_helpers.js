@@ -413,7 +413,7 @@ export function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description))} ${cBadge}</p>${heatmapHtml}</div>`;
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description, split))} ${cBadge}</p>${heatmapHtml}</div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {

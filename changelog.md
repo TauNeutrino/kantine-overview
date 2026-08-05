@@ -16,6 +16,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
+## [2.1.1] - 2026-08-05
+
+### Removed
+
+- **Lang-Modell-Learning entfernt**: Die komplette Delta-Maschinerie (`learnFromCourse`, `loadDelta`, `saveDelta`, `mergeDelta`, `LS.LANG_MODEL_DELTA`) aus `langModel.js` gelöscht. Das Modell war nach der Erstellung faktisch unveränderlich — die Learning-Funktionen waren ungenutzter toter Code mit eigenem localStorage-Key. Tests (`test_langmodel_learning.js`) und Doku-Referenzen ebenfalls entfernt.
+
+### Changed
+
+- **Performance**: `splitLanguage()` erstellt das Lang-Modell nicht mehr pro Aufruf neu, sondern nutzt eine Singleton-Instanz auf Modulebene. Das eliminiert das wiederholte Kopieren der Trigramm-Tabellen bei jedem Menü-Item.
+- **Performance**: `createDayCard` ruft `splitLanguage()` nur noch einmal pro Item auf und reicht das Ergebnis an `getLocalizedText()` durch (statt doppelt zu splitten).
+- **Privatsphäre**: Der Installer-Text (`scripts/build.js`) macht korrekt klar, dass die pseudonymisierte Kennung ein stabiler kryptografischer Hash ist (kein "täglich wechselnder Hash") und es kein Opt-out innerhalb der Anwendung gibt — nur die Nicht-Verwendung beendet die Erfassung.
+
+### Fixed
+
+- **Stale Build-Artefakt**: Den versehentlich verschachtelten `dist/stats/stats/`-Copy entfernt (dort lag eine alte `index.html`-Version).
+
 ## [2.1.0] - 2026-07-31
 
 ### Hauptmerkmale

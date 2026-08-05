@@ -1,6 +1,13 @@
 const STORAGE_KEY = '_kstats_state';
 const GIST_ID_KEY = '_kstats_gist_id';
 
+// Caps to keep the Gist payload under the GitHub 1MB file-size limit at scale.
+// Above the cap, dedup arrays rotate FIFO (oldest evicted) — last 5000 all-time
+// unique users / 500 per-day unique users still get full dedup. Older hashes
+// returning to the rotating window may be re-counted (bounded, acceptable).
+const ALL_TIME_HASH_CAP = 5000;
+const SEEN_HASHES_DAY_CAP = 500;
+
 import { GIST_ID, GIST_PAT, DEV_MODE_PW_HASH } from './constants.js';
 
 // GIST_PAT arrives obfuscated (XOR with DEV_MODE_PW_HASH + base64) so GitHub's
@@ -214,7 +221,12 @@ class StatsTracker {
             if (!day.unique_today) day.unique_today = 0;
 
             if (pendingUserHash && !day.seen_hashes.includes(pendingUserHash)) {
-                day.seen_hashes.push(pendingUserHash);
+                if (day.seen_hashes.length < SEEN_HASHES_DAY_CAP) {
+                    day.seen_hashes.push(pendingUserHash);
+                } else {
+                    day.seen_hashes.shift();
+                    day.seen_hashes.push(pendingUserHash);
+                }
                 day.unique_today++;
             }
 
@@ -250,7 +262,12 @@ class StatsTracker {
                 if (!data.all_time.unique_hashes) data.all_time.unique_hashes = [];
                 if (!data.all_time.unique_users) data.all_time.unique_users = 0;
                 if (!data.all_time.unique_hashes.includes(pendingUserHash)) {
-                    data.all_time.unique_hashes.push(pendingUserHash);
+                    if (data.all_time.unique_hashes.length < ALL_TIME_HASH_CAP) {
+                        data.all_time.unique_hashes.push(pendingUserHash);
+                    } else {
+                        data.all_time.unique_hashes.shift();
+                        data.all_time.unique_hashes.push(pendingUserHash);
+                    }
                     data.all_time.unique_users++;
                 }
             }

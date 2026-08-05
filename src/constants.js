@@ -56,7 +56,6 @@ export const LS = {
     VERSION_CACHE:           'kantine_version_cache',
     VERSION_ETAG:            'kantine_version_etag',
     DEV_MODE:                'kantine_dev_mode',
-    LANG_MODEL_DELTA:        'kantine_lang_model_delta',
     STATS_STATE:             '_kstats_state',
     BOOTLOADER_VERSION_KEY:  '_k_boot_ver',
 };

@@ -48,10 +48,6 @@ assert(withMit > withWith, "'mit' raises DE score vs 'with'");
 // Orthography test: umlaut pushes DE
 assert(m.scoreLang("Gemüse Kräuter Füße") > 0, "Umlaut text scores German");
 
-// mergeDelta stub: returns model, doesn't throw
-const m2 = m.mergeDelta({ 'xyz': 1 });
-assert(m2 !== null && m2 !== undefined, "mergeDelta stub returns model");
-
 // getModel returns the seed
 const got = m.getModel();
 assert(got.version === 'test', "getModel returns seed version");
