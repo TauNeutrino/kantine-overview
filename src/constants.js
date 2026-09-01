@@ -50,6 +50,7 @@ export const LS = {
     LAST_CHECKED:            'kantine_last_checked',
     MENU_CACHE:              'kantine_menuCache',
     MENU_CACHE_TS:           'kantine_menuCacheTs',
+    DISH_IMAGE_CACHE:        'kantine_dishImageCache',
     HISTORY_CACHE:           'kantine_history_cache',
     HIGHLIGHT_TAGS:          'kantine_highlightTags',
     LAST_UPDATED:            'kantine_last_updated',
@@ -62,6 +63,17 @@ export const LS = {
 
 /** Minimum bootloader version that has the domain guard fix (v2.0.5). */
 export const MIN_BOOTLOADER_VERSION = 'v2.0.5';
+
+/** Dish image search: hover-dwell popup timing, keyless proxy chain and Openverse fallback. */
+export const DISH_IMAGE_HOVER_MS = 500;
+export const DISH_IMAGE_CAROUSEL_INTERVAL_MS = 3000;
+export const DISH_IMAGE_FETCH_TIMEOUT_MS = 10000;
+export const DISH_IMAGE_MAX_RESULTS = 5;
+export const DISH_IMAGE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+export const DISH_IMAGE_GOOGLE_SCRAPE_URL = 'https://www.google.com/search?q={q}&tbm=isch&hl={hl}&gl=at&ijn=0';
+export const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
+export const DISH_IMAGE_PROXY_CHAIN = [{ name: 'allorigins-raw', template: 'https://api.allorigins.win/raw?url={url}' }, { name: 'codetabs', template: 'https://api.codetabs.com/v1/proxy?quest={url}' }, { name: 'allorigins-get', template: 'https://api.allorigins.win/get?url={url}' }];
+export const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 
 export const GIST_ID = '{{GIST_ID}}';
 export const GIST_SALT = '{{GIST_SALT}}';

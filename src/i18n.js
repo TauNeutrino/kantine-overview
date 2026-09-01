@@ -145,6 +145,19 @@ const TRANSLATIONS = {
         noConnection: 'Keine Verbindung',
         toOriginalPage: 'Zur Original-Seite',
 
+        // Dish image search
+        dishImageLinkTooltip: 'Nach Bildern dieses Gerichts suchen (Hover: Vorschau, Klick: Google-Bildersuche)',
+        dishImageModalTitle: 'Gerichtsbilder',
+        dishImageLoading: 'Bilder werden gesucht...',
+        dishImageNoImages: 'Keine Bilder gefunden.',
+        dishImageError: 'Bildersuche momentan nicht verfügbar.',
+        dishImageOpenInGoogle: 'Bei Google öffnen',
+        dishImageSourceGoogle: 'Quelle: Google Bildersuche',
+        dishImageSourceOpenverse: 'Quelle: Openverse',
+        dishImagePrev: 'Vorheriges Bild',
+        dishImageNext: 'Nächstes Bild',
+        dishImageClose: 'Schließen',
+
         // Misc
         loggedIn: 'Angemeldet',
     },
@@ -285,6 +298,19 @@ const TRANSLATIONS = {
         // Error modal
         noConnection: 'No connection',
         toOriginalPage: 'Go to original page',
+
+        // Dish image search
+        dishImageLinkTooltip: 'Search images of this dish (hover: preview, click: Google image search)',
+        dishImageModalTitle: 'Dish images',
+        dishImageLoading: 'Searching for images...',
+        dishImageNoImages: 'No images found.',
+        dishImageError: 'Image search is currently unavailable.',
+        dishImageOpenInGoogle: 'Open in Google',
+        dishImageSourceGoogle: 'Source: Google Images',
+        dishImageSourceOpenverse: 'Source: Openverse',
+        dishImagePrev: 'Previous image',
+        dishImageNext: 'Next image',
+        dishImageClose: 'Close',
 
         // Misc
         loggedIn: 'Logged in',
