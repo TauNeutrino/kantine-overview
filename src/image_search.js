@@ -3,7 +3,7 @@
 // Part 2: keyless image client — Google scrape via proxy chain, Openverse
 // fallback, localStorage cache. Fetches only when fetchDishImages is called.
 
-import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
+import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
 
 /**
  * Derives the main-course line from a language split result.
@@ -46,7 +46,7 @@ export function sanitizeDishQuery(text) {
  * @returns {string} Google image search URL
  */
 export function buildGoogleImageUrl(query) {
-    return `https://www.google.com/search?q=${encodeURIComponent(query)}&udm=2`
+    return DISH_IMAGE_GOOGLE_TAB_URL.replace('{q}', encodeURIComponent(query))
 }
 
 /**

@@ -92,6 +92,13 @@ function updateUILanguage() {
     const dishImageHeader = document.querySelector('#dish-image-modal .modal-header h2');
     if (dishImageHeader) dishImageHeader.textContent = t('dishImageModalTitle');
 
+    const btnDishImageClose = document.getElementById('btn-dish-image-close');
+    if (btnDishImageClose) {
+        const closeLabel = t('dishImageClose');
+        btnDishImageClose.title = closeLabel;
+        btnDishImageClose.setAttribute('aria-label', closeLabel);
+    }
+
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
     if (alarmBell && userFlags.size === 0) {

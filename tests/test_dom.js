@@ -442,6 +442,7 @@ function restoreIntervals() {
     w.setInterval = realSetInterval;
 }
 function clearDishCache() {
+    // LS.DISH_IMAGE_CACHE value — this harness evals the built bundle and has no ES-module import path to constants.js
     w.localStorage.removeItem('kantine_dishImageCache');
 }
 const IMG0 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:modalCase0&sig=A';

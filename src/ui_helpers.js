@@ -72,22 +72,23 @@ export function openDishImageModal(query, linkEl) {
     modal.setAttribute('aria-hidden', 'false');
     document.getElementById('btn-dish-image-close').focus();
     document.getElementById('dish-image-title').textContent = t('dishImageModalTitle');
-    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(3);
+    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(3) + `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
     tracker.increment('dish_image_popup');
 
     fetchDishImages(query).then(result => {
         // Stale-response guard: ignore results after query change or close.
         if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
-        if (result.source === null) renderDishImageError(query);
+        if (result.source === null) renderDishImageError(query, false);
+        else if (!result.images || result.images.length === 0) renderDishImageError(query, true);
         else renderDishImageCarousel(query, result);
     });
 }
 
-function renderDishImageError(query) {
+function renderDishImageError(query, isEmpty) {
     const body = document.getElementById('dish-image-body');
     if (!body) return;
     stopDishImageAdvance();
-    body.innerHTML = `<p class="dish-image-error-text">${escapeHtml(t('dishImageError'))}</p><a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a>`;
+    body.innerHTML = `<p class="dish-image-error-text">${escapeHtml(isEmpty ? t('dishImageNoImages') : t('dishImageError'))}</p><a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a>`;
     const link = body.querySelector('.dish-image-google-link');
     if (link) link.addEventListener('click', () => tracker.increment('dish_image_tab'));
 }
