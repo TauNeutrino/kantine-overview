@@ -1,6 +1,9 @@
-// === Dish Image Search: Query Derivation (FR-123..125) ===
-// Part 1: pure functions only (no imports) so they stay vm-testable.
-// The fetch/proxy/cache client is added to this module in a later step.
+// === Dish Image Search: Query Derivation + Fetch Client (FR-123..125) ===
+// Part 1: pure query functions (no dependencies) — vm-testable in isolation.
+// Part 2: keyless image client — Google scrape via proxy chain, Openverse
+// fallback, localStorage cache. Fetches only when fetchDishImages is called.
+
+import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
 
 /**
  * Derives the main-course line from a language split result.
@@ -44,4 +47,104 @@ export function sanitizeDishQuery(text) {
  */
 export function buildGoogleImageUrl(query) {
     return `https://www.google.com/search?q=${encodeURIComponent(query)}&udm=2`
+}
+
+/**
+ * Extracts gstatic thumbnail URLs from proxied Google image-search HTML.
+ * Every match is entity-decoded (&amp; -> &) because proxy HTML escapes the
+ * URL query separators, then deduped preserving first-occurrence order.
+ * @param {string} html Google image search HTML document
+ * @returns {{url: string, license: string, creator: string}[]} Uniform image entries (Google carries no license metadata)
+ */
+export function extractImageThumbs(html) {
+    const matches = String(html || '').match(/https:\/\/encrypted-tbn\d*\.gstatic\.com\/images\?q=tbn:[A-Za-z0-9_\-]+[^"'\s\\<>]*/g) || []
+    const seen = new Set()
+    const images = []
+    for (const match of matches) {
+        const url = match.replace(/&amp;/g, '&')
+        if (seen.has(url)) continue
+        seen.add(url)
+        images.push({ url, license: '', creator: '' })
+    }
+    return images.slice(0, DISH_IMAGE_MAX_RESULTS)
+}
+
+/**
+ * Fetches preview images for a dish query. Stage 1 scrapes Google image
+ * search through a keyless proxy chain; stage 2 falls back to Openverse
+ * when every proxy came up empty. Fresh results are cached in localStorage
+ * for DISH_IMAGE_CACHE_TTL_MS. Never throws: total failure resolves to
+ * { images: [], source: null }.
+ * @param {string} query Sanitized dish query
+ * @param {'de'|'en'} [lang] Query language for the Google UI hint (defaults to 'de')
+ * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
+ */
+export async function fetchDishImages(query, lang) {
+    const key = query.trim().replace(/\s+/g, ' ').toLowerCase()
+    const cache = readDishImageCache()
+    const entry = cache && cache.queries ? cache.queries[key] : null
+    if (entry && Date.now() - entry.ts < DISH_IMAGE_CACHE_TTL_MS) {
+        return { images: entry.images, source: entry.source, cached: true }
+    }
+
+    const scrapeUrl = DISH_IMAGE_GOOGLE_SCRAPE_URL
+        .replace('{q}', encodeURIComponent(query))
+        .replace('{hl}', lang === 'en' ? 'en' : 'de')
+
+    for (const proxy of DISH_IMAGE_PROXY_CHAIN) {
+        try {
+            const response = await fetch(proxy.template.replace('{url}', encodeURIComponent(scrapeUrl)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
+            if (!response.ok) continue
+            let body = await response.text()
+            if (proxy.name === 'allorigins-get') body = JSON.parse(body).contents
+            const images = extractImageThumbs(body)
+            if (images.length < 1) continue
+            writeDishImageCache(key, 'google', images)
+            return { images, source: 'google' }
+        } catch (e) {
+            // Proxy unreachable, timed out or returned a malformed payload — try the next one.
+        }
+    }
+
+    try {
+        const response = await fetch(DISH_IMAGE_OPENVERSE_URL.replace('{q}', encodeURIComponent(query)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
+        if (response.ok) {
+            const data = await response.json()
+            const images = data.results.map(r => ({ url: r.thumbnail || r.url, license: r.license || '', creator: r.creator || '' }))
+                .filter(image => typeof image.url === 'string' && image.url.startsWith('https://'))
+                .slice(0, DISH_IMAGE_MAX_RESULTS)
+            if (images.length >= 1) {
+                writeDishImageCache(key, 'openverse', images)
+                return { images, source: 'openverse' }
+            }
+        }
+    } catch (e) {
+        // Openverse unreachable or malformed — fall through to the total-failure result.
+    }
+
+    return { images: [], source: null }
+}
+
+function readDishImageCache() {
+    try {
+        return JSON.parse(localStorage.getItem(LS.DISH_IMAGE_CACHE))
+    } catch (e) {
+        return null
+    }
+}
+
+function writeDishImageCache(key, source, images) {
+    const cache = readDishImageCache()
+    const queries = cache && cache.queries ? { ...cache.queries } : {}
+    const now = Date.now()
+    for (const existingKey of Object.keys(queries)) {
+        if (now - queries[existingKey].ts >= DISH_IMAGE_CACHE_TTL_MS) delete queries[existingKey]
+    }
+    queries[key] = { ts: now, source, images }
+    const keys = Object.keys(queries)
+    if (keys.length > 50) {
+        keys.sort((a, b) => queries[a].ts - queries[b].ts)
+        for (const evictedKey of keys.slice(0, keys.length - 50)) delete queries[evictedKey]
+    }
+    localStorage.setItem(LS.DISH_IMAGE_CACHE, JSON.stringify({ queries }))
 }
