@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
+## [2.1.2] - 2026-09-01
+
+### Added
+
+- **Bildvorschau für Hauptgerichte**: Bei sicher erkannten Menüs (Splitter-Konfidenz 'high') ist der Hauptgerichtstext (zweiter Gang; bei Ein-Gang-Menüs dieser Gang) jetzt ein Link innerhalb der Menübeschreibung. Verhalten: Hover ≥ 500 ms öffnet ein Popup mit bis zu 5 Gerichtsbildern als automatisch wechselndes Karussell, Klick/Enter öffnet immer die Google-Bildersuche in einem neuen Tab, kein Link bei Vorlagen-Karten, unsicherer Trennung oder im Zweisprachig-Modus (ALL), Bilder laden erst bei Popup-Öffnung (Cache 7 Tage), das Karussell wechselt alle 3 s, pausiert bei Hover/Fokus und ist bei `prefers-reduced-motion` deaktiviert.
+- **Bildquellen ohne Credentials**: Die Bilder werden keyless beschafft, primär über eine Proxy-Kette der Google-Bildersuche und bei Ausfall über die Openverse-API. Keine API-Keys, keine laufenden Kosten. Ein dauerhaft sichtbarer „Bei Google öffnen"-Link im Popup federt den Fehler-/Leerzustand ab.
+
 ## [2.1.1] - 2026-08-05
 
 ### Removed

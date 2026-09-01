@@ -21,6 +21,7 @@ index.js (Entry Point)
   ├── ui_helpers.js   – UI-Komponenten (Tageskarten, Toasts)
   ├── events.js       – Event-Delegation
   ├── i18n.js         – DE/EN Lokalisierung
+  ├── image_search.js – Bildsuche: Query-Ableitung, Proxy-/Openverse-Bildclient (Cache)
   ├── constants.js    – Konstanten
   └── utils.js        – Hilfsfunktionen
 ```

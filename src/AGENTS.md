@@ -16,6 +16,7 @@
 - `constants.js` API_BASE, VENUE_ID, MENU_ID, localStorage keys, placeholders.
 - `utils.js` Helpers: getISOWeek, escapeHtml, splitLanguage re-export.
 - `i18n.js` `t()` localization.
+- `image_search.js` Dish image search: query derivation, keyless proxy/Openverse image client with cache.
 - `stats-tracker.js`, `stats-hash.js` Pseudonymous stats.
 - `lang/` Separate AGENTS.md.
 
@@ -30,6 +31,7 @@
 - Headers / auth signatures → `api.js`
 - Endpoints / IDs / storage keys / placeholders → `constants.js`
 - Translations → `i18n.js`
+- Bildsuche / Gerichtsbild-Popup → `src/image_search.js` (+ Modal in `ui_helpers.js`)
 - Date/week / HTML escaping / language detection entry → `utils.js`
 - Pseudonymous stats → `stats-tracker.js`, `stats-hash.js`
 - Language detection internals → `src/lang/AGENTS.md`
