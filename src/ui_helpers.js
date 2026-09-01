@@ -1,13 +1,25 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION } from './constants.js';
+import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
+import { getMainCourseLine, sanitizeDishQuery, buildGoogleImageUrl } from './image_search.js';
+import { tracker } from './stats-tracker.js';
 import { createLangModel } from './lang/langModel.js';
 import { LANG_MODEL_SEED } from './lang/langModelSeed.js';
 
 const heatmapLangModel = createLangModel(LANG_MODEL_SEED);
+
+// Dish image search hover-dwell popup state (FR-125, event-flow spec)
+let dwellTimer = null;
+let dishImagePopupSuppressed = false;
+
+/** Null-safe modal-closed check: missing element (pre-Todo-6) counts as closed. */
+function isDishImageModalClosed() {
+    const modal = document.getElementById('dish-image-modal');
+    return !modal || modal.classList.contains('hidden');
+}
 
 /**
  * Updates the "Next Week" button tooltip and glow state.
@@ -413,7 +425,28 @@ export function createDayCard(day) {
             tagsHtml = `<div class="matched-tags">${badges}</div>`;
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${escapeHtml(getLocalizedText(item.description, split))} ${cBadge}</p>${heatmapHtml}</div>`;
+        const localized = getLocalizedText(item.description, split);
+        const mainCourse = getMainCourseLine(split, langMode);
+        const dishQuery = mainCourse ? sanitizeDishQuery(mainCourse.text) : null;
+        let descHtml = escapeHtml(localized);
+        if (dishQuery !== null) {
+            const rawLines = localized.split('\n');
+            const nonEmptyCount = rawLines.map(s => s.trim()).filter(Boolean).length;
+            const mainIdx = nonEmptyCount >= 2 ? 1 : 0;
+            let seen = 0;
+            descHtml = rawLines.map(line => {
+                if (line.trim()) {
+                    const isMain = seen === mainIdx;
+                    seen++;
+                    if (isMain) {
+                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${escapeHtml(dishQuery)}" title="${escapeHtml(t('dishImageLinkTooltip'))}">${escapeHtml(mainCourse.text)}</a>`;
+                    }
+                }
+                return escapeHtml(line);
+            }).join('\n');
+        }
+
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}</p>${heatmapHtml}</div>`;
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {
@@ -445,6 +478,34 @@ export function createDayCard(day) {
                 const btn = e.currentTarget;
                 toggleFlag(btn.dataset.date, parseInt(btn.dataset.article), btn.dataset.name, btn.dataset.cutoff);
             });
+        }
+
+        const dishLink = itemEl.querySelector('.dish-image-link');
+        if (dishLink) {
+            const linkQuery = dishLink.dataset.dishQuery;
+            dishLink.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tracker.increment('dish_image_tab');
+                closeDishImageModal();
+            });
+            dishLink.addEventListener('pointerenter', (e) => {
+                if (e.pointerType !== 'mouse') return;
+                if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                if (dishImagePopupSuppressed) return;
+                if (!isDishImageModalClosed()) return;
+                clearTimeout(dwellTimer);
+                dwellTimer = setTimeout(() => {
+                    dwellTimer = null;
+                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery);
+                }, DISH_IMAGE_HOVER_MS);
+            });
+            const cancelDishDwell = () => {
+                clearTimeout(dwellTimer);
+                dwellTimer = null;
+                dishImagePopupSuppressed = false;
+            };
+            dishLink.addEventListener('pointerleave', cancelDishDwell);
+            dishLink.addEventListener('pointercancel', cancelDishDwell);
         }
 
         body.appendChild(itemEl);

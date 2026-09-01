@@ -87,7 +87,20 @@ const jsCode = fs.readFileSync('dist/kantine.bundle.js', 'utf8')
     .replace('function createDayCard(day) {', 'window.createDayCard = function(day) {');
 
 log("Instantiating JSDOM...");
-const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://web.bessa.app/" });
+const { VirtualConsole } = require('jsdom');
+const virtualConsole = new VirtualConsole();
+['log', 'info', 'warn', 'error', 'debug', 'trace'].forEach((ev) =>
+    virtualConsole.on(ev, (...args) => console[ev === 'trace' ? 'log' : ev](...args))
+);
+virtualConsole.on('jsdomError', (err) => {
+    const msg = (err && err.message) || String(err);
+    // Expected interim noise: jsdom never opens the Google tab, and
+    // open/closeDishImageModal land in this module only in the next wave (Todo 6).
+    if (/Not implemented: navigation/.test(msg)) return;
+    if (/openDishImageModal|closeDishImageModal/.test(msg)) return;
+    console.error(msg);
+});
+const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://web.bessa.app/", virtualConsole });
 log("JSDOM dom created...");
 global.window = dom.window;
 global.document = window.document;
@@ -326,4 +339,184 @@ if (!/#kantine-wrapper\s*\{[^}]*background-color:\s*var\(--bg-body\)/.test(cssCo
 }
 console.log("✅ CSS Background Specificity Fix Test Passed");
 
-process.exit(0);
+console.log("--- Testing Dish Image Trigger Link (Todo 5) ---");
+const w = dom.window;
+const d = w.document;
+const HIGH_DESC = 'Zucchinisuppe / Zucchini soup Lasagne Bolognese mit Tomatensauce / Lasagna Bolognese with tomato sauce(AFO) Himbeer- Mandelkuchen / Rasberry- almond cake(AFH)';
+const TEMPLATE_DESC = 'Suppe / Soup Salat / Salad Dessert';
+const HOVER_MS = 500;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const interimErrors = [];
+w.addEventListener('error', (e) => {
+    const msg = e.message || '';
+    if (/openDishImageModal|closeDishImageModal/.test(msg)) {
+        interimErrors.push(msg);
+        e.preventDefault();
+    }
+});
+
+function makeDishCard(description, articleId) {
+    const day = {
+        date: '2026-09-02',
+        weekday: 3,
+        items: [{
+            id: 'item_' + articleId,
+            articleId,
+            name: 'Menü ' + articleId,
+            description,
+            price: 6.5,
+            available: true,
+            amountTracking: false
+        }]
+    };
+    const card = w.createDayCard(day);
+    d.body.appendChild(card);
+    return card;
+}
+
+function firePointer(el, type, pointerType) {
+    const ev = new w.Event(type, { cancelable: true });
+    ev.pointerType = pointerType;
+    el.dispatchEvent(ev);
+}
+
+function readDishTabCount() {
+    const raw = w.localStorage.getItem('_kstats_state');
+    if (!raw) return 0;
+    try {
+        return (JSON.parse(raw).daily || {}).dish_image_tab || 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
+const realMatchMedia = w.matchMedia;
+const realSetTimeout = w.setTimeout;
+let scheduledTimers = [];
+function setHoverCapable(capable) {
+    w.matchMedia = (q) => ({
+        matches: capable && q === '(hover: hover) and (pointer: fine)',
+        addListener: () => { }, removeListener: () => { },
+        addEventListener: () => { }, removeEventListener: () => { }
+    });
+}
+function startTimerSpy() {
+    scheduledTimers = [];
+    w.setTimeout = function (fn, ms, ...args) {
+        scheduledTimers.push(ms);
+        return realSetTimeout.call(w, fn, ms, ...args);
+    };
+}
+function stopTimerSpy() {
+    w.setTimeout = realSetTimeout;
+}
+
+async function runDishImageTests() {
+    // Deterministic language: the Feature-4 test above toggled the UI to EN
+    d.querySelector('.lang-btn[data-lang="de"]').click();
+
+    // (a) high split → anchor with safe Google image-search href
+    {
+        const card = makeDishCard(HIGH_DESC, 901);
+        const link = card.querySelector('.dish-image-link');
+        if (!link) throw new Error('(a) .dish-image-link missing for high split');
+        if (link.tagName !== 'A') throw new Error('(a) trigger must be an <a>, got ' + link.tagName);
+        if (link.getAttribute('target') !== '_blank') throw new Error('(a) target=_blank missing');
+        const rel = link.getAttribute('rel') || '';
+        if (!rel.includes('noopener') || !rel.includes('noreferrer')) throw new Error('(a) rel must contain noopener and noreferrer, got: ' + rel);
+        const query = link.getAttribute('data-dish-query');
+        if (!query || !query.includes('Lasagne Bolognese')) throw new Error('(a) data-dish-query must carry the main course, got: ' + query);
+        const href = link.getAttribute('href');
+        if (!href.startsWith('https://www.google.com/search?q=')) throw new Error('(a) href must start with Google search URL, got: ' + href);
+        if (!href.includes('udm=2')) throw new Error('(a) href must contain udm=2, got: ' + href);
+        if (href !== 'https://www.google.com/search?q=' + encodeURIComponent(query) + '&udm=2') throw new Error('(a) href must encode the query exactly, got: ' + href);
+        if (!link.getAttribute('title')) throw new Error('(a) tooltip title missing');
+        const desc = card.querySelector('.item-desc');
+        if (!desc.textContent.includes('Zucchinisuppe')) throw new Error('(a) other course lines must stay rendered');
+        card.remove();
+        console.log('OK (a) high split renders dish-image-link anchor');
+    }
+
+    // (b) template split → no link, plain text rendering unchanged
+    {
+        const card = makeDishCard(TEMPLATE_DESC, 902);
+        if (card.querySelector('.dish-image-link')) throw new Error('(b) template split must NOT render a link');
+        if (card.querySelector('.item-desc a')) throw new Error('(b) template desc must contain no anchor');
+        const desc = card.querySelector('.item-desc');
+        if (!desc.textContent.includes('Suppe') || !desc.textContent.includes('Dessert')) throw new Error('(b) template desc text lost');
+        card.remove();
+        console.log('OK (b) template split renders plain text without link');
+    }
+
+    // (c) click → tracker counts dish_image_tab +1 (no preventDefault, jsdom does not navigate)
+    {
+        const card = makeDishCard(HIGH_DESC, 903);
+        const link = card.querySelector('.dish-image-link');
+        if (!link) throw new Error('(c) link fixture broken');
+        const before = readDishTabCount();
+        link.click();
+        const after = readDishTabCount();
+        if (after !== before + 1) throw new Error('(c) dish_image_tab must increment by 1, got ' + before + ' → ' + after);
+        card.remove();
+        console.log('OK (c) click increments dish_image_tab by 1');
+    }
+
+    // (d) pointerenter with touch pointer → NO dwell timer
+    {
+        setHoverCapable(true);
+        startTimerSpy();
+        const card = makeDishCard(HIGH_DESC, 904);
+        const link = card.querySelector('.dish-image-link');
+        firePointer(link, 'pointerenter', 'touch');
+        stopTimerSpy();
+        if (scheduledTimers.includes(HOVER_MS)) throw new Error('(d) touch pointer must not start the dwell timer');
+        card.remove();
+        console.log('OK (d) touch pointerenter starts no dwell timer');
+    }
+
+    // (e) non-hover device (matchMedia false) → pointerenter mouse starts NO timer
+    {
+        setHoverCapable(false);
+        startTimerSpy();
+        const card = makeDishCard(HIGH_DESC, 905);
+        const link = card.querySelector('.dish-image-link');
+        firePointer(link, 'pointerenter', 'mouse');
+        stopTimerSpy();
+        if (scheduledTimers.includes(HOVER_MS)) throw new Error('(e) non-hover-capable device must not start the dwell timer');
+        card.remove();
+        console.log('OK (e) hover-incapable device starts no dwell timer');
+    }
+
+    // (f) mouse dwell: timer starts, pointerleave at 499 ms clears it → no popup
+    {
+        setHoverCapable(true);
+        startTimerSpy();
+        const card = makeDishCard(HIGH_DESC, 906);
+        const link = card.querySelector('.dish-image-link');
+        const openErrorsBefore = interimErrors.filter((m) => /openDishImageModal/.test(m)).length;
+        firePointer(link, 'pointerenter', 'mouse');
+        const started = scheduledTimers.includes(HOVER_MS);
+        await sleep(499);
+        firePointer(link, 'pointerleave', 'mouse');
+        await sleep(400);
+        stopTimerSpy();
+        if (!started) throw new Error('(f) mouse pointerenter on hover-capable device must start the dwell timer');
+        const openErrorsAfter = interimErrors.filter((m) => /openDishImageModal/.test(m)).length;
+        if (openErrorsAfter !== openErrorsBefore) throw new Error('(f) popup must not open after pointerleave cleared the timer');
+        const modal = d.getElementById('dish-image-modal');
+        if (modal && !modal.classList.contains('hidden')) throw new Error('(f) no dish-image modal may be visible after cleared dwell');
+        card.remove();
+        console.log('OK (f) dwell timer cleared by pointerleave before popup');
+    }
+
+    w.matchMedia = realMatchMedia;
+}
+
+runDishImageTests().then(() => {
+    console.log("✅ Dish Image Trigger Link Tests Passed");
+    process.exit(0);
+}).catch((err) => {
+    console.error("❌ Dish Image Trigger Link Test Failed:", (err && err.message) || err);
+    process.exit(1);
+});
