@@ -1,10 +1,10 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS } from './constants.js';
+import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS, DISH_IMAGE_CAROUSEL_INTERVAL_MS } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
-import { getMainCourseLine, sanitizeDishQuery, buildGoogleImageUrl } from './image_search.js';
+import { getMainCourseLine, sanitizeDishQuery, buildGoogleImageUrl, fetchDishImages } from './image_search.js';
 import { tracker } from './stats-tracker.js';
 import { createLangModel } from './lang/langModel.js';
 import { LANG_MODEL_SEED } from './lang/langModelSeed.js';
@@ -19,6 +19,146 @@ let dishImagePopupSuppressed = false;
 function isDishImageModalClosed() {
     const modal = document.getElementById('dish-image-modal');
     return !modal || modal.classList.contains('hidden');
+}
+
+// Dish image carousel modal state (FR-125) — module singleton, lives outside
+// the menu container so renderVisibleWeeks re-renders never touch the modal.
+let dishImageModalOpen = false;
+let dishImageCurrentQuery = null;
+let dishImageCarouselIndex = 0;
+let dishImageIntervalId = null;
+let dishImageTriggerLink = null;
+
+function startDishImageAdvance() {
+    stopDishImageAdvance();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    dishImageIntervalId = setInterval(() => showDishImageSlide(dishImageCarouselIndex + 1), DISH_IMAGE_CAROUSEL_INTERVAL_MS);
+}
+
+function stopDishImageAdvance() {
+    if (dishImageIntervalId !== null) {
+        clearInterval(dishImageIntervalId);
+        dishImageIntervalId = null;
+    }
+}
+
+/** Activates slide `index` (wrapping both directions) and syncs the dots. */
+function showDishImageSlide(index) {
+    const carousel = document.querySelector('#dish-image-body .dish-image-carousel');
+    if (!carousel) return;
+    const slides = Array.from(carousel.querySelectorAll('.dish-image-slide'));
+    if (slides.length === 0) return;
+    dishImageCarouselIndex = ((index % slides.length) + slides.length) % slides.length;
+    slides.forEach((slide, i) => slide.classList.toggle('active', i === dishImageCarouselIndex));
+    Array.from(carousel.querySelectorAll('.dish-image-dot')).forEach((dot, i) => dot.classList.toggle('active', i === dishImageCarouselIndex));
+}
+
+/**
+ * Opens the dish-image popup for a query (event-flow spec step 3/7):
+ * suppression flag set here, reset happens on the link's next pointerleave.
+ * @param {string} query Sanitized dish query
+ * @param {HTMLElement} [linkEl] Triggering anchor — focus returns here on close
+ */
+export function openDishImageModal(query, linkEl) {
+    const modal = document.getElementById('dish-image-modal');
+    if (!modal) return;
+    dishImagePopupSuppressed = true;
+    dishImageTriggerLink = linkEl || null;
+    dishImageModalOpen = true;
+    dishImageCurrentQuery = query;
+    dishImageCarouselIndex = 0;
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    document.getElementById('btn-dish-image-close').focus();
+    document.getElementById('dish-image-title').textContent = t('dishImageModalTitle');
+    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(3);
+    tracker.increment('dish_image_popup');
+
+    fetchDishImages(query).then(result => {
+        // Stale-response guard: ignore results after query change or close.
+        if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
+        if (result.source === null) renderDishImageError(query);
+        else renderDishImageCarousel(query, result);
+    });
+}
+
+function renderDishImageError(query) {
+    const body = document.getElementById('dish-image-body');
+    if (!body) return;
+    stopDishImageAdvance();
+    body.innerHTML = `<p class="dish-image-error-text">${escapeHtml(t('dishImageError'))}</p><a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a>`;
+    const link = body.querySelector('.dish-image-google-link');
+    if (link) link.addEventListener('click', () => tracker.increment('dish_image_tab'));
+}
+
+function renderDishImageCarousel(query, result) {
+    const body = document.getElementById('dish-image-body');
+    if (!body) return;
+    stopDishImageAdvance();
+
+    const sourceLabel = t(result.source === 'openverse' ? 'dishImageSourceOpenverse' : 'dishImageSourceGoogle');
+    const slidesHtml = result.images.map(img => {
+        const attribution = escapeHtml([img.creator, img.license].filter(Boolean).join(' — '));
+        return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;
+    }).join('');
+
+    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${escapeHtml(t('dishImagePrev'))}" title="${escapeHtml(t('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${escapeHtml(t('dishImageNext'))}" title="${escapeHtml(t('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption">${escapeHtml(sourceLabel)} — ${escapeHtml(query)} <a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a></p>`;
+
+    const carousel = body.querySelector('.dish-image-carousel');
+    const dotsEl = carousel.querySelector('.dish-image-dots');
+    dotsEl.innerHTML = Array.from(carousel.querySelectorAll('.dish-image-slide'), (_, i) => `<button type="button" class="dish-image-dot" data-slide="${i}" aria-label="${i + 1}"></button>`).join('');
+
+    carousel.querySelector('.dish-image-prev').addEventListener('click', () => showDishImageSlide(dishImageCarouselIndex - 1));
+    carousel.querySelector('.dish-image-next').addEventListener('click', () => showDishImageSlide(dishImageCarouselIndex + 1));
+    dotsEl.addEventListener('click', (e) => {
+        const dot = e.target.closest('.dish-image-dot');
+        if (dot) showDishImageSlide(parseInt(dot.dataset.slide, 10));
+    });
+    body.querySelector('.dish-image-google-link').addEventListener('click', () => tracker.increment('dish_image_tab'));
+
+    // Failed image: drop its slide, re-sync dots, advance; all failed → error state.
+    carousel.querySelectorAll('.dish-image-slide img').forEach(img => {
+        img.addEventListener('error', () => {
+            const slide = img.closest('.dish-image-slide');
+            if (slide) slide.remove();
+            if (carousel.querySelectorAll('.dish-image-slide').length === 0) {
+                renderDishImageError(query);
+                return;
+            }
+            dotsEl.innerHTML = Array.from(carousel.querySelectorAll('.dish-image-slide'), (_, i) => `<button type="button" class="dish-image-dot" data-slide="${i}" aria-label="${i + 1}"></button>`).join('');
+            showDishImageSlide(dishImageCarouselIndex);
+        });
+    });
+
+    // Pause auto-advance while the pointer or keyboard focus rests on the carousel.
+    carousel.addEventListener('mouseenter', stopDishImageAdvance);
+    carousel.addEventListener('mouseleave', startDishImageAdvance);
+    carousel.addEventListener('focusin', stopDishImageAdvance);
+    carousel.addEventListener('focusout', (e) => {
+        if (!carousel.contains(e.relatedTarget)) startDishImageAdvance();
+    });
+
+    showDishImageSlide(0);
+    startDishImageAdvance();
+}
+
+/**
+ * Closes the popup: clears the interval, hides the modal, resets state and
+ * returns focus to the trigger link. Safe no-op when already closed.
+ */
+export function closeDishImageModal() {
+    const modal = document.getElementById('dish-image-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    stopDishImageAdvance();
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+    dishImageModalOpen = false;
+    dishImageCurrentQuery = null;
+    dishImageCarouselIndex = 0;
+    const trigger = dishImageTriggerLink;
+    dishImageTriggerLink = null;
+    if (trigger && trigger.isConnected) trigger.focus();
 }
 
 /**
@@ -496,7 +636,7 @@ export function createDayCard(day) {
                 clearTimeout(dwellTimer);
                 dwellTimer = setTimeout(() => {
                     dwellTimer = null;
-                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery);
+                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink);
                 }, DISH_IMAGE_HOVER_MS);
             });
             const cancelDishDwell = () => {

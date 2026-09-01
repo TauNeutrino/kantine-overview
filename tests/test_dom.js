@@ -37,6 +37,19 @@ const html = `
         <form id="login-form"></form>
         <div id="login-error" class="hidden"></div>
     </div>
+
+    <!-- Mocks for Dish Image Modal -->
+    <div id="dish-image-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dish-image-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="dish-image-title"></h2>
+                <button id="btn-dish-image-close" class="icon-btn" aria-label="Close" title="Schließen">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="modal-body" id="dish-image-body"></div>
+        </div>
+    </div>
     
     <!-- Mocks for History Modal -->
     <button id="btn-history">History</button>
@@ -84,7 +97,8 @@ log("Reading file jsCode...");
 const jsCode = fs.readFileSync('dist/kantine.bundle.js', 'utf8')
     .replace('if (window.__KANTINE_LOADED) {', 'if (false) {')
     .replace('window.location.reload();', 'window.__RELOAD_CALLED = true;')
-    .replace('function createDayCard(day) {', 'window.createDayCard = function(day) {');
+    .replace('function createDayCard(day) {', 'window.createDayCard = function(day) {')
+    .replace('function closeDishImageModal() {', 'window.openDishImageModal = openDishImageModal; window.closeDishImageModal = closeDishImageModal;\nfunction closeDishImageModal() {');
 
 log("Instantiating JSDOM...");
 const { VirtualConsole } = require('jsdom');
@@ -412,6 +426,41 @@ function stopTimerSpy() {
     w.setTimeout = realSetTimeout;
 }
 
+// === Dish Image Modal (Todo 6) helpers ===
+const CAROUSEL_MS = 3000;
+const realSetInterval = w.setInterval;
+const defaultFetch = w.fetch;
+let intervalCalls = [];
+function spyIntervals() {
+    intervalCalls = [];
+    w.setInterval = function (fn, ms, ...args) {
+        intervalCalls.push(ms);
+        return realSetInterval.call(w, fn, ms, ...args);
+    };
+}
+function restoreIntervals() {
+    w.setInterval = realSetInterval;
+}
+function clearDishCache() {
+    w.localStorage.removeItem('kantine_dishImageCache');
+}
+const IMG0 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:modalCase0&sig=A';
+const IMG1 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:modalCase1&sig=B';
+function mockGoogleFetch(thumbUrls) {
+    const html = thumbUrls.map((u) => `<img src="${u.replace(/&/g, '&amp;')}">`).join('');
+    w.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve(html) });
+}
+function mockFetchFailure() {
+    w.fetch = () => Promise.resolve({ ok: false, text: () => Promise.resolve(''), json: () => Promise.resolve({}) });
+}
+function setReducedMotion(on) {
+    w.matchMedia = (q) => ({
+        matches: on && q === '(prefers-reduced-motion: reduce)',
+        addListener: () => { }, removeListener: () => { },
+        addEventListener: () => { }, removeEventListener: () => { }
+    });
+}
+
 async function runDishImageTests() {
     // Deterministic language: the Feature-4 test above toggled the UI to EN
     d.querySelector('.lang-btn[data-lang="de"]').click();
@@ -508,6 +557,137 @@ async function runDishImageTests() {
         if (modal && !modal.classList.contains('hidden')) throw new Error('(f) no dish-image modal may be visible after cleared dwell');
         card.remove();
         console.log('OK (f) dwell timer cleared by pointerleave before popup');
+    }
+
+    // === Dish Image Modal cases (Todo 6) ===
+    const dishModal = d.getElementById('dish-image-modal');
+    const dishBody = d.getElementById('dish-image-body');
+
+    // (a) open → visible, 3 skeleton blocks, DE title, aria-hidden false
+    {
+        clearDishCache();
+        w.openDishImageModal('Lasagne Mod A');
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(a) modal must be visible after open');
+        if (dishModal.getAttribute('aria-hidden') !== 'false') throw new Error('modal(a) aria-hidden must be false when open');
+        if (dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length !== 3) throw new Error('modal(a) expected 3 skeleton blocks, got ' + dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length);
+        if (d.getElementById('dish-image-title').textContent !== 'Gerichtsbilder') throw new Error("modal(a) title must be t('dishImageModalTitle'), got: " + d.getElementById('dish-image-title').textContent);
+        w.closeDishImageModal();
+        console.log('OK modal(a) open renders skeleton + title + aria-hidden=false');
+    }
+
+    // (b) fetch resolves with images → first slide is images[0], caption carries source + query
+    {
+        clearDishCache();
+        mockGoogleFetch([IMG0, IMG1]);
+        w.openDishImageModal('Lasagne Mod B');
+        await sleep(150);
+        const img = dishBody.querySelector('.dish-image-slide img');
+        if (!img) throw new Error('modal(b) no carousel image rendered');
+        if (img.src !== IMG0) throw new Error('modal(b) first slide must be images[0].url, got ' + img.src);
+        if (img.getAttribute('loading') !== 'lazy') throw new Error('modal(b) images must be lazy-loaded');
+        if (img.getAttribute('referrerpolicy') !== 'no-referrer') throw new Error('modal(b) images need referrerpolicy=no-referrer');
+        const caption = dishBody.querySelector('.dish-image-caption');
+        if (!caption) throw new Error('modal(b) caption missing');
+        if (!caption.textContent.includes('Quelle: Google Bildersuche')) throw new Error('modal(b) caption must name the source, got: ' + caption.textContent);
+        if (!caption.textContent.includes('Lasagne Mod B')) throw new Error('modal(b) caption must contain the query');
+        console.log('OK modal(b) carousel shows images[0] + source caption');
+    }
+
+    // (c) close button click → .hidden + aria-hidden=true (also stops the interval)
+    {
+        d.getElementById('btn-dish-image-close').click();
+        if (!dishModal.classList.contains('hidden')) throw new Error('modal(c) close button must hide the modal');
+        if (dishModal.getAttribute('aria-hidden') !== 'true') throw new Error('modal(c) aria-hidden must be true after close');
+        w.fetch = defaultFetch;
+        console.log('OK modal(c) close button hides modal + aria-hidden=true');
+    }
+
+    // (d) ESC keydown (document, bubbles to window) → .hidden
+    {
+        w.openDishImageModal('Lasagne Mod D');
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(d) fixture: modal should be open before ESC');
+        d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        if (!dishModal.classList.contains('hidden')) throw new Error('modal(d) ESC must close the popup');
+        console.log('OK modal(d) ESC keydown closes modal');
+    }
+
+    // (e) backdrop click (e.target === modal element) → .hidden
+    {
+        w.openDishImageModal('Lasagne Mod E');
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(e) fixture: modal should be open before backdrop click');
+        dishModal.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+        if (!dishModal.classList.contains('hidden')) throw new Error('modal(e) backdrop click must close the popup');
+        console.log('OK modal(e) backdrop click closes modal');
+    }
+
+    // (f) total fetch failure → error state with encoded Google link (counts dish_image_tab)
+    {
+        clearDishCache();
+        mockFetchFailure();
+        const before = readDishTabCount();
+        w.openDishImageModal('Schnitzel Mod F');
+        await sleep(150);
+        if (!dishBody.querySelector('.dish-image-error-text')) throw new Error('modal(f) error text missing after total failure');
+        const link = dishBody.querySelector('.dish-image-google-link');
+        if (!link) throw new Error('modal(f) Google fallback link missing');
+        const href = link.getAttribute('href');
+        if (!href.includes('udm=2')) throw new Error('modal(f) link must open the Google image tab, got: ' + href);
+        if (!href.includes(encodeURIComponent('Schnitzel Mod F'))) throw new Error('modal(f) link must carry the encoded query, got: ' + href);
+        link.click();
+        if (readDishTabCount() !== before + 1) throw new Error('modal(f) link click must increment dish_image_tab');
+        w.closeDishImageModal();
+        w.fetch = defaultFetch;
+        console.log('OK modal(f) total failure shows error state with Google link');
+    }
+
+    // (g) prefers-reduced-motion → NO auto-advance interval; motion allowed → interval starts
+    {
+        clearDishCache();
+        setReducedMotion(true);
+        mockGoogleFetch([IMG0, IMG1]);
+        spyIntervals();
+        w.openDishImageModal('Lasagne Mod G');
+        await sleep(150);
+        restoreIntervals();
+        if (!dishBody.querySelector('.dish-image-slide')) throw new Error('modal(g) carousel must still render under reduced motion');
+        if (intervalCalls.includes(CAROUSEL_MS)) throw new Error('modal(g) reduced motion must NOT start the 3000 ms auto-advance interval');
+        w.closeDishImageModal();
+        clearDishCache();
+        setReducedMotion(false);
+        spyIntervals();
+        w.openDishImageModal('Lasagne Mod G2');
+        await sleep(150);
+        restoreIntervals();
+        if (!intervalCalls.includes(CAROUSEL_MS)) throw new Error('modal(g) normal motion must start the 3000 ms auto-advance interval');
+        w.closeDishImageModal();
+        w.fetch = defaultFetch;
+        console.log('OK modal(g) auto-advance interval gated on prefers-reduced-motion');
+    }
+
+    // (h) aria-hidden toggles false on open / true on close
+    {
+        w.openDishImageModal('Lasagne Mod H');
+        if (dishModal.getAttribute('aria-hidden') !== 'false') throw new Error('modal(h) aria-hidden must be false while open');
+        w.closeDishImageModal();
+        if (dishModal.getAttribute('aria-hidden') !== 'true') throw new Error('modal(h) aria-hidden must be true after close');
+        console.log('OK modal(h) aria-hidden toggles false/true on open/close');
+    }
+
+    // (i) renderVisibleWeeks re-render while open → modal stays open (lives outside #menu-container)
+    {
+        clearDishCache();
+        mockGoogleFetch([IMG0, IMG1]);
+        w.openDishImageModal('Lasagne Mod I');
+        await sleep(150);
+        d.getElementById('btn-lang-toggle').click();
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(i) re-render must not close the open popup');
+        if (!dishBody.querySelector('.dish-image-slide')) throw new Error('modal(i) carousel content must survive the re-render');
+        if (d.getElementById('dish-image-title').textContent !== 'Dish images') throw new Error('modal(i) updateUILanguage must re-title the modal, got: ' + d.getElementById('dish-image-title').textContent);
+        d.getElementById('btn-lang-toggle').click();
+        d.getElementById('btn-lang-toggle').click();
+        w.closeDishImageModal();
+        w.fetch = defaultFetch;
+        console.log('OK modal(i) modal survives renderVisibleWeeks re-render');
     }
 
     w.matchMedia = realMatchMedia;

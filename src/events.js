@@ -1,6 +1,6 @@
 import { displayMode, authToken, userFlags, langMode, setLangMode, setDisplayMode, setAuthToken, setCurrentUser, setOrderMap } from './state.js';
 import { updateAuthUI, loadMenuDataFromAPI, fetchOrders, startPolling, stopPolling, fetchFullOrderHistory, addHighlightTag, renderTagsList, refreshFlaggedItems } from './actions.js';
-import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights, checkBootloaderVersion } from './ui_helpers.js';
+import { renderVisibleWeeks, openVersionMenu, updateNextWeekBadge, updateAlarmBell, syncMenuItemHeights, checkBootloaderVersion, closeDishImageModal } from './ui_helpers.js';
 import { API_BASE, LS } from './constants.js';
 import { tracker } from './stats-tracker.js';
 import { apiHeaders } from './api.js';
@@ -88,6 +88,9 @@ function updateUILanguage() {
 
     const loginHeader = document.querySelector('#login-modal .modal-header h2');
     if (loginHeader) loginHeader.textContent = t('loginTitle');
+
+    const dishImageHeader = document.querySelector('#dish-image-modal .modal-header h2');
+    if (dishImageHeader) dishImageHeader.textContent = t('dishImageModalTitle');
 
     // Alarm bell
     const alarmBell = document.getElementById('alarm-bell');
@@ -211,6 +214,19 @@ export function bindEvents() {
 
     window.addEventListener('click', (e) => {
         if (e.target === versionModal) versionModal.classList.add('hidden');
+    });
+
+    // Dish-image carousel popup (FR-125): X button, backdrop click and ESC all close it.
+    const dishImageModal = document.getElementById('dish-image-modal');
+    const btnDishImageClose = document.getElementById('btn-dish-image-close');
+    if (btnDishImageClose) {
+        btnDishImageClose.addEventListener('click', () => closeDishImageModal());
+    }
+    window.addEventListener('click', (e) => {
+        if (dishImageModal && e.target === dishImageModal) closeDishImageModal();
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDishImageModal();
     });
 
     btnAddTag.addEventListener('click', () => {

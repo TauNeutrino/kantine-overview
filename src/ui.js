@@ -122,6 +122,18 @@ export function injectUI() {
             </div>
         </div>
 
+        <div id="dish-image-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dish-image-title" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="dish-image-title"></h2>
+                    <button id="btn-dish-image-close" class="icon-btn" aria-label="Close" title="Schließen">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="dish-image-body"></div>
+            </div>
+        </div>
+
         <div id="progress-modal" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
