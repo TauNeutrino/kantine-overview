@@ -16,47 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
-## [2.1.7] - 2026-09-02
+## [2.2.0] - 2026-09-02
 
-### Changed
+### Added
 
-- **Eigene Cloudflare-Worker-Quelle vorbereitet**: Neuer Worker (`cloudflare-worker/`, serverseitiger Google-Bildersuche-Scrape) ist als schnellste Stufe der Bildkette vorverdrahtet. Aktivierung nach dem Worker-Deploy durch das CI-Secret `DISH_IMAGE_WORKER_URL` (siehe `cloudflare-worker/README.md`); ohne Secret bleibt die Stufe deaktiviert und die Kette unverändert.
-
-## [2.1.11] - 2026-09-02
+- **Bildvorschau für Gerichte (Hover-Popover)**: Bei sicher erkannten Hauptgerichten ist der Gerichtsname ein unterstrichener Link im Speiseplan. Hover ≥ 0,5 s öffnet eine schlanke Bild-Karte (~480 px) neben dem Link mit bis zu 5 Rezeptfotos als automatisch wechselndes Karussell; die Bildunterschrift zeigt pro Bild Rezeptname und Quelle. Die Karte verschwindet, sobald die Maus Link und Karte verlässt (X und ESC funktionieren weiterhin). Klick auf den Gerichtsnamen öffnet jederzeit die Google-Bildersuche im neuen Tab.
+- **Rezeptfotos von Chefkoch, Kochbar & Eatsmarter**: Die Bildersuche läuft über den eigenen Cloudflare-Worker (serverseitig — ohne öffentliche Proxys und ohne API-Keys; der Worker ist per GitHub-Anbindung automatisch aktuell). Deutsche Rezeptseiten werden immer mit dem **deutschen** Gerichtsnamen gesucht; ein Relevanz-Score (Token-Überlappung zwischen Suchbegriff und Rezeptname) sortiert die besten Treffer zuerst, und alle Quellen kommen im Karussell verteilt zum Zug.
+- **Weitere Quellen als Fallback**: Wikipedia-Artikelbild, Wikimedia-Commons-Suche und Openverse — direkt per CORS, ohne Proxy.
+- **Selbstreinigender Bildcache**: Einträge laufen nach 7 Tagen ab, werden nie mehr ausgeliefert und automatisch aus dem localStorage entfernt (max. 50 Einträge, älteste werden beim Schreiben verdrängt).
+- **Console-Diagnose**: Jeder Bildersuche-Schritt ist unter `[Kantine] Bildersuche:` nachvollziehbar (Quelle, Status, Dauer, Treffer).
 
 ### Removed
 
-- **Google-Programmable-Search-Overlay entfernt**: Das Experiment mit dem eingebetteten Google-Widget ist raus — das Popover zeigt wieder ausschließlich die schlanke native Ansicht (Chefkoch-Rezeptfotos über den Worker, sonst Wikipedia/Commons/Openverse) und schließt wie gewohnt automatisch, sobald die Maus das Popover verlässt.
-
-## [2.1.10] - 2026-09-02
-
-### Changed
-
-- **Chefkoch-Rezeptfotos als Primärquelle**: Der eigene Cloudflare-Worker (`kantine-dish-images.kaufi-at.workers.dev`) scrapt die Chefkoch-Rezeptssuche serverseitig und liefert exakte Gerichts-Treffer (echte Rezeptfotos). Kette jetzt: Chefkoch → Wikipedia → Commons → Openverse.
-- **Google-Proxy-Stage entfernt**: Die 4 öffentlichen CORS-Proxys lieferten nur Timeouts, Anti-Bot-Seiten oder JS-Shells (Google/Bing/DDG blocken serverseitiges Bilder-Scraping wirksam) — die tote Stage ist raus, Failures werden jetzt in ~1-2 s statt 30 s erreicht. Der Klick auf einen Gerichtslink öffnet weiterhin die Google-Bildersuche im neuen Tab.
-
-## [2.1.12] - 2026-09-02
-
-### Changed
-
-- **Deutsche Suche für deutsche Rezeptseiten**: Der Worker durchsucht chefkoch.de immer mit dem **deutschen** Gerichtsnamen (neuer `qde`-Parameter aus der Sprach-Split-Maschinerie) — englische Suchbegriffe lieferten auf chefkoch.de falsche Treffer.
-- **Relevanz-Score**: Rezeptfotos erhalten einen Score (Token-Überlappung zwischen Suchbegriffen und Rezeptnamen, z. B. „Kartoffelgulasch" + „mit" im Slug) und werden absteigend danach sortiert — der beste Treffer steht zuerst.
-- **Bildunterschrift pro Bild**: Die Caption im Popover aktualisiert sich beim Bildwechsel und zeigt Rezeptname bzw. Artikel-Titel des aktuell angezeigten Bildes (z. B. „Quelle: Chefkoch — Kartoffelgulasch mit Fisolen").
-
-## [2.1.13] - 2026-09-02
-
-### Changed
-
-- **Bildcache räumt sich selbst auf**: Abgelaufene Einträge (älter als 7 Tage) werden jetzt bei **jedem** Bildersuche-Zugriff automatisch aus dem localStorage entfernt — auch wenn die Suche selbst nichts findet oder das Popover sofort wieder geschlossen wird. Zusätzlich bleiben die bestehenden Regeln aktiv: frische Einträge werden 7 Tage serviert, maximum 50 Einträge (älteste werden beim Schreiben verdrängt).
-
-## [2.1.4] - 2026-09-02
-
-### Changed
-
-- **Bildvorschau als schwebendes Hover-Popover**: Das Popup ist kein ausgewachsenes Modal mehr, sondern ein kleiner Card-Popover (~480 px), der beim Daraufzeigen neben dem Gerichts-Link positioniert wird und automatisch verschwindet, sobald der Zeiger Link und Popover verlässt (X-Button und ESC funktionieren weiterhin).
-- **Neue Bildquellen ohne Proxy**: Die Kette ist jetzt Wikipedia (Artikelbild) → Wikimedia Commons (Bildersuche) → Google über Proxy-Kette (jetzt parallel statt sequenziell — Worst Case 30 s → 10 s) → Openverse. Wikipedia/Commons werden direkt per CORS gefetcht und umgehen die oft überlasteten/erreichbaren Public-Proxys komplett.
-- **Suche bricht beim Schließen ab**: Wird das Popover geschlossen, bricht ein AbortSignal alle laufenden Quellen-Anfragen ab — keine verspäteten Log-Meldungen mehr.
-- **Query-Sanitizer geschärft**: Kleinbuchstaben-Allergencodes `(lm)`, kompakte Gruppen `(AFO)` und führende Aufzählungszeichen (`•`) werden entfernt — die Suchbegriffe sind sauber (v2.1.3 lieferte zusätzlich Console-Diagnose für jeden Kettenschritt).
+- **Suchmaschinen-Bilderscraping verworfen**: Google, Bing, DuckDuckGo und Yandex blocken serverseitiges Bilder-Scraping wirksam (JS-Shells, 403er, irrelevante Junk-Ergebnisse) — die öffentliche Proxy-Kette dafür wurde ersatzlos entfernt. Auch das Experiment mit dem eingebetteten Google-Programmable-Search-Widget ist raus.
 
 ## [2.1.2] - 2026-09-01
 
