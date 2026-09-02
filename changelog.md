@@ -35,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chefkoch-Rezeptfotos als Primärquelle**: Der eigene Cloudflare-Worker (`kantine-dish-images.kaufi-at.workers.dev`) scrapt die Chefkoch-Rezeptssuche serverseitig und liefert exakte Gerichts-Treffer (echte Rezeptfotos). Kette jetzt: Chefkoch → Wikipedia → Commons → Openverse.
 - **Google-Proxy-Stage entfernt**: Die 4 öffentlichen CORS-Proxys lieferten nur Timeouts, Anti-Bot-Seiten oder JS-Shells (Google/Bing/DDG blocken serverseitiges Bilder-Scraping wirksam) — die tote Stage ist raus, Failures werden jetzt in ~1-2 s statt 30 s erreicht. Der Klick auf einen Gerichtslink öffnet weiterhin die Google-Bildersuche im neuen Tab.
 
+## [2.1.12] - 2026-09-02
+
+### Changed
+
+- **Deutsche Suche für deutsche Rezeptseiten**: Der Worker durchsucht chefkoch.de immer mit dem **deutschen** Gerichtsnamen (neuer `qde`-Parameter aus der Sprach-Split-Maschinerie) — englische Suchbegriffe lieferten auf chefkoch.de falsche Treffer.
+- **Relevanz-Score**: Rezeptfotos erhalten einen Score (Token-Überlappung zwischen Suchbegriffen und Rezeptnamen, z. B. „Kartoffelgulasch" + „mit" im Slug) und werden absteigend danach sortiert — der beste Treffer steht zuerst.
+- **Bildunterschrift pro Bild**: Die Caption im Popover aktualisiert sich beim Bildwechsel und zeigt Rezeptname bzw. Artikel-Titel des aktuell angezeigten Bildes (z. B. „Quelle: Chefkoch — Kartoffelgulasch mit Fisolen").
+
 ## [2.1.4] - 2026-09-02
 
 ### Changed

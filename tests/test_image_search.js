@@ -274,16 +274,30 @@ async function runClientTests() {
     resetSandboxState();
     sandbox.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
     planFetch([
-        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'Wiener Schnitzel', engine: 'chefkoch', count: 1, images: [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de' }] } }] },
+        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'Wiener Schnitzel', engine: 'chefkoch', count: 1, images: [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de', title: 'Wiener Schnitzel Original', score: 3 }] } }] },
         { match: WIKI_MATCH, steps: [{ reject: 'wikipedia must not be reached' }] }
     ]);
     const resultWorker = await fetchDishImages('Wiener Schnitzel');
     assertEquals(resultWorker.source, 'chefkoch', "worker images should report chefkoch source");
-    assertDeepEqual(resultWorker.images, [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de' }], "worker images pass through");
+    assertDeepEqual(resultWorker.images, [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de', title: 'Wiener Schnitzel Original', score: 3 }], "worker images pass through with title and relevance score");
     assertEquals(fetchCallsFor('workers.dev'), 1, "worker stage fires first");
     assertEquals(fetchCallsFor(WIKI_MATCH), 0, "worker hit must short-circuit wikipedia and everything after");
     sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
     ok("fetchDishImages: configured worker delivers chefkoch recipe photos as stage 0 (chain short-circuits)");
+
+    // Case 13e2: German dish name propagates as qde (german recipe sites search german)
+    resetSandboxState();
+    sandbox.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
+    planFetch([
+        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'roast pork', searchQuery: 'Schweinebraten', engine: 'chefkoch', count: 0, images: [] } }] },
+        { match: WIKI_MATCH, steps: [{ ok: true, json: { title: 'Roast pork', thumbnail: { source: THUMB_C } } }] }
+    ]);
+    await fetchDishImages('roast pork with dumplings', 'en', null, 'Schweinebraten');
+    const workerCall = fetchLog.find(call => call.url.includes('workers.dev'));
+    assertEquals(decodeURIComponent(workerCall.url).includes('qde=Schweinebraten'), true, "the german dish name must be passed as qde parameter");
+    assertEquals(decodeURIComponent(workerCall.url).includes('q=roast pork with dumplings'), true, "the display query stays in q");
+    sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
+    ok("fetchDishImages: german dish name propagates to the worker via qde (display query stays in q)");
 
     // Case 13f: worker failure falls through to wikipedia
     resetSandboxState();

@@ -74,9 +74,10 @@ function queryCandidates(query) {
  * @param {string} query Sanitized dish query
  * @param {'de'|'en'} [lang] Query language hint passed through to the worker (defaults to 'de')
  * @param {AbortSignal} [cancelSignal] Aborts the search when the popup closes
+ * @param {string} [queryDe] German dish name — German recipe sites always search German
  * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
  */
-export async function fetchDishImages(query, lang, cancelSignal) {
+export async function fetchDishImages(query, lang, cancelSignal, queryDe) {
     if (cancelSignal && cancelSignal.aborted) return { images: [], source: null }
     const key = query.trim().replace(/\s+/g, ' ').toLowerCase()
     const note = (level, message) => {
@@ -107,7 +108,9 @@ export async function fetchDishImages(query, lang, cancelSignal) {
     const workerBase = /^https:\/\//.test(DISH_IMAGE_WORKER_URL) ? DISH_IMAGE_WORKER_URL.replace(/\/+$/, '') : ''
     if (workerBase) {
         try {
-            const response = await fetch(`${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}`, { signal: attemptSignal() })
+            const workerUrl = `${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}` +
+                (queryDe ? `&qde=${encodeURIComponent(queryDe)}` : '')
+            const response = await fetch(workerUrl, { signal: attemptSignal() })
             if (response.ok) {
                 const data = await response.json()
                 const images = (data.images || [])

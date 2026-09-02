@@ -26,6 +26,7 @@ function isDishImageModalClosed() {
 let dishImageModalOpen = false;
 let dishImageCurrentQuery = null;
 let dishImageCarouselIndex = 0;
+let dishImageCaptionPrefix = '';
 let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
@@ -75,6 +76,12 @@ function showDishImageSlide(index) {
     dishImageCarouselIndex = ((index % slides.length) + slides.length) % slides.length;
     slides.forEach((slide, i) => slide.classList.toggle('active', i === dishImageCarouselIndex));
     Array.from(carousel.querySelectorAll('.dish-image-dot')).forEach((dot, i) => dot.classList.toggle('active', i === dishImageCarouselIndex));
+    const captionText = document.getElementById('dish-image-caption-text');
+    const activeImg = slides[dishImageCarouselIndex].querySelector('img');
+    if (captionText && activeImg) {
+        const label = (activeImg.dataset && activeImg.dataset.title) ? activeImg.dataset.title : dishImageCurrentQuery;
+        captionText.textContent = `${dishImageCaptionPrefix} — ${label}`;
+    }
 }
 
 /**
@@ -83,7 +90,7 @@ function showDishImageSlide(index) {
  * @param {string} query Sanitized dish query
  * @param {HTMLElement} [linkEl] Triggering anchor — the popover is positioned next to it
  */
-export function openDishImageModal(query, linkEl) {
+export function openDishImageModal(query, linkEl, queryDe) {
     const popover = document.getElementById('dish-image-popover');
     if (!popover) return;
     if (dishImageSearchAbort) dishImageSearchAbort.abort();
@@ -112,7 +119,7 @@ export function openDishImageModal(query, linkEl) {
     document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
     tracker.increment('dish_image_popup');
 
-    fetchDishImages(query, undefined, dishImageSearchAbort.signal).then(result => {
+    fetchDishImages(query, undefined, dishImageSearchAbort.signal, queryDe).then(result => {
         // Stale-response guard: ignore results after query change or close.
         if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
         if (result.source === null) renderDishImageError(query, false);
@@ -138,10 +145,12 @@ function renderDishImageCarousel(query, result) {
     const sourceLabel = t({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = escapeHtml([img.creator, img.license].filter(Boolean).join(' — '));
-        return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;
+        const slideTitle = escapeHtml(img.title || img.creator || '');
+        return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}" data-title="${slideTitle}"></div>`;
     }).join('');
 
-    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${escapeHtml(t('dishImagePrev'))}" title="${escapeHtml(t('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${escapeHtml(t('dishImageNext'))}" title="${escapeHtml(t('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption">${escapeHtml(sourceLabel)} — ${escapeHtml(query)} <a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a></p>`;
+    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${escapeHtml(t('dishImagePrev'))}" title="${escapeHtml(t('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${escapeHtml(t('dishImageNext'))}" title="${escapeHtml(t('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption"><span id="dish-image-caption-text">${escapeHtml(sourceLabel)} — ${escapeHtml(query)}</span> <a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a></p>`;
+    dishImageCaptionPrefix = sourceLabel;
 
     const carousel = body.querySelector('.dish-image-carousel');
     const dotsEl = carousel.querySelector('.dish-image-dots');
@@ -606,7 +615,9 @@ export function createDayCard(day) {
 
         const localized = getLocalizedText(item.description, split);
         const mainCourse = getMainCourseLine(split, langMode);
+        const mainCourseDe = getMainCourseLine(split, 'de');
         const dishQuery = mainCourse ? sanitizeDishQuery(mainCourse.text) : null;
+        const dishQueryDe = mainCourseDe ? sanitizeDishQuery(mainCourseDe.text) : dishQuery;
         let descHtml = escapeHtml(localized);
         if (dishQuery !== null) {
             const rawLines = localized.split('\n');
@@ -618,7 +629,7 @@ export function createDayCard(day) {
                     const isMain = seen === mainIdx;
                     seen++;
                     if (isMain) {
-                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${escapeHtml(dishQuery)}" title="${escapeHtml(t('dishImageLinkTooltip'))}">${escapeHtml(mainCourse.text)}</a>`;
+                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${escapeHtml(dishQuery)}" data-dish-query-de="${escapeHtml(dishQueryDe || dishQuery)}" title="${escapeHtml(t('dishImageLinkTooltip'))}">${escapeHtml(mainCourse.text)}</a>`;
                     }
                 }
                 return escapeHtml(line);
@@ -662,6 +673,7 @@ export function createDayCard(day) {
         const dishLink = itemEl.querySelector('.dish-image-link');
         if (dishLink) {
             const linkQuery = dishLink.dataset.dishQuery;
+            const linkQueryDe = dishLink.dataset.dishQueryDe || linkQuery;
             dishLink.addEventListener('click', (e) => {
                 e.stopPropagation();
                 tracker.increment('dish_image_tab');
@@ -675,7 +687,7 @@ export function createDayCard(day) {
                 clearTimeout(dwellTimer);
                 dwellTimer = setTimeout(() => {
                     dwellTimer = null;
-                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink);
+                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink, linkQueryDe);
                 }, DISH_IMAGE_HOVER_MS);
             });
             const cancelDishDwell = () => {
