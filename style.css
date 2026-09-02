@@ -1211,6 +1211,19 @@ body {
     margin-bottom: 12px;
 }
 
+/* CSE mode: let the embedded Google results blend into the popover */
+.dish-image-popover .gsc-control-cse,
+.dish-image-popover .gsc-control-cse .gsc-table-result {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.dish-image-popover iframe {
+    width: 100%;
+    border: none;
+}
+
 .badges {
     display: flex;
     gap: 0.5rem;

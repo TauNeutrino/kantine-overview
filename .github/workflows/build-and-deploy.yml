@@ -21,6 +21,7 @@ jobs:
       GIST_SALT: ${{ secrets.GIST_SALT }}
       CORSPROXY_KEY: ${{ secrets.CORSPROXY_KEY }}
       DISH_IMAGE_WORKER_URL: ${{ secrets.DISH_IMAGE_WORKER_URL }}
+      DISH_IMAGE_CSE_ID: ${{ secrets.DISH_IMAGE_CSE_ID }}
     steps:
       - uses: actions/checkout@v7
         with:
