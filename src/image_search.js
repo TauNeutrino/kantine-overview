@@ -121,11 +121,9 @@ export async function fetchDishImages(query, lang, cancelSignal) {
     let result = null
 
     // Stage 0: own Cloudflare Worker (server-side Google scrape — exact dish
-    // coverage without public proxies). Skipped when no worker URL is
-    // configured (empty string or unreplaced placeholder in local builds).
-    const workerBase = DISH_IMAGE_WORKER_URL && !DISH_IMAGE_WORKER_URL.includes('{{')
-        ? DISH_IMAGE_WORKER_URL.replace(/\/+$/, '')
-        : ''
+    // coverage without public proxies). Active only for a properly configured
+    // https URL; empty string or unreplaced placeholder disables the stage.
+    const workerBase = /^https:\/\//.test(DISH_IMAGE_WORKER_URL) ? DISH_IMAGE_WORKER_URL.replace(/\/+$/, '') : ''
     if (workerBase) {
         try {
             const response = await fetch(`${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}`, { signal: attemptSignal() })
