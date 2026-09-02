@@ -71,18 +71,20 @@ const sandbox = {
 
 function planFetch(routes) {
     fetchLog = [];
-    // Merge duplicate matches into one route (a second route with the same
-    // match would be unreachable — find() always returns the first).
+    // Clone steps (shift() would otherwise mutate the shared helper objects
+    // across cases) and merge duplicate matches into one route (a second
+    // route with the same match would be unreachable — find() takes the first).
     fetchRoutes = routes.reduce((acc, route) => {
+        const steps = route.steps.map(step => ({ ...step }));
         const existing = acc.find(r => r.match === route.match);
-        if (existing) existing.steps.push(...route.steps);
-        else acc.push(route);
+        if (existing) existing.steps.push(...steps);
+        else acc.push({ match: route.match, steps });
         return acc;
     }, []);
 }
 
-const wikiMiss = { match: WIKI_MATCH, steps: [{ ok: false, status: 404 }] };
-const commonsEmpty = { match: COMMONS_MATCH, steps: [{ ok: true, json: { query: { pages: {} } } }] };
+const wikiMiss = { match: WIKI_MATCH, steps: [{ ok: false, status: 404 }, { ok: false, status: 404 }, { ok: false, status: 404 }] };
+const commonsEmpty = { match: COMMONS_MATCH, steps: [{ ok: true, json: { query: { pages: {} } } }, { ok: true, json: { query: { pages: {} } } }, { ok: true, json: { query: { pages: {} } } }] };
 const wikiHit = (title, thumb) => ({ match: WIKI_MATCH, steps: [{ ok: true, json: { title, thumbnail: { source: thumb } } }] });
 const fetchCallsFor = (match) => fetchLog.filter(call => call.url.includes(match)).length;
 
@@ -273,7 +275,7 @@ async function runClientTests() {
         { url: THUMB_A_DECODED, license: '', creator: '' },
         { url: THUMB_B, license: '', creator: '' }
     ], "deduped, entity-decoded gstatic URLs in HTML order");
-    assertEquals(fetchLog.length, 6, "wikipedia miss + commons empty + 4 PARALLEL proxies = 6 fetch calls");
+    assertEquals(fetchLog.length, 8, "wikipedia 2x + commons 2x (2-word query) + 4 PARALLEL proxies = 8 fetch calls");
     assertEquals(fetchCallsFor(RAW_MATCH), 1, "allorigins-raw must be attempted");
     assertEquals(fetchCallsFor(GET_MATCH), 1, "allorigins-get must fire in parallel even though raw already failed");
     assertEquals(fetchCallsFor(CORSPROXY_MATCH), 1, "corsproxy-io must fire in parallel");
@@ -327,6 +329,25 @@ async function runClientTests() {
     assertEquals(fetchLog.length, 1, "Wikipedia hit must skip commons, proxies and openverse");
     ok("fetchDishImages: Wikipedia article image short-circuits the chain (1 fetch, no proxy traffic)");
 
+    // Case 13d: progressive query shortening — full dish name 404s, the
+    // leading dish word hits the Wikipedia article
+    resetSandboxState();
+    planFetch([
+        { match: WIKI_MATCH, steps: [
+            { ok: false, status: 404 },
+            { ok: false, status: 404 },
+            { ok: true, json: { title: 'Kartoffelgulasch', thumbnail: { source: THUMB_C } } }
+        ] },
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ reject: 'must not be reached' }] }
+    ]);
+    const resultProgressive = await fetchDishImages('Kartoffelgulasch mit Braunschweiger');
+    assertEquals(resultProgressive.source, 'wikipedia', "the shortened query should hit the Wikipedia article");
+    assertDeepEqual(resultProgressive.images, [{ url: THUMB_C, license: '', creator: 'Kartoffelgulasch' }], "Wikipedia thumbnail with the shortened article title as creator");
+    assertEquals(fetchCallsFor(WIKI_MATCH), 3, "three candidates tried (full name 404, two words 404, first word hit)");
+    assertEquals(fetchLog.length, 3, "wikipedia hit must short-circuit before commons and proxies (3 progressive candidates)");
+    ok("fetchDishImages: progressive shortening — 'Kartoffelgulasch mit Braunschweiger' 404s, 'Kartoffelgulasch' hits");
+
     // Case 15 (b): wikipedia/commons empty + 4 anti-bot proxies -> Openverse fallback with 5 thumbnails
     resetSandboxState();
     planFetch([
@@ -354,8 +375,8 @@ async function runClientTests() {
         { url: 'https://api.openverse.org/v1/thumbs/a4', license: 'PDM', creator: 'Ana' },
         { url: 'https://api.openverse.org/v1/thumbs/a5', license: '', creator: '' }
     ], "license/creator pass through unchanged, missing fields default to ''");
-    assertEquals(fetchLog.length, 7, "wikipedia + commons + 4 proxies + 1 Openverse = 7 fetch calls");
-    assertEquals(fetchLog[6].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
+    assertEquals(fetchLog.length, 11, "wikipedia 3x + commons 3x (3-word query) + 4 proxies + 1 Openverse = 11 fetch calls");
+    assertEquals(fetchLog[10].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
     ok("fetchDishImages: empty wiki/commons + anti-bot proxies -> Openverse fallback with 5 thumbnail results, license/creator passthrough");
 
     // Case 16 (b2): Openverse mapping uses thumbnail||url and filters to https strings
@@ -395,7 +416,7 @@ async function runClientTests() {
     ]);
     const resultC = await fetchDishImages('Total Failure Dish');
     assertDeepEqual(resultC, { images: [], source: null }, "total failure should resolve to { images: [], source: null }");
-    assertEquals(fetchLog.length, 7, "all 7 sources should be attempted");
+    assertEquals(fetchLog.length, 7, "wikipedia 1x (thrown error breaks the candidate loop) + commons 1x + 4 proxies + 1 Openverse = 7 fetch calls");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "no cache write on total failure");
     ok("fetchDishImages: everything fails -> { images: [], source: null }, 7 calls, no throw, no cache write");
 

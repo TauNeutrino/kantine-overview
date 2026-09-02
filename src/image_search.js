@@ -52,6 +52,19 @@ export function buildGoogleImageUrl(query) {
 }
 
 /**
+ * Progressive search candidates: full query, first two words, first word.
+ * Dish names like "Kartoffelgulasch mit Braunschweiger" have no exact
+ * Wikipedia/Commons entry, but the leading dish word usually does.
+ */
+function queryCandidates(query) {
+    const words = String(query).trim().split(/\s+/).filter(Boolean)
+    const candidates = [String(query).trim()]
+    if (words.length >= 2) candidates.push(words.slice(0, 2).join(' '))
+    if (words.length >= 1) candidates.push(words[0])
+    return [...new Set(candidates)].filter(candidate => candidate.length >= 3)
+}
+
+/**
  * Extracts gstatic thumbnail URLs from proxied Google image-search HTML.
  * Every match is entity-decoded (&amp; -> &) because proxy HTML escapes the
  * URL query separators, then deduped preserving first-occurrence order.
@@ -107,28 +120,45 @@ export async function fetchDishImages(query, lang, cancelSignal) {
 
     let result = null
 
-    // Stage 1: Wikipedia article summary (direct fetch, CORS-enabled) — precise lead image.
-    try {
-        const response = await fetch(DISH_IMAGE_WIKIPEDIA_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
-        if (response.ok) {
+    // Stage 1: Wikipedia article summary (direct fetch, CORS-enabled).
+    // Progressive query shortening: the full dish name rarely has an article,
+    // the leading dish word usually does ("Kartoffelgulasch mit X" ->
+    // "Kartoffelgulasch mit" -> "Kartoffelgulasch").
+    for (const candidate of queryCandidates(query)) {
+        if (isCancelled()) return { images: [], source: null }
+        try {
+            const response = await fetch(DISH_IMAGE_WIKIPEDIA_URL.replace('{q}', encodeURIComponent(candidate)), { signal: attemptSignal() })
+            if (!response.ok) {
+                note('log', `kein Wikipedia-Artikel für "${candidate}" (HTTP ${response.status})`)
+                continue
+            }
             const summary = await response.json()
             const thumb = summary && summary.thumbnail && summary.thumbnail.source
             if (typeof thumb === 'string' && thumb.startsWith('http')) {
-                const images = [{ url: thumb, license: '', creator: summary.title || query }].slice(0, DISH_IMAGE_MAX_RESULTS)
+                const images = [{ url: thumb, license: '', creator: summary.title || candidate }].slice(0, DISH_IMAGE_MAX_RESULTS)
                 writeDishImageCache(key, 'wikipedia', images)
-                note('log', `Wikipedia-Artikelbild gefunden — fertig in ${Date.now() - startedAt}ms — ${images.length} Bild`)
+                note('log', `Wikipedia-Artikelbild gefunden ("${candidate}") — fertig in ${Date.now() - startedAt}ms — ${images.length} Bild`)
                 result = { images, source: 'wikipedia' }
+                break
             }
+            note('log', `Wikipedia-Artikel "${candidate}" hat kein Vorschaubild`)
+        } catch (e) {
+            if (!isCancelled()) note('warn', `Wikipedia fehlgeschlagen (${e && e.message ? e.message : e})`)
+            break
         }
-    } catch (e) {
-        if (!isCancelled()) note('warn', `Wikipedia fehlgeschlagen (${e && e.message ? e.message : e})`)
     }
     if (result || isCancelled()) return result || { images: [], source: null }
 
-    // Stage 2: Wikimedia Commons file search (direct fetch, CORS via origin=*).
-    try {
-        const response = await fetch(DISH_IMAGE_COMMONS_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
-        if (response.ok) {
+    // Stage 2: Wikimedia Commons file search (direct fetch, CORS via origin=*),
+    // same progressive query shortening (Commons search ANDs its tokens).
+    for (const candidate of queryCandidates(query)) {
+        if (isCancelled()) return { images: [], source: null }
+        try {
+            const response = await fetch(DISH_IMAGE_COMMONS_URL.replace('{q}', encodeURIComponent(candidate)), { signal: attemptSignal() })
+            if (!response.ok) {
+                note('warn', `Commons antwortete HTTP ${response.status} für "${candidate}"`)
+                continue
+            }
             const data = await response.json()
             const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : []
             const images = pages
@@ -136,15 +166,17 @@ export async function fetchDishImages(query, lang, cancelSignal) {
                 .filter(info => info && typeof info.thumburl === 'string' && info.thumburl.startsWith('https://'))
                 .slice(0, DISH_IMAGE_MAX_RESULTS)
                 .map(info => ({ url: info.thumburl, license: '', creator: String(info.title || '').replace(/^File:/, '') }))
-            note('log', `Commons-Suche lieferte ${images.length} Bilder`)
             if (images.length >= 1) {
+                note('log', `Commons lieferte ${images.length} Bilder für "${candidate}" — fertig in ${Date.now() - startedAt}ms (Quelle: Wikimedia Commons)`)
                 writeDishImageCache(key, 'commons', images)
-                note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Wikimedia Commons)`)
                 result = { images, source: 'commons' }
+                break
             }
+            note('log', `Commons: 0 Bilder für "${candidate}"`)
+        } catch (e) {
+            if (!isCancelled()) note('warn', `Commons fehlgeschlagen (${e && e.message ? e.message : e})`)
+            break
         }
-    } catch (e) {
-        if (!isCancelled()) note('warn', `Commons fehlgeschlagen (${e && e.message ? e.message : e})`)
     }
     if (result || isCancelled()) return result || { images: [], source: null }
 
