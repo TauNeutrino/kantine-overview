@@ -14,8 +14,10 @@
 //                   "title": "Schweinebraten ...", "score": 2 }] }
 //
 // Weitere Quellen: eine fetchFrom<X>()-Scrape-Funktion ergänzen und in der
-// Merge-Logik sammeln (z. B. gutekueche.at — deren Suche läuft aktuell
-// clientseitig und ist nicht GET-scrapebar; Stand: 2026-09).
+// Merge-Logik sammeln. Getestet und NICHT GET-scrapebar (Stand: 2026-09):
+// gutekueche.at + kochbar.de (Suche clientseitig, ?search= filtert nicht),
+// eatsmarter.de (POST + CSRF-Token), lecker.de (JS-gerendert), Google/Bing/
+// DDG/Yandex (bot-geblockt für Server-IPs).
 
 const CHEFKOCH_SEARCH_URL = 'https://www.chefkoch.de/rs/s0/{q}/Rezepte.html';
 const CK_IMG_REGEX = /https:\/\/img\.chefkoch-cdn\.de\/rezepte\/\d+\/bilder\/\d+\/[^"'?\s\\<>]+\.jpg/g;
