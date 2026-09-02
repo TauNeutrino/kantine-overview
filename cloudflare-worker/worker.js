@@ -207,8 +207,19 @@ export default {
             fetchFromEatsmarter(searchQuery, queryTokens)
         ]);
         const chefkochWithSource = chefkochScored.map(img => ({ ...img, source: 'chefkoch' }));
-        // Merge mit Score absteigend; bei Gleichstand gewinnt Chefkoch (stabile Sortierung).
-        const merged = [...chefkochWithSource, ...kochbarScored, ...eatsmarterScored].sort((a, b) => b.score - a.score);
+        // Alle Quellen werden vollständig gescored; dann Score-sortiertes
+        // Round-Robin-Interleave (bester Treffer jeder Quelle im Wechsel),
+        // damit jede Quelle in den Top-5 vertreten ist — erst am Ende wird
+        // auf 5 reduziert.
+        const pools = [chefkochWithSource, kochbarScored, eatsmarterScored];
+        pools.forEach(pool => pool.sort((a, b) => b.score - a.score));
+        const merged = [];
+        const maxPoolLength = Math.max(...pools.map(pool => pool.length), 0);
+        for (let i = 0; i < maxPoolLength; i++) {
+            for (const pool of pools) {
+                if (pool[i]) merged.push(pool[i]);
+            }
+        }
         const images = merged.slice(0, 5);
 
         return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar+eatsmarter', count: images.length, images });
