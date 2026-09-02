@@ -445,9 +445,12 @@ function clearDishCache() {
 }
 const IMG0 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:modalCase0&sig=A';
 const IMG1 = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:modalCase1&sig=B';
-function mockGoogleFetch(thumbUrls) {
-    const html = thumbUrls.map((u) => `<img src="${u.replace(/&/g, '&amp;')}">`).join('');
-    w.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve(html) });
+function mockOpenverseFetch(thumbUrls) {
+    w.fetch = () => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve('<html>no thumbnails in this mock</html>'),
+        json: () => Promise.resolve({ results: thumbUrls.map((u) => ({ thumbnail: u, license: '', creator: '' })) })
+    });
 }
 function mockFetchFailure() {
     w.fetch = () => Promise.resolve({ ok: false, text: () => Promise.resolve(''), json: () => Promise.resolve({}) });
@@ -577,7 +580,7 @@ async function runDishImageTests() {
     // (b) fetch resolves with images → first slide is images[0], caption carries source + query
     {
         clearDishCache();
-        mockGoogleFetch([IMG0, IMG1]);
+        mockOpenverseFetch([IMG0, IMG1]);
         w.openDishImageModal('Lasagne Mod B');
         await sleep(150);
         const img = dishBody.querySelector('.dish-image-slide img');
@@ -587,7 +590,7 @@ async function runDishImageTests() {
         if (img.getAttribute('referrerpolicy') !== 'no-referrer') throw new Error('modal(b) images need referrerpolicy=no-referrer');
         const caption = dishBody.querySelector('.dish-image-caption');
         if (!caption) throw new Error('modal(b) caption missing');
-        if (!caption.textContent.includes('Quelle: Google Bildersuche')) throw new Error('modal(b) caption must name the source, got: ' + caption.textContent);
+        if (!caption.textContent.includes('Quelle: Openverse')) throw new Error('modal(b) caption must name the source, got: ' + caption.textContent);
         if (!caption.textContent.includes('Lasagne Mod B')) throw new Error('modal(b) caption must contain the query');
         console.log('OK modal(b) carousel shows images[0] + source caption');
     }
@@ -650,7 +653,7 @@ async function runDishImageTests() {
     {
         clearDishCache();
         setReducedMotion(true);
-        mockGoogleFetch([IMG0, IMG1]);
+        mockOpenverseFetch([IMG0, IMG1]);
         spyIntervals();
         w.openDishImageModal('Lasagne Mod G');
         await sleep(150);
@@ -682,7 +685,7 @@ async function runDishImageTests() {
     // (i) renderVisibleWeeks re-render while open → modal stays open (lives outside #menu-container)
     {
         clearDishCache();
-        mockGoogleFetch([IMG0, IMG1]);
+        mockOpenverseFetch([IMG0, IMG1]);
         w.openDishImageModal('Lasagne Mod I');
         await sleep(150);
         d.getElementById('btn-lang-toggle').click();

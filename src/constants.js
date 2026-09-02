@@ -64,7 +64,7 @@ export const LS = {
 /** Minimum bootloader version that has the domain guard fix (v2.0.5). */
 export const MIN_BOOTLOADER_VERSION = 'v2.0.5';
 
-/** Dish image search: hover-dwell popup timing, keyless proxy chain and Openverse fallback. */
+/** Dish image search: hover-dwell popup timing, popover sources and cache. */
 export const DISH_IMAGE_HOVER_MS = 500;
 export const DISH_IMAGE_CAROUSEL_INTERVAL_MS = 3000;
 export const DISH_IMAGE_FETCH_TIMEOUT_MS = 10000;
@@ -74,13 +74,11 @@ export const DISH_IMAGE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/page/summary/{q}';
 /** Wikimedia Commons file search (thumburl per hit) — direct fetch, CORS via origin=*, no proxy needed. */
 export const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
-/** Own Cloudflare Worker (server-side Google scrape, see cloudflare-worker/) — empty string disables the stage. */
+/** Own Cloudflare Worker (server-side chefkoch recipe-photo scrape, see cloudflare-worker/) — empty string disables the stage. */
 export const DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
 /** Google Programmable Search engine ID (cx) — embeds real Google image results in the popover; empty string disables the mode. */
 export const DISH_IMAGE_CSE_ID = '{{DISH_IMAGE_CSE_ID}}';
-export const DISH_IMAGE_GOOGLE_SCRAPE_URL = 'https://www.google.com/search?q={q}&tbm=isch&hl={hl}&gl=at&ijn=0';
 export const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
-export const DISH_IMAGE_PROXY_CHAIN = [{ name: 'allorigins-raw', template: 'https://api.allorigins.win/raw?url={url}' }, { name: 'codetabs', template: 'https://api.codetabs.com/v1/proxy?quest={url}' }, { name: 'allorigins-get', template: 'https://api.allorigins.win/get?url={url}' }, { name: 'corsproxy-io', template: 'https://corsproxy.io/?key={{CORSPROXY_KEY}}&url={url}' }];
 export const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 
 export const GIST_ID = '{{GIST_ID}}';

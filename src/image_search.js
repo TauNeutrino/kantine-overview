@@ -1,10 +1,11 @@
 // === Dish Image Search: Query Derivation + Fetch Client (FR-123..125) ===
 // Part 1: pure query functions (no dependencies) — vm-testable in isolation.
-// Part 2: keyless image client — source chain Wikipedia → Commons → Google
-// (proxy chain, parallel) → Openverse, localStorage cache, abortable via
-// cancelSignal. Fetches only when fetchDishImages is called.
+// Part 2: image client — source chain Chefkoch (own Cloudflare Worker,
+// server-side recipe-photo scrape) → Wikipedia → Commons → Openverse,
+// localStorage cache, abortable via cancelSignal. Fetches only when
+// fetchDishImages is called.
 
-import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_WIKIPEDIA_URL, DISH_IMAGE_COMMONS_URL, DISH_IMAGE_WORKER_URL, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
+import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_WIKIPEDIA_URL, DISH_IMAGE_COMMONS_URL, DISH_IMAGE_WORKER_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL } from './constants.js'
 
 /**
  * Derives the main-course line from a language split result.
@@ -65,33 +66,13 @@ function queryCandidates(query) {
 }
 
 /**
- * Extracts gstatic thumbnail URLs from proxied Google image-search HTML.
- * Every match is entity-decoded (&amp; -> &) because proxy HTML escapes the
- * URL query separators, then deduped preserving first-occurrence order.
- * @param {string} html Google image search HTML document
- * @returns {Object[]} Uniform image entries (fields: url, license, creator — Google carries no license metadata)
- */
-export function extractImageThumbs(html) {
-    const matches = String(html || '').match(/https:\/\/encrypted-tbn\d*\.gstatic\.com\/images\?q=tbn:[A-Za-z0-9_\-]+[^"'\s\\<>]*/g) || []
-    const seen = new Set()
-    const images = []
-    for (const match of matches) {
-        const url = match.replace(/&amp;/g, '&')
-        if (seen.has(url)) continue
-        seen.add(url)
-        images.push({ url, license: '', creator: '' })
-    }
-    return images.slice(0, DISH_IMAGE_MAX_RESULTS)
-}
-
-/**
- * Fetches preview images for a dish query. Source chain: Wikipedia article
- * summary → Wikimedia Commons search → Google scrape via parallel proxy
- * chain → Openverse. Fresh results are cached in localStorage for
+ * Fetches preview images for a dish query. Source chain: own Cloudflare
+ * Worker (chefkoch recipe photos) → Wikipedia article summary → Wikimedia
+ * Commons search → Openverse. Fresh results are cached in localStorage for
  * DISH_IMAGE_CACHE_TTL_MS. Never throws: total failure (or cancellation)
  * resolves to { images: [], source: null }.
  * @param {string} query Sanitized dish query
- * @param {'de'|'en'} [lang] Query language for the Google UI hint (defaults to 'de')
+ * @param {'de'|'en'} [lang] Query language hint passed through to the worker (defaults to 'de')
  * @param {AbortSignal} [cancelSignal] Aborts the search when the popup closes
  * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
  */
@@ -206,44 +187,7 @@ export async function fetchDishImages(query, lang, cancelSignal) {
     }
     if (result || isCancelled()) return result || { images: [], source: null }
 
-    // Stage 3: Google scrape via proxy chain — all proxies fire in parallel
-    // (one hanging proxy no longer stalls the whole chain); first hit in
-    // chain order wins.
-    note('log', 'Wikipedia/Commons ohne Treffer — Google über Proxy-Kette (parallel)...')
-    const scrapeUrl = DISH_IMAGE_GOOGLE_SCRAPE_URL
-        .replace('{q}', encodeURIComponent(query))
-        .replace('{hl}', lang === 'en' ? 'en' : 'de')
-    const attempts = DISH_IMAGE_PROXY_CHAIN.map(proxy => {
-        const attemptStartedAt = Date.now()
-        return fetch(proxy.template.replace('{url}', encodeURIComponent(scrapeUrl)), { signal: attemptSignal() })
-            .then(async response => {
-                if (!response.ok) {
-                    note('warn', `${proxy.name} antwortete HTTP ${response.status} nach ${Date.now() - attemptStartedAt}ms`)
-                    return []
-                }
-                let body = await response.text()
-                if (proxy.name === 'allorigins-get') body = JSON.parse(body).contents
-                const images = extractImageThumbs(body)
-                note('log', `${proxy.name} lieferte ${images.length} Bilder (${Date.now() - attemptStartedAt}ms, ${(body.length / 1024).toFixed(0)} KB HTML)`)
-                return images
-            })
-            .catch(e => {
-                note('warn', `${proxy.name} fehlgeschlagen nach ${Date.now() - attemptStartedAt}ms (${e && e.message ? e.message : e})`)
-                return []
-            })
-    })
-    const settled = await Promise.all(attempts)
-    if (isCancelled()) return { images: [], source: null }
-    for (let i = 0; i < DISH_IMAGE_PROXY_CHAIN.length; i++) {
-        if (settled[i].length >= 1) {
-            writeDishImageCache(key, 'google', settled[i])
-            note('log', `fertig in ${Date.now() - startedAt}ms — ${settled[i].length} Bilder (Quelle: Google via ${DISH_IMAGE_PROXY_CHAIN[i].name})`)
-            return { images: settled[i], source: 'google' }
-        }
-    }
-    note('log', 'alle Proxys ohne Treffer — Fallback Openverse...')
-
-    // Stage 4: Openverse.
+    // Stage 3: Openverse.
     try {
         const response = await fetch(DISH_IMAGE_OPENVERSE_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
         if (response.ok) {

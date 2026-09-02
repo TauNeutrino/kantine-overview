@@ -159,7 +159,6 @@ function stepReadAndInject() {
   const GIST_PAT  = process.env.GIST_PAT || '';
   const GIST_ID   = process.env.GIST_ID  || '';
   const GIST_SALT = process.env.GIST_SALT || '';
-  const CORSPROXY_KEY = process.env.CORSPROXY_KEY || '';
   const DISH_IMAGE_WORKER_URL = process.env.DISH_IMAGE_WORKER_URL || '';
   const DISH_IMAGE_CSE_ID = process.env.DISH_IMAGE_CSE_ID || '';
 
@@ -211,7 +210,6 @@ function stepReadAndInject() {
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT_OBF)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
     .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT)
-    .replace(/\{\{CORSPROXY_KEY\}\}/g, CORSPROXY_KEY)
     .replace(/\{\{DISH_IMAGE_WORKER_URL\}\}/g, DISH_IMAGE_WORKER_URL)
     .replace(/\{\{DISH_IMAGE_CSE_ID\}\}/g, DISH_IMAGE_CSE_ID);
 
@@ -543,8 +541,6 @@ function stepSmokeAndSize(ctx) {
   log('✓ Gist ID: ' + (GI ? (GI === '{{GIST_ID}}' ? '(placeholder)' : GI.substring(0, 8) + '...') : '(empty)'));
   const GS = process.env.GIST_SALT;
   log('✓ Gist Salt: ' + (GS ? '(set)' : '(placeholder)'));
-  const CK = process.env.CORSPROXY_KEY;
-  log('✓ Corsproxy key: ' + (CK ? 'injected (length: ' + CK.length + ')' : 'not set — the corsproxy.io chain entry stays unauthenticated'));
   const WU = process.env.DISH_IMAGE_WORKER_URL;
   log('✓ Dish-image worker: ' + (WU ? WU : 'not set — worker stage disabled'));
   const CI = process.env.DISH_IMAGE_CSE_ID;

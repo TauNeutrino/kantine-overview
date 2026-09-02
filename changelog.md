@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Eigene Cloudflare-Worker-Quelle vorbereitet**: Neuer Worker (`cloudflare-worker/`, serverseitiger Google-Bildersuche-Scrape) ist als schnellste Stufe der Bildkette vorverdrahtet. Aktivierung nach dem Worker-Deploy durch das CI-Secret `DISH_IMAGE_WORKER_URL` (siehe `cloudflare-worker/README.md`); ohne Secret bleibt die Stufe deaktiviert und die Kette unverändert.
 
+## [2.1.10] - 2026-09-02
+
+### Changed
+
+- **Chefkoch-Rezeptfotos als Primärquelle**: Der eigene Cloudflare-Worker (`kantine-dish-images.kaufi-at.workers.dev`) scrapt die Chefkoch-Rezeptssuche serverseitig und liefert exakte Gerichts-Treffer (echte Rezeptfotos). Kette jetzt: Chefkoch → Wikipedia → Commons → Openverse.
+- **Google-Proxy-Stage entfernt**: Die 4 öffentlichen CORS-Proxys lieferten nur Timeouts, Anti-Bot-Seiten oder JS-Shells (Google/Bing/DDG blocken serverseitiges Bilder-Scraping wirksam) — die tote Stage ist raus, Failures werden jetzt in ~1-2 s statt 30 s erreicht. Der Klick auf einen Gerichtslink öffnet weiterhin die Google-Bildersuche im neuen Tab.
+
 ## [2.1.4] - 2026-09-02
 
 ### Changed

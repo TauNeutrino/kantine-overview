@@ -19,7 +19,6 @@ jobs:
       GIST_PAT:  ${{ secrets.GIST_PAT }}
       GIST_ID:   ${{ secrets.GIST_ID }}
       GIST_SALT: ${{ secrets.GIST_SALT }}
-      CORSPROXY_KEY: ${{ secrets.CORSPROXY_KEY }}
       DISH_IMAGE_WORKER_URL: ${{ secrets.DISH_IMAGE_WORKER_URL }}
       DISH_IMAGE_CSE_ID: ${{ secrets.DISH_IMAGE_CSE_ID }}
     steps:
