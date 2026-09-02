@@ -9,9 +9,9 @@ import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MA
  * Derives the main-course line from a language split result.
  * Only confident splits (label 'high') in de/en mode qualify; the second
  * course line is the main dish, single-course menus fall back to that line.
- * @param {{de?: string, en?: string, label?: string}|null} split splitLanguage result
+ * @param {Object|null} split splitLanguage result (fields: de, en, label)
  * @param {'de'|'en'|'all'} langMode Current language mode
- * @returns {{text: string, lang: string}|null} Main course line or null
+ * @returns {Object|null} Main course line ({text, lang}) or null
  */
 export function getMainCourseLine(split, langMode) {
     if (langMode === 'all') return null
@@ -54,7 +54,7 @@ export function buildGoogleImageUrl(query) {
  * Every match is entity-decoded (&amp; -> &) because proxy HTML escapes the
  * URL query separators, then deduped preserving first-occurrence order.
  * @param {string} html Google image search HTML document
- * @returns {{url: string, license: string, creator: string}[]} Uniform image entries (Google carries no license metadata)
+ * @returns {Object[]} Uniform image entries (fields: url, license, creator — Google carries no license metadata)
  */
 export function extractImageThumbs(html) {
     const matches = String(html || '').match(/https:\/\/encrypted-tbn\d*\.gstatic\.com\/images\?q=tbn:[A-Za-z0-9_\-]+[^"'\s\\<>]*/g) || []
