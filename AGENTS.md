@@ -89,6 +89,8 @@ npm run train-langmodel # Regenerate src/lang/langModelSeed.js from fixture data
 ```
 
 > **Release/Deploy**: `npm run release` bumpt die Patch-Version in `version.txt`, commitet und pusht nach `main`. Alles Weitere übernimmt CI/CD (`.github/workflows/build-and-deploy.yml`): Build mit echten Secrets, GitHub-Pages-Deploy und Erstellen/Pushen des Git-Tags. Das frühere lokale Tag/Push-Verhalten wurde entfernt — es würde den CI-Tag mit lokal gebauten, secrets-freien Artefakten überschreiben.
+>
+> **Update-Kanäle**: Dev-Clients folgen automatisch `version.json` auf Pages (jeder CI-Run). Stable-Clients (nicht-dev) folgen **`rel-version.json` im Repo-Root auf main** — diese Datei wird bewusst MANUELL pro freigegebener Version gebumpt (CI fasst sie nicht an; ohne Bump bleiben Stable-Clients auf der alten Version). Der 🆕-Badge listet für Stable-Clients nur echte GitHub Releases (manuell anlegen), für Dev-Clients alle Tags. Details: `docs/ARCHITECTURE.md#update-kanäle-dev-vs-stable`.
 
 ## NOTES
 

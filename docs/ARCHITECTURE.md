@@ -56,9 +56,26 @@ Das Bookmarklet ist bewusst ein **minimaler Bootloader**. Es enthält einen klei
 | Artefakt | Ort | Zweck |
 |----------|-----|-------|
 | `bookmarklet.txt` | Im Browser-Lesezeichen des Nutzers | Bootloader + Fallback-Bundle |
-| `version.json` | GitHub Pages (`https://tauneutrino.github.io/kantine-overview/version.json`) | Aktuelle Version + URL zum CDN-Bundle |
+| `version.json` | GitHub Pages (`https://tauneutrino.github.io/kantine-overview/version.json`) | **Dev-Kanal:** aktuelle Version + URL zum CDN-Bundle (wird von jedem CI-Run aktualisiert) |
+| `rel-version.json` | Repo-Root auf `main` (raw.githubusercontent.com) | **Stable-Kanal:** freigegebene Version + URL zum CDN-Bundle (manuelle Pflege, siehe unten) |
 | `kantine-auto-update-bundle.js` | jsDelivr CDN (`https://cdn.jsdelivr.net/gh/...`) | Aktuelle Haupt-Anwendung |
 | `_k_au_cache` | `localStorage` des Nutzers | Gecachtes Bundle für Offline-Nutzung (1h Gültigkeit) |
+
+#### Update-Kanäle (dev vs. stable)
+
+Der Bootloader wählt die Versions-Quelle je nach Dev-Mode (`kantine_dev_mode`):
+
+| | **Dev-Kanal** | **Stable-Kanal** (Standard) |
+|---|---|---|
+| Versions-Quelle | `version.json` auf GitHub Pages | `rel-version.json` im Repo-Root auf `main` |
+| Aktualisierung | automatisch bei jedem CI-Run | **manuell** durch einen Commit (bewusste Freigabe) |
+| 🆕-Badge im UI | GitHub API `/tags` (alle Tags) | GitHub API `/releases` (nur echte GitHub Releases) |
+
+Regeln:
+
+- Der Versionsvergleich ist vollständiges Semver **inkl. Patch** (`isNewer`) — jede Stufe triggert das Update, sobald der Kanal-Zeiger sie kennt. Es gibt keinen minor-/major-Filter.
+- **Stable-Promotion ist ein manueller Akt:** `rel-version.json` (`version` + `bundleUrl` mit dem jsDelivr-Tag) wird bewusst per Commit hochgezogen, nachdem eine Version als stabil freigegeben ist. CI/CD ändert diese Datei nicht. Ein Release erreichen Stable-Clients daher erst mit diesem Bump.
+- Der 🆕-Badge für Stable-Clients listet nur **echte GitHub Releases** — CI erstellt ausschließlich Git-Tags. Soll der Badge erscheinen, muss zusätzlich ein GitHub Release (UI oder `gh release create <tag>`) angelegt werden. Das Auto-Update selbst funktioniert unabhängig davon über `rel-version.json`.
 
 #### Ablauf beim Start
 
@@ -70,7 +87,8 @@ Bootloader startet (Splash: "Initialisiere...")
         │
         ├──> Liest lokalen Cache (_k_au_cache, max. 1h alt)
         │
-        ├──> Fragt version.json auf GitHub Pages ab
+        ├──> Fragt die Versions-Quelle des Kanals ab
+        │    (dev: version.json auf Pages / stable: rel-version.json auf main)
         │
         └──> Entscheidung:
                  │
