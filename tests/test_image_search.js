@@ -348,20 +348,20 @@ async function runClientTests() {
     assertEquals(fetchLog.length, 3, "wikipedia hit must short-circuit before commons and proxies (3 progressive candidates)");
     ok("fetchDishImages: progressive shortening — 'Kartoffelgulasch mit Braunschweiger' 404s, 'Kartoffelgulasch' hits");
 
-    // Case 13e: configured worker (bing scrape server-side) delivers as stage 0
+    // Case 13e: configured worker (chefkoch scrape server-side) delivers as stage 0
     resetSandboxState();
     sandbox.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
     planFetch([
-        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'Wiener Schnitzel', engine: 'bing', count: 1, images: [{ url: THUMB_C, license: '', creator: '' }] } }] },
+        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'Wiener Schnitzel', engine: 'chefkoch', count: 1, images: [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de' }] } }] },
         { match: WIKI_MATCH, steps: [{ reject: 'wikipedia must not be reached' }] }
     ]);
     const resultWorker = await fetchDishImages('Wiener Schnitzel');
-    assertEquals(resultWorker.source, 'bing', "worker images should report bing source");
-    assertDeepEqual(resultWorker.images, [{ url: THUMB_C, license: '', creator: '' }], "worker images pass through");
+    assertEquals(resultWorker.source, 'chefkoch', "worker images should report chefkoch source");
+    assertDeepEqual(resultWorker.images, [{ url: THUMB_C, license: 'Chefkoch', creator: 'chefkoch.de' }], "worker images pass through");
     assertEquals(fetchCallsFor('workers.dev'), 1, "worker stage fires first");
     assertEquals(fetchCallsFor(WIKI_MATCH), 0, "worker hit must short-circuit wikipedia and everything after");
     sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
-    ok("fetchDishImages: configured worker delivers bing thumbs as stage 0 (chain short-circuits)");
+    ok("fetchDishImages: configured worker delivers chefkoch recipe photos as stage 0 (chain short-circuits)");
 
     // Case 13f: worker failure falls through to wikipedia
     resetSandboxState();

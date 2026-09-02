@@ -1,15 +1,14 @@
-// Kantine Dish-Images Worker — serverseitige Bing-Bildersuche.
-// Googles Bilder-Tab liefert an Server-IPs nur noch eine JS-Shell (keine
-// Bild-URLs im HTML), Bings HTML ist dagegen stabil scrapebar: jede
-// Ergebnis-Kachel trägt ein m="{...}"-Attribut mit der Original-Bild-URL
-// (murl, HTML-entity-kodiert).
+// Kantine Dish-Images Worker — serverseitiger Chefkoch-Rezeptfoto-Scrape.
+// Rezeptseiten liefern exakte Gerichts-Treffer (echte Rezeptfotos statt
+// Suchmaschinen-Müll). Chefkoch serves vollständiges HTML an Server-IPs und
+// erlaubt Hotlinking seiner CDN-Bilder ohne Referer-Prüfung.
 //
-// GET https://<worker>.workers.dev/?q=Wiener%20Schnitzel&hl=de
-// -> { "query": "...", "hl": "de", "engine": "bing", "count": 5,
-//      "images": [{ "url": "https://..." }] }
+// GET https://<worker>.workers.dev/?q=Kartoffelgulasch&hl=de
+// -> { "query": "...", "hl": "de", "engine": "chefkoch", "count": 5,
+//      "images": [{ "url": "https://img.chefkoch-cdn.de/rezepte/..." }] }
 
-const BING_IMAGES_URL = 'https://www.bing.com/images/search?q={q}&form=HDRSC2&first=1&setlang={hl}&cc=AT';
-const MURL_REGEX = /murl&quot;:&quot;([^&]+)&quot;/g;
+const CHEFKOCH_SEARCH_URL = 'https://www.chefkoch.de/rs/s0/{q}/Rezepte.html';
+const CK_IMG_REGEX = /https:\/\/img\.chefkoch-cdn\.de\/rezepte\/\d+\/bilder\/\d+\/[^"'?\s\\<>]+\.jpg/g;
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
 function jsonResponse(body, status = 200) {
@@ -21,16 +20,6 @@ function jsonResponse(body, status = 200) {
             'Cache-Control': 'public, max-age=3600'
         }
     });
-}
-
-function decodeHtmlEntities(text) {
-    return text
-        .replace(/&quot;/g, '"')
-        .replace(/&#34;/g, '"')
-        .replace(/&amp;/g, '&')
-        .replace(/&#39;/g, "'")
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>');
 }
 
 export default {
@@ -51,34 +40,32 @@ export default {
             return jsonResponse({ error: 'missing or too-short q parameter' }, 400);
         }
 
-        const bingUrl = BING_IMAGES_URL
-            .replace('{q}', encodeURIComponent(query.trim()))
-            .replace('{hl}', hl);
+        const searchUrl = CHEFKOCH_SEARCH_URL.replace('{q}', encodeURIComponent(query.trim()).replace(/%20/g, '+'));
 
         let html = '';
         try {
-            const response = await fetch(bingUrl, {
+            const response = await fetch(searchUrl, {
                 headers: {
                     'User-Agent': BROWSER_UA,
-                    'Accept-Language': `${hl}-AT,${hl};q=0.9`,
+                    'Accept-Language': 'de-AT,de;q=0.9',
                     'Accept': 'text/html,application/xhtml+xml'
                 }
             });
             html = await response.text();
         } catch (e) {
-            return jsonResponse({ error: `bing scrape failed: ${e.message}`, images: [] }, 502);
+            return jsonResponse({ error: `chefkoch scrape failed: ${e.message}`, images: [] }, 502);
         }
 
         const seen = new Set();
         const images = [];
-        for (const match of html.matchAll(MURL_REGEX)) {
-            const decoded = decodeHtmlEntities(match[1]);
-            if (!/^https:\/\//.test(decoded) || seen.has(decoded)) continue;
-            seen.add(decoded);
-            images.push({ url: decoded, license: '', creator: '' });
+        for (const match of html.matchAll(CK_IMG_REGEX)) {
+            const dedupeKey = match[0].split('/').slice(0, 7).join('/');
+            if (seen.has(dedupeKey)) continue;
+            seen.add(dedupeKey);
+            images.push({ url: match[0], license: 'Chefkoch', creator: 'chefkoch.de' });
             if (images.length >= 5) break;
         }
 
-        return jsonResponse({ query: query.trim(), hl, engine: 'bing', count: images.length, images });
+        return jsonResponse({ query: query.trim(), hl, engine: 'chefkoch', count: images.length, images });
     }
 }
