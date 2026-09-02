@@ -1247,7 +1247,6 @@ function githubHeaders(etag) {
 /* harmony export */   Rr: () => (/* binding */ DISH_IMAGE_HOVER_MS),
 /* harmony export */   Rx: () => (/* binding */ DISH_IMAGE_CAROUSEL_INTERVAL_MS),
 /* harmony export */   X9: () => (/* binding */ COMMIT_HASH),
-/* harmony export */   Xi: () => (/* binding */ DISH_IMAGE_CSE_ID),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
 /* harmony export */   Z7: () => (/* binding */ DEV_MODE_PW_HASH),
 /* harmony export */   be: () => (/* binding */ DISH_IMAGE_OPENVERSE_URL),
@@ -1344,8 +1343,6 @@ const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/page/summ
 const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
 /** Own Cloudflare Worker (server-side chefkoch recipe-photo scrape, see cloudflare-worker/) — empty string disables the stage. */
 const DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
-/** Google Programmable Search engine ID (cx) — embeds real Google image results in the popover; empty string disables the mode. */
-const DISH_IMAGE_CSE_ID = '{{DISH_IMAGE_CSE_ID}}';
 const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
 const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 
@@ -1524,6 +1521,8 @@ const TRANSLATIONS = {
         dishImageSourceWikipedia: 'Quelle: Wikipedia',
         dishImageSourceCommons: 'Quelle: Wikimedia Commons',
         dishImageSourceChefkoch: 'Quelle: Chefkoch',
+        dishImageSourceKochbar: 'Quelle: Kochbar',
+        dishImageSourceEatsmarter: 'Quelle: Eatsmarter',
         dishImageSourceGoogle: 'Quelle: Google Bildersuche',
         dishImageSourceOpenverse: 'Quelle: Openverse',
         dishImagePrev: 'Vorheriges Bild',
@@ -1680,6 +1679,8 @@ const TRANSLATIONS = {
         dishImageSourceWikipedia: 'Source: Wikipedia',
         dishImageSourceCommons: 'Source: Wikimedia Commons',
         dishImageSourceChefkoch: 'Source: Chefkoch',
+        dishImageSourceKochbar: 'Source: Kochbar',
+        dishImageSourceEatsmarter: 'Source: Eatsmarter',
         dishImageSourceGoogle: 'Source: Google Images',
         dishImageSourceOpenverse: 'Source: Openverse',
         dishImagePrev: 'Previous image',
@@ -6921,9 +6922,10 @@ function queryCandidates(query) {
  * @param {string} query Sanitized dish query
  * @param {'de'|'en'} [lang] Query language hint passed through to the worker (defaults to 'de')
  * @param {AbortSignal} [cancelSignal] Aborts the search when the popup closes
+ * @param {string} [queryDe] German dish name — German recipe sites always search German
  * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
  */
-async function fetchDishImages(query, lang, cancelSignal) {
+async function fetchDishImages(query, lang, cancelSignal, queryDe) {
     if (cancelSignal && cancelSignal.aborted) return { images: [], source: null }
     const key = query.trim().replace(/\s+/g, ' ').toLowerCase()
     const note = (level, message) => {
@@ -6931,6 +6933,27 @@ async function fetchDishImages(query, lang, cancelSignal) {
         console[level](`[Kantine] Bildersuche: ${message}`)
     }
     const cache = readDishImageCache()
+    // Selbstreinigung: abgelaufene Einträge bei jedem Zugriff entfernen —
+    // so werden alte Bilder automatisch aussortiert, auch ohne neue Suche.
+    if (cache && cache.queries) {
+        const now = Date.now()
+        let expired = 0
+        for (const entryKey of Object.keys(cache.queries)) {
+            const entry = cache.queries[entryKey]
+            if (!entry || now - entry.ts >= constants/* DISH_IMAGE_CACHE_TTL_MS */.yd) {
+                delete cache.queries[entryKey]
+                expired++
+            }
+        }
+        if (expired > 0) {
+            try {
+                localStorage.setItem(constants.LS.DISH_IMAGE_CACHE, JSON.stringify(cache))
+                note('log', `Cache aufgeräumt — ${expired} abgelaufene Einträge entfernt`)
+            } catch (e) {
+                // Quota-Überschreitung — der nächste Schreibvorgang versucht es erneut.
+            }
+        }
+    }
     const entry = cache && cache.queries ? cache.queries[key] : null
     if (entry && Date.now() - entry.ts < constants/* DISH_IMAGE_CACHE_TTL_MS */.yd) {
         note('log', `Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)
@@ -6954,7 +6977,9 @@ async function fetchDishImages(query, lang, cancelSignal) {
     const workerBase = /^https:\/\//.test(constants/* DISH_IMAGE_WORKER_URL */.w3) ? constants/* DISH_IMAGE_WORKER_URL */.w3.replace(/\/+$/, '') : ''
     if (workerBase) {
         try {
-            const response = await fetch(`${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}`, { signal: attemptSignal() })
+            const workerUrl = `${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}` +
+                (queryDe ? `&qde=${encodeURIComponent(queryDe)}` : '')
+            const response = await fetch(workerUrl, { signal: attemptSignal() })
             if (response.ok) {
                 const data = await response.json()
                 const images = (data.images || [])
@@ -6962,9 +6987,9 @@ async function fetchDishImages(query, lang, cancelSignal) {
                     .slice(0, constants/* DISH_IMAGE_MAX_RESULTS */.v0)
                 note('log', `Worker lieferte ${images.length} Bilder`)
                 if (images.length >= 1) {
-                    writeDishImageCache(key, 'chefkoch', images)
-                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Chefkoch via Worker)`)
-                    return { images, source: 'chefkoch' }
+                    writeDishImageCache(key, images[0] && images[0].source ? images[0].source : 'chefkoch', images)
+                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: ${images[0] && images[0].source ? images[0].source : 'chefkoch'} via Worker)`)
+                    return { images, source: images[0] && images[0].source ? images[0].source : 'chefkoch' }
                 }
             } else {
                 note('warn', `Worker antwortete HTTP ${response.status}`)
@@ -7119,47 +7144,12 @@ function isDishImageModalClosed() {
 let dishImageModalOpen = false;
 let dishImageCurrentQuery = null;
 let dishImageCarouselIndex = 0;
+let dishImageCaptionPrefix = '';
 let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
-let dishImageCseScriptInjected = false;
-let dishImageCseReady = false;
-let dishImageCsePendingQuery = null;
-let dishImageCseMode = false;
 
-const dishCseConfigured = () => Boolean(constants/* DISH_IMAGE_CSE_ID */.Xi) && !constants/* DISH_IMAGE_CSE_ID */.Xi.includes('{');
-
-function ensureDishImageCseScript() {
-    if (dishImageCseScriptInjected) return;
-    dishImageCseScriptInjected = true;
-    window.__gcse = window.__gcse || {};
-    window.__gcse.parsetags = 'explicit';
-    window.__gcse.callback = () => {
-        dishImageCseReady = true;
-        if (dishImageCsePendingQuery !== null) {
-            const pending = dishImageCsePendingQuery;
-            dishImageCsePendingQuery = null;
-            renderDishImageCse(pending);
-        }
-    };
-    const script = document.createElement('script');
-    script.src = `https://cse.google.com/cse.js?cx=${constants/* DISH_IMAGE_CSE_ID */.Xi}`;
-    script.async = true;
-    document.head.appendChild(script);
-}
-
-function renderDishImageCse(query) {
-    const body = document.getElementById('dish-image-body');
-    if (!body || !dishImageModalOpen || dishImageCurrentQuery !== query) return;
-    body.innerHTML = '<div id="dish-cse-results"></div>';
-    try {
-        google.search.cse.element.render({ div: 'dish-cse-results', tag: 'searchresults-only', gname: 'dish-cse', attributes: { enableImageSearch: 'true' } });
-    } catch (e) {
-        // Element already rendered for this gname — re-executing is enough.
-    }
-    const element = google.search.cse.element.getElement('dish-cse');
-    if (element) element.execute(query);
-}
+const DISH_SOURCE_LABEL_KEYS = { wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', kochbar: 'dishImageSourceKochbar', eatsmarter: 'dishImageSourceEatsmarter', openverse: 'dishImageSourceOpenverse' };
 
 function startDishImageAdvance() {
     stopDishImageAdvance();
@@ -7175,9 +7165,7 @@ function stopDishImageAdvance() {
 }
 
 function scheduleDishImagePopoverClose(delay) {
-    // CSE mode keeps the popover open: the interactive Google iframe swallows
-    // pointer events, so mouse-out auto-close would close it immediately.
-    if (dishImageCseMode || isDishImageModalClosed()) return;
+    if (isDishImageModalClosed()) return;
     clearTimeout(dishImageCloseTimer);
     dishImageCloseTimer = setTimeout(() => {
         dishImageCloseTimer = null;
@@ -7208,6 +7196,14 @@ function showDishImageSlide(index) {
     dishImageCarouselIndex = ((index % slides.length) + slides.length) % slides.length;
     slides.forEach((slide, i) => slide.classList.toggle('active', i === dishImageCarouselIndex));
     Array.from(carousel.querySelectorAll('.dish-image-dot')).forEach((dot, i) => dot.classList.toggle('active', i === dishImageCarouselIndex));
+    const captionText = document.getElementById('dish-image-caption-text');
+    const activeImg = slides[dishImageCarouselIndex].querySelector('img');
+    if (captionText && activeImg) {
+        const title = (activeImg.dataset && activeImg.dataset.title) ? activeImg.dataset.title : dishImageCurrentQuery;
+        const sourceKey = (activeImg.dataset && activeImg.dataset.source) || '';
+        const sourceLabelNow = (sourceKey && DISH_SOURCE_LABEL_KEYS[sourceKey]) ? (0,i18n.t)(DISH_SOURCE_LABEL_KEYS[sourceKey]) : dishImageCaptionPrefix;
+        captionText.textContent = `${sourceLabelNow} — ${title}`;
+    }
 }
 
 /**
@@ -7216,7 +7212,7 @@ function showDishImageSlide(index) {
  * @param {string} query Sanitized dish query
  * @param {HTMLElement} [linkEl] Triggering anchor — the popover is positioned next to it
  */
-function openDishImageModal(query, linkEl) {
+function openDishImageModal(query, linkEl, queryDe) {
     const popover = document.getElementById('dish-image-popover');
     if (!popover) return;
     if (dishImageSearchAbort) dishImageSearchAbort.abort();
@@ -7242,25 +7238,10 @@ function openDishImageModal(query, linkEl) {
         popover.style.top = Math.round(top) + 'px';
     }
     document.getElementById('dish-image-title').textContent = query;
-
-    const cseElementApi = window.google && window.google.search && window.google.search.cse && window.google.search.cse.element;
-    dishImageCseMode = Boolean(cseElementApi || dishCseConfigured());
+    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
     stats_tracker/* tracker */.F.increment('dish_image_popup');
 
-    if (dishImageCseMode) {
-        if (cseElementApi) {
-            renderDishImageCse(query);
-        } else {
-            ensureDishImageCseScript();
-            dishImageCsePendingQuery = query;
-            document.getElementById('dish-image-body').innerHTML = `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
-        }
-        return;
-    }
-
-    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
-
-    fetchDishImages(query, undefined, dishImageSearchAbort.signal).then(result => {
+    fetchDishImages(query, undefined, dishImageSearchAbort.signal, queryDe).then(result => {
         // Stale-response guard: ignore results after query change or close.
         if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
         if (result.source === null) renderDishImageError(query, false);
@@ -7283,13 +7264,16 @@ function renderDishImageCarousel(query, result) {
     if (!body) return;
     stopDishImageAdvance();
 
-    const sourceLabel = (0,i18n.t)({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
+    const sourceLabel = (0,i18n.t)(DISH_SOURCE_LABEL_KEYS[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = (0,utils/* escapeHtml */.ZD)([img.creator, img.license].filter(Boolean).join(' — '));
-        return `<div class="dish-image-slide"><img src="${(0,utils/* escapeHtml */.ZD)(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;
+        const slideTitle = (0,utils/* escapeHtml */.ZD)(img.title || img.creator || '');
+        const slideSource = (0,utils/* escapeHtml */.ZD)(img.source || result.source || '');
+        return `<div class="dish-image-slide"><img src="${(0,utils/* escapeHtml */.ZD)(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}" data-title="${slideTitle}" data-source="${slideSource}"></div>`;
     }).join('');
 
-    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption">${(0,utils/* escapeHtml */.ZD)(sourceLabel)} — ${(0,utils/* escapeHtml */.ZD)(query)} <a href="${(0,utils/* escapeHtml */.ZD)(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageOpenInGoogle'))}</a></p>`;
+    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption"><span id="dish-image-caption-text">${(0,utils/* escapeHtml */.ZD)(sourceLabel)} — ${(0,utils/* escapeHtml */.ZD)(query)}</span> <a href="${(0,utils/* escapeHtml */.ZD)(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageOpenInGoogle'))}</a></p>`;
+    dishImageCaptionPrefix = sourceLabel;
 
     const carousel = body.querySelector('.dish-image-carousel');
     const dotsEl = carousel.querySelector('.dish-image-dots');
@@ -7754,7 +7738,9 @@ function createDayCard(day) {
 
         const localized = (0,utils/* getLocalizedText */.PC)(item.description, split);
         const mainCourse = getMainCourseLine(split, state/* langMode */.Kl);
+        const mainCourseDe = getMainCourseLine(split, 'de');
         const dishQuery = mainCourse ? sanitizeDishQuery(mainCourse.text) : null;
+        const dishQueryDe = mainCourseDe ? sanitizeDishQuery(mainCourseDe.text) : dishQuery;
         let descHtml = (0,utils/* escapeHtml */.ZD)(localized);
         if (dishQuery !== null) {
             const rawLines = localized.split('\n');
@@ -7766,7 +7752,7 @@ function createDayCard(day) {
                     const isMain = seen === mainIdx;
                     seen++;
                     if (isMain) {
-                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${(0,utils/* escapeHtml */.ZD)(dishQuery)}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLinkTooltip'))}">${(0,utils/* escapeHtml */.ZD)(mainCourse.text)}</a>`;
+                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${(0,utils/* escapeHtml */.ZD)(dishQuery)}" data-dish-query-de="${(0,utils/* escapeHtml */.ZD)(dishQueryDe || dishQuery)}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLinkTooltip'))}">${(0,utils/* escapeHtml */.ZD)(mainCourse.text)}</a>`;
                     }
                 }
                 return (0,utils/* escapeHtml */.ZD)(line);
@@ -7810,6 +7796,7 @@ function createDayCard(day) {
         const dishLink = itemEl.querySelector('.dish-image-link');
         if (dishLink) {
             const linkQuery = dishLink.dataset.dishQuery;
+            const linkQueryDe = dishLink.dataset.dishQueryDe || linkQuery;
             dishLink.addEventListener('click', (e) => {
                 e.stopPropagation();
                 stats_tracker/* tracker */.F.increment('dish_image_tab');
@@ -7823,7 +7810,7 @@ function createDayCard(day) {
                 clearTimeout(dwellTimer);
                 dwellTimer = setTimeout(() => {
                     dwellTimer = null;
-                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink);
+                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink, linkQueryDe);
                 }, constants/* DISH_IMAGE_HOVER_MS */.Rr);
             });
             const cancelDishDwell = () => {
