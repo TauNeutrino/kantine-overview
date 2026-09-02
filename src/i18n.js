@@ -147,11 +147,12 @@ const TRANSLATIONS = {
 
         // Dish image search
         dishImageLinkTooltip: 'Nach Bildern dieses Gerichts suchen (Hover: Vorschau, Klick: Google-Bildersuche)',
-        dishImageModalTitle: 'Gerichtsbilder',
         dishImageLoading: 'Bilder werden gesucht...',
         dishImageNoImages: 'Keine Bilder gefunden.',
         dishImageError: 'Bildersuche momentan nicht verfügbar.',
         dishImageOpenInGoogle: 'Bei Google öffnen',
+        dishImageSourceWikipedia: 'Quelle: Wikipedia',
+        dishImageSourceCommons: 'Quelle: Wikimedia Commons',
         dishImageSourceGoogle: 'Quelle: Google Bildersuche',
         dishImageSourceOpenverse: 'Quelle: Openverse',
         dishImagePrev: 'Vorheriges Bild',
@@ -301,11 +302,12 @@ const TRANSLATIONS = {
 
         // Dish image search
         dishImageLinkTooltip: 'Search images of this dish (hover: preview, click: Google image search)',
-        dishImageModalTitle: 'Dish images',
         dishImageLoading: 'Searching for images...',
         dishImageNoImages: 'No images found.',
         dishImageError: 'Image search is currently unavailable.',
         dishImageOpenInGoogle: 'Open in Google',
+        dishImageSourceWikipedia: 'Source: Wikipedia',
+        dishImageSourceCommons: 'Source: Wikimedia Commons',
         dishImageSourceGoogle: 'Source: Google Images',
         dishImageSourceOpenverse: 'Source: Openverse',
         dishImagePrev: 'Previous image',

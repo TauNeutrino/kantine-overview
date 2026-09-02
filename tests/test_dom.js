@@ -38,17 +38,15 @@ const html = `
         <div id="login-error" class="hidden"></div>
     </div>
 
-    <!-- Mocks for Dish Image Modal -->
-    <div id="dish-image-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dish-image-title" aria-hidden="true">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="dish-image-title"></h2>
-                <button id="btn-dish-image-close" class="icon-btn" aria-label="Close" title="Schließen">
-                    <span class="material-icons-round">close</span>
-                </button>
-            </div>
-            <div class="modal-body" id="dish-image-body"></div>
+    <!-- Mocks for Dish Image Popover -->
+    <div id="dish-image-popover" class="dish-image-popover hidden" role="dialog" aria-hidden="true">
+        <div class="dish-image-popover-header">
+            <span id="dish-image-title"></span>
+            <button id="btn-dish-image-close" class="icon-btn" aria-label="Close" title="Schließen">
+                <span class="material-icons-round">close</span>
+            </button>
         </div>
+        <div id="dish-image-body"></div>
     </div>
     
     <!-- Mocks for History Modal -->
@@ -554,26 +552,26 @@ async function runDishImageTests() {
         if (!started) throw new Error('(f) mouse pointerenter on hover-capable device must start the dwell timer');
         const openErrorsAfter = interimErrors.filter((m) => /openDishImageModal/.test(m)).length;
         if (openErrorsAfter !== openErrorsBefore) throw new Error('(f) popup must not open after pointerleave cleared the timer');
-        const modal = d.getElementById('dish-image-modal');
+        const modal = d.getElementById('dish-image-popover');
         if (modal && !modal.classList.contains('hidden')) throw new Error('(f) no dish-image modal may be visible after cleared dwell');
         card.remove();
         console.log('OK (f) dwell timer cleared by pointerleave before popup');
     }
 
     // === Dish Image Modal cases (Todo 6) ===
-    const dishModal = d.getElementById('dish-image-modal');
+    const dishModal = d.getElementById('dish-image-popover');
     const dishBody = d.getElementById('dish-image-body');
 
-    // (a) open → visible, 3 skeleton blocks, DE title, aria-hidden false
+    // (a) open → visible, 2 skeleton blocks, query as title, aria-hidden false
     {
         clearDishCache();
         w.openDishImageModal('Lasagne Mod A');
-        if (dishModal.classList.contains('hidden')) throw new Error('modal(a) modal must be visible after open');
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(a) popover must be visible after open');
         if (dishModal.getAttribute('aria-hidden') !== 'false') throw new Error('modal(a) aria-hidden must be false when open');
-        if (dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length !== 3) throw new Error('modal(a) expected 3 skeleton blocks, got ' + dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length);
-        if (d.getElementById('dish-image-title').textContent !== 'Gerichtsbilder') throw new Error("modal(a) title must be t('dishImageModalTitle'), got: " + d.getElementById('dish-image-title').textContent);
+        if (dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length !== 2) throw new Error('modal(a) expected 2 skeleton blocks, got ' + dishBody.querySelectorAll('.skeleton.dish-image-skeleton').length);
+        if (d.getElementById('dish-image-title').textContent !== 'Lasagne Mod A') throw new Error('modal(a) title must carry the dish query, got: ' + d.getElementById('dish-image-title').textContent);
         w.closeDishImageModal();
-        console.log('OK modal(a) open renders skeleton + title + aria-hidden=false');
+        console.log('OK modal(a) open renders skeleton + query title + aria-hidden=false');
     }
 
     // (b) fetch resolves with images → first slide is images[0], caption carries source + query
@@ -612,13 +610,20 @@ async function runDishImageTests() {
         console.log('OK modal(d) ESC keydown closes modal');
     }
 
-    // (e) backdrop click (e.target === modal element) → .hidden
+    // (e) pointer leaves the popover → closes after the grace delay; re-enter cancels
     {
         w.openDishImageModal('Lasagne Mod E');
-        if (dishModal.classList.contains('hidden')) throw new Error('modal(e) fixture: modal should be open before backdrop click');
-        dishModal.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
-        if (!dishModal.classList.contains('hidden')) throw new Error('modal(e) backdrop click must close the popup');
-        console.log('OK modal(e) backdrop click closes modal');
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(e) fixture: popover should be open');
+        firePointer(dishModal, 'pointerleave', 'mouse');
+        await sleep(100);
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(e) popover must stay open during the grace delay');
+        firePointer(dishModal, 'pointerenter', 'mouse');
+        await sleep(400);
+        if (dishModal.classList.contains('hidden')) throw new Error('modal(e) popover must stay open while the pointer rests on it');
+        firePointer(dishModal, 'pointerleave', 'mouse');
+        await sleep(400);
+        if (!dishModal.classList.contains('hidden')) throw new Error('modal(e) popover must close after the pointer left');
+        console.log('OK modal(e) popover closes after pointer leaves (grace delay), re-enter cancels');
     }
 
     // (f) total fetch failure → error state with encoded Google link (counts dish_image_tab)
@@ -683,7 +688,7 @@ async function runDishImageTests() {
         d.getElementById('btn-lang-toggle').click();
         if (dishModal.classList.contains('hidden')) throw new Error('modal(i) re-render must not close the open popup');
         if (!dishBody.querySelector('.dish-image-slide')) throw new Error('modal(i) carousel content must survive the re-render');
-        if (d.getElementById('dish-image-title').textContent !== 'Dish images') throw new Error('modal(i) updateUILanguage must re-title the modal, got: ' + d.getElementById('dish-image-title').textContent);
+        if (d.getElementById('dish-image-title').textContent !== 'Lasagne Mod I') throw new Error('modal(i) the query title must survive updateUILanguage (language-independent), got: ' + d.getElementById('dish-image-title').textContent);
         d.getElementById('btn-lang-toggle').click();
         d.getElementById('btn-lang-toggle').click();
         w.closeDishImageModal();

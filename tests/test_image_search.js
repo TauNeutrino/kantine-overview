@@ -17,7 +17,14 @@ const BASE_NOW = 1700000000000;
 let mockNow = BASE_NOW;
 
 let fetchLog = [];
-let fetchPlan = [];
+let fetchRoutes = [];
+
+const WIKI_MATCH = 'de.wikipedia.org';
+const COMMONS_MATCH = 'commons.wikimedia.org';
+const RAW_MATCH = 'api.allorigins.win/raw';
+const CODETABS_MATCH = 'api.codetabs.com';
+const GET_MATCH = 'api.allorigins.win/get';
+const OPENVERSE_MATCH = 'api.openverse.org';
 
 const sandbox = {
     console: {
@@ -43,11 +50,12 @@ const sandbox = {
     },
     AbortSignal: { timeout: (ms) => ({ timeoutMs: ms }) },
     fetch: function (url, opts) {
-        const step = fetchPlan[fetchLog.length];
         fetchLog.push({ url, opts });
-        if (!step) {
-            return Promise.reject(new Error('unexpected fetch call #' + fetchLog.length + ': ' + url));
+        const route = fetchRoutes.find(r => url.includes(r.match));
+        if (!route || route.steps.length === 0) {
+            return Promise.reject(new Error('unexpected fetch call: ' + url.slice(0, 90)));
         }
+        const step = route.steps.shift();
         if (step.reject) {
             return Promise.reject(new Error(step.reject));
         }
@@ -60,10 +68,22 @@ const sandbox = {
     }
 };
 
-function planFetch(steps) {
+function planFetch(routes) {
     fetchLog = [];
-    fetchPlan = steps;
+    // Merge duplicate matches into one route (a second route with the same
+    // match would be unreachable — find() always returns the first).
+    fetchRoutes = routes.reduce((acc, route) => {
+        const existing = acc.find(r => r.match === route.match);
+        if (existing) existing.steps.push(...route.steps);
+        else acc.push(route);
+        return acc;
+    }, []);
 }
+
+const wikiMiss = { match: WIKI_MATCH, steps: [{ ok: false, status: 404 }] };
+const commonsEmpty = { match: COMMONS_MATCH, steps: [{ ok: true, json: { query: { pages: {} } } }] };
+const wikiHit = (title, thumb) => ({ match: WIKI_MATCH, steps: [{ ok: true, json: { title, thumbnail: { source: thumb } } }] });
+const fetchCallsFor = (match) => fetchLog.filter(call => call.url.includes(match)).length;
 
 function resetSandboxState() {
     sandbox.localStorage.clear();
@@ -186,6 +206,18 @@ ok("sanitizeDishQuery: 'Tagessuppe 4,50 €' -> 'Tagessuppe'");
 assertEquals(sanitizeDishQuery('ab'), null, "query shorter than 3 chars must return null");
 ok("sanitizeDishQuery: 'ab' -> null");
 
+// Case 9b: lowercase allergen codes and leading bullets are stripped (real menu data)
+assertEquals(sanitizeDishQuery('• kartoffelgulasch mit braunschweiger (lm)'), 'kartoffelgulasch mit braunschweiger', "leading bullet and lowercase allergen '(lm)' must be removed");
+ok("sanitizeDishQuery: '• kartoffelgulasch mit braunschweiger (lm)' -> 'kartoffelgulasch mit braunschweiger'");
+
+// Case 9c: compact allergen groups without commas are stripped too
+assertEquals(sanitizeDishQuery('Schweinsbraten (AFO)'), 'Schweinsbraten', "compact allergen group '(AFO)' must be removed");
+ok("sanitizeDishQuery: 'Schweinsbraten (AFO)' -> 'Schweinsbraten'");
+
+// Case 9d: word-like parentheses are preserved (over-stripping guard)
+assertEquals(sanitizeDishQuery('Chili sin Carne (vegan)'), 'Chili sin Carne (vegan)', "word-like parentheses must survive the sanitizer");
+ok("sanitizeDishQuery: 'Chili sin Carne (vegan)' survives");
+
 // === Part 1: buildGoogleImageUrl ===
 
 // Case 10: encodeURIComponent + udm=2, no other parameters
@@ -222,62 +254,92 @@ async function runClientTests() {
     assertEquals(capped[4].url, 'https://encrypted-tbn4.gstatic.com/images?q=tbn:ANd9GcCap4X', "the first five matches should be kept in order");
     ok("extractImageThumbs: caps results at DISH_IMAGE_MAX_RESULTS (5 of 7 distinct URLs)");
 
-    // Case 12 (a): proxy 1 throws -> proxy 2 returns HTML with &amp; entities + 1 duplicate
+    // Case 12 (a): raw proxy throws -> codetabs returns HTML with &amp; entities + 1 duplicate;
+    // parallel chain: all 3 proxies fire, first hit in chain order wins
     resetSandboxState();
     planFetch([
-        { reject: 'allorigins-raw network error' },
-        { ok: true, text: googleFixtureHtml }
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ reject: 'allorigins-raw network error' }] },
+        { match: CODETABS_MATCH, steps: [{ ok: true, text: googleFixtureHtml }] },
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get network error' }] }
     ]);
     const resultA = await fetchDishImages('Wiener Schnitzel');
-    assertEquals(resultA.source, 'google', "proxy 2 success should report source 'google'");
+    assertEquals(resultA.source, 'google', "codetabs success should report source 'google'");
     assertEquals(resultA.cached, undefined, "a fresh fetch must not carry the cached flag");
     assertDeepEqual(resultA.images, [
         { url: THUMB_A_DECODED, license: '', creator: '' },
         { url: THUMB_B, license: '', creator: '' }
     ], "deduped, entity-decoded gstatic URLs in HTML order");
-    assertEquals(fetchLog.length, 2, "failed proxy 1 + successful proxy 2 = exactly 2 fetch calls");
-    assertEquals(fetchLog[0].url.startsWith('https://api.allorigins.win/raw?url='), true, "proxy chain must start with allorigins-raw");
-    assertEquals(fetchLog[1].url, 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://www.google.com/search?q=Wiener%20Schnitzel&tbm=isch&hl=de&gl=at&ijn=0'), "proxy 2 URL wraps the encoded Google scrape URL (hl=de default)");
-    assertEquals(fetchLog[1].opts && fetchLog[1].opts.signal && fetchLog[1].opts.signal.timeoutMs, sandbox.DISH_IMAGE_FETCH_TIMEOUT_MS, "each proxy fetch carries AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS)");
-    ok("fetchDishImages: proxy 1 throws -> proxy 2 HTML -> google source with deduped, &amp;-decoded URLs in order");
+    assertEquals(fetchLog.length, 5, "wikipedia miss + commons empty + 3 PARALLEL proxies = 5 fetch calls");
+    assertEquals(fetchCallsFor(RAW_MATCH), 1, "allorigins-raw must be attempted");
+    assertEquals(fetchCallsFor(GET_MATCH), 1, "allorigins-get must fire in parallel even though raw already failed");
+    const codetabsCall = fetchLog.find(call => call.url.includes(CODETABS_MATCH));
+    assertEquals(codetabsCall.url, 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://www.google.com/search?q=Wiener%20Schnitzel&tbm=isch&hl=de&gl=at&ijn=0'), "proxy URL wraps the encoded Google scrape URL (hl=de default)");
+    assertEquals(codetabsCall.opts && codetabsCall.opts.signal && codetabsCall.opts.signal.timeoutMs, sandbox.DISH_IMAGE_FETCH_TIMEOUT_MS, "each proxy fetch carries AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS)");
+    ok("fetchDishImages: parallel proxies — raw throws, codetabs HTML -> google source with deduped, &amp;-decoded URLs in order");
 
     // Case 13 (a2): allorigins-get JSON body is unwrapped via .contents before extraction
     resetSandboxState();
     planFetch([
-        { ok: true, text: antiBotHtml },
-        { reject: 'codetabs down' },
-        { ok: true, text: JSON.stringify({ contents: `<div>${THUMB_C}</div>` }) }
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
+        { match: GET_MATCH, steps: [{ ok: true, text: JSON.stringify({ contents: `<div>${THUMB_C}</div>` }) }] }
     ]);
     const resultA2 = await fetchDishImages('Kaiserschmarrn');
     assertEquals(resultA2.source, 'google', "allorigins-get JSON contents should be extracted as google source");
     assertDeepEqual(resultA2.images, [{ url: THUMB_C, license: '', creator: '' }], "images should come from the JSON .contents payload");
-    assertEquals(fetchLog.length, 3, "empty proxy 1, failed proxy 2, JSON proxy 3 = 3 fetch calls");
-    assertEquals(fetchLog[2].url.startsWith('https://api.allorigins.win/get?url='), true, "third chain entry must be the allorigins-get JSON proxy");
-    ok("fetchDishImages: allorigins-get JSON body unwrapped via .contents; 200-but-empty proxy advances the chain");
+    assertEquals(fetchLog.length, 5, "wikipedia + commons + 3 parallel proxies = 5 fetch calls");
+    assertEquals(fetchCallsFor(GET_MATCH), 1, "third chain entry must be the allorigins-get JSON proxy");
+    ok("fetchDishImages: allorigins-get JSON body unwrapped via .contents; 200-but-empty proxy does not win");
 
-    // Case 14 (a3): lang 'en' propagates to the Google hl parameter
-    resetSandboxState();
-    planFetch([{ ok: true, text: `<div>${THUMB_C}</div>` }]);
-    await fetchDishImages('roast pork with dumplings', 'en');
-    assertEquals(decodeURIComponent(fetchLog[0].url).includes('hl=en'), true, "lang='en' should set hl=en in the scrape URL");
-    ok("fetchDishImages: lang 'en' propagates to the Google hl parameter (default is 'de')");
-
-    // Case 15 (b): all 3 proxies return 200 anti-bot HTML -> Openverse fallback with 5 thumbnails
+    // Case 13b (a3): lang 'en' propagates to the Google hl parameter
     resetSandboxState();
     planFetch([
-        { ok: true, text: antiBotHtml },
-        { ok: true, text: antiBotHtml },
-        { ok: true, text: antiBotHtml },
-        { ok: true, json: { results: [
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: `<div>${THUMB_C}</div>` }] },
+        { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] }
+    ]);
+    await fetchDishImages('roast pork with dumplings', 'en');
+    const scrapeCall = fetchLog.find(call => decodeURIComponent(call.url).includes('google.com/search'));
+    assertEquals(decodeURIComponent(scrapeCall.url).includes('hl=en'), true, "lang='en' should set hl=en in the scrape URL");
+    ok("fetchDishImages: lang 'en' propagates to the Google hl parameter (default is 'de')");
+
+    // Case 13c: Wikipedia lead image wins before the proxy chain even starts
+    resetSandboxState();
+    planFetch([
+        wikiHit('Käsespätzle', THUMB_C),
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ reject: 'must not be reached' }] }
+    ]);
+    const resultWiki = await fetchDishImages('Käsespätzle');
+    assertEquals(resultWiki.source, 'wikipedia', "Wikipedia hit should short-circuit the chain");
+    assertDeepEqual(resultWiki.images, [{ url: THUMB_C, license: '', creator: 'Käsespätzle' }], "Wikipedia thumbnail with article title as creator");
+    assertEquals(fetchLog.length, 1, "Wikipedia hit must skip commons, proxies and openverse");
+    ok("fetchDishImages: Wikipedia article image short-circuits the chain (1 fetch, no proxy traffic)");
+
+    // Case 15 (b): wikipedia/commons empty + 3 anti-bot proxies -> Openverse fallback with 5 thumbnails
+    resetSandboxState();
+    planFetch([
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CODETABS_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: GET_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: OPENVERSE_MATCH, steps: [{ ok: true, json: { results: [
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a1', license: 'CC BY 4.0', creator: 'Jane Doe' },
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a2', license: 'CC0', creator: 'Max Muster' },
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a3' },
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a4', license: 'PDM', creator: 'Ana' },
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a5', license: '', creator: '' }
-        ] } }
+        ] } }] }
     ]);
     const resultB = await fetchDishImages('Gulasch mit Knödel');
-    assertEquals(resultB.source, 'openverse', "all proxies empty should fall back to Openverse");
+    assertEquals(resultB.source, 'openverse', "all earlier sources empty should fall back to Openverse");
     assertEquals(resultB.images.length, 5, "5 Openverse results should yield 5 images");
     assertDeepEqual(resultB.images, [
         { url: 'https://api.openverse.org/v1/thumbs/a1', license: 'CC BY 4.0', creator: 'Jane Doe' },
@@ -286,22 +348,24 @@ async function runClientTests() {
         { url: 'https://api.openverse.org/v1/thumbs/a4', license: 'PDM', creator: 'Ana' },
         { url: 'https://api.openverse.org/v1/thumbs/a5', license: '', creator: '' }
     ], "license/creator pass through unchanged, missing fields default to ''");
-    assertEquals(fetchLog.length, 4, "3 proxies + 1 Openverse = 4 fetch calls");
-    assertEquals(fetchLog[3].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
-    ok("fetchDishImages: 3 anti-bot proxies -> Openverse fallback with 5 thumbnail results, license/creator passthrough");
+    assertEquals(fetchLog.length, 6, "wikipedia + commons + 3 proxies + 1 Openverse = 6 fetch calls");
+    assertEquals(fetchLog[5].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
+    ok("fetchDishImages: empty wiki/commons + anti-bot proxies -> Openverse fallback with 5 thumbnail results, license/creator passthrough");
 
     // Case 16 (b2): Openverse mapping uses thumbnail||url and filters to https strings
     resetSandboxState();
     planFetch([
-        { ok: true, text: antiBotHtml },
-        { ok: true, text: antiBotHtml },
-        { ok: true, text: antiBotHtml },
-        { ok: true, json: { results: [
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CODETABS_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: GET_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: OPENVERSE_MATCH, steps: [{ ok: true, json: { results: [
             { url: 'https://api.openverse.org/v1/images/direct1', license: 'CC BY', creator: 'Only Url' },
             { thumbnail: 'http://insecure.example/thumb', license: '', creator: '' },
             { thumbnail: null, url: 'https://api.openverse.org/v1/images/direct2' },
             { thumbnail: 42, license: '', creator: '' }
-        ] } }
+        ] } }] }
     ]);
     const resultB2 = await fetchDishImages('Gemüsecurry mit Reis');
     assertEquals(resultB2.source, 'openverse', "mixed Openverse results should still report openverse source");
@@ -311,55 +375,69 @@ async function runClientTests() {
     ], "thumbnail||url fallback applies; non-https and non-string urls are filtered");
     ok("fetchDishImages: Openverse mapping uses thumbnail||url and filters to https strings");
 
-    // Case 17 (c): everything fails (proxies throw/!ok, Openverse throws) -> graceful empty result
+    // Case 17 (c): everything fails -> graceful empty result, no cache write
     resetSandboxState();
     planFetch([
-        { reject: 'allorigins-raw down' },
-        { ok: false, status: 500 },
-        { reject: 'allorigins-get down' },
-        { reject: 'openverse down' }
+        { match: WIKI_MATCH, steps: [{ reject: 'wikipedia down' }] },
+        { match: COMMONS_MATCH, steps: [{ reject: 'commons down' }] },
+        { match: RAW_MATCH, steps: [{ reject: 'allorigins-raw down' }] },
+        { match: CODETABS_MATCH, steps: [{ ok: false, status: 500 }] },
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] },
+        { match: OPENVERSE_MATCH, steps: [{ reject: 'openverse down' }] }
     ]);
     const resultC = await fetchDishImages('Total Failure Dish');
     assertDeepEqual(resultC, { images: [], source: null }, "total failure should resolve to { images: [], source: null }");
-    assertEquals(fetchLog.length, 4, "3 proxies + Openverse should all be attempted");
+    assertEquals(fetchLog.length, 6, "all 6 sources should be attempted");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "no cache write on total failure");
-    ok("fetchDishImages: everything fails -> { images: [], source: null }, 4 calls, no throw, no cache write");
+    ok("fetchDishImages: everything fails -> { images: [], source: null }, 6 calls, no throw, no cache write");
 
-    // Case 18 (c2): all proxies answer 403 -> 4 calls, empty result (anti-bot scenario)
+    // Case 18 (c2): every source answers 403 -> 6 calls, empty result (anti-bot scenario)
     resetSandboxState();
     planFetch([
-        { ok: false, status: 403 },
-        { ok: false, status: 403 },
-        { ok: false, status: 403 },
-        { ok: false, status: 403 }
+        { match: WIKI_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: COMMONS_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: RAW_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: CODETABS_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: GET_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: OPENVERSE_MATCH, steps: [{ ok: false, status: 403 }] }
     ]);
     const resultC2 = await fetchDishImages('Käsespätzle');
     assertDeepEqual(resultC2, { images: [], source: null }, "403 everywhere should degrade to the empty result");
-    assertEquals(fetchLog.length, 4, "403 variant: 3 proxies + Openverse = 4 fetch calls");
+    assertEquals(fetchLog.length, 6, "403 variant: all 6 sources attempted");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "403 variant must not write a cache entry");
-    ok("fetchDishImages: all proxies 403 -> 4 fetch calls, empty result, graceful degradation");
+    ok("fetchDishImages: all sources 403 -> 6 fetch calls, empty result, graceful degradation");
+
+    // Case 18b: pre-aborted cancelSignal -> instant empty result, zero fetch calls
+    resetSandboxState();
+    planFetch([]);
+    const abortController = new AbortController();
+    abortController.abort();
+    const resultAborted = await fetchDishImages('Aborted Dish', 'de', abortController.signal);
+    assertDeepEqual(resultAborted, { images: [], source: null }, "pre-aborted search should resolve to the empty result");
+    assertEquals(fetchLog.length, 0, "pre-aborted search must not issue any fetch call");
+    ok("fetchDishImages: pre-aborted cancelSignal -> no fetch traffic at all");
 
     // Case 19 (d): cache hit serves 0 fetches; TTL expiry after 8 days refetches
     resetSandboxState();
     planFetch([
-        { ok: true, text: googleFixtureHtml },
-        { ok: true, text: `<div>${THUMB_C}</div>` }
+        wikiHit('Käsespätzle', THUMB_C),
+        wikiHit('Käsespätzle 2', THUMB_B)
     ]);
     const first = await fetchDishImages('Käsespätzle');
-    assertEquals(first.source, 'google', "first call should fetch from google");
+    assertEquals(first.source, 'wikipedia', "first call should fetch from wikipedia");
     assertEquals(first.cached, undefined, "first call must not be marked cached");
-    assertEquals(fetchLog.length, 1, "first call should make exactly 1 fetch");
+    assertEquals(fetchLog.length, 1, "first call should make exactly 1 fetch (wikipedia hit short-circuits)");
     const second = await fetchDishImages('  KÄSESPÄTZLE  ');
     assertEquals(second.cached, true, "second call (any casing/whitespace) should be served from cache");
-    assertEquals(second.source, 'google', "cached source should pass through");
+    assertEquals(second.source, 'wikipedia', "cached source should pass through");
     assertDeepEqual(second.images, first.images, "cached images should be shape-identical to fresh ones");
     assertEquals(fetchLog.length, 1, "cache hit should trigger 0 additional fetch calls");
     mockNow = BASE_NOW + 8 * 24 * 60 * 60 * 1000;
     const third = await fetchDishImages('Käsespätzle');
     assertEquals(third.cached, undefined, "expired entry should refetch instead of serving stale cache");
-    assertEquals(third.source, 'google', "refetch should succeed");
+    assertEquals(third.source, 'wikipedia', "refetch should succeed");
     assertEquals(fetchLog.length, 2, "refetch after TTL expiry should make a second fetch call");
-    assertDeepEqual(third.images, [{ url: THUMB_C, license: '', creator: '' }], "refetch should return the new fixture images");
+    assertDeepEqual(third.images, [{ url: THUMB_B, license: '', creator: 'Käsespätzle 2' }], "refetch should return the new fixture images");
     ok("fetchDishImages: cache hit serves 0 fetches; 8 days later the expired entry refetches");
 
     // Case 20 (e): pruning — 50 seeded entries + 1 new -> stays 50, oldest evicted
@@ -369,7 +447,7 @@ async function runClientTests() {
         seeded.queries['seed' + i] = { ts: BASE_NOW - (50 - i) * 1000, source: 'google', images: [{ url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:seed' + i, license: '', creator: '' }] };
     }
     sandbox.localStorage.setItem(sandbox.LS.DISH_IMAGE_CACHE, JSON.stringify(seeded));
-    planFetch([{ ok: true, text: `<div>${THUMB_C}</div>` }]);
+    planFetch([wikiHit('Brandnew Dish', THUMB_C)]);
     await fetchDishImages('Brandnew Dish');
     const pruned = JSON.parse(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE));
     assertEquals(Object.keys(pruned.queries).length, 50, "cache should stay at exactly 50 entries after the write");
@@ -385,7 +463,7 @@ async function runClientTests() {
         freshEntry: { ts: BASE_NOW - 1000, source: 'google', images: [] },
         staleEntry: { ts: BASE_NOW - TTL - 1000, source: 'google', images: [] }
     } }));
-    planFetch([{ ok: true, text: `<div>${THUMB_C}</div>` }]);
+    planFetch([wikiHit('Fresh Query', THUMB_C)]);
     await fetchDishImages('Fresh Query');
     const afterF = JSON.parse(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE));
     assertEquals(afterF.queries['staleEntry'], undefined, "the expired entry should be removed on write");
@@ -397,26 +475,28 @@ async function runClientTests() {
     // Case 22 (g): corrupt cache JSON is treated as empty and replaced on write
     resetSandboxState();
     sandbox.localStorage.setItem(sandbox.LS.DISH_IMAGE_CACHE, '{corrupt json');
-    planFetch([{ ok: true, text: `<div>${THUMB_C}</div>` }]);
+    planFetch([wikiHit('Corrupt Cache Dish', THUMB_C)]);
     const resultG = await fetchDishImages('Corrupt Cache Dish');
-    assertEquals(resultG.source, 'google', "corrupt cache JSON should be treated as empty — fetch proceeds");
+    assertEquals(resultG.source, 'wikipedia', "corrupt cache JSON should be treated as empty — fetch proceeds");
     assertEquals(fetchLog.length, 1, "corrupt cache must not block the fetch");
     const afterG = JSON.parse(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE));
     assertEquals(afterG.queries['corrupt cache dish'] !== undefined, true, "the corrupt payload should be replaced by a valid cache");
     ok("fetchDishImages: corrupt cache JSON treated as empty and replaced by a valid cache on write");
 }
 
-// Plan QA failure scenario: every Google proxy answers HTTP 403 (anti-bot).
-// Expected graceful behavior: 4 fetch calls (3 proxies + Openverse), empty
-// result, no outward throw, no cache write.
+// Plan QA failure scenario: every source answers HTTP 403 (anti-bot).
+// Expected graceful behavior: 6 fetch calls (wikipedia + commons + 3 proxies +
+// openverse), empty result, no outward throw, no cache write.
 async function simulateAllProxies403() {
-    console.log("--- FAIL SCENARIO SIMULATION: all Google proxies answer HTTP 403 (anti-bot) ---");
+    console.log("--- FAIL SCENARIO SIMULATION: every image source answers HTTP 403 (anti-bot) ---");
     resetSandboxState();
     planFetch([
-        { ok: false, status: 403 },
-        { ok: false, status: 403 },
-        { ok: false, status: 403 },
-        { ok: false, status: 403 }
+        { match: WIKI_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: COMMONS_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: RAW_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: CODETABS_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: GET_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: OPENVERSE_MATCH, steps: [{ ok: false, status: 403 }] }
     ]);
     const result = await fetchDishImages('Käsespätzle');
     for (let i = 0; i < fetchLog.length; i++) {
@@ -424,10 +504,10 @@ async function simulateAllProxies403() {
         console.log('         -> HTTP 403, response.ok=false -> no extraction, next stage');
     }
     console.log(`  result: ${JSON.stringify(result)}`);
-    assertEquals(fetchLog.length, 4, "fail scenario: 3 proxies + Openverse = 4 fetch calls");
+    assertEquals(fetchLog.length, 6, "fail scenario: wikipedia + commons + 3 proxies + openverse = 6 fetch calls");
     assertDeepEqual(result, { images: [], source: null }, "fail scenario: graceful empty result with source null");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "fail scenario: no cache write");
-    ok("fail scenario (all 403): fetch call count = 4, result empty, no outward throw");
+    ok("fail scenario (all 403): fetch call count = 6, result empty, no outward throw");
 }
 
 runClientTests().then(

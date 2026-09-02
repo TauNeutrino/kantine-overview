@@ -89,9 +89,6 @@ function updateUILanguage() {
     const loginHeader = document.querySelector('#login-modal .modal-header h2');
     if (loginHeader) loginHeader.textContent = t('loginTitle');
 
-    const dishImageHeader = document.querySelector('#dish-image-modal .modal-header h2');
-    if (dishImageHeader) dishImageHeader.textContent = t('dishImageModalTitle');
-
     const btnDishImageClose = document.getElementById('btn-dish-image-close');
     if (btnDishImageClose) {
         const closeLabel = t('dishImageClose');
@@ -223,15 +220,12 @@ export function bindEvents() {
         if (e.target === versionModal) versionModal.classList.add('hidden');
     });
 
-    // Dish-image carousel popup (FR-125): X button, backdrop click and ESC all close it.
-    const dishImageModal = document.getElementById('dish-image-modal');
+    // Dish-image hover popover (FR-125): X button and ESC close it; the
+    // popover itself also closes when the pointer leaves link and popover.
     const btnDishImageClose = document.getElementById('btn-dish-image-close');
     if (btnDishImageClose) {
         btnDishImageClose.addEventListener('click', () => closeDishImageModal());
     }
-    window.addEventListener('click', (e) => {
-        if (dishImageModal && e.target === dishImageModal) closeDishImageModal();
-    });
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeDishImageModal();
     });

@@ -16,6 +16,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 
+## [2.1.4] - 2026-09-02
+
+### Changed
+
+- **Bildvorschau als schwebendes Hover-Popover**: Das Popup ist kein ausgewachsenes Modal mehr, sondern ein kleiner Card-Popover (~480 px), der beim Daraufzeigen neben dem Gerichts-Link positioniert wird und automatisch verschwindet, sobald der Zeiger Link und Popover verlässt (X-Button und ESC funktionieren weiterhin).
+- **Neue Bildquellen ohne Proxy**: Die Kette ist jetzt Wikipedia (Artikelbild) → Wikimedia Commons (Bildersuche) → Google über Proxy-Kette (jetzt parallel statt sequenziell — Worst Case 30 s → 10 s) → Openverse. Wikipedia/Commons werden direkt per CORS gefetcht und umgehen die oft überlasteten/erreichbaren Public-Proxys komplett.
+- **Suche bricht beim Schließen ab**: Wird das Popover geschlossen, bricht ein AbortSignal alle laufenden Quellen-Anfragen ab — keine verspäteten Log-Meldungen mehr.
+- **Query-Sanitizer geschärft**: Kleinbuchstaben-Allergencodes `(lm)`, kompakte Gruppen `(AFO)` und führende Aufzählungszeichen (`•`) werden entfernt — die Suchbegriffe sind sauber (v2.1.3 lieferte zusätzlich Console-Diagnose für jeden Kettenschritt).
+
 ## [2.1.2] - 2026-09-01
 
 ### Added

@@ -17,17 +17,18 @@ let dishImagePopupSuppressed = false;
 
 /** Null-safe modal-closed check: missing element (pre-Todo-6) counts as closed. */
 function isDishImageModalClosed() {
-    const modal = document.getElementById('dish-image-modal');
-    return !modal || modal.classList.contains('hidden');
+    const popover = document.getElementById('dish-image-popover');
+    return !popover || popover.classList.contains('hidden');
 }
 
-// Dish image carousel modal state (FR-125) — module singleton, lives outside
-// the menu container so renderVisibleWeeks re-renders never touch the modal.
+// Dish image hover popover state (FR-125) — module singleton, lives outside
+// the menu container so renderVisibleWeeks re-renders never touch the popover.
 let dishImageModalOpen = false;
 let dishImageCurrentQuery = null;
 let dishImageCarouselIndex = 0;
 let dishImageIntervalId = null;
-let dishImageTriggerLink = null;
+let dishImageSearchAbort = null;
+let dishImageCloseTimer = null;
 
 function startDishImageAdvance() {
     stopDishImageAdvance();
@@ -42,6 +43,29 @@ function stopDishImageAdvance() {
     }
 }
 
+function scheduleDishImagePopoverClose(delay) {
+    if (isDishImageModalClosed()) return;
+    clearTimeout(dishImageCloseTimer);
+    dishImageCloseTimer = setTimeout(() => {
+        dishImageCloseTimer = null;
+        closeDishImageModal();
+    }, delay);
+}
+
+function cancelDishImagePopoverClose() {
+    clearTimeout(dishImageCloseTimer);
+    dishImageCloseTimer = null;
+}
+
+/** Keeps the popover open while the pointer rests on it; wires once per element. */
+function ensureDishImagePopoverHoverWiring() {
+    const popover = document.getElementById('dish-image-popover');
+    if (!popover || popover.dataset.hoverWired === 'true') return;
+    popover.dataset.hoverWired = 'true';
+    popover.addEventListener('pointerenter', cancelDishImagePopoverClose);
+    popover.addEventListener('pointerleave', () => scheduleDishImagePopoverClose(250));
+}
+
 /** Activates slide `index` (wrapping both directions) and syncs the dots. */
 function showDishImageSlide(index) {
     const carousel = document.querySelector('#dish-image-body .dish-image-carousel');
@@ -54,28 +78,41 @@ function showDishImageSlide(index) {
 }
 
 /**
- * Opens the dish-image popup for a query (event-flow spec step 3/7):
- * suppression flag set here, reset happens on the link's next pointerleave.
+ * Opens the dish-image hover popover for a query, anchored to the triggering
+ * link. Closes automatically when the pointer leaves link and popover.
  * @param {string} query Sanitized dish query
- * @param {HTMLElement} [linkEl] Triggering anchor — focus returns here on close
+ * @param {HTMLElement} [linkEl] Triggering anchor — the popover is positioned next to it
  */
 export function openDishImageModal(query, linkEl) {
-    const modal = document.getElementById('dish-image-modal');
-    if (!modal) return;
+    const popover = document.getElementById('dish-image-popover');
+    if (!popover) return;
+    if (dishImageSearchAbort) dishImageSearchAbort.abort();
+    dishImageSearchAbort = new AbortController();
+    ensureDishImagePopoverHoverWiring();
     dishImagePopupSuppressed = true;
-    dishImageTriggerLink = linkEl || null;
     dishImageModalOpen = true;
     dishImageCurrentQuery = query;
     dishImageCarouselIndex = 0;
+    cancelDishImagePopoverClose();
 
-    modal.classList.remove('hidden');
-    modal.setAttribute('aria-hidden', 'false');
-    document.getElementById('btn-dish-image-close').focus();
-    document.getElementById('dish-image-title').textContent = t('dishImageModalTitle');
-    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(3) + `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
+    popover.classList.remove('hidden');
+    popover.setAttribute('aria-hidden', 'false');
+    if (linkEl && typeof linkEl.getBoundingClientRect === 'function') {
+        const rect = linkEl.getBoundingClientRect();
+        const width = popover.offsetWidth || 480;
+        const height = popover.offsetHeight || 320;
+        let left = rect.left;
+        if (left + width > window.innerWidth - 8) left = Math.max(8, window.innerWidth - width - 8);
+        let top = rect.bottom + 8;
+        if (top + height > window.innerHeight - 8) top = Math.max(8, rect.top - height - 8);
+        popover.style.left = Math.round(left) + 'px';
+        popover.style.top = Math.round(top) + 'px';
+    }
+    document.getElementById('dish-image-title').textContent = query;
+    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
     tracker.increment('dish_image_popup');
 
-    fetchDishImages(query).then(result => {
+    fetchDishImages(query, undefined, dishImageSearchAbort.signal).then(result => {
         // Stale-response guard: ignore results after query change or close.
         if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
         if (result.source === null) renderDishImageError(query, false);
@@ -98,7 +135,7 @@ function renderDishImageCarousel(query, result) {
     if (!body) return;
     stopDishImageAdvance();
 
-    const sourceLabel = t(result.source === 'openverse' ? 'dishImageSourceOpenverse' : 'dishImageSourceGoogle');
+    const sourceLabel = t({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = escapeHtml([img.creator, img.license].filter(Boolean).join(' — '));
         return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;
@@ -151,17 +188,16 @@ function renderDishImageCarousel(query, result) {
  * returns focus to the trigger link. Safe no-op when already closed.
  */
 export function closeDishImageModal() {
-    const modal = document.getElementById('dish-image-modal');
-    if (!modal || modal.classList.contains('hidden')) return;
+    const popover = document.getElementById('dish-image-popover');
+    if (!popover || popover.classList.contains('hidden')) return;
+    if (dishImageSearchAbort) dishImageSearchAbort.abort();
     stopDishImageAdvance();
-    modal.classList.add('hidden');
-    modal.setAttribute('aria-hidden', 'true');
+    cancelDishImagePopoverClose();
+    popover.classList.add('hidden');
+    popover.setAttribute('aria-hidden', 'true');
     dishImageModalOpen = false;
     dishImageCurrentQuery = null;
     dishImageCarouselIndex = 0;
-    const trigger = dishImageTriggerLink;
-    dishImageTriggerLink = null;
-    if (trigger && trigger.isConnected) trigger.focus();
 }
 
 /**
@@ -646,6 +682,7 @@ export function createDayCard(day) {
                 clearTimeout(dwellTimer);
                 dwellTimer = null;
                 dishImagePopupSuppressed = false;
+                if (!isDishImageModalClosed()) scheduleDishImagePopoverClose(400);
             };
             dishLink.addEventListener('pointerleave', cancelDishDwell);
             dishLink.addEventListener('pointercancel', cancelDishDwell);

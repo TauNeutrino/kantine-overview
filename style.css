@@ -1070,20 +1070,48 @@ body {
     outline-offset: 1px;
 }
 
-/* === Dish Image Carousel Modal (FR-125) === */
-#dish-image-modal .modal-content {
-    max-width: 560px;
+/* === Dish Image Hover Popover (FR-125) === */
+.dish-image-popover {
+    position: fixed;
+    z-index: 1000;
+    width: min(480px, 92vw);
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 12px 14px;
 }
 
-#dish-image-modal .modal-body {
-    padding: 16px;
+.dish-image-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.dish-image-popover-header span {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dish-image-skeleton {
-    height: 240px;
-    border-radius: 12px;
+    height: 130px;
+    border-radius: 10px;
     background: var(--banner-bg);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+}
+
+.dish-image-loading-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
 }
 
 .dish-image-carousel {
@@ -1092,9 +1120,9 @@ body {
 
 .dish-image-track {
     position: relative;
-    height: 300px;
+    height: 210px;
     background: var(--bg-body);
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
 }
 

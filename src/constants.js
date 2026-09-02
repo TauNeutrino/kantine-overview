@@ -70,6 +70,10 @@ export const DISH_IMAGE_CAROUSEL_INTERVAL_MS = 3000;
 export const DISH_IMAGE_FETCH_TIMEOUT_MS = 10000;
 export const DISH_IMAGE_MAX_RESULTS = 5;
 export const DISH_IMAGE_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+/** Wikipedia article summary (lead image) — direct fetch, CORS-enabled, no proxy needed. */
+export const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/page/summary/{q}';
+/** Wikimedia Commons file search (thumburl per hit) — direct fetch, CORS via origin=*, no proxy needed. */
+export const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
 export const DISH_IMAGE_GOOGLE_SCRAPE_URL = 'https://www.google.com/search?q={q}&tbm=isch&hl={hl}&gl=at&ijn=0';
 export const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
 export const DISH_IMAGE_PROXY_CHAIN = [{ name: 'allorigins-raw', template: 'https://api.allorigins.win/raw?url={url}' }, { name: 'codetabs', template: 'https://api.codetabs.com/v1/proxy?quest={url}' }, { name: 'allorigins-get', template: 'https://api.allorigins.win/get?url={url}' }];

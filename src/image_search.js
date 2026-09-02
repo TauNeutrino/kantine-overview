@@ -1,9 +1,10 @@
 // === Dish Image Search: Query Derivation + Fetch Client (FR-123..125) ===
 // Part 1: pure query functions (no dependencies) — vm-testable in isolation.
-// Part 2: keyless image client — Google scrape via proxy chain, Openverse
-// fallback, localStorage cache. Fetches only when fetchDishImages is called.
+// Part 2: keyless image client — source chain Wikipedia → Commons → Google
+// (proxy chain, parallel) → Openverse, localStorage cache, abortable via
+// cancelSignal. Fetches only when fetchDishImages is called.
 
-import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
+import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_WIKIPEDIA_URL, DISH_IMAGE_COMMONS_URL, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
 
 /**
  * Derives the main-course line from a language split result.
@@ -30,8 +31,9 @@ export function getMainCourseLine(split, langMode) {
  */
 export function sanitizeDishQuery(text) {
     const cleaned = String(text || '')
-        .replace(/\s*\([A-Z](?:\s*,\s*[A-Z])*\)/g, '')
+        .replace(/\s*\([A-Za-z]{1,4}(?:\s*,\s*[A-Za-z]{1,4})*\)/g, '')
         .replace(/\d+[.,]\d+\s*€?/g, '')
+        .replace(/^[\s•·▪◦‣*–—-]+/, '')
         .replace(/\s+/g, ' ')
         .trim()
         .replace(/^[,\s]+|[,\s]+$/g, '')
@@ -70,77 +72,142 @@ export function extractImageThumbs(html) {
 }
 
 /**
- * Fetches preview images for a dish query. Stage 1 scrapes Google image
- * search through a keyless proxy chain; stage 2 falls back to Openverse
- * when every proxy came up empty. Fresh results are cached in localStorage
- * for DISH_IMAGE_CACHE_TTL_MS. Never throws: total failure resolves to
- * { images: [], source: null }.
+ * Fetches preview images for a dish query. Source chain: Wikipedia article
+ * summary → Wikimedia Commons search → Google scrape via parallel proxy
+ * chain → Openverse. Fresh results are cached in localStorage for
+ * DISH_IMAGE_CACHE_TTL_MS. Never throws: total failure (or cancellation)
+ * resolves to { images: [], source: null }.
  * @param {string} query Sanitized dish query
  * @param {'de'|'en'} [lang] Query language for the Google UI hint (defaults to 'de')
+ * @param {AbortSignal} [cancelSignal] Aborts the search when the popup closes
  * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
  */
-export async function fetchDishImages(query, lang) {
+export async function fetchDishImages(query, lang, cancelSignal) {
+    if (cancelSignal && cancelSignal.aborted) return { images: [], source: null }
     const key = query.trim().replace(/\s+/g, ' ').toLowerCase()
+    const note = (level, message) => {
+        if (cancelSignal && cancelSignal.aborted) return
+        console[level](`[Kantine] Bildersuche: ${message}`)
+    }
     const cache = readDishImageCache()
     const entry = cache && cache.queries ? cache.queries[key] : null
     if (entry && Date.now() - entry.ts < DISH_IMAGE_CACHE_TTL_MS) {
-        console.log(`[Kantine] Bildersuche: Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)
+        note('log', `Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)
         return { images: entry.images, source: entry.source, cached: true }
     }
 
     const startedAt = Date.now()
-    console.log(`[Kantine] Bildersuche: "${key}" (hl=${lang === 'en' ? 'en' : 'de'}) — kein Cache, Quellen werden der Reihe nach probiert...`)
+    note('log', `"${key}" (hl=${lang === 'en' ? 'en' : 'de'}) — kein Cache, Quellen-Kette: Wikipedia → Commons → Google → Openverse`)
+    const isCancelled = () => Boolean(cancelSignal && cancelSignal.aborted)
+    const attemptSignal = () => {
+        const timeoutSignal = AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS)
+        if (cancelSignal && typeof AbortSignal.any === 'function') return AbortSignal.any([cancelSignal, timeoutSignal])
+        return timeoutSignal
+    }
 
+    let result = null
+
+    // Stage 1: Wikipedia article summary (direct fetch, CORS-enabled) — precise lead image.
+    try {
+        const response = await fetch(DISH_IMAGE_WIKIPEDIA_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
+        if (response.ok) {
+            const summary = await response.json()
+            const thumb = summary && summary.thumbnail && summary.thumbnail.source
+            if (typeof thumb === 'string' && thumb.startsWith('http')) {
+                const images = [{ url: thumb, license: '', creator: summary.title || query }].slice(0, DISH_IMAGE_MAX_RESULTS)
+                writeDishImageCache(key, 'wikipedia', images)
+                note('log', `Wikipedia-Artikelbild gefunden — fertig in ${Date.now() - startedAt}ms — ${images.length} Bild`)
+                result = { images, source: 'wikipedia' }
+            }
+        }
+    } catch (e) {
+        if (!isCancelled()) note('warn', `Wikipedia fehlgeschlagen (${e && e.message ? e.message : e})`)
+    }
+    if (result || isCancelled()) return result || { images: [], source: null }
+
+    // Stage 2: Wikimedia Commons file search (direct fetch, CORS via origin=*).
+    try {
+        const response = await fetch(DISH_IMAGE_COMMONS_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
+        if (response.ok) {
+            const data = await response.json()
+            const pages = data && data.query && data.query.pages ? Object.values(data.query.pages) : []
+            const images = pages
+                .map(page => page && page.imageinfo && page.imageinfo[0])
+                .filter(info => info && typeof info.thumburl === 'string' && info.thumburl.startsWith('https://'))
+                .slice(0, DISH_IMAGE_MAX_RESULTS)
+                .map(info => ({ url: info.thumburl, license: '', creator: String(info.title || '').replace(/^File:/, '') }))
+            note('log', `Commons-Suche lieferte ${images.length} Bilder`)
+            if (images.length >= 1) {
+                writeDishImageCache(key, 'commons', images)
+                note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Wikimedia Commons)`)
+                result = { images, source: 'commons' }
+            }
+        }
+    } catch (e) {
+        if (!isCancelled()) note('warn', `Commons fehlgeschlagen (${e && e.message ? e.message : e})`)
+    }
+    if (result || isCancelled()) return result || { images: [], source: null }
+
+    // Stage 3: Google scrape via proxy chain — all proxies fire in parallel
+    // (one hanging proxy no longer stalls the whole chain); first hit in
+    // chain order wins.
+    note('log', 'Wikipedia/Commons ohne Treffer — Google über Proxy-Kette (parallel)...')
     const scrapeUrl = DISH_IMAGE_GOOGLE_SCRAPE_URL
         .replace('{q}', encodeURIComponent(query))
         .replace('{hl}', lang === 'en' ? 'en' : 'de')
-
-    for (const proxy of DISH_IMAGE_PROXY_CHAIN) {
+    const attempts = DISH_IMAGE_PROXY_CHAIN.map(proxy => {
         const attemptStartedAt = Date.now()
-        try {
-            const response = await fetch(proxy.template.replace('{url}', encodeURIComponent(scrapeUrl)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
-            if (!response.ok) {
-                console.warn(`[Kantine] Bildersuche: ${proxy.name} antwortete HTTP ${response.status} nach ${Date.now() - attemptStartedAt}ms — nächster Versuch`)
-                continue
-            }
-            let body = await response.text()
-            if (proxy.name === 'allorigins-get') body = JSON.parse(body).contents
-            const images = extractImageThumbs(body)
-            console.log(`[Kantine] Bildersuche: ${proxy.name} lieferte ${images.length} Bilder (${Date.now() - attemptStartedAt}ms, ${(body.length / 1024).toFixed(0)} KB HTML)`)
-            if (images.length < 1) continue
-            writeDishImageCache(key, 'google', images)
-            console.log(`[Kantine] Bildersuche: fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Google via ${proxy.name})`)
-            return { images, source: 'google' }
-        } catch (e) {
-            // Proxy unreachable, timed out or returned a malformed payload — try the next one.
-            console.warn(`[Kantine] Bildersuche: ${proxy.name} fehlgeschlagen nach ${Date.now() - attemptStartedAt}ms (${e && e.message ? e.message : e})`)
+        return fetch(proxy.template.replace('{url}', encodeURIComponent(scrapeUrl)), { signal: attemptSignal() })
+            .then(async response => {
+                if (!response.ok) {
+                    note('warn', `${proxy.name} antwortete HTTP ${response.status} nach ${Date.now() - attemptStartedAt}ms`)
+                    return []
+                }
+                let body = await response.text()
+                if (proxy.name === 'allorigins-get') body = JSON.parse(body).contents
+                const images = extractImageThumbs(body)
+                note('log', `${proxy.name} lieferte ${images.length} Bilder (${Date.now() - attemptStartedAt}ms, ${(body.length / 1024).toFixed(0)} KB HTML)`)
+                return images
+            })
+            .catch(e => {
+                note('warn', `${proxy.name} fehlgeschlagen nach ${Date.now() - attemptStartedAt}ms (${e && e.message ? e.message : e})`)
+                return []
+            })
+    })
+    const settled = await Promise.all(attempts)
+    if (isCancelled()) return { images: [], source: null }
+    for (let i = 0; i < DISH_IMAGE_PROXY_CHAIN.length; i++) {
+        if (settled[i].length >= 1) {
+            writeDishImageCache(key, 'google', settled[i])
+            note('log', `fertig in ${Date.now() - startedAt}ms — ${settled[i].length} Bilder (Quelle: Google via ${DISH_IMAGE_PROXY_CHAIN[i].name})`)
+            return { images: settled[i], source: 'google' }
         }
     }
+    note('log', 'alle Proxys ohne Treffer — Fallback Openverse...')
 
-    const openverseStartedAt = Date.now()
+    // Stage 4: Openverse.
     try {
-        console.log('[Kantine] Bildersuche: alle Proxys ohne Treffer — Fallback Openverse...')
-        const response = await fetch(DISH_IMAGE_OPENVERSE_URL.replace('{q}', encodeURIComponent(query)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
+        const response = await fetch(DISH_IMAGE_OPENVERSE_URL.replace('{q}', encodeURIComponent(query)), { signal: attemptSignal() })
         if (response.ok) {
             const data = await response.json()
             const images = data.results.map(r => ({ url: r.thumbnail || r.url, license: r.license || '', creator: r.creator || '' }))
                 .filter(image => typeof image.url === 'string' && image.url.startsWith('https://'))
                 .slice(0, DISH_IMAGE_MAX_RESULTS)
-            console.log(`[Kantine] Bildersuche: Openverse lieferte ${images.length} verwendbare Bilder (${Date.now() - openverseStartedAt}ms)`)
+            note('log', `Openverse lieferte ${images.length} verwendbare Bilder`)
             if (images.length >= 1) {
                 writeDishImageCache(key, 'openverse', images)
-                console.log(`[Kantine] Bildersuche: fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Openverse)`)
+                note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Openverse)`)
                 return { images, source: 'openverse' }
             }
         } else {
-            console.warn(`[Kantine] Bildersuche: Openverse antwortete HTTP ${response.status} nach ${Date.now() - openverseStartedAt}ms`)
+            note('warn', `Openverse antwortete HTTP ${response.status}`)
         }
     } catch (e) {
         // Openverse unreachable or malformed — fall through to the total-failure result.
-        console.warn(`[Kantine] Bildersuche: Openverse fehlgeschlagen nach ${Date.now() - openverseStartedAt}ms (${e && e.message ? e.message : e})`)
+        note('warn', `Openverse fehlgeschlagen (${e && e.message ? e.message : e})`)
     }
 
-    console.warn(`[Kantine] Bildersuche: keine Quelle lieferte Bilder für "${key}" (${Date.now() - startedAt}ms) — Fehlerzustand mit "Bei Google öffnen"-Link wird angezeigt`)
+    note('warn', `keine Quelle lieferte Bilder für "${key}" (${Date.now() - startedAt}ms) — Fehlerzustand mit "Bei Google öffnen"-Link wird angezeigt`)
     return { images: [], source: null }
 }
 
