@@ -84,44 +84,63 @@ export async function fetchDishImages(query, lang) {
     const cache = readDishImageCache()
     const entry = cache && cache.queries ? cache.queries[key] : null
     if (entry && Date.now() - entry.ts < DISH_IMAGE_CACHE_TTL_MS) {
+        console.log(`[Kantine] Bildersuche: Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)
         return { images: entry.images, source: entry.source, cached: true }
     }
+
+    const startedAt = Date.now()
+    console.log(`[Kantine] Bildersuche: "${key}" (hl=${lang === 'en' ? 'en' : 'de'}) — kein Cache, Quellen werden der Reihe nach probiert...`)
 
     const scrapeUrl = DISH_IMAGE_GOOGLE_SCRAPE_URL
         .replace('{q}', encodeURIComponent(query))
         .replace('{hl}', lang === 'en' ? 'en' : 'de')
 
     for (const proxy of DISH_IMAGE_PROXY_CHAIN) {
+        const attemptStartedAt = Date.now()
         try {
             const response = await fetch(proxy.template.replace('{url}', encodeURIComponent(scrapeUrl)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
-            if (!response.ok) continue
+            if (!response.ok) {
+                console.warn(`[Kantine] Bildersuche: ${proxy.name} antwortete HTTP ${response.status} nach ${Date.now() - attemptStartedAt}ms — nächster Versuch`)
+                continue
+            }
             let body = await response.text()
             if (proxy.name === 'allorigins-get') body = JSON.parse(body).contents
             const images = extractImageThumbs(body)
+            console.log(`[Kantine] Bildersuche: ${proxy.name} lieferte ${images.length} Bilder (${Date.now() - attemptStartedAt}ms, ${(body.length / 1024).toFixed(0)} KB HTML)`)
             if (images.length < 1) continue
             writeDishImageCache(key, 'google', images)
+            console.log(`[Kantine] Bildersuche: fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Google via ${proxy.name})`)
             return { images, source: 'google' }
         } catch (e) {
             // Proxy unreachable, timed out or returned a malformed payload — try the next one.
+            console.warn(`[Kantine] Bildersuche: ${proxy.name} fehlgeschlagen nach ${Date.now() - attemptStartedAt}ms (${e && e.message ? e.message : e})`)
         }
     }
 
+    const openverseStartedAt = Date.now()
     try {
+        console.log('[Kantine] Bildersuche: alle Proxys ohne Treffer — Fallback Openverse...')
         const response = await fetch(DISH_IMAGE_OPENVERSE_URL.replace('{q}', encodeURIComponent(query)), { signal: AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS) })
         if (response.ok) {
             const data = await response.json()
             const images = data.results.map(r => ({ url: r.thumbnail || r.url, license: r.license || '', creator: r.creator || '' }))
                 .filter(image => typeof image.url === 'string' && image.url.startsWith('https://'))
                 .slice(0, DISH_IMAGE_MAX_RESULTS)
+            console.log(`[Kantine] Bildersuche: Openverse lieferte ${images.length} verwendbare Bilder (${Date.now() - openverseStartedAt}ms)`)
             if (images.length >= 1) {
                 writeDishImageCache(key, 'openverse', images)
+                console.log(`[Kantine] Bildersuche: fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Openverse)`)
                 return { images, source: 'openverse' }
             }
+        } else {
+            console.warn(`[Kantine] Bildersuche: Openverse antwortete HTTP ${response.status} nach ${Date.now() - openverseStartedAt}ms`)
         }
     } catch (e) {
         // Openverse unreachable or malformed — fall through to the total-failure result.
+        console.warn(`[Kantine] Bildersuche: Openverse fehlgeschlagen nach ${Date.now() - openverseStartedAt}ms (${e && e.message ? e.message : e})`)
     }
 
+    console.warn(`[Kantine] Bildersuche: keine Quelle lieferte Bilder für "${key}" (${Date.now() - startedAt}ms) — Fehlerzustand mit "Bei Google öffnen"-Link wird angezeigt`)
     return { images: [], source: null }
 }
 

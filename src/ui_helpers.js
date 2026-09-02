@@ -121,9 +121,11 @@ function renderDishImageCarousel(query, result) {
     // Failed image: drop its slide, re-sync dots, advance; all failed → error state.
     carousel.querySelectorAll('.dish-image-slide img').forEach(img => {
         img.addEventListener('error', () => {
+            console.warn(`[Kantine] Bildersuche: Bild konnte nicht geladen werden (${img.src.slice(0, 80)}...) — Slide wird entfernt`)
             const slide = img.closest('.dish-image-slide');
             if (slide) slide.remove();
             if (carousel.querySelectorAll('.dish-image-slide').length === 0) {
+                console.warn('[Kantine] Bildersuche: alle Karussell-Bilder fehlgeschlagen — Fehlerzustand wird angezeigt');
                 renderDishImageError(query);
                 return;
             }
