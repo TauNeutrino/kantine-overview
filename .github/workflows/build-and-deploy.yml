@@ -19,6 +19,7 @@ jobs:
       GIST_PAT:  ${{ secrets.GIST_PAT }}
       GIST_ID:   ${{ secrets.GIST_ID }}
       GIST_SALT: ${{ secrets.GIST_SALT }}
+      CORSPROXY_KEY: ${{ secrets.CORSPROXY_KEY }}
     steps:
       - uses: actions/checkout@v7
         with:

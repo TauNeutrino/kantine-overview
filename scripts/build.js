@@ -159,6 +159,7 @@ function stepReadAndInject() {
   const GIST_PAT  = process.env.GIST_PAT || '';
   const GIST_ID   = process.env.GIST_ID  || '';
   const GIST_SALT = process.env.GIST_SALT || '';
+  const CORSPROXY_KEY = process.env.CORSPROXY_KEY || '';
 
   // Fail loudly if any required Gist credential is missing — otherwise the
   // {{GIST_*}} placeholders stay literal in the bundle and every Gist API
@@ -207,7 +208,8 @@ function stepReadAndInject() {
     .replace(/\{\{FAVICON_DATA_URI\}\}/g, FAVICON_URL)
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT_OBF)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
-    .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT);
+    .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT)
+    .replace(/\{\{CORSPROXY_KEY\}\}/g, CORSPROXY_KEY);
 
   // Defensive guard: no placeholder may survive injection in the shipped bundle.
   const survivors = ['{{GIST_PAT}}', '{{GIST_ID}}', '{{GIST_SALT}}', '{{CSS}}']
@@ -537,6 +539,8 @@ function stepSmokeAndSize(ctx) {
   log('✓ Gist ID: ' + (GI ? (GI === '{{GIST_ID}}' ? '(placeholder)' : GI.substring(0, 8) + '...') : '(empty)'));
   const GS = process.env.GIST_SALT;
   log('✓ Gist Salt: ' + (GS ? '(set)' : '(placeholder)'));
+  const CK = process.env.CORSPROXY_KEY;
+  log('✓ Corsproxy key: ' + (CK ? 'injected (length: ' + CK.length + ')' : 'not set — the corsproxy.io chain entry stays unauthenticated'));
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────

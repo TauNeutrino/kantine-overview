@@ -24,6 +24,7 @@ const COMMONS_MATCH = 'commons.wikimedia.org';
 const RAW_MATCH = 'api.allorigins.win/raw';
 const CODETABS_MATCH = 'api.codetabs.com';
 const GET_MATCH = 'api.allorigins.win/get';
+const CORSPROXY_MATCH = 'corsproxy.io';
 const OPENVERSE_MATCH = 'api.openverse.org';
 
 const sandbox = {
@@ -255,14 +256,15 @@ async function runClientTests() {
     ok("extractImageThumbs: caps results at DISH_IMAGE_MAX_RESULTS (5 of 7 distinct URLs)");
 
     // Case 12 (a): raw proxy throws -> codetabs returns HTML with &amp; entities + 1 duplicate;
-    // parallel chain: all 3 proxies fire, first hit in chain order wins
+    // parallel chain: all 4 proxies fire, first hit in chain order wins
     resetSandboxState();
     planFetch([
         wikiMiss,
         commonsEmpty,
         { match: RAW_MATCH, steps: [{ reject: 'allorigins-raw network error' }] },
         { match: CODETABS_MATCH, steps: [{ ok: true, text: googleFixtureHtml }] },
-        { match: GET_MATCH, steps: [{ reject: 'allorigins-get network error' }] }
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get network error' }] },
+        { match: CORSPROXY_MATCH, steps: [{ reject: 'corsproxy network error' }] }
     ]);
     const resultA = await fetchDishImages('Wiener Schnitzel');
     assertEquals(resultA.source, 'google', "codetabs success should report source 'google'");
@@ -271,9 +273,10 @@ async function runClientTests() {
         { url: THUMB_A_DECODED, license: '', creator: '' },
         { url: THUMB_B, license: '', creator: '' }
     ], "deduped, entity-decoded gstatic URLs in HTML order");
-    assertEquals(fetchLog.length, 5, "wikipedia miss + commons empty + 3 PARALLEL proxies = 5 fetch calls");
+    assertEquals(fetchLog.length, 6, "wikipedia miss + commons empty + 4 PARALLEL proxies = 6 fetch calls");
     assertEquals(fetchCallsFor(RAW_MATCH), 1, "allorigins-raw must be attempted");
     assertEquals(fetchCallsFor(GET_MATCH), 1, "allorigins-get must fire in parallel even though raw already failed");
+    assertEquals(fetchCallsFor(CORSPROXY_MATCH), 1, "corsproxy-io must fire in parallel");
     const codetabsCall = fetchLog.find(call => call.url.includes(CODETABS_MATCH));
     assertEquals(codetabsCall.url, 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://www.google.com/search?q=Wiener%20Schnitzel&tbm=isch&hl=de&gl=at&ijn=0'), "proxy URL wraps the encoded Google scrape URL (hl=de default)");
     assertEquals(codetabsCall.opts && codetabsCall.opts.signal && codetabsCall.opts.signal.timeoutMs, sandbox.DISH_IMAGE_FETCH_TIMEOUT_MS, "each proxy fetch carries AbortSignal.timeout(DISH_IMAGE_FETCH_TIMEOUT_MS)");
@@ -286,12 +289,13 @@ async function runClientTests() {
         commonsEmpty,
         { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
-        { match: GET_MATCH, steps: [{ ok: true, text: JSON.stringify({ contents: `<div>${THUMB_C}</div>` }) }] }
+        { match: GET_MATCH, steps: [{ ok: true, text: JSON.stringify({ contents: `<div>${THUMB_C}</div>` }) }] },
+        { match: CORSPROXY_MATCH, steps: [{ reject: 'corsproxy down' }] }
     ]);
     const resultA2 = await fetchDishImages('Kaiserschmarrn');
     assertEquals(resultA2.source, 'google', "allorigins-get JSON contents should be extracted as google source");
     assertDeepEqual(resultA2.images, [{ url: THUMB_C, license: '', creator: '' }], "images should come from the JSON .contents payload");
-    assertEquals(fetchLog.length, 5, "wikipedia + commons + 3 parallel proxies = 5 fetch calls");
+    assertEquals(fetchLog.length, 6, "wikipedia + commons + 4 parallel proxies = 6 fetch calls");
     assertEquals(fetchCallsFor(GET_MATCH), 1, "third chain entry must be the allorigins-get JSON proxy");
     ok("fetchDishImages: allorigins-get JSON body unwrapped via .contents; 200-but-empty proxy does not win");
 
@@ -302,7 +306,8 @@ async function runClientTests() {
         commonsEmpty,
         { match: RAW_MATCH, steps: [{ ok: true, text: `<div>${THUMB_C}</div>` }] },
         { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
-        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] }
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] },
+        { match: CORSPROXY_MATCH, steps: [{ reject: 'corsproxy down' }] }
     ]);
     await fetchDishImages('roast pork with dumplings', 'en');
     const scrapeCall = fetchLog.find(call => decodeURIComponent(call.url).includes('google.com/search'));
@@ -322,7 +327,7 @@ async function runClientTests() {
     assertEquals(fetchLog.length, 1, "Wikipedia hit must skip commons, proxies and openverse");
     ok("fetchDishImages: Wikipedia article image short-circuits the chain (1 fetch, no proxy traffic)");
 
-    // Case 15 (b): wikipedia/commons empty + 3 anti-bot proxies -> Openverse fallback with 5 thumbnails
+    // Case 15 (b): wikipedia/commons empty + 4 anti-bot proxies -> Openverse fallback with 5 thumbnails
     resetSandboxState();
     planFetch([
         wikiMiss,
@@ -330,6 +335,7 @@ async function runClientTests() {
         { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: CODETABS_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: GET_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CORSPROXY_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: OPENVERSE_MATCH, steps: [{ ok: true, json: { results: [
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a1', license: 'CC BY 4.0', creator: 'Jane Doe' },
             { thumbnail: 'https://api.openverse.org/v1/thumbs/a2', license: 'CC0', creator: 'Max Muster' },
@@ -348,8 +354,8 @@ async function runClientTests() {
         { url: 'https://api.openverse.org/v1/thumbs/a4', license: 'PDM', creator: 'Ana' },
         { url: 'https://api.openverse.org/v1/thumbs/a5', license: '', creator: '' }
     ], "license/creator pass through unchanged, missing fields default to ''");
-    assertEquals(fetchLog.length, 6, "wikipedia + commons + 3 proxies + 1 Openverse = 6 fetch calls");
-    assertEquals(fetchLog[5].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
+    assertEquals(fetchLog.length, 7, "wikipedia + commons + 4 proxies + 1 Openverse = 7 fetch calls");
+    assertEquals(fetchLog[6].url, 'https://api.openverse.org/v1/images/?q=Gulasch%20mit%20Kn%C3%B6del&page_size=5', "Openverse URL should carry the encoded query");
     ok("fetchDishImages: empty wiki/commons + anti-bot proxies -> Openverse fallback with 5 thumbnail results, license/creator passthrough");
 
     // Case 16 (b2): Openverse mapping uses thumbnail||url and filters to https strings
@@ -360,6 +366,7 @@ async function runClientTests() {
         { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: CODETABS_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: GET_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CORSPROXY_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
         { match: OPENVERSE_MATCH, steps: [{ ok: true, json: { results: [
             { url: 'https://api.openverse.org/v1/images/direct1', license: 'CC BY', creator: 'Only Url' },
             { thumbnail: 'http://insecure.example/thumb', license: '', creator: '' },
@@ -383,15 +390,16 @@ async function runClientTests() {
         { match: RAW_MATCH, steps: [{ reject: 'allorigins-raw down' }] },
         { match: CODETABS_MATCH, steps: [{ ok: false, status: 500 }] },
         { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] },
+        { match: CORSPROXY_MATCH, steps: [{ reject: 'corsproxy down' }] },
         { match: OPENVERSE_MATCH, steps: [{ reject: 'openverse down' }] }
     ]);
     const resultC = await fetchDishImages('Total Failure Dish');
     assertDeepEqual(resultC, { images: [], source: null }, "total failure should resolve to { images: [], source: null }");
-    assertEquals(fetchLog.length, 6, "all 6 sources should be attempted");
+    assertEquals(fetchLog.length, 7, "all 7 sources should be attempted");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "no cache write on total failure");
-    ok("fetchDishImages: everything fails -> { images: [], source: null }, 6 calls, no throw, no cache write");
+    ok("fetchDishImages: everything fails -> { images: [], source: null }, 7 calls, no throw, no cache write");
 
-    // Case 18 (c2): every source answers 403 -> 6 calls, empty result (anti-bot scenario)
+    // Case 18 (c2): every source answers 403 -> 7 calls, empty result (anti-bot scenario)
     resetSandboxState();
     planFetch([
         { match: WIKI_MATCH, steps: [{ ok: false, status: 403 }] },
@@ -399,13 +407,14 @@ async function runClientTests() {
         { match: RAW_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: CODETABS_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: GET_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: CORSPROXY_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: OPENVERSE_MATCH, steps: [{ ok: false, status: 403 }] }
     ]);
     const resultC2 = await fetchDishImages('Käsespätzle');
     assertDeepEqual(resultC2, { images: [], source: null }, "403 everywhere should degrade to the empty result");
-    assertEquals(fetchLog.length, 6, "403 variant: all 6 sources attempted");
+    assertEquals(fetchLog.length, 7, "403 variant: all 7 sources attempted");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "403 variant must not write a cache entry");
-    ok("fetchDishImages: all sources 403 -> 6 fetch calls, empty result, graceful degradation");
+    ok("fetchDishImages: all sources 403 -> 7 fetch calls, empty result, graceful degradation");
 
     // Case 18b: pre-aborted cancelSignal -> instant empty result, zero fetch calls
     resetSandboxState();
@@ -416,6 +425,24 @@ async function runClientTests() {
     assertDeepEqual(resultAborted, { images: [], source: null }, "pre-aborted search should resolve to the empty result");
     assertEquals(fetchLog.length, 0, "pre-aborted search must not issue any fetch call");
     ok("fetchDishImages: pre-aborted cancelSignal -> no fetch traffic at all");
+
+    // Case 18c: keyed corsproxy.io (last in chain) delivers when the public proxies fail
+    resetSandboxState();
+    planFetch([
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: antiBotHtml }] },
+        { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] },
+        { match: CORSPROXY_MATCH, steps: [{ ok: true, text: `<div>${THUMB_C}</div>` }] },
+        { match: OPENVERSE_MATCH, steps: [{ reject: 'openverse unexpected call' }] }
+    ]);
+    const resultCors = await fetchDishImages('Topfenknödel');
+    assertEquals(resultCors.source, 'google', "corsproxy hit should report google source");
+    assertDeepEqual(resultCors.images, [{ url: THUMB_C, license: '', creator: '' }], "corsproxy images extracted from the scraped HTML");
+    assertEquals(fetchCallsFor(CORSPROXY_MATCH), 1, "corsproxy.io must be attempted last in chain order");
+    assertEquals(fetchLog.length, 6, "wikipedia + commons + 4 parallel proxies = 6 fetch calls (openverse skipped)");
+    ok("fetchDishImages: keyed corsproxy.io delivers as last chain entry when public proxies fail");
 
     // Case 19 (d): cache hit serves 0 fetches; TTL expiry after 8 days refetches
     resetSandboxState();
@@ -485,7 +512,7 @@ async function runClientTests() {
 }
 
 // Plan QA failure scenario: every source answers HTTP 403 (anti-bot).
-// Expected graceful behavior: 6 fetch calls (wikipedia + commons + 3 proxies +
+// Expected graceful behavior: 7 fetch calls (wikipedia + commons + 4 proxies +
 // openverse), empty result, no outward throw, no cache write.
 async function simulateAllProxies403() {
     console.log("--- FAIL SCENARIO SIMULATION: every image source answers HTTP 403 (anti-bot) ---");
@@ -496,6 +523,7 @@ async function simulateAllProxies403() {
         { match: RAW_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: CODETABS_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: GET_MATCH, steps: [{ ok: false, status: 403 }] },
+        { match: CORSPROXY_MATCH, steps: [{ ok: false, status: 403 }] },
         { match: OPENVERSE_MATCH, steps: [{ ok: false, status: 403 }] }
     ]);
     const result = await fetchDishImages('Käsespätzle');
@@ -504,10 +532,10 @@ async function simulateAllProxies403() {
         console.log('         -> HTTP 403, response.ok=false -> no extraction, next stage');
     }
     console.log(`  result: ${JSON.stringify(result)}`);
-    assertEquals(fetchLog.length, 6, "fail scenario: wikipedia + commons + 3 proxies + openverse = 6 fetch calls");
+    assertEquals(fetchLog.length, 7, "fail scenario: wikipedia + commons + 4 proxies + openverse = 7 fetch calls");
     assertDeepEqual(result, { images: [], source: null }, "fail scenario: graceful empty result with source null");
     assertEquals(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE), null, "fail scenario: no cache write");
-    ok("fail scenario (all 403): fetch call count = 6, result empty, no outward throw");
+    ok("fail scenario (all 403): fetch call count = 7, result empty, no outward throw");
 }
 
 runClientTests().then(

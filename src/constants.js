@@ -76,7 +76,7 @@ export const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/pa
 export const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
 export const DISH_IMAGE_GOOGLE_SCRAPE_URL = 'https://www.google.com/search?q={q}&tbm=isch&hl={hl}&gl=at&ijn=0';
 export const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
-export const DISH_IMAGE_PROXY_CHAIN = [{ name: 'allorigins-raw', template: 'https://api.allorigins.win/raw?url={url}' }, { name: 'codetabs', template: 'https://api.codetabs.com/v1/proxy?quest={url}' }, { name: 'allorigins-get', template: 'https://api.allorigins.win/get?url={url}' }];
+export const DISH_IMAGE_PROXY_CHAIN = [{ name: 'allorigins-raw', template: 'https://api.allorigins.win/raw?url={url}' }, { name: 'codetabs', template: 'https://api.codetabs.com/v1/proxy?quest={url}' }, { name: 'allorigins-get', template: 'https://api.allorigins.win/get?url={url}' }, { name: 'corsproxy-io', template: 'https://corsproxy.io/?key={{CORSPROXY_KEY}}&url={url}' }];
 export const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 
 export const GIST_ID = '{{GIST_ID}}';
