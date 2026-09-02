@@ -84,9 +84,11 @@ Highest-centrality symbols (ranked by cross-file references):
 ```bash
 npm run build          # Webpack → Terser → inject placeholders → tests → size guard
 npm test               # Run the 5 standalone Node tests (needs built dist/ first)
-npm run release        # Tag and push from version.txt (requires clean working tree)
+npm run release        # Bump patch version + commit + push to main — CI/CD does build, deploy and tag
 npm run train-langmodel # Regenerate src/lang/langModelSeed.js from fixture data
 ```
+
+> **Release/Deploy**: `npm run release` bumpt die Patch-Version in `version.txt`, commitet und pusht nach `main`. Alles Weitere übernimmt CI/CD (`.github/workflows/build-and-deploy.yml`): Build mit echten Secrets, GitHub-Pages-Deploy und Erstellen/Pushen des Git-Tags. Das frühere lokale Tag/Push-Verhalten wurde entfernt — es würde den CI-Tag mit lokal gebauten, secrets-freien Artefakten überschreiben.
 
 ## NOTES
 

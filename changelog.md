@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Bildvorschau für Hauptgerichte**: Bei sicher erkannten Menüs (Splitter-Konfidenz 'high') ist der Hauptgerichtstext (zweiter Gang; bei Ein-Gang-Menüs dieser Gang) jetzt ein Link innerhalb der Menübeschreibung. Verhalten: Hover ≥ 500 ms öffnet ein Popup mit bis zu 5 Gerichtsbildern als automatisch wechselndes Karussell, Klick/Enter öffnet immer die Google-Bildersuche in einem neuen Tab, kein Link bei Vorlagen-Karten, unsicherer Trennung oder im Zweisprachig-Modus (ALL), Bilder laden erst bei Popup-Öffnung (Cache 7 Tage), das Karussell wechselt alle 3 s, pausiert bei Hover/Fokus und ist bei `prefers-reduced-motion` deaktiviert.
 - **Bildquellen ohne Credentials**: Die Bilder werden keyless beschafft, primär über eine Proxy-Kette der Google-Bildersuche und bei Ausfall über die Openverse-API. Keine API-Keys, keine laufenden Kosten. Ein dauerhaft sichtbarer „Bei Google öffnen"-Link im Popup federt den Fehler-/Leerzustand ab.
 
+### Changed
+
+- **Release-Flow vereinfacht**: `npm run release` bumpt nur noch die Patch-Version in `version.txt`, commitet und pusht nach `main` — Build, GitHub-Pages-Deploy und Git-Tag übernimmt vollständig die CI/CD (`.github/workflows/build-and-deploy.yml`). Das frühere lokale Tag/Push-Verhalten des Skripts ist entfernt; ein manuelles Taggen ist nicht mehr nötig (bzw. schädlich, da es den CI-Tag mit secrets-freien Artefakten überschreiben würde). Guard: nur von `main`, sauberer Working Tree, nächste Version darf noch nicht als Tag existieren.
+
 ## [2.1.1] - 2026-08-05
 
 ### Removed

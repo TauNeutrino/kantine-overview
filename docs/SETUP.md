@@ -60,7 +60,7 @@ Alternativ: Öffne `dist/kantine-standalone.html` für UI-Tests mit Mock-Daten.
 | Dependencies installieren | `npm install` |
 | Build | `npm run build` |
 | Tests | `npm test` |
-| Release | `npm run release` |
+| Release | `npm run release` (bumpt Patch-Version + push — Build/Deploy/Tag macht CI/CD) |
 | Clean Build | `rm -rf dist/` |
 
 ---

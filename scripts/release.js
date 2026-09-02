@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * release.js — Platform-independent Kantine Releaser
- * Replaces: release.sh
+ * release.js — Kantine Release Trigger
+ *
+ * Bumps the patch version in version.txt, commits and pushes to main.
+ * Everything else is automated by CI/CD (.github/workflows/build-and-deploy.yml):
+ * build with real secrets, GitHub Pages deploy, git tag created/pushed by CI.
  *
  * Pipeline:
- *   1. Check dist/ exists
- *   2. Read version
- *   3. Check for uncommitted changes (excluding dist/)
- *   4. git add dist/
- *   5. git commit -m "chore: update build artifacts for <version>"
- *   6. git tag <version>
- *   7. git push origin HEAD
- *   8. git push origin --force tag <version>
+ *   1. Guard: on branch main, clean working tree
+ *   2. Guard: next version tag must not exist yet (local + remote)
+ *   3. Bump patch in version.txt (v2.1.2 -> v2.1.3)
+ *   4. Commit version.txt
+ *   5. Push main -> CI builds, deploys GitHub Pages and tags the release
  */
 
 'use strict';
@@ -21,7 +21,6 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const DIST = path.join(ROOT, 'dist');
 const VERSION_FILE = path.join(ROOT, 'version.txt');
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -42,85 +41,70 @@ function warn(...a)   { console.warn('⚠️', ...a); }
 
 // ── Main ───────────────────────────────────────────────────────────────────
 function main() {
-  // 1. Check dist/
-  if (!fs.existsSync(DIST)) {
-    fail(`dist folder missing at ${DIST}. Please run "npm run build" first.`);
-  }
-
-  // 2. Read version
-  if (!fs.existsSync(VERSION_FILE)) {
-    fail(`version.txt not found at ${VERSION_FILE}`);
-  }
-  const VERSION = fs.readFileSync(VERSION_FILE, 'utf8').replace(/[\n\r ]/g, '');
-  if (!VERSION) {
-    fail('Could not determine version from version.txt');
-  }
-
-  log(`=== Kantine Bookmarklet Releaser (${VERSION}) ===\n`);
-
-  // Check we're in a git repo
+  // Git repo guard
   try { exec('git rev-parse --git-dir'); } catch (_) {
     fail('Not a git repository.');
   }
 
-  // 3. Check for uncommitted changes (excluding dist/)
-  const statusOutput = exec('git status --porcelain --ignore-submodules');
-  const nonDistChanges = statusOutput
-    .split('\n')
-    .filter(line => line.trim() && !line.includes('dist/'))
-    .join('\n');
-
-  if (nonDistChanges) {
-    warn('You have uncommitted changes outside dist/:');
-    console.log(nonDistChanges);
-    console.log();
-    fail('Please commit your code changes before running the release script.\n' +
-         '  You can run: npm run build && git add -A && git commit -m "..." && npm run release');
+  // Branch guard: CI only deploys from main
+  const branch = exec('git branch --show-current');
+  if (branch !== 'main') {
+    fail(`Releasing is only allowed from branch main (current: ${branch}).`);
   }
 
-  // 4. git add dist/
-  log('=== Committing build artifacts ===');
-  exec('git add dist/');
-  ok('git add dist/');
-
-  // 5. git commit (allow-empty — we want a tag commit even if nothing changed)
-  try {
-    exec(`git commit -m "chore: update build artifacts for ${VERSION}" --allow-empty`);
-    ok(`Committed dist/ for ${VERSION}`);
-  } catch (e) {
-    warn(`Commit may have failed: ${e.message}`);
+  // Clean tree guard: a release is a deliberate act from a clean state
+  const status = exec('git status --porcelain --ignore-submodules');
+  if (status) {
+    fail('Working tree not clean — commit your changes first.\n' +
+         '  (Stale local dist/ builds can be discarded via: git checkout -- dist/)\n' + status);
   }
 
-  // 6. Tag
-  log('\n=== Tagging ===');
-  const tagExists = (() => {
-    try { exec(`git rev-parse "${VERSION}"`); return true; }
+  // Read + parse current version
+  if (!fs.existsSync(VERSION_FILE)) {
+    fail(`version.txt not found at ${VERSION_FILE}`);
+  }
+  const current = fs.readFileSync(VERSION_FILE, 'utf8').replace(/[\n\r ]/g, '');
+  const match = /^v(\d+)\.(\d+)\.(\d+)$/.exec(current);
+  if (!match) {
+    fail(`Unexpected version format in version.txt: "${current}" (expected vX.Y.Z)`);
+  }
+  const next = `v${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+
+  // Tag guards: never bump onto an already-released version
+  const localTagExists = (() => {
+    try { exec(`git rev-parse -q --verify refs/tags/${next}`); return true; }
     catch (_) { return false; }
   })();
-  if (tagExists) {
-    exec(`git tag -f "${VERSION}"`);
-    warn(`Tag ${VERSION} moved to current commit.`);
-  } else {
-    exec(`git tag "${VERSION}"`);
-    ok(`Created tag: ${VERSION}`);
+  if (localTagExists) {
+    fail(`Tag ${next} already exists locally — version.txt is behind the tag history.`);
+  }
+  let remoteTag = '';
+  try {
+    remoteTag = exec(`git ls-remote --tags origin refs/tags/${next}`);
+  } catch (e) {
+    warn('Could not check remote tags (network?). Continuing — CI resolves tag conflicts.');
+  }
+  if (remoteTag) {
+    fail(`Tag ${next} already exists on origin — aborting to avoid overwriting a released version.`);
   }
 
-  // 7-8. Push
+  log(`=== Kantine Release Trigger (${current} -> ${next}) ===\n`);
+
+  // Bump version
+  fs.writeFileSync(VERSION_FILE, `${next}\n`);
+  ok(`version.txt: ${current} -> ${next}`);
+
+  // Commit the bump (no [skip ci] — the push itself must trigger CI!)
+  exec('git add version.txt');
+  exec(`git commit -m "chore(release): bump version to ${next}"`);
+  ok(`Committed version bump to ${next}`);
+
+  // Push: CI/CD does the rest (build, Pages deploy, tag)
   log('\n=== Pushing to origin ===');
-  try {
-    exec('git push origin HEAD');
-    ok('Pushed HEAD to origin');
-  } catch (e) {
-    warn(`Push HEAD failed: ${e.message}`);
-  }
-  try {
-    exec(`git push origin --force tag "${VERSION}"`);
-    ok(`Pushed tag ${VERSION} to origin`);
-  } catch (e) {
-    warn(`Push tag failed: ${e.message}`);
-  }
-
-  log(`\n🎉 Successfully released version ${VERSION}!`);
+  exec('git push origin main');
+  ok('Pushed main.');
+  log(`\n🎉 Release ${next} triggered. CI/CD is now building, deploying to GitHub Pages`);
+  log(`   and creating/pushing the tag ${next}. Track it: Actions -> "Build & Deploy".`);
 }
 
 main();
