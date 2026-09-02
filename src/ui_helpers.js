@@ -31,6 +31,8 @@ let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
 
+const DISH_SOURCE_LABEL_KEYS = { wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', kochbar: 'dishImageSourceKochbar', openverse: 'dishImageSourceOpenverse' };
+
 function startDishImageAdvance() {
     stopDishImageAdvance();
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -79,8 +81,10 @@ function showDishImageSlide(index) {
     const captionText = document.getElementById('dish-image-caption-text');
     const activeImg = slides[dishImageCarouselIndex].querySelector('img');
     if (captionText && activeImg) {
-        const label = (activeImg.dataset && activeImg.dataset.title) ? activeImg.dataset.title : dishImageCurrentQuery;
-        captionText.textContent = `${dishImageCaptionPrefix} — ${label}`;
+        const title = (activeImg.dataset && activeImg.dataset.title) ? activeImg.dataset.title : dishImageCurrentQuery;
+        const sourceKey = (activeImg.dataset && activeImg.dataset.source) || '';
+        const sourceLabelNow = (sourceKey && DISH_SOURCE_LABEL_KEYS[sourceKey]) ? t(DISH_SOURCE_LABEL_KEYS[sourceKey]) : dishImageCaptionPrefix;
+        captionText.textContent = `${sourceLabelNow} — ${title}`;
     }
 }
 
@@ -142,11 +146,12 @@ function renderDishImageCarousel(query, result) {
     if (!body) return;
     stopDishImageAdvance();
 
-    const sourceLabel = t({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
+    const sourceLabel = t(DISH_SOURCE_LABEL_KEYS[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = escapeHtml([img.creator, img.license].filter(Boolean).join(' — '));
         const slideTitle = escapeHtml(img.title || img.creator || '');
-        return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}" data-title="${slideTitle}"></div>`;
+        const slideSource = escapeHtml(img.source || result.source || '');
+        return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}" data-title="${slideTitle}" data-source="${slideSource}"></div>`;
     }).join('');
 
     body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${escapeHtml(t('dishImagePrev'))}" title="${escapeHtml(t('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${escapeHtml(t('dishImageNext'))}" title="${escapeHtml(t('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption"><span id="dish-image-caption-text">${escapeHtml(sourceLabel)} — ${escapeHtml(query)}</span> <a href="${escapeHtml(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${escapeHtml(t('dishImageOpenInGoogle'))}</a></p>`;

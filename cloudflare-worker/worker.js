@@ -21,6 +21,9 @@
 
 const CHEFKOCH_SEARCH_URL = 'https://www.chefkoch.de/rs/s0/{q}/Rezepte.html';
 const CK_IMG_REGEX = /https:\/\/img\.chefkoch-cdn\.de\/rezepte\/\d+\/bilder\/\d+\/[^"'?\s\\<>]+\.jpg/g;
+const KOCHBAR_SEARCH_URL = 'https://www.kochbar.de/rezepte/{q}.html';
+const KB_IMG_REGEX = /https:\/\/ais\.kochbar\.de\/kbrezept\/([^\/\s"']+?)\/\d+x\d+\/([^"'\s\\<>]+\.jpg)/g;
+const KB_IMAGE_SIZE = '460x345';
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
 function jsonResponse(body, status = 200) {
@@ -49,6 +52,15 @@ function relevanceScore(slugTokens, queryTokens) {
 
 function titleFromSlug(slugTokens) {
     return slugTokens.map(token => token.charAt(0).toUpperCase() + token.slice(1)).join(' ');
+}
+
+function slugifySearchQuery(query) {
+    return query
+        .toLowerCase()
+        .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-');
 }
 
 async function fetchFromChefkoch(searchQuery, queryTokens) {
@@ -86,6 +98,46 @@ async function fetchFromChefkoch(searchQuery, queryTokens) {
     return scored;
 }
 
+async function fetchFromKochbar(searchQuery, queryTokens) {
+    const slug = slugifySearchQuery(searchQuery);
+    if (slug.length < 3) return [];
+    const searchUrl = KOCHBAR_SEARCH_URL.replace('{q}', slug);
+    let html = '';
+    try {
+        const response = await fetch(searchUrl, {
+            headers: {
+                'User-Agent': BROWSER_UA,
+                'Accept-Language': 'de-AT,de;q=0.9',
+                'Accept': 'text/html,application/xhtml+xml'
+            }
+        });
+        html = await response.text();
+    } catch (e) {
+        return [];
+    }
+
+    const seen = new Set();
+    const scored = [];
+    for (const match of html.matchAll(KB_IMG_REGEX)) {
+        const kbrezeptId = match[1];
+        const file = match[2];
+        if (file.includes('@')) continue;
+        if (seen.has(kbrezeptId)) continue;
+        seen.add(kbrezeptId);
+        const imageUrl = `https://ais.kochbar.de/kbrezept/${kbrezeptId}/${KB_IMAGE_SIZE}/${file}`;
+        const slugTokens = file.replace(/\.jpg$/i, '').replace(/-rezept$/, '').split('-').filter(Boolean);
+        scored.push({
+            url: imageUrl,
+            license: 'Kochbar',
+            creator: 'kochbar.de',
+            title: titleFromSlug(slugTokens),
+            score: relevanceScore(slugTokens, queryTokens),
+            source: 'kochbar'
+        });
+    }
+    return scored;
+}
+
 export default {
     async fetch(request) {
         const url = new URL(request.url);
@@ -110,10 +162,15 @@ export default {
         const searchQuery = (queryDe && queryDe.trim().length >= 3) ? queryDe.trim() : query.trim();
         const queryTokens = searchQuery.toLowerCase().split(/\s+/).filter(word => word.length > 2);
 
-        const scored = await fetchFromChefkoch(searchQuery, queryTokens);
-        scored.sort((a, b) => b.score - a.score);
-        const images = scored.slice(0, 5);
+        const [chefkochScored, kochbarScored] = await Promise.all([
+            fetchFromChefkoch(searchQuery, queryTokens),
+            fetchFromKochbar(searchQuery, queryTokens)
+        ]);
+        const chefkochWithSource = chefkochScored.map(img => ({ ...img, source: 'chefkoch' }));
+        // Merge mit Score absteigend; bei Gleichstand gewinnt Chefkoch (stabile Sortierung).
+        const merged = [...chefkochWithSource, ...kochbarScored].sort((a, b) => b.score - a.score);
+        const images = merged.slice(0, 5);
 
-        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch', count: images.length, images });
+        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar', count: images.length, images });
     }
 }

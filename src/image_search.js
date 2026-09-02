@@ -118,9 +118,9 @@ export async function fetchDishImages(query, lang, cancelSignal, queryDe) {
                     .slice(0, DISH_IMAGE_MAX_RESULTS)
                 note('log', `Worker lieferte ${images.length} Bilder`)
                 if (images.length >= 1) {
-                    writeDishImageCache(key, 'chefkoch', images)
-                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Chefkoch via Worker)`)
-                    return { images, source: 'chefkoch' }
+                    writeDishImageCache(key, images[0] && images[0].source ? images[0].source : 'chefkoch', images)
+                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: ${images[0] && images[0].source ? images[0].source : 'chefkoch'} via Worker)`)
+                    return { images, source: images[0] && images[0].source ? images[0].source : 'chefkoch' }
                 }
             } else {
                 note('warn', `Worker antwortete HTTP ${response.status}`)
