@@ -37,13 +37,16 @@ Wenn sich Änderungen am Worker künftig automatisch deployen sollen:
 
 1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Workers** →
    **Import a repository** (Workers Builds).
-2. **Connect GitHub** (OAuth-Freigabe erteilen) → Repository
+2. **Connect GitHub** (OAuth-Freigabe erteilen — am besten „Only select
+   repositories" und nur dieses Repo) → Repository
    `TauNeutrino/kantine-overview` auswählen.
 3. Build-Konfiguration:
    - **Project name:** `kantine-dish-images`
-   - **Root directory:** `cloudflare-worker` ← wichtig!
+   - **Production branch:** `main`
    - **Build command:** leer lassen
    - **Deploy command:** `npx wrangler deploy`
+   - Kein Root-Verzeichnis nötig — die `wrangler.toml` liegt im Repo-Root und
+     zeigt per `main` auf `cloudflare-worker/worker.js`.
 4. **Create and Deploy** — Cloudflare klont das Repo, baut den Worker und
    deployt ihn. Jeder Push auf `main`, der `cloudflare-worker/` ändert,
    deployet den Worker automatisch neu.
