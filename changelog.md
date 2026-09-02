@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Eigene Cloudflare-Worker-Quelle vorbereitet**: Neuer Worker (`cloudflare-worker/`, serverseitiger Google-Bildersuche-Scrape) ist als schnellste Stufe der Bildkette vorverdrahtet. Aktivierung nach dem Worker-Deploy durch das CI-Secret `DISH_IMAGE_WORKER_URL` (siehe `cloudflare-worker/README.md`); ohne Secret bleibt die Stufe deaktiviert und die Kette unverändert.
 
+## [2.1.11] - 2026-09-02
+
+### Removed
+
+- **Google-Programmable-Search-Overlay entfernt**: Das Experiment mit dem eingebetteten Google-Widget ist raus — das Popover zeigt wieder ausschließlich die schlanke native Ansicht (Chefkoch-Rezeptfotos über den Worker, sonst Wikipedia/Commons/Openverse) und schließt wie gewohnt automatisch, sobald die Maus das Popover verlässt.
+
 ## [2.1.10] - 2026-09-02
 
 ### Changed

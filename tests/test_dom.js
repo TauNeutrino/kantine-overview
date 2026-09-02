@@ -699,42 +699,6 @@ async function runDishImageTests() {
         console.log('OK modal(i) modal survives renderVisibleWeeks re-render');
     }
 
-    // (j) CSE mode: configured cx → google element rendered + query executed, no API fetch
-    {
-        clearDishCache();
-        const cseRender = [];
-        const cseExecute = [];
-        w.google = { search: { cse: { element: {
-            render: (cfg) => cseRender.push(cfg),
-            getElement: () => ({ execute: (q) => cseExecute.push(q) })
-        } } } };
-        w.openDishImageModal('Lasagne Mod J');
-        if (dishModal.classList.contains('hidden')) throw new Error('cse(j) popover must open in CSE mode');
-        if (!cseRender.length || cseRender[0].gname !== 'dish-cse') throw new Error('cse(j) CSE element must be rendered, got: ' + JSON.stringify(cseRender));
-        if (cseRender[0].tag !== 'searchresults-only') throw new Error('cse(j) element tag must be searchresults-only, got: ' + cseRender[0].tag);
-        if (!cseExecute.includes('Lasagne Mod J')) throw new Error('cse(j) query must be executed, got: ' + JSON.stringify(cseExecute));
-        if (!dishBody.querySelector('#dish-cse-results')) throw new Error('cse(j) results container missing');
-        w.closeDishImageModal();
-        delete w.google;
-        console.log('OK cse(j) configured cx renders google element + executes query');
-    }
-
-    // (k) CSE mode: hover-out does NOT auto-close (interactive iframe), X still closes
-    {
-        w.google = { search: { cse: { element: {
-            render: () => { },
-            getElement: () => ({ execute: () => { } })
-        } } } };
-        w.openDishImageModal('Lasagne Mod K');
-        firePointer(dishModal, 'pointerleave', 'mouse');
-        await sleep(600);
-        if (dishModal.classList.contains('hidden')) throw new Error('cse(k) popover must NOT auto-close on pointer leave in CSE mode');
-        d.getElementById('btn-dish-image-close').click();
-        if (!dishModal.classList.contains('hidden')) throw new Error('cse(k) close button must still work in CSE mode');
-        delete w.google;
-        console.log('OK cse(k) CSE popover stays open on hover-out, X closes');
-    }
-
     w.matchMedia = realMatchMedia;
 }
 

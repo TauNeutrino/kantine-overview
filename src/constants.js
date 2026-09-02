@@ -76,8 +76,6 @@ export const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/pa
 export const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
 /** Own Cloudflare Worker (server-side chefkoch recipe-photo scrape, see cloudflare-worker/) — empty string disables the stage. */
 export const DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
-/** Google Programmable Search engine ID (cx) — embeds real Google image results in the popover; empty string disables the mode. */
-export const DISH_IMAGE_CSE_ID = '{{DISH_IMAGE_CSE_ID}}';
 export const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
 export const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 

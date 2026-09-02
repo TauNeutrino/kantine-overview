@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
 import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS, DISH_IMAGE_CAROUSEL_INTERVAL_MS, DISH_IMAGE_CSE_ID } from './constants.js';
+import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS, DISH_IMAGE_CAROUSEL_INTERVAL_MS } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
@@ -29,44 +29,6 @@ let dishImageCarouselIndex = 0;
 let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
-let dishImageCseScriptInjected = false;
-let dishImageCseReady = false;
-let dishImageCsePendingQuery = null;
-let dishImageCseMode = false;
-
-const dishCseConfigured = () => Boolean(DISH_IMAGE_CSE_ID) && !DISH_IMAGE_CSE_ID.includes('{');
-
-function ensureDishImageCseScript() {
-    if (dishImageCseScriptInjected) return;
-    dishImageCseScriptInjected = true;
-    window.__gcse = window.__gcse || {};
-    window.__gcse.parsetags = 'explicit';
-    window.__gcse.callback = () => {
-        dishImageCseReady = true;
-        if (dishImageCsePendingQuery !== null) {
-            const pending = dishImageCsePendingQuery;
-            dishImageCsePendingQuery = null;
-            renderDishImageCse(pending);
-        }
-    };
-    const script = document.createElement('script');
-    script.src = `https://cse.google.com/cse.js?cx=${DISH_IMAGE_CSE_ID}`;
-    script.async = true;
-    document.head.appendChild(script);
-}
-
-function renderDishImageCse(query) {
-    const body = document.getElementById('dish-image-body');
-    if (!body || !dishImageModalOpen || dishImageCurrentQuery !== query) return;
-    body.innerHTML = '<div id="dish-cse-results"></div>';
-    try {
-        google.search.cse.element.render({ div: 'dish-cse-results', tag: 'searchresults-only', gname: 'dish-cse', attributes: { enableImageSearch: 'true' } });
-    } catch (e) {
-        // Element already rendered for this gname — re-executing is enough.
-    }
-    const element = google.search.cse.element.getElement('dish-cse');
-    if (element) element.execute(query);
-}
 
 function startDishImageAdvance() {
     stopDishImageAdvance();
@@ -82,9 +44,7 @@ function stopDishImageAdvance() {
 }
 
 function scheduleDishImagePopoverClose(delay) {
-    // CSE mode keeps the popover open: the interactive Google iframe swallows
-    // pointer events, so mouse-out auto-close would close it immediately.
-    if (dishImageCseMode || isDishImageModalClosed()) return;
+    if (isDishImageModalClosed()) return;
     clearTimeout(dishImageCloseTimer);
     dishImageCloseTimer = setTimeout(() => {
         dishImageCloseTimer = null;
@@ -149,23 +109,8 @@ export function openDishImageModal(query, linkEl) {
         popover.style.top = Math.round(top) + 'px';
     }
     document.getElementById('dish-image-title').textContent = query;
-
-    const cseElementApi = window.google && window.google.search && window.google.search.cse && window.google.search.cse.element;
-    dishImageCseMode = Boolean(cseElementApi || dishCseConfigured());
-    tracker.increment('dish_image_popup');
-
-    if (dishImageCseMode) {
-        if (cseElementApi) {
-            renderDishImageCse(query);
-        } else {
-            ensureDishImageCseScript();
-            dishImageCsePendingQuery = query;
-            document.getElementById('dish-image-body').innerHTML = `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
-        }
-        return;
-    }
-
     document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${escapeHtml(t('dishImageLoading'))}</p>`;
+    tracker.increment('dish_image_popup');
 
     fetchDishImages(query, undefined, dishImageSearchAbort.signal).then(result => {
         // Stale-response guard: ignore results after query change or close.

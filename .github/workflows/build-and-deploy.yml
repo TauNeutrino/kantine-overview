@@ -20,7 +20,6 @@ jobs:
       GIST_ID:   ${{ secrets.GIST_ID }}
       GIST_SALT: ${{ secrets.GIST_SALT }}
       DISH_IMAGE_WORKER_URL: ${{ secrets.DISH_IMAGE_WORKER_URL }}
-      DISH_IMAGE_CSE_ID: ${{ secrets.DISH_IMAGE_CSE_ID }}
     steps:
       - uses: actions/checkout@v7
         with:

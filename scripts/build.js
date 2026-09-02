@@ -160,7 +160,6 @@ function stepReadAndInject() {
   const GIST_ID   = process.env.GIST_ID  || '';
   const GIST_SALT = process.env.GIST_SALT || '';
   const DISH_IMAGE_WORKER_URL = process.env.DISH_IMAGE_WORKER_URL || '';
-  const DISH_IMAGE_CSE_ID = process.env.DISH_IMAGE_CSE_ID || '';
 
   // Fail loudly if any required Gist credential is missing — otherwise the
   // {{GIST_*}} placeholders stay literal in the bundle and every Gist API
@@ -210,8 +209,7 @@ function stepReadAndInject() {
     .replace(/\{\{GIST_PAT\}\}/g, GIST_PAT_OBF)
     .replace(/\{\{GIST_ID\}\}/g, GIST_ID)
     .replace(/\{\{GIST_SALT\}\}/g, GIST_SALT)
-    .replace(/\{\{DISH_IMAGE_WORKER_URL\}\}/g, DISH_IMAGE_WORKER_URL)
-    .replace(/\{\{DISH_IMAGE_CSE_ID\}\}/g, DISH_IMAGE_CSE_ID);
+    .replace(/\{\{DISH_IMAGE_WORKER_URL\}\}/g, DISH_IMAGE_WORKER_URL);
 
   // Defensive guard: no placeholder may survive injection in the shipped bundle.
   const survivors = ['{{GIST_PAT}}', '{{GIST_ID}}', '{{GIST_SALT}}', '{{CSS}}']
@@ -543,8 +541,6 @@ function stepSmokeAndSize(ctx) {
   log('✓ Gist Salt: ' + (GS ? '(set)' : '(placeholder)'));
   const WU = process.env.DISH_IMAGE_WORKER_URL;
   log('✓ Dish-image worker: ' + (WU ? WU : 'not set — worker stage disabled'));
-  const CI = process.env.DISH_IMAGE_CSE_ID;
-  log('✓ Dish-image CSE: ' + (CI ? 'cx injected (length: ' + CI.length + ')' : 'not set — CSE popover mode disabled'));
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
