@@ -134,9 +134,9 @@ export async function fetchDishImages(query, lang, cancelSignal) {
                     .slice(0, DISH_IMAGE_MAX_RESULTS)
                 note('log', `Worker lieferte ${images.length} Bilder`)
                 if (images.length >= 1) {
-                    writeDishImageCache(key, 'google', images)
-                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Google via Worker)`)
-                    return { images, source: 'google' }
+                    writeDishImageCache(key, 'bing', images)
+                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Bing via Worker)`)
+                    return { images, source: 'bing' }
                 }
             } else {
                 note('warn', `Worker antwortete HTTP ${response.status}`)

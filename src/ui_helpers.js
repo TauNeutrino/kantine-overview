@@ -135,7 +135,7 @@ function renderDishImageCarousel(query, result) {
     if (!body) return;
     stopDishImageAdvance();
 
-    const sourceLabel = t({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
+    const sourceLabel = t({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', bing: 'dishImageSourceBing', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = escapeHtml([img.creator, img.license].filter(Boolean).join(' — '));
         return `<div class="dish-image-slide"><img src="${escapeHtml(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;

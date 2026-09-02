@@ -1,15 +1,17 @@
 # Kantine Dish-Images Worker
 
-Cloudflare Worker, der die Google-Bildersuche **serverseitig** abfragt und
-sauberes JSON mit Thumbnail-URLs zurückliefert. Damit entfällt das Bookmarklet-
-Risiko „öffentlicher CORS-Proxy ist gerade tot" — der Worker läuft auf deiner
-eigenen Cloudflare-Infrastruktur (Free-Tier: 100.000 Requests/Tag, für den
-Kantine-Anwendungsfall mehr als ausreichend).
+Cloudflare Worker, der die **Bing-Bildersuche serverseitig** abfragt und
+sauberes JSON mit Bild-URLs zurückliefert. (Google scheidet aus: dessen
+Bilder-Tab liefert an Server-IPs nur noch eine JS-Shell ohne Bild-URLs.)
+Damit entfällt das Bookmarklet-Risiko „öffentlicher CORS-Proxy ist gerade
+tot" — der Worker läuft auf deiner eigenen Cloudflare-Infrastruktur
+(Free-Tier: 100.000 Requests/Tag, für den Kantine-Anwendungsfall mehr als
+ausreichend).
 
 **Endpoint:** `GET https://<worker-name>.<dein-subdomain>.workers.dev/?q=<gericht>&hl=de`
 
 ```json
-{ "query": "Wiener Schnitzel", "hl": "de", "count": 5, "images": [{ "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:..." }] }
+{ "query": "Wiener Schnitzel", "hl": "de", "engine": "bing", "count": 5, "images": [{ "url": "https://..." }] }
 ```
 
 ---
