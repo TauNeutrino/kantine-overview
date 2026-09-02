@@ -4,7 +4,7 @@
 // (proxy chain, parallel) → Openverse, localStorage cache, abortable via
 // cancelSignal. Fetches only when fetchDishImages is called.
 
-import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_WIKIPEDIA_URL, DISH_IMAGE_COMMONS_URL, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
+import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MAX_RESULTS, DISH_IMAGE_WIKIPEDIA_URL, DISH_IMAGE_COMMONS_URL, DISH_IMAGE_WORKER_URL, DISH_IMAGE_GOOGLE_SCRAPE_URL, DISH_IMAGE_GOOGLE_TAB_URL, DISH_IMAGE_OPENVERSE_URL, DISH_IMAGE_PROXY_CHAIN } from './constants.js'
 
 /**
  * Derives the main-course line from a language split result.
@@ -119,6 +119,34 @@ export async function fetchDishImages(query, lang, cancelSignal) {
     }
 
     let result = null
+
+    // Stage 0: own Cloudflare Worker (server-side Google scrape — exact dish
+    // coverage without public proxies). Skipped when no worker URL is
+    // configured (empty string or unreplaced placeholder in local builds).
+    const workerBase = DISH_IMAGE_WORKER_URL && !DISH_IMAGE_WORKER_URL.includes('{{')
+        ? DISH_IMAGE_WORKER_URL.replace(/\/+$/, '')
+        : ''
+    if (workerBase) {
+        try {
+            const response = await fetch(`${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}`, { signal: attemptSignal() })
+            if (response.ok) {
+                const data = await response.json()
+                const images = (data.images || [])
+                    .filter(img => img && typeof img.url === 'string' && img.url.startsWith('https://'))
+                    .slice(0, DISH_IMAGE_MAX_RESULTS)
+                note('log', `Worker lieferte ${images.length} Bilder`)
+                if (images.length >= 1) {
+                    writeDishImageCache(key, 'google', images)
+                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Google via Worker)`)
+                    return { images, source: 'google' }
+                }
+            } else {
+                note('warn', `Worker antwortete HTTP ${response.status}`)
+            }
+        } catch (e) {
+            if (!isCancelled()) note('warn', `Worker fehlgeschlagen (${e && e.message ? e.message : e})`)
+        }
+    }
 
     // Stage 1: Wikipedia article summary (direct fetch, CORS-enabled).
     // Progressive query shortening: the full dish name rarely has an article,

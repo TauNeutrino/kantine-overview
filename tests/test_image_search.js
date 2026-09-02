@@ -348,6 +348,50 @@ async function runClientTests() {
     assertEquals(fetchLog.length, 3, "wikipedia hit must short-circuit before commons and proxies (3 progressive candidates)");
     ok("fetchDishImages: progressive shortening — 'Kartoffelgulasch mit Braunschweiger' 404s, 'Kartoffelgulasch' hits");
 
+    // Case 13e: configured worker delivers exact google thumbs as stage 0
+    resetSandboxState();
+    sandbox.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
+    planFetch([
+        { match: 'workers.dev', steps: [{ ok: true, json: { query: 'Wiener Schnitzel', count: 1, images: [{ url: THUMB_C, license: '', creator: '' }] } }] },
+        { match: WIKI_MATCH, steps: [{ reject: 'wikipedia must not be reached' }] }
+    ]);
+    const resultWorker = await fetchDishImages('Wiener Schnitzel');
+    assertEquals(resultWorker.source, 'google', "worker images should report google source");
+    assertDeepEqual(resultWorker.images, [{ url: THUMB_C, license: '', creator: '' }], "worker images pass through");
+    assertEquals(fetchCallsFor('workers.dev'), 1, "worker stage fires first");
+    assertEquals(fetchCallsFor(WIKI_MATCH), 0, "worker hit must short-circuit wikipedia and everything after");
+    sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
+    ok("fetchDishImages: configured worker delivers google thumbs as stage 0 (chain short-circuits)");
+
+    // Case 13f: worker failure falls through to wikipedia
+    resetSandboxState();
+    sandbox.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
+    planFetch([
+        { match: 'workers.dev', steps: [{ reject: 'worker down' }] },
+        wikiHit('Käsespätzle', THUMB_C)
+    ]);
+    const resultWorkerFail = await fetchDishImages('Käsespätzle');
+    assertEquals(resultWorkerFail.source, 'wikipedia', "worker failure should fall through to wikipedia");
+    assertEquals(fetchCallsFor('workers.dev'), 1, "worker attempted exactly once");
+    sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
+    ok("fetchDishImages: worker failure falls through to wikipedia");
+
+    // Case 13g: unreplaced worker placeholder (local builds) -> stage disabled
+    resetSandboxState();
+    sandbox.DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
+    planFetch([
+        wikiMiss,
+        commonsEmpty,
+        { match: RAW_MATCH, steps: [{ ok: true, text: `<div>${THUMB_C}</div>` }] },
+        { match: CODETABS_MATCH, steps: [{ reject: 'codetabs down' }] },
+        { match: GET_MATCH, steps: [{ reject: 'allorigins-get down' }] },
+        { match: CORSPROXY_MATCH, steps: [{ reject: 'corsproxy down' }] }
+    ]);
+    const resultNoWorker = await fetchDishImages('Topfenknödel');
+    assertEquals(resultNoWorker.source, 'google', "placeholder worker URL must disable the stage, chain proceeds");
+    assertEquals(fetchCallsFor('workers.dev'), 0, "placeholder worker URL must trigger zero worker fetches");
+    ok("fetchDishImages: unreplaced worker placeholder disables stage 0");
+
     // Case 15 (b): wikipedia/commons empty + 4 anti-bot proxies -> Openverse fallback with 5 thumbnails
     resetSandboxState();
     planFetch([
