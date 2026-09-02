@@ -14,16 +14,18 @@
 //                   "title": "Schweinebraten ...", "score": 2 }] }
 //
 // Weitere Quellen: eine fetchFrom<X>()-Scrape-Funktion ergänzen und in der
-// Merge-Logik sammeln. Getestet und NICHT GET-scrapebar (Stand: 2026-09):
-// gutekueche.at + kochbar.de (Suche clientseitig, ?search= filtert nicht),
-// eatsmarter.de (POST + CSRF-Token), lecker.de (JS-gerendert), Google/Bing/
-// DDG/Yandex (bot-geblockt für Server-IPs).
+// Merge-Logik (Promise.all) sammeln. Getestet und NICHT GET-scrapebar
+// (Stand: 2026-09): gutekueche.at + kochbar.de (Suche clientseitig,
+// ?search= filtert nicht), lecker.de (JS-gerendert), Google/Bing/DDG/Yandex
+// (bot-geblockt für Server-IPs).
 
 const CHEFKOCH_SEARCH_URL = 'https://www.chefkoch.de/rs/s0/{q}/Rezepte.html';
 const CK_IMG_REGEX = /https:\/\/img\.chefkoch-cdn\.de\/rezepte\/\d+\/bilder\/\d+\/[^"'?\s\\<>]+\.jpg/g;
 const KOCHBAR_SEARCH_URL = 'https://www.kochbar.de/rezepte/{q}.html';
 const KB_IMG_REGEX = /https:\/\/ais\.kochbar\.de\/kbrezept\/([^\/\s"']+?)\/\d+x\d+\/([^"'\s\\<>]+\.jpg)/g;
 const KB_IMAGE_SIZE = '460x345';
+const EATSMARTER_SEARCH_URL = 'https://eatsmarter.de/suche/rezepte?ft={q}';
+const ES_IMG_REGEX = /https:\/\/images\.eatsmarter\.de\/sites\/default\/files\/styles\/300x225-webp\/public\/([^"'?\s\\<>]+\.jpg)/g;
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
 function jsonResponse(body, status = 200) {
@@ -138,6 +140,43 @@ async function fetchFromKochbar(searchQuery, queryTokens) {
     return scored;
 }
 
+async function fetchFromEatsmarter(searchQuery, queryTokens) {
+    const searchUrl = EATSMARTER_SEARCH_URL.replace('{q}', encodeURIComponent(searchQuery));
+    let html = '';
+    try {
+        const response = await fetch(searchUrl, {
+            headers: {
+                'User-Agent': BROWSER_UA,
+                'Accept-Language': 'de-AT,de;q=0.9',
+                'Accept': 'text/html,application/xhtml+xml'
+            }
+        });
+        html = await response.text();
+    } catch (e) {
+        return [];
+    }
+
+    const seen = new Set();
+    const scored = [];
+    for (const match of html.matchAll(ES_IMG_REGEX)) {
+        const file = match[1];
+        if (file.includes('default_images')) continue;
+        if (seen.has(file)) continue;
+        seen.add(file);
+        const imageUrl = `https://images.eatsmarter.de/sites/default/files/styles/300x225-webp/public/${file}`;
+        const slugTokens = file.replace(/\.jpg$/i, '').split('-').filter(token => token && !/^\d+$/.test(token));
+        scored.push({
+            url: imageUrl,
+            license: 'Eatsmarter',
+            creator: 'eatsmarter.de',
+            title: titleFromSlug(slugTokens),
+            score: relevanceScore(slugTokens, queryTokens),
+            source: 'eatsmarter'
+        });
+    }
+    return scored;
+}
+
 export default {
     async fetch(request) {
         const url = new URL(request.url);
@@ -162,15 +201,16 @@ export default {
         const searchQuery = (queryDe && queryDe.trim().length >= 3) ? queryDe.trim() : query.trim();
         const queryTokens = searchQuery.toLowerCase().split(/\s+/).filter(word => word.length > 2);
 
-        const [chefkochScored, kochbarScored] = await Promise.all([
+        const [chefkochScored, kochbarScored, eatsmarterScored] = await Promise.all([
             fetchFromChefkoch(searchQuery, queryTokens),
-            fetchFromKochbar(searchQuery, queryTokens)
+            fetchFromKochbar(searchQuery, queryTokens),
+            fetchFromEatsmarter(searchQuery, queryTokens)
         ]);
         const chefkochWithSource = chefkochScored.map(img => ({ ...img, source: 'chefkoch' }));
         // Merge mit Score absteigend; bei Gleichstand gewinnt Chefkoch (stabile Sortierung).
-        const merged = [...chefkochWithSource, ...kochbarScored].sort((a, b) => b.score - a.score);
+        const merged = [...chefkochWithSource, ...kochbarScored, ...eatsmarterScored].sort((a, b) => b.score - a.score);
         const images = merged.slice(0, 5);
 
-        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar', count: images.length, images });
+        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar+eatsmarter', count: images.length, images });
     }
 }

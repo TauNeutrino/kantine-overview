@@ -31,7 +31,7 @@ let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
 
-const DISH_SOURCE_LABEL_KEYS = { wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', kochbar: 'dishImageSourceKochbar', openverse: 'dishImageSourceOpenverse' };
+const DISH_SOURCE_LABEL_KEYS = { wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', kochbar: 'dishImageSourceKochbar', eatsmarter: 'dishImageSourceEatsmarter', openverse: 'dishImageSourceOpenverse' };
 
 function startDishImageAdvance() {
     stopDishImageAdvance();
