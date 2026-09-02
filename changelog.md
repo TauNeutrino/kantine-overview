@@ -43,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Relevanz-Score**: Rezeptfotos erhalten einen Score (Token-Überlappung zwischen Suchbegriffen und Rezeptnamen, z. B. „Kartoffelgulasch" + „mit" im Slug) und werden absteigend danach sortiert — der beste Treffer steht zuerst.
 - **Bildunterschrift pro Bild**: Die Caption im Popover aktualisiert sich beim Bildwechsel und zeigt Rezeptname bzw. Artikel-Titel des aktuell angezeigten Bildes (z. B. „Quelle: Chefkoch — Kartoffelgulasch mit Fisolen").
 
+## [2.1.13] - 2026-09-02
+
+### Changed
+
+- **Bildcache räumt sich selbst auf**: Abgelaufene Einträge (älter als 7 Tage) werden jetzt bei **jedem** Bildersuche-Zugriff automatisch aus dem localStorage entfernt — auch wenn die Suche selbst nichts findet oder das Popover sofort wieder geschlossen wird. Zusätzlich bleiben die bestehenden Regeln aktiv: frische Einträge werden 7 Tage serviert, maximum 50 Einträge (älteste werden beim Schreiben verdrängt).
+
 ## [2.1.4] - 2026-09-02
 
 ### Changed

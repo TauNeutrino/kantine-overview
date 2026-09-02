@@ -85,6 +85,27 @@ export async function fetchDishImages(query, lang, cancelSignal, queryDe) {
         console[level](`[Kantine] Bildersuche: ${message}`)
     }
     const cache = readDishImageCache()
+    // Selbstreinigung: abgelaufene Einträge bei jedem Zugriff entfernen —
+    // so werden alte Bilder automatisch aussortiert, auch ohne neue Suche.
+    if (cache && cache.queries) {
+        const now = Date.now()
+        let expired = 0
+        for (const entryKey of Object.keys(cache.queries)) {
+            const entry = cache.queries[entryKey]
+            if (!entry || now - entry.ts >= DISH_IMAGE_CACHE_TTL_MS) {
+                delete cache.queries[entryKey]
+                expired++
+            }
+        }
+        if (expired > 0) {
+            try {
+                localStorage.setItem(LS.DISH_IMAGE_CACHE, JSON.stringify(cache))
+                note('log', `Cache aufgeräumt — ${expired} abgelaufene Einträge entfernt`)
+            } catch (e) {
+                // Quota-Überschreitung — der nächste Schreibvorgang versucht es erneut.
+            }
+        }
+    }
     const entry = cache && cache.queries ? cache.queries[key] : null
     if (entry && Date.now() - entry.ts < DISH_IMAGE_CACHE_TTL_MS) {
         note('log', `Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)

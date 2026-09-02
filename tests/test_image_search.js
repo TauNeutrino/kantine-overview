@@ -410,8 +410,24 @@ async function runClientTests() {
     assertEquals(fetchLog.length, 0, "pre-aborted search must not issue any fetch call");
     ok("fetchDishImages: pre-aborted cancelSignal -> no fetch traffic at all");
 
-    // Case 19 (d): cache hit serves 0 fetches; TTL expiry after 8 days refetches
+    // Case 18b2: expired entries are pruned on READ — even without a cache write
+    // (cache hit isolates the session sweep: no write happens in this scenario)
     resetSandboxState();
+    const TTL_PRUNE = sandbox.DISH_IMAGE_CACHE_TTL_MS;
+    sandbox.localStorage.setItem(sandbox.LS.DISH_IMAGE_CACHE, JSON.stringify({ queries: {
+        'frische suppe': { ts: BASE_NOW - 1000, source: 'chefkoch', images: [{ url: THUMB_C, license: '', creator: '' }] },
+        'alte suppe': { ts: BASE_NOW - TTL_PRUNE - 1000, source: 'openverse', images: [{ url: 'https://example.com/alt.jpg', license: '', creator: '' }] }
+    } }));
+    planFetch([]);
+    const resultPrune = await fetchDishImages('Frische Suppe');
+    assertEquals(resultPrune.cached, true, "the surviving fresh entry should still be served from cache");
+    const afterPrune = JSON.parse(sandbox.localStorage.getItem(sandbox.LS.DISH_IMAGE_CACHE));
+    assertEquals(afterPrune.queries['alte suppe'], undefined, "the expired entry must be pruned on read — even without a cache write");
+    assertEquals(afterPrune.queries['frische suppe'] !== undefined, true, "the fresh entry must survive the prune");
+    assertEquals(fetchLog.length, 0, "cache hit: no fetch calls");
+    ok("fetchDishImages: expired cache entries pruned on read (session sweep), even without a cache write");
+
+    // Case 19 (d): cache hit serves 0 fetches; TTL expiry after 8 days refetches    resetSandboxState();
     planFetch([
         wikiHit('Käsespätzle', THUMB_C),
         wikiHit('Käsespätzle 2', THUMB_B)
