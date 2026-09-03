@@ -226,6 +226,28 @@ assertEquals(sandbox.getLocalizedText(menu), '• Pizza', "Localized EN");
 sandbox.langMode = 'all';
 assertEquals(sandbox.getLocalizedText(menu), menu, "Localized ALL (raw)");
 
+// --- Test buildSplitFeedbackUrl ---
+console.log("Testing buildSplitFeedbackUrl...");
+const fbUrl = sandbox.buildSplitFeedbackUrl({
+    repo: 'TauNeutrino/kantine-overview',
+    raw: 'Erbsen- Minzsuppe / Pea mint soup',
+    de: '• Erbsen- Minzsuppe',
+    en: '• Pea mint soup',
+    confidence: 0.8328,
+    label: 'high',
+    version: 'v2.2.1'
+});
+assert(fbUrl.startsWith('https://github.com/TauNeutrino/kantine-overview/issues/new?'), "Feedback URL base");
+assert(fbUrl.includes('labels=bug'), "Feedback URL label=bug");
+const fbDecoded = decodeURIComponent(fbUrl);
+assert(fbDecoded.includes('[Split-FB] Erbsen- Minzsuppe'), "Feedback title hint from raw text");
+assert(fbDecoded.includes('**Menütext (roh):**'), "Feedback body raw section");
+assert(fbDecoded.includes('**Split DE:**'), "Feedback body DE section");
+assert(fbDecoded.includes('**Split EN:**'), "Feedback body EN section");
+assert(fbDecoded.includes('• Pea mint soup'), "Feedback body contains EN split");
+assert(fbDecoded.includes('high (0.83)'), "Feedback body confidence");
+assert(fbDecoded.includes('v2.2.1'), "Feedback body version");
+
 // --- Test debounce ---
 console.log("Testing debounce...");
 let callCount = 0;

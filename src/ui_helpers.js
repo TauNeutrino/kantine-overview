@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, allWeeks, currentWeekNumber, currentYear, displayMode, langMode } from './state.js';
-import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage } from './utils.js';
-import { GITHUB_API, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS, DISH_IMAGE_CAROUSEL_INTERVAL_MS } from './constants.js';
+import { getISOWeek, getWeekYear, translateDay, escapeHtml, getRelativeTime, isNewer, getLocalizedText, splitLanguage, buildSplitFeedbackUrl } from './utils.js';
+import { GITHUB_API, GITHUB_REPO, RAW_INSTALLER_BASE, GITHUB_FILE_BASE, CLIENT_VERSION, LS, DEV_MODE_PW_HASH, MIN_BOOTLOADER_VERSION, DISH_IMAGE_HOVER_MS, DISH_IMAGE_CAROUSEL_INTERVAL_MS } from './constants.js';
 import { githubHeaders } from './api.js';
 import { placeOrder, cancelOrder, toggleFlag, showToast, checkHighlight } from './actions.js';
 import { t } from './i18n.js';
@@ -641,7 +641,30 @@ export function createDayCard(day) {
             }).join('\n');
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}</p>${heatmapHtml}</div>`;
+        const rawDesc = item.description || '';
+        let splitFeedbackButton = '';
+        if (rawDesc.trim()) {
+            splitFeedbackButton = ` <button type="button" class="icon-btn icon-btn-small btn-split-feedback" aria-label="${escapeHtml(t('reportSplit'))}" title="${escapeHtml(t('reportSplitTooltip'))}"><span class="material-icons-round" aria-hidden="true">bug_report</span></button>`;
+        }
+
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}${splitFeedbackButton}</p>${heatmapHtml}</div>`;
+
+        const feedbackBtn = itemEl.querySelector('.btn-split-feedback');
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tracker.increment('split_feedback_open');
+                window.open(buildSplitFeedbackUrl({
+                    repo: GITHUB_REPO,
+                    raw: rawDesc,
+                    de: split.de,
+                    en: split.en,
+                    confidence: split.confidence,
+                    label: split.label,
+                    version: CLIENT_VERSION
+                }), '_blank', 'noopener');
+            });
+        }
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {

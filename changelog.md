@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **DE/EN-Split bei geteiltem Kopfnomen**: Gerichte wie „Fusilli mit … / Fusilli with …" landeten mit dem Kopfnomen in der falschen Sprache (z.B. „Fusilli" in der englischen Suppe). Zwei Maßnahmen: 12 fehlende Pasta-Lehnwörter (`fusilli`, `farfalle`, `tortellini`, `tortelloni`, `macaroni`, `linguine`, `fettuccine`, `rigatoni`, `orecchiette`, `pappardelle`, `cannelloni`, `conchiglie`, `bucatini`) ergänzt + neuer Head-Noun-Bonus in der Boundary-Erkennung (EN₂-Eröffnungswort ≅ DE₂-Eröffnungswort), der auch unbekannte Wörter absichert.
 - **Bootloader**: Domain-Prüfung (`web.bessa.app`) jetzt vor dem Version-Check im Bootloader, nicht erst nach dem Laden des Bundles. Vermeidet CORS/Netzwerkfehler auf fremden Domains.
 
 ### Added
 
+- **Split-Feedback-Button**: Jedes Gericht mit Beschreibung hat jetzt einen kleinen Bug-Icon-Button, der ein vorausgefülltes GitHub-Issue (Rohtext + DE/EN-Split + Confidence + Version, Label `bug`) in einem neuen Tab öffnet — User klicken nur noch „Submit new issue". Hinweis: GitHub-Login erforderlich, anonyme Issues sind nicht möglich.
 - **Bootloader-Update-Erinnerung**: Bei veraltetem Bookmarklet-Bootloader (älter als v2.0.5) wird ein animiertes ⚠️-Badge neben dem Versions-Tag angezeigt. Beim Hover erscheint ein Tooltip mit Erklärung und "Jetzt aktualisieren"-Button, der zur Installationsseite führt.
 - **Dokumentation**: `AGENTS.md` und `README.md` um `stats/index.html` (Chart.js Usage Dashboard) ergänzt, damit zukünftige Agenten den Stats-Code direkt finden.
 

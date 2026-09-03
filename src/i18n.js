@@ -69,6 +69,8 @@ const TRANSLATIONS = {
         cancelOneOrder: 'Eine Bestellung stornieren',
         flagActivate: 'Benachrichtigen wenn verfügbar',
         flagDeactivate: 'Benachrichtigung deaktivieren',
+        reportSplit: 'Split melden',
+        reportSplitTooltip: 'Fehlerhaften DE/EN-Split auf GitHub melden (GitHub-Login erforderlich)',
 
         // Alarm bell
         alarmTooltipNone: 'Keine beobachteten Menüs',
@@ -227,6 +229,8 @@ const TRANSLATIONS = {
         cancelOneOrder: 'Cancel one order',
         flagActivate: 'Notify when available',
         flagDeactivate: 'Deactivate notification',
+        reportSplit: 'Report split',
+        reportSplitTooltip: 'Report a wrong DE/EN split on GitHub (GitHub login required)',
 
         // Alarm bell
         alarmTooltipNone: 'No flagged menus',

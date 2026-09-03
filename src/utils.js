@@ -94,3 +94,34 @@ export function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+
+/**
+ * Builds a prefilled GitHub issue URL for reporting a wrong DE/EN split.
+ * Opens the issue form with title, body and label preset — the reporter
+ * only clicks "Submit new issue". Note: GitHub requires login, anonymous
+ * issues are not possible; logged-out users land on login first and return
+ * to the prefilled form afterwards.
+ * @param {object} report - { repo, raw, de, en, confidence, label, version }
+ * @returns {string} Prefilled https://github.com/<repo>/issues/new URL
+ */
+export function buildSplitFeedbackUrl({ repo, raw, de, en, confidence, label, version }) {
+    const hint = String(raw || '').split('/')[0].trim().slice(0, 60) || 'DE/EN-Split';
+    const conf = typeof confidence === 'number' ? confidence.toFixed(2) : '?';
+    const body = [
+        '**Menütext (roh):**',
+        raw || '',
+        '',
+        '**Split DE:**',
+        de || '',
+        '',
+        '**Split EN:**',
+        en || '',
+        '',
+        `**Confidence:** ${label} (${conf})`,
+        `**Version:** ${version || '?'}`
+    ].join('\n');
+    return `https://github.com/${repo}/issues/new`
+        + '?title=' + encodeURIComponent('[Split-FB] ' + hint)
+        + '&body=' + encodeURIComponent(body)
+        + '&labels=' + encodeURIComponent('bug');
+}
