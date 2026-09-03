@@ -44,20 +44,30 @@ function slugTokensFromUrl(imageUrl) {
     return file.split('-').filter(Boolean);
 }
 
+function normalizeToken(token) {
+    return token.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
+}
+
 function relevanceScore(slugTokens, queryTokens) {
-    const slug = slugTokens.map(token => token.toLowerCase());
-    const query = queryTokens.map(token => token.toLowerCase());
+    const slug = slugTokens.map(normalizeToken);
+    const query = queryTokens.map(normalizeToken);
     let exact = 0;
     for (const queryToken of query) {
         if (slug.some(slugToken => slugToken === queryToken)) exact++;
     }
     let orderedPairs = 0;
     for (let i = 0; i + 1 < query.length; i++) {
-        const first = slug.indexOf(query[i]);
-        const second = slug.indexOf(query[i + 1]);
-        if (first >= 0 && second > first) orderedPairs++;
+        for (let j = i + 1; j < query.length; j++) {
+            const first = slug.indexOf(query[i]);
+            const second = slug.indexOf(query[j]);
+            if (first >= 0 && second > first) orderedPairs++;
+        }
     }
-    return exact + 2 * orderedPairs;
+    const matched = new Set(query.filter(queryToken => slug.includes(queryToken))).size;
+    const extraSlugTokens = slug.length - matched;
+    const firstTokenBonus = (slug.length > 0 && query.length > 0 && slug[0] === query[0]) ? 1 : 0;
+    const contiguousBonus = slug.join(' ').includes(query.join(' ')) ? 4 : 0;
+    return 2 * exact + 2 * orderedPairs - 0.5 * extraSlugTokens + firstTokenBonus + contiguousBonus;
 }
 
 function titleFromSlug(slugTokens) {

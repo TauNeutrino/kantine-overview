@@ -44,55 +44,63 @@ function ok(message) {
     console.log(`OK: ${message}`);
 }
 
-// === relevanceScore: exact-word matches ===
+// === relevanceScore: 2×exact + 2×ordered-pairs − 0.5×extra + first-token + contiguous ===
 
-// Case 1: exact matches count, ordered adjacent pair doubles the signal
+// Case 1: exact matches count, ordered pair doubles part of the signal
 assertEquals(
     relevanceScore(['kartoffelgulasch', 'mit', 'fisolen'], ['kartoffelgulasch', 'mit', 'braunschweiger']),
-    4,
-    "2 exact matches + 1 ordered adjacent pair (kartoffelgulasch->mit) should score 2 + 2*1 = 4"
+    6.5,
+    "2 exact (4) + 1 ordered pair (2) + first-token (1) − 1 extra slug token (0.5) = 6.5"
 );
-ok("relevanceScore: exact matches + ordered pair bonus (4)");
+ok("relevanceScore: exact matches + ordered pair bonus (6.5)");
 
 // Case 2: same words in wrong order lose the pair bonus
 assertEquals(
     relevanceScore(['fisolen', 'mit', 'kartoffelgulasch'], ['kartoffelgulasch', 'mit', 'braunschweiger']),
-    2,
-    "2 exact matches in wrong order should score 2 + 2*0 = 2"
+    3.5,
+    "2 exact (4) + 0 ordered pairs + no first-token − 1 extra slug token (0.5) = 3.5"
 );
-ok("relevanceScore: unordered matches lose the pair bonus (2)");
+ok("relevanceScore: unordered matches lose pair bonus and first-token (3.5)");
 
-// Case 3: no overlap scores zero
+// Case 3: no overlap scores negative (conciseness penalty on junk)
 assertEquals(
     relevanceScore(['pizza', 'margherita'], ['kartoffelgulasch', 'mit']),
-    0,
-    "no shared words should score 0"
+    -1,
+    "0 exact + 0 pairs − 2 extra slug tokens (1) = -1"
 );
-ok("relevanceScore: no overlap scores 0");
+ok("relevanceScore: no overlap scores -1");
 
-// Case 4: single-word match has no pair to form
+// Case 4: single-word match also collects contiguous bonus
 assertEquals(
     relevanceScore(['gulasch'], ['gulasch']),
-    1,
-    "single-word exact match should score 1"
+    7,
+    "2 exact + 0 pairs + first-token (1) + contiguous full match (4) = 7"
 );
-ok("relevanceScore: single-word match scores 1");
+ok("relevanceScore: single-word match scores 7");
 
 // Case 5: case-insensitive matching
 assertEquals(
     relevanceScore(['Mit'], ['mit']),
-    1,
-    "matching must be case-insensitive"
+    7,
+    "matching must be case-insensitive: 2 + 0 + 1 + 4 = 7"
 );
 ok("relevanceScore: case-insensitive exact match");
 
 // Case 6: prefix-only is NOT a match anymore (exact semantics)
 assertEquals(
     relevanceScore(['kartoffel'], ['kartoffelgulasch']),
-    0,
-    "prefix-only similarity must not score under exact semantics"
+    -0.5,
+    "0 exact + 0 pairs − 1 extra slug token (0.5), no contiguous substring = -0.5"
 );
-ok("relevanceScore: prefix similarity scores 0 (exact-only)");
+ok("relevanceScore: prefix similarity scores -0.5 (exact-only)");
+
+// Case 6b: full query as-is with a prefix — the strongest signal
+assertEquals(
+    relevanceScore(['geroestete', 'knoedel', 'mit', 'ei'], ['knödel', 'mit', 'ei']),
+    15.5,
+    "3 exact (6) + 3 ordered pairs (6) − 1 extra slug token (0.5) + 0 first-token + contiguous full match (4) = 15.5"
+);
+ok("relevanceScore: full query as substring with prefix scores 15.5 (top signal)");
 
 // === slugTokensFromUrl ===
 
