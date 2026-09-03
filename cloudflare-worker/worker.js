@@ -45,11 +45,19 @@ function slugTokensFromUrl(imageUrl) {
 }
 
 function relevanceScore(slugTokens, queryTokens) {
-    let score = 0;
-    for (const queryToken of queryTokens) {
-        if (slugTokens.some(slugToken => slugToken === queryToken || slugToken.startsWith(queryToken) || queryToken.startsWith(slugToken))) score++;
+    const slug = slugTokens.map(token => token.toLowerCase());
+    const query = queryTokens.map(token => token.toLowerCase());
+    let exact = 0;
+    for (const queryToken of query) {
+        if (slug.some(slugToken => slugToken === queryToken)) exact++;
     }
-    return score;
+    let orderedPairs = 0;
+    for (let i = 0; i + 1 < query.length; i++) {
+        const first = slug.indexOf(query[i]);
+        const second = slug.indexOf(query[i + 1]);
+        if (first >= 0 && second > first) orderedPairs++;
+    }
+    return exact + 2 * orderedPairs;
 }
 
 function titleFromSlug(slugTokens) {
