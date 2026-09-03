@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Split-Feedback-Button inline**: Der Button nutzte `display: flex` (eigene Zeile) und rahmenloses Styling. Jetzt `inline-flex` direkt rechts neben dem Confidence-Badge, mit Rahmen im `.btn-flag`-Stil (22×22 px, Theme-Variablen).
 - **DE/EN-Split bei geteiltem Kopfnomen**: Gerichte wie „Fusilli mit … / Fusilli with …" landeten mit dem Kopfnomen in der falschen Sprache (z.B. „Fusilli" in der englischen Suppe). Zwei Maßnahmen: 12 fehlende Pasta-Lehnwörter (`fusilli`, `farfalle`, `tortellini`, `tortelloni`, `macaroni`, `linguine`, `fettuccine`, `rigatoni`, `orecchiette`, `pappardelle`, `cannelloni`, `conchiglie`, `bucatini`) ergänzt + neuer Head-Noun-Bonus in der Boundary-Erkennung (EN₂-Eröffnungswort ≅ DE₂-Eröffnungswort), der auch unbekannte Wörter absichert.
 - **Bootloader**: Domain-Prüfung (`web.bessa.app`) jetzt vor dem Version-Check im Bootloader, nicht erst nach dem Laden des Bundles. Vermeidet CORS/Netzwerkfehler auf fremden Domains.
 

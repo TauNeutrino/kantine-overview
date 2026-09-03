@@ -2191,6 +2191,33 @@ body {
 .confidence-fallback { background: rgba(231, 76, 60, 0.25); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.4); }
 .confidence-template { background: rgba(52, 152, 219, 0.25); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
 
+/* Split-feedback button: same framed treatment as .btn-flag (inline, bordered),
+   sized for placement right next to the confidence badge inside .item-desc. */
+.btn-split-feedback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 2px;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-left: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-split-feedback:hover {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+}
+.btn-split-feedback .material-icons-round {
+    font-size: 0.95rem;
+}
+
 .heatmap-row { margin-top: 6px; font-family: monospace; font-size: 0.75em; line-height: 1.4; letter-spacing: 0.5px; word-break: break-all; }
 .heatmap-char { display: inline; }
 

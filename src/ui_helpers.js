@@ -644,7 +644,7 @@ export function createDayCard(day) {
         const rawDesc = item.description || '';
         let splitFeedbackButton = '';
         if (rawDesc.trim()) {
-            splitFeedbackButton = ` <button type="button" class="icon-btn icon-btn-small btn-split-feedback" aria-label="${escapeHtml(t('reportSplit'))}" title="${escapeHtml(t('reportSplitTooltip'))}"><span class="material-icons-round" aria-hidden="true">bug_report</span></button>`;
+            splitFeedbackButton = ` <button type="button" class="icon-btn btn-split-feedback" aria-label="${escapeHtml(t('reportSplit'))}" title="${escapeHtml(t('reportSplitTooltip'))}"><span class="material-icons-round" aria-hidden="true">bug_report</span></button>`;
         }
 
         itemEl.innerHTML = `<div class="item-header"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}${splitFeedbackButton}</p>${heatmapHtml}</div>`;
