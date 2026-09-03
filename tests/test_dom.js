@@ -699,6 +699,34 @@ async function runDishImageTests() {
         console.log('OK modal(i) modal survives renderVisibleWeeks re-render');
     }
 
+    // (m) mixed worker sources: caption label + source switch per slide
+    {
+        clearDishCache();
+        const mixedImages = [
+            { url: IMG0, license: 'Chefkoch', creator: 'chefkoch.de', title: 'ChefKartoffelgulasch', score: 3, source: 'chefkoch' },
+            { url: IMG1, license: 'Kochbar', creator: 'kochbar.de', title: 'KochbarGulasch', score: 2, source: 'kochbar' }
+        ];
+        const defaultFetchM = w.fetch;
+        w.DISH_IMAGE_WORKER_URL = 'https://kantine-dish-images.test.workers.dev';
+        w.fetch = (url) => String(url).includes('workers.dev')
+            ? Promise.resolve({ ok: true, json: () => Promise.resolve({ query: 'x', engine: 'chefkoch+kochbar', count: 2, images: mixedImages }) })
+            : Promise.reject(new Error('modal(m): non-worker fetch blocked'));
+        w.openDishImageModal('Lasagne Mod M');
+        await sleep(150);
+        const captionText = d.getElementById('dish-image-caption-text');
+        if (!captionText) throw new Error('modal(m) caption text element missing');
+        if (!captionText.textContent.includes('Quelle: Chefkoch')) throw new Error('modal(m) slide 0 caption must name chefkoch, got: ' + captionText.textContent);
+        if (!captionText.textContent.includes('ChefKartoffelgulasch')) throw new Error('modal(m) slide 0 caption must carry the recipe title, got: ' + captionText.textContent);
+        const nextBtn = dishBody.querySelector('.dish-image-next');
+        nextBtn.click();
+        if (!captionText.textContent.includes('Quelle: Kochbar')) throw new Error('modal(m) slide 1 caption must name kochbar, got: ' + captionText.textContent);
+        if (!captionText.textContent.includes('KochbarGulasch')) throw new Error('modal(m) slide 1 caption must carry the kochbar recipe title, got: ' + captionText.textContent);
+        w.closeDishImageModal();
+        w.fetch = defaultFetchM;
+        delete w.DISH_IMAGE_WORKER_URL;
+        console.log('OK modal(m) caption switches source + title per slide (chefkoch <-> kochbar)');
+    }
+
     w.matchMedia = realMatchMedia;
 }
 

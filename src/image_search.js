@@ -124,10 +124,13 @@ export async function fetchDishImages(query, lang, cancelSignal, queryDe) {
 
     let result = null
 
-    // Stage 0: own Cloudflare Worker (server-side Google scrape — exact dish
-    // coverage without public proxies). Active only for a properly configured
-    // https URL; empty string or unreplaced placeholder disables the stage.
-    const workerBase = /^https:\/\//.test(DISH_IMAGE_WORKER_URL) ? DISH_IMAGE_WORKER_URL.replace(/\/+$/, '') : ''
+    // Stage 0: own Cloudflare Worker (server-side recipe-photo scrape — exact
+    // dish coverage without public proxies). Active only for a properly
+    // configured https URL; empty string or unreplaced placeholder disables
+    // the stage. window.DISH_IMAGE_WORKER_URL overrides the constant (used
+    // by tests and for debugging via the browser console).
+    const configuredWorkerUrl = (typeof window !== 'undefined' && window.DISH_IMAGE_WORKER_URL) || DISH_IMAGE_WORKER_URL
+    const workerBase = /^https:\/\//.test(configuredWorkerUrl) ? configuredWorkerUrl.replace(/\/+$/, '') : ''
     if (workerBase) {
         try {
             const workerUrl = `${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}` +
