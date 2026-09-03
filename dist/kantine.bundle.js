@@ -1238,6 +1238,7 @@ function githubHeaders(etag) {
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Dy: () => (/* binding */ GITHUB_REPO),
 /* harmony export */   Gm: () => (/* binding */ DISH_IMAGE_COMMONS_URL),
 /* harmony export */   HC: () => (/* binding */ BUNDLED_CSS),
 /* harmony export */   IY: () => (/* binding */ RAW_INSTALLER_BASE),
@@ -1247,7 +1248,6 @@ function githubHeaders(etag) {
 /* harmony export */   Rr: () => (/* binding */ DISH_IMAGE_HOVER_MS),
 /* harmony export */   Rx: () => (/* binding */ DISH_IMAGE_CAROUSEL_INTERVAL_MS),
 /* harmony export */   X9: () => (/* binding */ COMMIT_HASH),
-/* harmony export */   Xi: () => (/* binding */ DISH_IMAGE_CSE_ID),
 /* harmony export */   YU: () => (/* binding */ MENU_ID),
 /* harmony export */   Z7: () => (/* binding */ DEV_MODE_PW_HASH),
 /* harmony export */   be: () => (/* binding */ DISH_IMAGE_OPENVERSE_URL),
@@ -1265,7 +1265,7 @@ function githubHeaders(etag) {
 /* harmony export */   w3: () => (/* binding */ DISH_IMAGE_WORKER_URL),
 /* harmony export */   yd: () => (/* binding */ DISH_IMAGE_CACHE_TTL_MS)
 /* harmony export */ });
-/* unused harmony exports GITHUB_REPO, GIST_SALT */
+/* unused harmony export GIST_SALT */
 /**
  * Application-wide constants.
  * All API endpoints, IDs and timing parameters are centralized here
@@ -1344,8 +1344,6 @@ const DISH_IMAGE_WIKIPEDIA_URL = 'https://de.wikipedia.org/api/rest_v1/page/summ
 const DISH_IMAGE_COMMONS_URL = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url&iiurlwidth=480&gsrsearch={q}';
 /** Own Cloudflare Worker (server-side chefkoch recipe-photo scrape, see cloudflare-worker/) — empty string disables the stage. */
 const DISH_IMAGE_WORKER_URL = '{{DISH_IMAGE_WORKER_URL}}';
-/** Google Programmable Search engine ID (cx) — embeds real Google image results in the popover; empty string disables the mode. */
-const DISH_IMAGE_CSE_ID = '{{DISH_IMAGE_CSE_ID}}';
 const DISH_IMAGE_OPENVERSE_URL = 'https://api.openverse.org/v1/images/?q={q}&page_size=5';
 const DISH_IMAGE_GOOGLE_TAB_URL = 'https://www.google.com/search?q={q}&udm=2';
 
@@ -1439,6 +1437,8 @@ const TRANSLATIONS = {
         cancelOneOrder: 'Eine Bestellung stornieren',
         flagActivate: 'Benachrichtigen wenn verfügbar',
         flagDeactivate: 'Benachrichtigung deaktivieren',
+        reportSplit: 'Split melden',
+        reportSplitTooltip: 'Fehlerhaften DE/EN-Split auf GitHub melden (GitHub-Login erforderlich)',
 
         // Alarm bell
         alarmTooltipNone: 'Keine beobachteten Menüs',
@@ -1524,6 +1524,8 @@ const TRANSLATIONS = {
         dishImageSourceWikipedia: 'Quelle: Wikipedia',
         dishImageSourceCommons: 'Quelle: Wikimedia Commons',
         dishImageSourceChefkoch: 'Quelle: Chefkoch',
+        dishImageSourceKochbar: 'Quelle: Kochbar',
+        dishImageSourceEatsmarter: 'Quelle: Eatsmarter',
         dishImageSourceGoogle: 'Quelle: Google Bildersuche',
         dishImageSourceOpenverse: 'Quelle: Openverse',
         dishImagePrev: 'Vorheriges Bild',
@@ -1595,6 +1597,8 @@ const TRANSLATIONS = {
         cancelOneOrder: 'Cancel one order',
         flagActivate: 'Notify when available',
         flagDeactivate: 'Deactivate notification',
+        reportSplit: 'Report split',
+        reportSplitTooltip: 'Report a wrong DE/EN split on GitHub (GitHub login required)',
 
         // Alarm bell
         alarmTooltipNone: 'No flagged menus',
@@ -1680,6 +1684,8 @@ const TRANSLATIONS = {
         dishImageSourceWikipedia: 'Source: Wikipedia',
         dishImageSourceCommons: 'Source: Wikimedia Commons',
         dishImageSourceChefkoch: 'Source: Chefkoch',
+        dishImageSourceKochbar: 'Source: Kochbar',
+        dishImageSourceEatsmarter: 'Source: Eatsmarter',
         dishImageSourceGoogle: 'Source: Google Images',
         dishImageSourceOpenverse: 'Source: Openverse',
         dishImagePrev: 'Previous image',
@@ -6416,6 +6422,9 @@ const LOANWORDS = new Set([
     'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
     'ciabatta', 'bruschetta', 'antipasti', 'carpaccio', 'bolognese', 'pomodoro',
     'tagliatelle', 'carbonara', 'arrabiata', 'arabiata',
+    'fusilli', 'farfalle', 'tortellini', 'tortelloni', 'macaroni', 'linguine',
+    'fettuccine', 'rigatoni', 'orecchiette', 'pappardelle', 'cannelloni',
+    'conchiglie', 'bucatini',
     'schnitzel', 'schöberl', 'backerbsen', 'strudel', 'spätzle', 'spaetzle',
     'pizza', 'zucchini', 'minestrone', 'cheddar', 'tofu', 'croutons', 'quinoa',
     'harissa', 'prosciutto', 'steak', 'burger'
@@ -6856,15 +6865,16 @@ var i18n = __webpack_require__(646);
 
 /**
  * Derives the main-course line from a language split result.
- * Only confident splits (label 'high') in de/en mode qualify; the second
- * course line is the main dish, single-course menus fall back to that line.
+ * Confident splits (label 'high' or 'medium') in de/en mode qualify; the
+ * second course line is the main dish, single-course menus fall back to that
+ * line.
  * @param {Object|null} split splitLanguage result (fields: de, en, label)
  * @param {'de'|'en'|'all'} langMode Current language mode
  * @returns {Object|null} Main course line ({text, lang}) or null
  */
 function getMainCourseLine(split, langMode) {
     if (langMode === 'all') return null
-    if (!split || split.label !== 'high') return null
+    if (!split || (split.label !== 'high' && split.label !== 'medium')) return null
     const lines = String(langMode === 'en' ? split.en : split.de || '').split('\n').map(s => s.trim()).filter(Boolean)
     if (lines.length >= 2) return { text: lines[1], lang: langMode }
     if (lines.length === 1) return { text: lines[0], lang: langMode }
@@ -6921,9 +6931,10 @@ function queryCandidates(query) {
  * @param {string} query Sanitized dish query
  * @param {'de'|'en'} [lang] Query language hint passed through to the worker (defaults to 'de')
  * @param {AbortSignal} [cancelSignal] Aborts the search when the popup closes
+ * @param {string} [queryDe] German dish name — German recipe sites always search German
  * @returns {Promise<{images: {url: string, license: string, creator: string}[], source: string|null, cached?: boolean}>}
  */
-async function fetchDishImages(query, lang, cancelSignal) {
+async function fetchDishImages(query, lang, cancelSignal, queryDe) {
     if (cancelSignal && cancelSignal.aborted) return { images: [], source: null }
     const key = query.trim().replace(/\s+/g, ' ').toLowerCase()
     const note = (level, message) => {
@@ -6931,6 +6942,27 @@ async function fetchDishImages(query, lang, cancelSignal) {
         console[level](`[Kantine] Bildersuche: ${message}`)
     }
     const cache = readDishImageCache()
+    // Selbstreinigung: abgelaufene Einträge bei jedem Zugriff entfernen —
+    // so werden alte Bilder automatisch aussortiert, auch ohne neue Suche.
+    if (cache && cache.queries) {
+        const now = Date.now()
+        let expired = 0
+        for (const entryKey of Object.keys(cache.queries)) {
+            const entry = cache.queries[entryKey]
+            if (!entry || now - entry.ts >= constants/* DISH_IMAGE_CACHE_TTL_MS */.yd) {
+                delete cache.queries[entryKey]
+                expired++
+            }
+        }
+        if (expired > 0) {
+            try {
+                localStorage.setItem(constants.LS.DISH_IMAGE_CACHE, JSON.stringify(cache))
+                note('log', `Cache aufgeräumt — ${expired} abgelaufene Einträge entfernt`)
+            } catch (e) {
+                // Quota-Überschreitung — der nächste Schreibvorgang versucht es erneut.
+            }
+        }
+    }
     const entry = cache && cache.queries ? cache.queries[key] : null
     if (entry && Date.now() - entry.ts < constants/* DISH_IMAGE_CACHE_TTL_MS */.yd) {
         note('log', `Cache-Treffer für "${key}" — ${entry.images.length} Bilder (Quelle: ${entry.source})`)
@@ -6948,13 +6980,18 @@ async function fetchDishImages(query, lang, cancelSignal) {
 
     let result = null
 
-    // Stage 0: own Cloudflare Worker (server-side Google scrape — exact dish
-    // coverage without public proxies). Active only for a properly configured
-    // https URL; empty string or unreplaced placeholder disables the stage.
-    const workerBase = /^https:\/\//.test(constants/* DISH_IMAGE_WORKER_URL */.w3) ? constants/* DISH_IMAGE_WORKER_URL */.w3.replace(/\/+$/, '') : ''
+    // Stage 0: own Cloudflare Worker (server-side recipe-photo scrape — exact
+    // dish coverage without public proxies). Active only for a properly
+    // configured https URL; empty string or unreplaced placeholder disables
+    // the stage. window.DISH_IMAGE_WORKER_URL overrides the constant (used
+    // by tests and for debugging via the browser console).
+    const configuredWorkerUrl = (typeof window !== 'undefined' && window.DISH_IMAGE_WORKER_URL) || constants/* DISH_IMAGE_WORKER_URL */.w3
+    const workerBase = /^https:\/\//.test(configuredWorkerUrl) ? configuredWorkerUrl.replace(/\/+$/, '') : ''
     if (workerBase) {
         try {
-            const response = await fetch(`${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}`, { signal: attemptSignal() })
+            const workerUrl = `${workerBase}/?q=${encodeURIComponent(query)}&hl=${lang === 'en' ? 'en' : 'de'}` +
+                (queryDe ? `&qde=${encodeURIComponent(queryDe)}` : '')
+            const response = await fetch(workerUrl, { signal: attemptSignal() })
             if (response.ok) {
                 const data = await response.json()
                 const images = (data.images || [])
@@ -6962,9 +6999,9 @@ async function fetchDishImages(query, lang, cancelSignal) {
                     .slice(0, constants/* DISH_IMAGE_MAX_RESULTS */.v0)
                 note('log', `Worker lieferte ${images.length} Bilder`)
                 if (images.length >= 1) {
-                    writeDishImageCache(key, 'chefkoch', images)
-                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: Chefkoch via Worker)`)
-                    return { images, source: 'chefkoch' }
+                    writeDishImageCache(key, images[0] && images[0].source ? images[0].source : 'chefkoch', images)
+                    note('log', `fertig in ${Date.now() - startedAt}ms — ${images.length} Bilder (Quelle: ${images[0] && images[0].source ? images[0].source : 'chefkoch'} via Worker)`)
+                    return { images, source: images[0] && images[0].source ? images[0].source : 'chefkoch' }
                 }
             } else {
                 note('warn', `Worker antwortete HTTP ${response.status}`)
@@ -7119,47 +7156,12 @@ function isDishImageModalClosed() {
 let dishImageModalOpen = false;
 let dishImageCurrentQuery = null;
 let dishImageCarouselIndex = 0;
+let dishImageCaptionPrefix = '';
 let dishImageIntervalId = null;
 let dishImageSearchAbort = null;
 let dishImageCloseTimer = null;
-let dishImageCseScriptInjected = false;
-let dishImageCseReady = false;
-let dishImageCsePendingQuery = null;
-let dishImageCseMode = false;
 
-const dishCseConfigured = () => Boolean(constants/* DISH_IMAGE_CSE_ID */.Xi) && !constants/* DISH_IMAGE_CSE_ID */.Xi.includes('{');
-
-function ensureDishImageCseScript() {
-    if (dishImageCseScriptInjected) return;
-    dishImageCseScriptInjected = true;
-    window.__gcse = window.__gcse || {};
-    window.__gcse.parsetags = 'explicit';
-    window.__gcse.callback = () => {
-        dishImageCseReady = true;
-        if (dishImageCsePendingQuery !== null) {
-            const pending = dishImageCsePendingQuery;
-            dishImageCsePendingQuery = null;
-            renderDishImageCse(pending);
-        }
-    };
-    const script = document.createElement('script');
-    script.src = `https://cse.google.com/cse.js?cx=${constants/* DISH_IMAGE_CSE_ID */.Xi}`;
-    script.async = true;
-    document.head.appendChild(script);
-}
-
-function renderDishImageCse(query) {
-    const body = document.getElementById('dish-image-body');
-    if (!body || !dishImageModalOpen || dishImageCurrentQuery !== query) return;
-    body.innerHTML = '<div id="dish-cse-results"></div>';
-    try {
-        google.search.cse.element.render({ div: 'dish-cse-results', tag: 'searchresults-only', gname: 'dish-cse', attributes: { enableImageSearch: 'true' } });
-    } catch (e) {
-        // Element already rendered for this gname — re-executing is enough.
-    }
-    const element = google.search.cse.element.getElement('dish-cse');
-    if (element) element.execute(query);
-}
+const DISH_SOURCE_LABEL_KEYS = { wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', kochbar: 'dishImageSourceKochbar', eatsmarter: 'dishImageSourceEatsmarter', openverse: 'dishImageSourceOpenverse' };
 
 function startDishImageAdvance() {
     stopDishImageAdvance();
@@ -7175,9 +7177,7 @@ function stopDishImageAdvance() {
 }
 
 function scheduleDishImagePopoverClose(delay) {
-    // CSE mode keeps the popover open: the interactive Google iframe swallows
-    // pointer events, so mouse-out auto-close would close it immediately.
-    if (dishImageCseMode || isDishImageModalClosed()) return;
+    if (isDishImageModalClosed()) return;
     clearTimeout(dishImageCloseTimer);
     dishImageCloseTimer = setTimeout(() => {
         dishImageCloseTimer = null;
@@ -7208,6 +7208,14 @@ function showDishImageSlide(index) {
     dishImageCarouselIndex = ((index % slides.length) + slides.length) % slides.length;
     slides.forEach((slide, i) => slide.classList.toggle('active', i === dishImageCarouselIndex));
     Array.from(carousel.querySelectorAll('.dish-image-dot')).forEach((dot, i) => dot.classList.toggle('active', i === dishImageCarouselIndex));
+    const captionText = document.getElementById('dish-image-caption-text');
+    const activeImg = slides[dishImageCarouselIndex].querySelector('img');
+    if (captionText && activeImg) {
+        const title = (activeImg.dataset && activeImg.dataset.title) ? activeImg.dataset.title : dishImageCurrentQuery;
+        const sourceKey = (activeImg.dataset && activeImg.dataset.source) || '';
+        const sourceLabelNow = (sourceKey && DISH_SOURCE_LABEL_KEYS[sourceKey]) ? (0,i18n.t)(DISH_SOURCE_LABEL_KEYS[sourceKey]) : dishImageCaptionPrefix;
+        captionText.textContent = `${sourceLabelNow} — ${title}`;
+    }
 }
 
 /**
@@ -7216,7 +7224,7 @@ function showDishImageSlide(index) {
  * @param {string} query Sanitized dish query
  * @param {HTMLElement} [linkEl] Triggering anchor — the popover is positioned next to it
  */
-function openDishImageModal(query, linkEl) {
+function openDishImageModal(query, linkEl, queryDe) {
     const popover = document.getElementById('dish-image-popover');
     if (!popover) return;
     if (dishImageSearchAbort) dishImageSearchAbort.abort();
@@ -7242,25 +7250,10 @@ function openDishImageModal(query, linkEl) {
         popover.style.top = Math.round(top) + 'px';
     }
     document.getElementById('dish-image-title').textContent = query;
-
-    const cseElementApi = window.google && window.google.search && window.google.search.cse && window.google.search.cse.element;
-    dishImageCseMode = Boolean(cseElementApi || dishCseConfigured());
+    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
     stats_tracker/* tracker */.F.increment('dish_image_popup');
 
-    if (dishImageCseMode) {
-        if (cseElementApi) {
-            renderDishImageCse(query);
-        } else {
-            ensureDishImageCseScript();
-            dishImageCsePendingQuery = query;
-            document.getElementById('dish-image-body').innerHTML = `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
-        }
-        return;
-    }
-
-    document.getElementById('dish-image-body').innerHTML = '<div class="skeleton dish-image-skeleton"></div>'.repeat(2) + `<p class="dish-image-loading-text">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLoading'))}</p>`;
-
-    fetchDishImages(query, undefined, dishImageSearchAbort.signal).then(result => {
+    fetchDishImages(query, undefined, dishImageSearchAbort.signal, queryDe).then(result => {
         // Stale-response guard: ignore results after query change or close.
         if (!dishImageModalOpen || dishImageCurrentQuery !== query) return;
         if (result.source === null) renderDishImageError(query, false);
@@ -7283,13 +7276,16 @@ function renderDishImageCarousel(query, result) {
     if (!body) return;
     stopDishImageAdvance();
 
-    const sourceLabel = (0,i18n.t)({ wikipedia: 'dishImageSourceWikipedia', commons: 'dishImageSourceCommons', chefkoch: 'dishImageSourceChefkoch', openverse: 'dishImageSourceOpenverse' }[result.source] || 'dishImageSourceGoogle');
+    const sourceLabel = (0,i18n.t)(DISH_SOURCE_LABEL_KEYS[result.source] || 'dishImageSourceGoogle');
     const slidesHtml = result.images.map(img => {
         const attribution = (0,utils/* escapeHtml */.ZD)([img.creator, img.license].filter(Boolean).join(' — '));
-        return `<div class="dish-image-slide"><img src="${(0,utils/* escapeHtml */.ZD)(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}"></div>`;
+        const slideTitle = (0,utils/* escapeHtml */.ZD)(img.title || img.creator || '');
+        const slideSource = (0,utils/* escapeHtml */.ZD)(img.source || result.source || '');
+        return `<div class="dish-image-slide"><img src="${(0,utils/* escapeHtml */.ZD)(img.url)}" alt="" loading="lazy" referrerpolicy="no-referrer" title="${attribution}" data-title="${slideTitle}" data-source="${slideSource}"></div>`;
     }).join('');
 
-    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption">${(0,utils/* escapeHtml */.ZD)(sourceLabel)} — ${(0,utils/* escapeHtml */.ZD)(query)} <a href="${(0,utils/* escapeHtml */.ZD)(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageOpenInGoogle'))}</a></p>`;
+    body.innerHTML = `<div class="dish-image-carousel"><div class="dish-image-track">${slidesHtml}</div><button type="button" class="icon-btn dish-image-nav dish-image-prev" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImagePrev'))}"><span class="material-icons-round">chevron_left</span></button><button type="button" class="icon-btn dish-image-nav dish-image-next" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageNext'))}"><span class="material-icons-round">chevron_right</span></button><div class="dish-image-dots"></div></div><p class="dish-image-caption"><span id="dish-image-caption-text">${(0,utils/* escapeHtml */.ZD)(sourceLabel)} — ${(0,utils/* escapeHtml */.ZD)(query)}</span> <a href="${(0,utils/* escapeHtml */.ZD)(buildGoogleImageUrl(query))}" target="_blank" rel="noopener noreferrer" class="dish-image-google-link">${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageOpenInGoogle'))}</a></p>`;
+    dishImageCaptionPrefix = sourceLabel;
 
     const carousel = body.querySelector('.dish-image-carousel');
     const dotsEl = carousel.querySelector('.dish-image-dots');
@@ -7754,7 +7750,9 @@ function createDayCard(day) {
 
         const localized = (0,utils/* getLocalizedText */.PC)(item.description, split);
         const mainCourse = getMainCourseLine(split, state/* langMode */.Kl);
+        const mainCourseDe = getMainCourseLine(split, 'de');
         const dishQuery = mainCourse ? sanitizeDishQuery(mainCourse.text) : null;
+        const dishQueryDe = mainCourseDe ? sanitizeDishQuery(mainCourseDe.text) : dishQuery;
         let descHtml = (0,utils/* escapeHtml */.ZD)(localized);
         if (dishQuery !== null) {
             const rawLines = localized.split('\n');
@@ -7766,14 +7764,37 @@ function createDayCard(day) {
                     const isMain = seen === mainIdx;
                     seen++;
                     if (isMain) {
-                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${(0,utils/* escapeHtml */.ZD)(dishQuery)}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLinkTooltip'))}">${(0,utils/* escapeHtml */.ZD)(mainCourse.text)}</a>`;
+                        return `<a href="${buildGoogleImageUrl(dishQuery)}" target="_blank" rel="noopener noreferrer" class="dish-image-link" data-dish-query="${(0,utils/* escapeHtml */.ZD)(dishQuery)}" data-dish-query-de="${(0,utils/* escapeHtml */.ZD)(dishQueryDe || dishQuery)}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('dishImageLinkTooltip'))}">${(0,utils/* escapeHtml */.ZD)(mainCourse.text)}</a>`;
                     }
                 }
                 return (0,utils/* escapeHtml */.ZD)(line);
             }).join('\n');
         }
 
-        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,utils/* escapeHtml */.ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}</p>${heatmapHtml}</div>`;
+        const rawDesc = item.description || '';
+        let splitFeedbackButton = '';
+        if (rawDesc.trim()) {
+            splitFeedbackButton = ` <button type="button" class="icon-btn icon-btn-small btn-split-feedback" aria-label="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('reportSplit'))}" title="${(0,utils/* escapeHtml */.ZD)((0,i18n.t)('reportSplitTooltip'))}"><span class="material-icons-round" aria-hidden="true">bug_report</span></button>`;
+        }
+
+        itemEl.innerHTML = `<div class="item-header"><span class="item-name">${(0,utils/* escapeHtml */.ZD)(item.name)}</span><span class="item-price">${item.price.toFixed(2)} €</span></div><div class="item-status-row">${orderedBadge}${cancelButton}${orderButton}${flagButton}<div class="badges">${statusBadge}</div></div>${tagsHtml}<div class="item-desc-wrap"><p class="item-desc"${dTitle}>${descHtml} ${cBadge}${splitFeedbackButton}</p>${heatmapHtml}</div>`;
+
+        const feedbackBtn = itemEl.querySelector('.btn-split-feedback');
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                stats_tracker/* tracker */.F.increment('split_feedback_open');
+                window.open((0,utils/* buildSplitFeedbackUrl */.RF)({
+                    repo: constants/* GITHUB_REPO */.Dy,
+                    raw: rawDesc,
+                    de: split.de,
+                    en: split.en,
+                    confidence: split.confidence,
+                    label: split.label,
+                    version: constants/* CLIENT_VERSION */.fZ
+                }), '_blank', 'noopener');
+            });
+        }
 
         const orderBtn = itemEl.querySelector('.btn-order');
         if (orderBtn) {
@@ -7810,6 +7831,7 @@ function createDayCard(day) {
         const dishLink = itemEl.querySelector('.dish-image-link');
         if (dishLink) {
             const linkQuery = dishLink.dataset.dishQuery;
+            const linkQueryDe = dishLink.dataset.dishQueryDe || linkQuery;
             dishLink.addEventListener('click', (e) => {
                 e.stopPropagation();
                 stats_tracker/* tracker */.F.increment('dish_image_tab');
@@ -7823,7 +7845,7 @@ function createDayCard(day) {
                 clearTimeout(dwellTimer);
                 dwellTimer = setTimeout(() => {
                     dwellTimer = null;
-                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink);
+                    if (dishLink.isConnected && isDishImageModalClosed()) openDishImageModal(linkQuery, dishLink, linkQueryDe);
                 }, constants/* DISH_IMAGE_HOVER_MS */.Rr);
             });
             const cancelDishDwell = () => {
@@ -8374,6 +8396,7 @@ function updateAlarmBell() {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
+  RF: () => (/* binding */ buildSplitFeedbackUrl),
   sg: () => (/* binding */ debounce),
   ZD: () => (/* binding */ escapeHtml),
   sn: () => (/* binding */ getISOWeek),
@@ -8716,28 +8739,44 @@ function splitDishes(text, langModel) {
     const s2 = slashIdxs[1];
     const de1 = tokens.slice(0, s1).join(' ').trim();
     const mid = tokens.slice(s1 + 1, s2); // EN_1 ... DE_2
-    const k = findDishBoundary(mid, langModel);
+    const tail = tokens.slice(s2 + 1).join(' ').trim();
+    // Bilingual dishes usually share their head noun ("Fusilli mit ... /
+    // Fusilli with ..."). If the word opening the tail (EN_2) also occurs
+    // inside mid, it most likely opens DE_2 — pass it as a bonus signal.
+    const k = findDishBoundary(mid, langModel, headBonusKey(mid, tail));
     const en1 = mid.slice(0, k).join(' ').trim();
     const de2 = mid.slice(k).join(' ').trim();
-    const tail = tokens.slice(s2 + 1).join(' ').trim();
 
     const first = { de: de1, en: en1 || de1, mono: false };
     const remainder = (de2 ? de2 + ' / ' : '/ ') + tail;
     return [first, ...splitDishes(remainder, langModel)];
 }
 
+// Normalized comparison key for head-noun matching (case-insensitive,
+// punctuation-stripped). Returns '' when the tail opener is not a usable
+// signal: too short or lowercase (filters function words like "with").
+function headBonusKey(midTokens, tail) {
+    const first = String(tail || '').split(' ')[0] || '';
+    if (!/^[A-ZÄÖÜ]/.test(first)) return '';
+    const key = first.toLowerCase().replace(/[^a-zäöüß]/g, '');
+    if (key.length < 3) return '';
+    const wanted = new Set(midTokens.map(t => String(t).toLowerCase().replace(/[^a-zäöüß]/g, '')));
+    return wanted.has(key) ? key : '';
+}
 // Continuous language evidence per token: the trigram model's signed score
 // (positive = German, negative = English). Loanwords are neutral — they occur
 // on both sides ("Kichererbsencurry" vs "chickpea curry").
 // Capitalization is NOT used as evidence here: English dish text in the source
 // data capitalizes freely ("Indian: Mix Sabji", "Vegetables"), so a hard
 // "capital => German" rule drowns the model signal. It only breaks ties.
-function findDishBoundary(midTokens, langModel) {
+function findDishBoundary(midTokens, langModel, headKey = '') {
     const n = midTokens.length;
     if (n <= 1) return n;
 
     const EPS = 1e-9;
+    const HEAD_BONUS = 3.0;
     const scores = midTokens.map(t => (0,loanwords/* isLoanword */.n)(t) ? 0 : langModel.scoreLang(t));
+    const norm = t => String(t).toLowerCase().replace(/[^a-zäöüß]/g, '');
 
     let bestK = 1;
     let bestPenalty = Infinity;
@@ -8751,6 +8790,7 @@ function findDishBoundary(midTokens, langModel) {
         for (let i = k; i < n; i++) if (scores[i] < 0) penalty -= scores[i];
 
         const cap = /^[A-ZÄÖÜ]/.test(midTokens[k]) ? 1 : 0;
+        if (headKey && norm(midTokens[k]) === headKey && cap) penalty -= HEAD_BONUS;
 
         if (penalty < bestPenalty - EPS || (Math.abs(penalty - bestPenalty) <= EPS && cap > bestCap)) {
             bestPenalty = penalty;
@@ -9352,6 +9392,37 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+/**
+ * Builds a prefilled GitHub issue URL for reporting a wrong DE/EN split.
+ * Opens the issue form with title, body and label preset — the reporter
+ * only clicks "Submit new issue". Note: GitHub requires login, anonymous
+ * issues are not possible; logged-out users land on login first and return
+ * to the prefilled form afterwards.
+ * @param {object} report - { repo, raw, de, en, confidence, label, version }
+ * @returns {string} Prefilled https://github.com/<repo>/issues/new URL
+ */
+function buildSplitFeedbackUrl({ repo, raw, de, en, confidence, label, version }) {
+    const hint = String(raw || '').split('/')[0].trim().slice(0, 60) || 'DE/EN-Split';
+    const conf = typeof confidence === 'number' ? confidence.toFixed(2) : '?';
+    const body = [
+        '**Menütext (roh):**',
+        raw || '',
+        '',
+        '**Split DE:**',
+        de || '',
+        '',
+        '**Split EN:**',
+        en || '',
+        '',
+        `**Confidence:** ${label} (${conf})`,
+        `**Version:** ${version || '?'}`
+    ].join('\n');
+    return `https://github.com/${repo}/issues/new`
+        + '?title=' + encodeURIComponent('[Split-FB] ' + hint)
+        + '&body=' + encodeURIComponent(body)
+        + '&labels=' + encodeURIComponent('bug');
 }
 
 
