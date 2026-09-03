@@ -125,4 +125,14 @@ assert(multiCourse.en.includes('Zucchini soup'), 'multi-course en soup');
 assert(multiCourse.en.includes('Lasagna Bolognese'), 'multi-course en main');
 assert(multiCourse.en.includes('Rasberry- almond cake'), 'multi-course en dessert');
 
+// Regression: shared head noun across the EN_1/DE_2 boundary ("Fusilli" ends
+// EN_1 in the raw text but opens DE_2) must not leak into the English soup.
+const fusilli = splitLanguage('Erbsen- Minzsuppe / Pea mint soup Fusilli mit Zucchini-Zitronencreme und Oliven / Fusilli with zucchini- lemon cream, and olives(AFO) Waldbeer Joghurt / Berry yogurt(F)');
+assert(countBullets(fusilli.de) === 3, 'fusilli de 3');
+assert(countBullets(fusilli.en) === 3, 'fusilli en 3');
+assert(fusilli.de.includes('Fusilli mit Zucchini-Zitronencreme und Oliven (AFO)'), 'fusilli de main');
+assert(fusilli.en.includes('Pea mint soup'), 'fusilli en soup');
+assert(!fusilli.en.includes('Pea mint soup Fusilli'), 'fusilli en soup has no head-noun leak');
+assert(fusilli.en.includes('Fusilli with zucchini- lemon cream, and olives (AFO)'), 'fusilli en main');
+
 console.log('✅ All splitter tests passed!');

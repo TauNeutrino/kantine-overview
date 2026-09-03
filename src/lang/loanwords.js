@@ -15,6 +15,9 @@ export const LOANWORDS = new Set([
     'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
     'ciabatta', 'bruschetta', 'antipasti', 'carpaccio', 'bolognese', 'pomodoro',
     'tagliatelle', 'carbonara', 'arrabiata', 'arabiata',
+    'fusilli', 'farfalle', 'tortellini', 'tortelloni', 'macaroni', 'linguine',
+    'fettuccine', 'rigatoni', 'orecchiette', 'pappardelle', 'cannelloni',
+    'conchiglie', 'bucatini',
     'schnitzel', 'schöberl', 'backerbsen', 'strudel', 'spätzle', 'spaetzle',
     'pizza', 'zucchini', 'minestrone', 'cheddar', 'tofu', 'croutons', 'quinoa',
     'harissa', 'prosciutto', 'steak', 'burger'
