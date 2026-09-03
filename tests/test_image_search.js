@@ -169,8 +169,9 @@ assertEquals(main, null, "label 'template' must not produce a link target");
 ok("getMainCourseLine: label 'template' returns null");
 
 main = getMainCourseLine({ label: 'medium', de: 'Menü 1\nMenü 2', en: 'menu 1\nmenu 2' }, 'de');
-assertEquals(main, null, "label 'medium' must not produce a link target");
-ok("getMainCourseLine: label 'medium' returns null");
+assertEquals(main && main.text, 'Menü 2', "label 'medium' qualifies for the link target (second course line)");
+assertEquals(main && main.lang, 'de', "medium split should keep the langMode");
+ok("getMainCourseLine: label 'medium' qualifies (second course line)");
 
 main = getMainCourseLine({ label: 'low', de: 'Menü 1\nMenü 2', en: 'menu 1\nmenu 2' }, 'de');
 assertEquals(main, null, "label 'low' must not produce a link target");

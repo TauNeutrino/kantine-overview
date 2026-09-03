@@ -9,15 +9,16 @@ import { LS, DISH_IMAGE_CACHE_TTL_MS, DISH_IMAGE_FETCH_TIMEOUT_MS, DISH_IMAGE_MA
 
 /**
  * Derives the main-course line from a language split result.
- * Only confident splits (label 'high') in de/en mode qualify; the second
- * course line is the main dish, single-course menus fall back to that line.
+ * Confident splits (label 'high' or 'medium') in de/en mode qualify; the
+ * second course line is the main dish, single-course menus fall back to that
+ * line.
  * @param {Object|null} split splitLanguage result (fields: de, en, label)
  * @param {'de'|'en'|'all'} langMode Current language mode
  * @returns {Object|null} Main course line ({text, lang}) or null
  */
 export function getMainCourseLine(split, langMode) {
     if (langMode === 'all') return null
-    if (!split || split.label !== 'high') return null
+    if (!split || (split.label !== 'high' && split.label !== 'medium')) return null
     const lines = String(langMode === 'en' ? split.en : split.de || '').split('\n').map(s => s.trim()).filter(Boolean)
     if (lines.length >= 2) return { text: lines[1], lang: langMode }
     if (lines.length === 1) return { text: lines[0], lang: langMode }
