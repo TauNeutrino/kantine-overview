@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Bildersuche findet deutlich mehr Gerichte (Spot-Check aller 418 verlinkbaren Queries)**: Query-Sanitizer entfernt jetzt alle Klammer-Anmerkungen, Anführungszeichen und repariert abgerissene Bindestriche (`Linsen- Curry` → `Linsen-Curry`).
+- **Progressive Query-Verkürzung pro Quelle**: Liefert die volle Query keine Treffer, versucht jede Rezeptseite automatisch kürzere Varianten (voll → erste zwei Wörter → erstes Wort).
+
+## [2.2.4] - 2026-09-07
+
+### Changed
+
 - **Bildersuche findet deutlich mehr Gerichte**: Query-Sanitizer entfernt jetzt alle Klammer-Anmerkungen (`(ACGLM)`, `(Koriander)`, `(vegan)`), Anführungszeichen und repariert abgerissene Bindestriche (`Linsen- Curry` → `Linsen-Curry`).
 - **Progressive Query-Verkürzung pro Quelle**: Liefert die volle Query keine Treffer, versucht jede Rezeptseite automatisch kürzere Varianten (voll → erste zwei Wörter → erstes Wort) — z. B. findet „Penne mit Gemüsesugo" jetzt über „Penne" trotzdem passende Bilder.
 - **Bindestrich-Tokenisierung im Scoring**: Zusammengesetzte Wörter (`Linsen-Curry`) werden an Bindestrichen getrennt bewertet.

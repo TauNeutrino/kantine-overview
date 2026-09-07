@@ -214,9 +214,9 @@ ok("sanitizeDishQuery: '• kartoffelgulasch mit braunschweiger (lm)' -> 'kartof
 assertEquals(sanitizeDishQuery('Schweinsbraten (AFO)'), 'Schweinsbraten', "compact allergen group '(AFO)' must be removed");
 ok("sanitizeDishQuery: 'Schweinsbraten (AFO)' -> 'Schweinsbraten'");
 
-// Case 9d: word-like parentheses are preserved (over-stripping guard)
-assertEquals(sanitizeDishQuery('Chili sin Carne (vegan)'), 'Chili sin Carne (vegan)', "word-like parentheses must survive the sanitizer");
-ok("sanitizeDishQuery: 'Chili sin Carne (vegan)' survives");
+// Case 9d: all parenthetical annotations are stripped (search queries only)
+assertEquals(sanitizeDishQuery('Chili sin Carne (vegan)'), 'Chili sin Carne', "parenthetical annotations must be removed for search");
+ok("sanitizeDishQuery: 'Chili sin Carne (vegan)' -> 'Chili sin Carne'");
 
 // Case 9e: long all-caps allergen groups are stripped too (real menu data)
 assertEquals(sanitizeDishQuery('Faschierter Braten mit Püree und Karotten (ACGLM)'), 'Faschierter Braten mit Püree und Karotten', "all-caps allergen group '(ACGLM)' must be removed");
@@ -225,6 +225,14 @@ ok("sanitizeDishQuery: '(ACGLM)' removed");
 // Case 9f: quotes are stripped (phrase search breaks recipe-site queries)
 assertEquals(sanitizeDishQuery('"Hühnerfleisch Szechuan" mit Reis'), 'Hühnerfleisch Szechuan mit Reis', "quotation marks must be removed");
 ok("sanitizeDishQuery: '\"Hühnerfleisch Szechuan\" mit Reis' -> 'Hühnerfleisch Szechuan mit Reis'");
+
+// Case 9g: glued annotation without space is stripped (real menu data)
+assertEquals(sanitizeDishQuery('Im Ofen gebackene Samosas(Koriander) mit Dip'), 'Im Ofen gebackene Samosas mit Dip', "glued parenthetical must be removed");
+ok("sanitizeDishQuery: 'Samosas(Koriander)' -> 'Samosas'");
+
+// Case 9h: torn hyphens rejoin (real menu data)
+assertEquals(sanitizeDishQuery('Linsen- Curry mit Serviettenschnitte'), 'Linsen-Curry mit Serviettenschnitte', "torn hyphen must rejoin");
+ok("sanitizeDishQuery: 'Linsen- Curry' -> 'Linsen-Curry'");
 
 // === Part 1: buildGoogleImageUrl ===
 
