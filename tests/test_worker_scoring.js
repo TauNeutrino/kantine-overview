@@ -42,7 +42,7 @@ try {
     process.exit(1);
 }
 
-const { relevanceScore, slugTokensFromUrl, titleFromSlug, searchCandidates, candidateTokens } = sandbox;
+const { relevanceScore, slugTokensFromUrl, titleFromSlug, searchCandidates, candidateTokens, canonicalSearchVariant, mergedSearchCandidates, isGenericQuery, queryTokenWeights, canonicalToken } = sandbox;
 
 function assertEquals(actual, expected, message) {
     if (actual !== expected) {
@@ -227,7 +227,6 @@ async function runHandlerTests() {
     ok("handler: chefkoch hit end-to-end (mocked fetch), no ReferenceError");
 }
 
-runHandlerTests().then(() => {
 // === austrian synonyms (AT menu names vs standard recipe spellings) ===
 
 // Case 15: rindsbraten matches rinderbraten (either direction)
@@ -251,9 +250,166 @@ assertEquals(
 );
 ok("relevanceScore: topfen/quark sentence scores 11");
 
-console.log("✅ Worker Scoring Unit Tests Passed!");
-process.exit(0);
-}).catch((err) => {
-    console.error("❌ Handler smoke test failed:", err && err.message ? err.message : err);
+// === hit-quality regression tests (2026-09 live evaluation, 40 queries) ===
+
+// Fix 2: compound-internal synonyms — grillhendl ≡ grillhaehnchen (full weight)
+assertEquals(
+    relevanceScore(['grillhaehnchen'], ['grillhendl']),
+    3,
+    "exact via synonym group (2) + first-token (1); no contiguous ('grillhaehnchen' does not contain 'grillhendl')"
+);
+assertEquals(
+    relevanceScore(['grill', 'haehnchen'], ['grillhendl']),
+    1.5,
+    "split compound: grillhendl matches haehnchen token via synonym group (2), extra slug token (−0.5)"
+);
+ok("relevanceScore: compound synonym grillhendl≡grillhaehnchen resolves (no protein conflict penalty)");
+
+// Fix 4b: 1-char typo tolerance on long tokens (menu spelling vs recipe slug)
+assertEquals(
+    relevanceScore(['geschmortes', 'rindfleisch'], ['geschmorrtes', 'rindfleisch', 'in', 'limettensauce']),
+    3,
+    "geschmorrtes~geschmortes one-char typo (0.5) + rindfleisch exact (1) = 1.5 -> 3; 'in'/limettensauce have no slug counterpart"
+);
+
+// Fix 4: joined compound bonus — Kartoffel-Gemüsestrudel must beat Kartoffel-Rösti
+const roestiScore = relevanceScore(
+    ['kartoffel', 'moehren', 'roesti', 'mit', 'tomaten', 'dip'],
+    ['kartoffel', 'gemuesestrudel', 'mit', 'dip']
+);
+const strudelScore = relevanceScore(
+    ['kartoffel', 'gemuese', 'strudel'],
+    ['kartoffel', 'gemuesestrudel', 'mit', 'dip']
+);
+if (!(strudelScore > roestiScore)) {
+    console.error(`❌ strudel (${strudelScore}) must outrank roesti (${roestiScore})`);
     process.exit(1);
-});
+}
+ok(`relevanceScore: Kartoffel-Gemüsestrudel (${strudelScore}) beats Kartoffel-Rösti (${roestiScore}) via joined compound bonus`);
+
+// Fix 5: integral dish components after 'mit' keep full weight
+assertEquals(
+    JSON.stringify(queryTokenWeights(['gnocchi', 'mit', 'erbsen', 'schinken', 'rahmsauce'].map(canonicalToken))),
+    JSON.stringify([1, 0.25, 0.25, 0.25, 1]),
+    "rahmsauce ends with 'sauce' -> integral, full weight; erbsen/schinken stay side-weighted"
+);
+assertEquals(
+    JSON.stringify(queryTokenWeights(['grillhendl', 'mit', 'semmel'].map(canonicalToken))),
+    JSON.stringify([1, 0.25, 0.25]),
+    "semmel stays a side (no core suffix/protein)"
+);
+ok("queryTokenWeights: sauce/reis/nudeln after 'mit' keep weight 1, sides stay 0.25");
+
+// Fix 6: diet conflict — vegan slug without vegan query is demoted
+const veganBolognese = relevanceScore(
+    ['penne', 'mit', 'veganer', 'sauce', 'bolognese', 'mit', 'zucchini'],
+    ['penne', 'bolognese']
+);
+const meatBolognese = relevanceScore(
+    ['penne', 'mit', 'monas', 'bolognese'],
+    ['penne', 'bolognese']
+);
+if (!(meatBolognese > veganBolognese)) {
+    console.error(`❌ meat bolognese (${meatBolognese}) must outrank vegan bolognese (${veganBolognese})`);
+    process.exit(1);
+}
+ok(`relevanceScore: Penne Bolognese (${meatBolognese}) beats vegan variant (${veganBolognese})`);
+
+// Fix 6: protein conflict — soja query prefers tofu-tikka over chicken-tikka
+const chickenTikka = relevanceScore(
+    ['chicken', 'tikka', 'masala', 'mit', 'topinambur'],
+    ['soja', 'tikka', 'masala', 'rajamah', 'mit', 'erbsenreis']
+);
+const tofuTikka = relevanceScore(
+    ['tofu', 'tikka', 'masala'],
+    ['soja', 'tikka', 'masala', 'rajamah', 'mit', 'erbsenreis']
+);
+if (!(tofuTikka > chickenTikka)) {
+    console.error(`❌ tofu tikka (${tofuTikka}) must outrank chicken tikka (${chickenTikka})`);
+    process.exit(1);
+}
+ok(`relevanceScore: Soja-Tikka matches tofu-tikka (${tofuTikka}) over chicken-tikka (${chickenTikka})`);
+
+// Fix 2: canonical search variants
+assertEquals(
+    canonicalSearchVariant('frisches Grillhendl mit Semmel'),
+    'frisches grillhaehnchen mit Semmel',
+    "unknown compound word grillhendl must canonicalize; known word Semmel stays"
+);
+assertEquals(canonicalSearchVariant('Kaiserschmarren mit Apfelmus'), null, "standard German query has no canonical variant");
+if (!mergedSearchCandidates('frisches Grillhndl').includes('frisches Grillhndl')) {
+    console.error('❌ merged candidates must keep the original query');
+    process.exit(1);
+}
+ok("canonicalSearchVariant: grillhendl -> grillhaehnchen, originals kept");
+
+// Fix 7: generic queries are detected
+assertEquals(isGenericQuery('Suppe, kleiner Salat + Dessert'), true, "generic combo line");
+assertEquals(isGenericQuery('Kleine Hauptspeise von Menü 3'), true, "generic label line");
+assertEquals(isGenericQuery('Kaiserschmarren mit Apfelmus'), false, "real dish must not be flagged generic");
+assertEquals(isGenericQuery('Salatteller mit Frühlingsrolle'), false, "dish with side must not be flagged generic");
+ok("isGenericQuery: generic lines detected, real dishes pass");
+
+// Fix 3+1: quality gate + global score merge (mocked fetch, full handler path)
+async function runQualityGateTests() {
+    sandbox.fetch = (url) => {
+        const u = String(url);
+        if (u.includes('chefkoch.de')) {
+            if (u.includes('grillhaehnchen')) {
+                return Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://img.chefkoch-cdn.de/rezepte/1/bilder/2/fit-960x720/grill-haehnchen.jpg">') });
+            }
+            return Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://img.chefkoch-cdn.de/rezepte/1/bilder/2/fit-960x720/frische-sonntagsbroetchen-bonifatius.jpg">') });
+        }
+        return Promise.resolve({ ok: true, text: () => Promise.resolve('<html>empty</html>') });
+    };
+    const response = await sandbox.__workerModule.fetch({ url: 'https://x/?q=frisches%20Grillhendl%20mit%20Semmel&hl=de&qde=frisches%20Grillhendl%20mit%20Semmel', method: 'GET' });
+    assertEquals(response.status, 200, "grillhendl handler must answer 200");
+    const data = await response.json();
+    if (data.count < 1) {
+        console.error('❌ grillhendl: canonical escalation must find grill-haehnchen, got count ' + data.count);
+        process.exit(1);
+    }
+    assertEquals(data.images[0].title, 'Grill Haehnchen', "slide 1 must be the grill chicken photo, not bread rolls");
+    ok("handler: grillhendl escalates to canonical grillhaehnchen search (Fix 2+3)");
+
+    // Fix 3: junk-only chefkoch pool must be rejected (no images at all)
+    sandbox.fetch = () => Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://img.chefkoch-cdn.de/rezepte/1/bilder/2/fit-960x720/xyz.jpg">') });
+    const junkResponse = await sandbox.__workerModule.fetch({ url: 'https://x/?q=Zzzzquarkxyz&hl=de', method: 'GET' });
+    const junkData = await junkResponse.json();
+    assertEquals(junkData.count, 0, "junk pool below quality gate must yield zero images");
+    ok("handler: junk chefkoch pool rejected by quality gate (Fix 3)");
+
+    // Fix 1: global score merge — better-scoring kochbar hit must be slide 1
+    sandbox.fetch = (url) => {
+        const u = String(url);
+        if (u.includes('chefkoch.de')) {
+            return Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://img.chefkoch-cdn.de/rezepte/1/bilder/2/fit-960x720/glutenfreier-kaiserschmarren.jpg">') });
+        }
+        if (u.includes('kochbar.de')) {
+            return Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://ais.kochbar.de/kbrezept/363877_351355/460x345/kaiserschmarren-mit-apfelmus-rezept.jpg">') });
+        }
+        return Promise.resolve({ ok: true, text: () => Promise.resolve('<html>empty</html>') });
+    };
+    const mergeResponse = await sandbox.__workerModule.fetch({ url: 'https://x/?q=Kaiserschmarren%20mit%20Apfelmus&hl=de', method: 'GET' });
+    const mergeData = await mergeResponse.json();
+    assertEquals(mergeData.images[0].source, 'kochbar', "kaiserschmarren-mit-apfelmus (score 9.5) must outrank chefkoch glutenfrei (1.5) on the global merge");
+    ok("handler: kochbar best hit leads slide 1 (Fix 1 global merge)");
+
+    // Fix 7: generic combo line returns zero images with generic flag
+    const genericResponse = await sandbox.__workerModule.fetch({ url: 'https://x/?q=Suppe%2C%20kleiner%20Salat%20%2B%20Dessert&hl=de', method: 'GET' });
+    const genericData = await genericResponse.json();
+    assertEquals(genericData.count, 0, "generic combo line must return zero images");
+    assertEquals(genericData.generic, true, "generic combo line must be flagged");
+    ok("handler: generic combo line short-circuits to empty result (Fix 7)");
+}
+
+runHandlerTests()
+    .then(runQualityGateTests)
+    .then(() => {
+        console.log("✅ Worker Scoring Unit Tests Passed!");
+        process.exit(0);
+    })
+    .catch((err) => {
+        console.error("❌ Handler smoke test failed:", err && err.message ? err.message : err);
+        process.exit(1);
+    });

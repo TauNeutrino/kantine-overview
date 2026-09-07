@@ -234,6 +234,16 @@ ok("sanitizeDishQuery: 'Samosas(Koriander)' -> 'Samosas'");
 assertEquals(sanitizeDishQuery('Linsen- Curry mit Serviettenschnitte'), 'Linsen-Curry mit Serviettenschnitte', "torn hyphen must rejoin");
 ok("sanitizeDishQuery: 'Linsen- Curry' -> 'Linsen-Curry'");
 
+// === sanitizeDishQuery: generic menu lines without a dish name -> null ===
+assertEquals(sanitizeDishQuery('Suppe, kleiner Salat + Dessert'), null, "generic combo line must not become a search query");
+ok("sanitizeDishQuery: 'Suppe, kleiner Salat + Dessert' -> null");
+assertEquals(sanitizeDishQuery('Kleine Hauptspeise von Menü 3'), null, "generic label line must not become a search query");
+ok("sanitizeDishQuery: 'Kleine Hauptspeise von Menü 3' -> null");
+assertEquals(sanitizeDishQuery('kleiner Salat und Nachspeise'), null, "generic salad+dessert line must not become a search query");
+ok("sanitizeDishQuery: 'kleiner Salat und Nachspeise' -> null");
+assertEquals(sanitizeDishQuery('Salatteller mit Frühlingsrolle'), 'Salatteller mit Frühlingsrolle', "real dish names with mit-sides must survive the generic filter");
+ok("sanitizeDishQuery: 'Salatteller mit Frühlingsrolle' survives");
+
 // === Part 1: buildGoogleImageUrl ===
 
 // Case 10: encodeURIComponent + udm=2, no other parameters

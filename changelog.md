@@ -11,16 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Bildersuche findet deutlich mehr Gerichte (Spot-Check aller 418 verlinkbaren Queries)**: Query-Sanitizer entfernt jetzt alle Klammer-Anmerkungen, Anführungszeichen und repariert abgerissene Bindestriche (`Linsen- Curry` → `Linsen-Curry`).
-- **Progressive Query-Verkürzung pro Quelle**: Liefert die volle Query keine Treffer, versucht jede Rezeptseite automatisch kürzere Varianten (voll → erste zwei Wörter → erstes Wort).
-
-## [2.2.4] - 2026-09-07
-
-### Changed
-
 - **Bildersuche findet deutlich mehr Gerichte**: Query-Sanitizer entfernt jetzt alle Klammer-Anmerkungen (`(ACGLM)`, `(Koriander)`, `(vegan)`), Anführungszeichen und repariert abgerissene Bindestriche (`Linsen- Curry` → `Linsen-Curry`).
 - **Progressive Query-Verkürzung pro Quelle**: Liefert die volle Query keine Treffer, versucht jede Rezeptseite automatisch kürzere Varianten (voll → erste zwei Wörter → erstes Wort) — z. B. findet „Penne mit Gemüsesugo" jetzt über „Penne" trotzdem passende Bilder.
 - **Bindestrich-Tokenisierung im Scoring**: Zusammengesetzte Wörter (`Linsen-Curry`) werden an Bindestrichen getrennt bewertet.
+- **Trefferqualität des Bild-Workers (manuelle Evaluation, 40 Live-Queries)**:
+  - **Globaler Score-Merge statt Pool-Round-Robin**: Slide 1 ist jetzt immer der bestbewertete Treffer über alle Quellen — vorher zeigte chefkoch immer zuerst, auch wenn kochbar/eatsmarter bis zu 8 Punkte besser scoreten (55% der Queries zeigten nicht den besten Treffer). Beispiele: „Kaiserschmarren mit Apfelmus" zeigt jetzt das Apfelmus-Rezept (9.5) statt der glutenfreien Variante (1.5), „Schinkenrolle auf Blattsalaten" die Schinkenrolle statt Kabeljau.
+  - **Suchseiten-Synonyme**: Die Rezeptseiten-Suche kanonisiert unbekannte Komposita (`frisches Grillhendl` → `frisches grillhaehnchen`) — chefkoch findet „grillhendl" nur in der standardsprachlichen Form (9 Junk- vs. 39 exakte Treffer). Direkte Tabellenwörter (semmel, erdäpfel) bleiben unverändert.
+  - **Quality-Gate pro Candidate**: Ein Such-Pool wird nur akzeptiert, wenn der beste Score einen echten Kern-Token-Treffer enthält (≥1.25) — Junk-Pools eines Voll-Query-Treffers blockieren nicht mehr die Eskalation zu kürzeren/kanonisierten Candidates. Pools werden immer gegen die volle Gerichts-Query gescored, nicht gegen den verkürzten Candidate.
+  - **Komposita-Bonus im Scoring**: `gemuesestrudel` (Query) matcht jetzt auch Slugs aus `gemuese` + `strudel` (Fugen-Buchstabe toleriert) — „Kartoffel-Gemüsestrudel mit Dip" zeigt das Strudel-Rezept statt Kartoffel-Rösti.
+  - **„mit"-Gewichtung nach Wortart**: Integrale Bestandteile (Rahmsauce, Erbsenreis, Spinatspätzle, „mit Huhn") behalten volles Gewicht; echte Beilagen (Dip, Semmel, Salat) bleiben bei 0.25.
+  - **Ernährungs-/Protein-Konflikte**: „Penne Bolognese" zeigt nicht mehr die vegane Variante (−2.5), „Soja-Tikka" matcht Tofu- statt Chicken-Rezepte (Protein-Konflikt −1.5; tofu≡soja, chicken≡hendl als Synonyme).
+  - **1-Zeichen-Typo-Toleranz**: Menü-Schreibweise „geschmorrtes" matcht Rezept-Slug „geschmortes".
+  - **Generische Menü-Zeilen ohne Gerichtsnamen** („Suppe, kleiner Salat + Dessert", „Kleine Hauptspeise von Menü 3") liefern jetzt leer → der Client zeigt seinen „Bei Google öffnen"-Fallback statt eines beliebigen Gerichts (Worker- und Client-seitiger Filter in `sanitizeDishQuery`).
 
 ### Fixed
 

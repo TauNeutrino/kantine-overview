@@ -25,11 +25,32 @@ export function getMainCourseLine(split, langMode) {
     return null
 }
 
+// Generische Menü-Zeilen ("Suppe, kleiner Salat + Dessert", "Kleine
+// Hauptspeise von Menü 3") enthalten keinen Gerichtsnamen — für sie gibt es
+// kein sinnvolles Rezeptfoto, weder beim Worker noch bei Wikipedia/Commons.
+// Die Zeile bekommt keinen Bild-Link (statt eines beliebigen Müll-Treffers).
+const GENERIC_QUERY_WORDS = new Set([
+    'suppe', 'salat', 'dessert', 'nachspeise', 'hauptspeise', 'vorspeise',
+    'menue', 'tagesmenue', 'tagesmenu', 'menueplan', 'kombination',
+    'kleiner', 'kleine', 'grosser', 'grosse', 'mit', 'und', 'oder', 'von', 'vom',
+    'beilage', 'beilagen', 'mix'
+])
+
+function isGenericDishQuery(cleaned) {
+    const tokens = cleaned.toLowerCase()
+        .split(/[\s,+/&·]+/)
+        .map(token => token
+            .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+            .replace(/[^a-z]/g, ''))
+        .filter(token => token && !/^\d+$/.test(token))
+    return tokens.length > 0 && tokens.every(token => GENERIC_QUERY_WORDS.has(token))
+}
+
 /**
  * Cleans a dish line into a search query: strips allergen codes in
  * parentheses and prices, compresses whitespace and edge commas.
  * @param {string} text Raw dish line
- * @returns {string|null} Sanitized query or null if too short
+ * @returns {string|null} Sanitized query or null if too short/generic
  */
 export function sanitizeDishQuery(text) {
     const cleaned = String(text || '')
@@ -42,6 +63,7 @@ export function sanitizeDishQuery(text) {
         .trim()
         .replace(/^[,\s]+|[,\s]+$/g, '')
     if (cleaned.length < 3) return null
+    if (isGenericDishQuery(cleaned)) return null
     return cleaned
 }
 
