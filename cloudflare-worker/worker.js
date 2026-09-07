@@ -270,6 +270,8 @@ export default {
 
         // Deutsche Rezeptseiten suchen immer mit dem deutschen Gerichtsnamen —
         // englische Begriffe liefern dort falsche Treffer.
+        const searchQuery = (queryDe && queryDe.trim().length >= 3) ? queryDe.trim() : query.trim();
+
         const [chefkochScored, kochbarScored, eatsmarterScored] = await Promise.all([
             fetchFromChefkoch(searchQuery),
             fetchFromKochbar(searchQuery),

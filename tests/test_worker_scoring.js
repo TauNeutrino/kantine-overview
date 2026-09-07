@@ -8,12 +8,25 @@ console.log("=== Running Worker Scoring Unit Tests: relevance ===");
 // can be unit-tested without deploying. Pattern: strip `export default`
 // (bare `default` would be a syntax error), promote top-level const/let to
 // var so declarations leak onto the sandbox object (tests/_langLoader.js trick).
+class SandboxResponse {
+    constructor(body, init) {
+        this._body = body;
+        this.status = (init && init.status) || 200;
+    }
+    async text() { return this._body; }
+    async json() { return JSON.parse(this._body); }
+}
+
 const sandbox = {
     console: {
         log: (...args) => console.log(...args),
         warn: (...args) => console.warn(...args),
         error: (...args) => console.error(...args)
-    }
+    },
+    fetch: () => Promise.reject(new Error('fetch not mocked for this test')),
+    Response: SandboxResponse,
+    URL: URL,
+    AbortSignal: AbortSignal
 };
 
 const workerPath = path.join(__dirname, '..', 'cloudflare-worker', 'worker.js');
@@ -193,5 +206,31 @@ assertEquals(
 );
 ok("candidateTokens: hyphen splitting keeps short words (Ei)");
 
-console.log("✅ Worker Scoring Unit Tests Passed!");
-process.exit(0);
+// === handler smoke test (mocked fetch) ===
+
+// Case 14: full handler path with a chefkoch hit — catches wiring bugs like
+// undefined variables in the request handler (ReferenceError -> HTTP 500 live)
+async function runHandlerTests() {
+    sandbox.fetch = (url) => {
+        const u = String(url);
+        if (u.includes('chefkoch.de')) {
+            return Promise.resolve({ ok: true, text: () => Promise.resolve('<img src="https://img.chefkoch-cdn.de/rezepte/1/bilder/2/fit-960x720/gulasch.jpg">') });
+        }
+        return Promise.resolve({ ok: true, text: () => Promise.resolve('<html>empty</html>') });
+    };
+    const response = await sandbox.__workerModule.fetch({ url: 'https://x/?q=Gulasch&hl=de', method: 'GET' });
+    assertEquals(response.status, 200, "handler must answer 200");
+    const data = await response.json();
+    assertEquals(data.engine, 'chefkoch+kochbar+eatsmarter', "engine tag must list all sources");
+    assertEquals(data.count, 1, "exactly one image expected");
+    assertEquals(data.images[0].source, 'chefkoch', "hit must carry the chefkoch source");
+    ok("handler: chefkoch hit end-to-end (mocked fetch), no ReferenceError");
+}
+
+runHandlerTests().then(() => {
+    console.log("✅ Worker Scoring Unit Tests Passed!");
+    process.exit(0);
+}).catch((err) => {
+    console.error("❌ Handler smoke test failed:", err && err.message ? err.message : err);
+    process.exit(1);
+});
