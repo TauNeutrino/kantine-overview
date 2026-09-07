@@ -28,6 +28,10 @@ const EATSMARTER_SEARCH_URL = 'https://eatsmarter.de/suche/rezepte?ft={q}';
 const ES_IMG_REGEX = /https:\/\/images\.eatsmarter\.de\/sites\/default\/files\/styles\/300x225-webp\/public\/([^"'?\s\\<>]+\.jpg)/g;
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
+// Revision marker — bump on every worker change so live deployments are
+// verifiable with one curl (Cloudflare auto-deploy can lag or fail silently).
+const WORKER_REV = '2026-09-07-synonyms';
+
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), {
         status,
@@ -313,6 +317,6 @@ export default {
         }
         const images = merged.slice(0, 5);
 
-        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar+eatsmarter', count: images.length, images });
+        return jsonResponse({ query: query.trim(), searchQuery, hl, engine: 'chefkoch+kochbar+eatsmarter', rev: WORKER_REV, count: images.length, images });
     }
 }
