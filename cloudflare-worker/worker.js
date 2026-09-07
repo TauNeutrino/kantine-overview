@@ -104,6 +104,18 @@ function titleFromSlug(slugTokens) {
     return slugTokens.map(token => token.charAt(0).toUpperCase() + token.slice(1)).join(' ');
 }
 
+function searchCandidates(query) {
+    const words = String(query).trim().split(/\s+/).filter(Boolean);
+    const candidates = [String(query).trim()];
+    if (words.length >= 2) candidates.push(words.slice(0, 2).join(' '));
+    if (words.length >= 1) candidates.push(words[0]);
+    return [...new Set(candidates)].filter(candidate => candidate.length >= 3);
+}
+
+function candidateTokens(candidate) {
+    return candidate.toLowerCase().split(/[\s-]+/).filter(word => word.length >= 2);
+}
+
 function slugifySearchQuery(query) {
     return query
         .toLowerCase()
@@ -113,116 +125,128 @@ function slugifySearchQuery(query) {
         .replace(/\s+/g, '-');
 }
 
-async function fetchFromChefkoch(searchQuery, queryTokens) {
-    const searchUrl = CHEFKOCH_SEARCH_URL.replace('{q}', encodeURIComponent(searchQuery).replace(/%20/g, '+'));
-    let html = '';
-    try {
-        const response = await fetch(searchUrl, {
-            headers: {
-                'User-Agent': BROWSER_UA,
-                'Accept-Language': 'de-AT,de;q=0.9',
-                'Accept': 'text/html,application/xhtml+xml'
-            }
-        });
-        html = await response.text();
-    } catch (e) {
-        return [];
-    }
+async function fetchFromChefkoch(searchQuery) {
+    for (const candidate of searchCandidates(searchQuery)) {
+        const tokens = candidateTokens(candidate);
+        const searchUrl = CHEFKOCH_SEARCH_URL.replace('{q}', encodeURIComponent(candidate).replace(/%20/g, '+'));
+        let html = '';
+        try {
+            const response = await fetch(searchUrl, {
+                headers: {
+                    'User-Agent': BROWSER_UA,
+                    'Accept-Language': 'de-AT,de;q=0.9',
+                    'Accept': 'text/html,application/xhtml+xml'
+                }
+            });
+            html = await response.text();
+        } catch (e) {
+            continue;
+        }
 
-    const seen = new Set();
-    const scored = [];
-    for (const match of html.matchAll(CK_IMG_REGEX)) {
-        const imageUrl = match[0];
-        const dedupeKey = imageUrl.split('/').slice(0, 7).join('/');
-        if (seen.has(dedupeKey)) continue;
-        seen.add(dedupeKey);
-        const slugTokens = slugTokensFromUrl(imageUrl);
-        scored.push({
-            url: imageUrl,
-            license: 'Chefkoch',
-            creator: 'chefkoch.de',
-            title: titleFromSlug(slugTokens),
-            score: relevanceScore(slugTokens, queryTokens)
-        });
+        const seen = new Set();
+        const scored = [];
+        for (const match of html.matchAll(CK_IMG_REGEX)) {
+            const imageUrl = match[0];
+            const dedupeKey = imageUrl.split('/').slice(0, 7).join('/');
+            if (seen.has(dedupeKey)) continue;
+            seen.add(dedupeKey);
+            const slugTokens = slugTokensFromUrl(imageUrl);
+            scored.push({
+                url: imageUrl,
+                license: 'Chefkoch',
+                creator: 'chefkoch.de',
+                title: titleFromSlug(slugTokens),
+                score: relevanceScore(slugTokens, tokens)
+            });
+        }
+        if (scored.length >= 1) return scored;
     }
-    return scored;
+    return [];
 }
 
-async function fetchFromKochbar(searchQuery, queryTokens) {
-    const slug = slugifySearchQuery(searchQuery);
-    if (slug.length < 3) return [];
-    const searchUrl = KOCHBAR_SEARCH_URL.replace('{q}', slug);
-    let html = '';
-    try {
-        const response = await fetch(searchUrl, {
-            headers: {
-                'User-Agent': BROWSER_UA,
-                'Accept-Language': 'de-AT,de;q=0.9',
-                'Accept': 'text/html,application/xhtml+xml'
-            }
-        });
-        html = await response.text();
-    } catch (e) {
-        return [];
-    }
+async function fetchFromKochbar(searchQuery) {
+    for (const candidate of searchCandidates(searchQuery)) {
+        const tokens = candidateTokens(candidate);
+        const slug = slugifySearchQuery(candidate);
+        if (slug.length < 3) continue;
+        const searchUrl = KOCHBAR_SEARCH_URL.replace('{q}', slug);
+        let html = '';
+        try {
+            const response = await fetch(searchUrl, {
+                headers: {
+                    'User-Agent': BROWSER_UA,
+                    'Accept-Language': 'de-AT,de;q=0.9',
+                    'Accept': 'text/html,application/xhtml+xml'
+                }
+            });
+            html = await response.text();
+        } catch (e) {
+            continue;
+        }
 
-    const seen = new Set();
-    const scored = [];
-    for (const match of html.matchAll(KB_IMG_REGEX)) {
-        const kbrezeptId = match[1];
-        const file = match[2];
-        if (file.includes('@')) continue;
-        if (seen.has(kbrezeptId)) continue;
-        seen.add(kbrezeptId);
-        const imageUrl = `https://ais.kochbar.de/kbrezept/${kbrezeptId}/${KB_IMAGE_SIZE}/${file}`;
-        const slugTokens = file.replace(/\.jpg$/i, '').replace(/-rezept$/, '').split('-').filter(Boolean);
-        scored.push({
-            url: imageUrl,
-            license: 'Kochbar',
-            creator: 'kochbar.de',
-            title: titleFromSlug(slugTokens),
-            score: relevanceScore(slugTokens, queryTokens),
-            source: 'kochbar'
-        });
+        const seen = new Set();
+        const scored = [];
+        for (const match of html.matchAll(KB_IMG_REGEX)) {
+            const kbrezeptId = match[1];
+            const file = match[2];
+            if (file.includes('@')) continue;
+            if (seen.has(kbrezeptId)) continue;
+            seen.add(kbrezeptId);
+            const imageUrl = `https://ais.kochbar.de/kbrezept/${kbrezeptId}/${KB_IMAGE_SIZE}/${file}`;
+            const slugTokens = file.replace(/\.jpg$/i, '').replace(/-rezept$/, '').split('-').filter(Boolean);
+            scored.push({
+                url: imageUrl,
+                license: 'Kochbar',
+                creator: 'kochbar.de',
+                title: titleFromSlug(slugTokens),
+                score: relevanceScore(slugTokens, tokens),
+                source: 'kochbar'
+            });
+        }
+        if (scored.length >= 1) return scored;
     }
-    return scored;
+    return [];
 }
 
-async function fetchFromEatsmarter(searchQuery, queryTokens) {
-    const searchUrl = EATSMARTER_SEARCH_URL.replace('{q}', encodeURIComponent(searchQuery));
-    let html = '';
-    try {
-        const response = await fetch(searchUrl, {
-            headers: {
-                'User-Agent': BROWSER_UA,
-                'Accept-Language': 'de-AT,de;q=0.9',
-                'Accept': 'text/html,application/xhtml+xml'
-            }
-        });
-        html = await response.text();
-    } catch (e) {
-        return [];
-    }
+async function fetchFromEatsmarter(searchQuery) {
+    for (const candidate of searchCandidates(searchQuery)) {
+        const tokens = candidateTokens(candidate);
+        const searchUrl = EATSMARTER_SEARCH_URL.replace('{q}', encodeURIComponent(candidate));
+        let html = '';
+        try {
+            const response = await fetch(searchUrl, {
+                headers: {
+                    'User-Agent': BROWSER_UA,
+                    'Accept-Language': 'de-AT,de;q=0.9',
+                    'Accept': 'text/html,application/xhtml+xml'
+                }
+            });
+            html = await response.text();
+        } catch (e) {
+            continue;
+        }
 
-    const seen = new Set();
-    const scored = [];
-    for (const match of html.matchAll(ES_IMG_REGEX)) {
-        const file = match[1];
-        if (file.includes('default_images')) continue;
-        if (seen.has(file)) continue;
-        seen.add(file);
-        const imageUrl = `https://images.eatsmarter.de/sites/default/files/styles/300x225-webp/public/${file}`;
-        const slugTokens = file.replace(/\.jpg$/i, '').split('-').filter(token => token && !/^\d+$/.test(token));
-        scored.push({
-            url: imageUrl,
-            license: 'Eatsmarter',
-            creator: 'eatsmarter.de',
-            title: titleFromSlug(slugTokens),
-            score: relevanceScore(slugTokens, queryTokens),
-            source: 'eatsmarter'
-        });
+        const seen = new Set();
+        const scored = [];
+        for (const match of html.matchAll(ES_IMG_REGEX)) {
+            const file = match[1];
+            if (file.includes('default_images')) continue;
+            if (seen.has(file)) continue;
+            seen.add(file);
+            const imageUrl = `https://images.eatsmarter.de/sites/default/files/styles/300x225-webp/public/${file}`;
+            const slugTokens = file.replace(/\.jpg$/i, '').split('-').filter(token => token && !/^\d+$/.test(token));
+            scored.push({
+                url: imageUrl,
+                license: 'Eatsmarter',
+                creator: 'eatsmarter.de',
+                title: titleFromSlug(slugTokens),
+                score: relevanceScore(slugTokens, tokens),
+                source: 'eatsmarter'
+            });
+        }
+        if (scored.length >= 1) return scored;
     }
-    return scored;
+    return [];
 }
 
 export default {
@@ -246,13 +270,10 @@ export default {
 
         // Deutsche Rezeptseiten suchen immer mit dem deutschen Gerichtsnamen —
         // englische Begriffe liefern dort falsche Treffer.
-        const searchQuery = (queryDe && queryDe.trim().length >= 3) ? queryDe.trim() : query.trim();
-        const queryTokens = searchQuery.toLowerCase().split(/\s+/).filter(word => word.length > 2);
-
         const [chefkochScored, kochbarScored, eatsmarterScored] = await Promise.all([
-            fetchFromChefkoch(searchQuery, queryTokens),
-            fetchFromKochbar(searchQuery, queryTokens),
-            fetchFromEatsmarter(searchQuery, queryTokens)
+            fetchFromChefkoch(searchQuery),
+            fetchFromKochbar(searchQuery),
+            fetchFromEatsmarter(searchQuery)
         ]);
         const chefkochWithSource = chefkochScored.map(img => ({ ...img, source: 'chefkoch' }));
         // Alle Quellen werden vollständig gescored; dann Score-sortiertes

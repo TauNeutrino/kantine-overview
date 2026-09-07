@@ -29,7 +29,7 @@ try {
     process.exit(1);
 }
 
-const { relevanceScore, slugTokensFromUrl, titleFromSlug } = sandbox;
+const { relevanceScore, slugTokensFromUrl, titleFromSlug, searchCandidates, candidateTokens } = sandbox;
 
 function assertEquals(actual, expected, message) {
     if (actual !== expected) {
@@ -156,6 +156,42 @@ assertEquals(
     "title must capitalize each token"
 );
 ok("titleFromSlug: tokens become a readable title");
+
+// === searchCandidates: progressive shortening ===
+
+// Case 10: multi-word query yields full, first-two, first-word candidates
+assertEquals(
+    JSON.stringify(searchCandidates('Penne mit Gemüsesugo')),
+    JSON.stringify(['Penne mit Gemüsesugo', 'Penne mit', 'Penne']),
+    "multi-word query should produce full, first-two and first-word candidates"
+);
+ok("searchCandidates: 3-word query shortens progressively");
+
+// Case 11: single-word query yields exactly one candidate
+assertEquals(
+    JSON.stringify(searchCandidates('Gulasch')),
+    JSON.stringify(['Gulasch']),
+    "single-word query should produce a single candidate"
+);
+ok("searchCandidates: single-word query stays single");
+
+// Case 12: short queries are filtered out
+assertEquals(
+    JSON.stringify(searchCandidates('ab')),
+    JSON.stringify([]),
+    "too-short query should produce no candidates"
+);
+ok("searchCandidates: too-short query filtered");
+
+// === candidateTokens: whitespace + hyphen splitting, short words kept ===
+
+// Case 13: hyphens split like whitespace, 2-letter words kept
+assertEquals(
+    JSON.stringify(candidateTokens('Linsen-Curry mit Ei')),
+    JSON.stringify(['linsen', 'curry', 'mit', 'ei']),
+    "hyphens must split like whitespace and short words must survive"
+);
+ok("candidateTokens: hyphen splitting keeps short words (Ei)");
 
 console.log("✅ Worker Scoring Unit Tests Passed!");
 process.exit(0);
