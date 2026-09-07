@@ -228,8 +228,31 @@ async function runHandlerTests() {
 }
 
 runHandlerTests().then(() => {
-    console.log("✅ Worker Scoring Unit Tests Passed!");
-    process.exit(0);
+// === austrian synonyms (AT menu names vs standard recipe spellings) ===
+
+// Case 15: rindsbraten matches rinderbraten (either direction)
+assertEquals(
+    relevanceScore(['rinderbraten'], ['rindsbraten']),
+    7,
+    "canonicalized single-word match: 2 exact + 0 pairs + first-token 1 + contiguous 4 = 7"
+);
+assertEquals(
+    relevanceScore(['hendl'], ['haehnchen']),
+    7,
+    "hendl normalizes to haehnchen"
+);
+ok("relevanceScore: austrian synonyms resolve both directions");
+
+// Case 16: multi-word synonym sentence
+assertEquals(
+    relevanceScore(['quark', 'taschen'], ['topfen', 'taschen']),
+    11,
+    "2 exact (4) + 1 ordered pair (2) + first-token (1) + contiguous (4) = 11"
+);
+ok("relevanceScore: topfen/quark sentence scores 11");
+
+console.log("✅ Worker Scoring Unit Tests Passed!");
+process.exit(0);
 }).catch((err) => {
     console.error("❌ Handler smoke test failed:", err && err.message ? err.message : err);
     process.exit(1);

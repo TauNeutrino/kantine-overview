@@ -48,6 +48,24 @@ function normalizeToken(token) {
     return token.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
 }
 
+// Austrian dish vocabulary mapped to standard German — the canteen menu
+// uses Austrian names (Rindsbraten, Erdäpfel, Paradeiser) while recipe sites
+// mostly use standard spellings (Rinderbraten, Kartoffel, Tomate).
+const AUSTRIAN_FOOD_SYNONYMS = {
+    rindsbraten: 'rinderbraten', hendl: 'haehnchen', hendel: 'haehnchen',
+    erdaepfel: 'kartoffel', paradeiser: 'tomate', fisolen: 'bohnen',
+    marillen: 'aprikosen', topfen: 'quark', palatschinken: 'pfannkuchen',
+    semmel: 'broetchen', schlagobers: 'sahne', obers: 'sahne', rahm: 'sahne',
+    eierschwammerl: 'pfifferlinge', karfiol: 'blumenkohl', kraut: 'kohl',
+    vogelsalat: 'feldsalat', ribisel: 'johannisbeeren', powidl: 'pflaumenmus',
+    germ: 'hefe', staubzucker: 'puderzucker', stelze: 'haxe', beuschel: 'lunge'
+};
+
+function canonicalToken(token) {
+    const normalized = normalizeToken(token);
+    return AUSTRIAN_FOOD_SYNONYMS[normalized] || normalized;
+}
+
 // Side-dish indicators: from the first indicator on, German dish suffixes
 // ("mit X", "dazu", "als Beilage", ...) weigh only a quarter — a side-heavy
 // slide must not outrank the pure main dish.
@@ -64,16 +82,18 @@ function queryTokenWeights(queryTokens) {
 }
 
 function partialMatchWeight(slugTokens, queryToken) {
-    if (queryToken.length < 4) return 0;
-    for (const slugToken of slugTokens) {
-        if (slugToken.length >= 4 && (slugToken.includes(queryToken) || queryToken.includes(slugToken))) return 0.5;
+    const normalized = canonicalToken(queryToken);
+    if (normalized.length < 4) return 0;
+    for (const raw of slugTokens) {
+        const slugToken = canonicalToken(raw);
+        if (slugToken.length >= 4 && (slugToken.includes(normalized) || normalized.includes(slugToken))) return 0.5;
     }
     return 0;
 }
 
 function relevanceScore(slugTokens, queryTokens) {
-    const slug = slugTokens.map(normalizeToken);
-    const query = queryTokens.map(normalizeToken);
+    const slug = slugTokens.map(canonicalToken);
+    const query = queryTokens.map(canonicalToken);
     const weights = queryTokenWeights(query);
     let exact = 0;
     const matched = new Set();
