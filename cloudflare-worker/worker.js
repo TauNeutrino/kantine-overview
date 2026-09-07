@@ -48,24 +48,43 @@ function normalizeToken(token) {
     return token.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss');
 }
 
+// Side-dish indicators: from the first indicator on, German dish suffixes
+// ("mit X", "dazu", "als Beilage", ...) weigh only a quarter — a side-heavy
+// slide must not outrank the pure main dish.
+const SIDE_INDICATORS = ['mit', 'dazu', 'beilage', 'beilagen', 'garnitur', 'garniert', 'serviert'];
+
+function queryTokenWeights(queryTokens) {
+    const weights = [];
+    let side = false;
+    for (const token of queryTokens) {
+        if (SIDE_INDICATORS.includes(token)) side = true;
+        weights.push(side ? 0.25 : 1);
+    }
+    return weights;
+}
+
 function relevanceScore(slugTokens, queryTokens) {
     const slug = slugTokens.map(normalizeToken);
     const query = queryTokens.map(normalizeToken);
+    const weights = queryTokenWeights(query);
     let exact = 0;
-    for (const queryToken of query) {
-        if (slug.some(slugToken => slugToken === queryToken)) exact++;
+    const matched = new Set();
+    for (let i = 0; i < query.length; i++) {
+        if (slug.includes(query[i])) {
+            exact += weights[i];
+            matched.add(query[i]);
+        }
     }
     let orderedPairs = 0;
     for (let i = 0; i + 1 < query.length; i++) {
         for (let j = i + 1; j < query.length; j++) {
             const first = slug.indexOf(query[i]);
             const second = slug.indexOf(query[j]);
-            if (first >= 0 && second > first) orderedPairs++;
+            if (first >= 0 && second > first) orderedPairs += Math.min(weights[i], weights[j]);
         }
     }
-    const matched = new Set(query.filter(queryToken => slug.includes(queryToken))).size;
-    const extraSlugTokens = slug.length - matched;
-    const firstTokenBonus = (slug.length > 0 && query.length > 0 && slug[0] === query[0]) ? 1 : 0;
+    const extraSlugTokens = slug.length - matched.size;
+    const firstTokenBonus = (slug.length > 0 && query.length > 0 && slug[0] === query[0]) ? weights[0] : 0;
     const contiguousBonus = slug.join(' ').includes(query.join(' ')) ? 4 : 0;
     return 2 * exact + 2 * orderedPairs - 0.5 * extraSlugTokens + firstTokenBonus + contiguousBonus;
 }

@@ -44,23 +44,24 @@ function ok(message) {
     console.log(`OK: ${message}`);
 }
 
-// === relevanceScore: 2×exact + 2×ordered-pairs − 0.5×extra + first-token + contiguous ===
+// === relevanceScore: 2×weighted-exact + 2×weighted-pairs − 0.5×extra + first-token + contiguous ===
+// Side tokens (from the first side indicator like "mit" on) weigh 1/4.
 
-// Case 1: exact matches count, ordered pair doubles part of the signal
+// Case 1: main-dish tokens keep full weight, side tokens are quartered
 assertEquals(
     relevanceScore(['kartoffelgulasch', 'mit', 'fisolen'], ['kartoffelgulasch', 'mit', 'braunschweiger']),
-    6.5,
-    "2 exact (4) + 1 ordered pair (2) + first-token (1) − 1 extra slug token (0.5) = 6.5"
+    3.5,
+    "exact kg(1)+mit(0.25)=1.25 -> 2.5; pair (kg,mit) min(1,0.25)*2=0.5; extra 1 -> -0.5; first-token 1; no contiguous = 3.5"
 );
-ok("relevanceScore: exact matches + ordered pair bonus (6.5)");
+ok("relevanceScore: side tokens quartered (3.5)");
 
 // Case 2: same words in wrong order lose the pair bonus
 assertEquals(
     relevanceScore(['fisolen', 'mit', 'kartoffelgulasch'], ['kartoffelgulasch', 'mit', 'braunschweiger']),
-    3.5,
-    "2 exact (4) + 0 ordered pairs + no first-token − 1 extra slug token (0.5) = 3.5"
+    2,
+    "exact 1.25 -> 2.5; pairs none; extra 1 -> -0.5; no first-token; no contiguous = 2"
 );
-ok("relevanceScore: unordered matches lose pair bonus and first-token (3.5)");
+ok("relevanceScore: unordered matches lose pair bonus and first-token (2)");
 
 // Case 3: no overlap scores negative (conciseness penalty on junk)
 assertEquals(
@@ -78,13 +79,13 @@ assertEquals(
 );
 ok("relevanceScore: single-word match scores 7");
 
-// Case 5: case-insensitive matching
+// Case 5: case-insensitive matching; indicator words weigh 1/4
 assertEquals(
     relevanceScore(['Mit'], ['mit']),
-    7,
-    "matching must be case-insensitive: 2 + 0 + 1 + 4 = 7"
+    4.75,
+    "exact 0.25 -> 0.5; 0 pairs; first-token 0.25; contiguous (4) = 4.75"
 );
-ok("relevanceScore: case-insensitive exact match");
+ok("relevanceScore: indicator token quartered (4.75)");
 
 // Case 6: prefix-only is NOT a match anymore (exact semantics)
 assertEquals(
@@ -97,10 +98,23 @@ ok("relevanceScore: prefix similarity scores -0.5 (exact-only)");
 // Case 6b: full query as-is with a prefix — the strongest signal
 assertEquals(
     relevanceScore(['geroestete', 'knoedel', 'mit', 'ei'], ['knödel', 'mit', 'ei']),
-    15.5,
-    "3 exact (6) + 3 ordered pairs (6) − 1 extra slug token (0.5) + 0 first-token + contiguous full match (4) = 15.5"
+    8,
+    "exact 1+0.25+0.25 -> 3; pairs 3x0.25 -> 1.5; extra 1 -> -0.5; first-token 0; contiguous (4) = 8"
 );
-ok("relevanceScore: full query as substring with prefix scores 15.5 (top signal)");
+ok("relevanceScore: full query as substring with prefix scores 8 (top signal)");
+
+// Case 6c: USER CASE — side-heavy slide must not outrank the pure main dish
+assertEquals(
+    relevanceScore(['gulasch'], ['gulasch', 'mit', 'wedges']),
+    3,
+    "pure main dish: exact 1 -> 2; pairs none; first-token 1; no contiguous (slug shorter than query) = 3"
+);
+assertEquals(
+    relevanceScore(['x', 'mit', 'wedges'], ['gulasch', 'mit', 'wedges']),
+    1,
+    "side-heavy slide: exact 0.25+0.25 -> 1; pair (mit,wedges) min*2 = 0.5; extra 1 -> -0.5; no first-token; no contiguous = 1"
+);
+ok("relevanceScore: pure main dish (3) beats side-heavy slide (1)");
 
 // === slugTokensFromUrl ===
 
