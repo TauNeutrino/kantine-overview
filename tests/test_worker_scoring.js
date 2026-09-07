@@ -116,6 +116,19 @@ assertEquals(
 );
 ok("relevanceScore: pure main dish (3) beats side-heavy slide (1)");
 
+// Case 6d: "an" is also a side indicator ("Topfenknödel an Fruchtmuse")
+assertEquals(
+    relevanceScore(['topfenknoedel'], ['topfenknoedel', 'an', 'fruchtmuse']),
+    3,
+    "pure main dish: exact 1 -> 2; pairs none; first-token 1; no contiguous = 3"
+);
+assertEquals(
+    relevanceScore(['x', 'an', 'fruchtmuse'], ['topfenknoedel', 'an', 'fruchtmuse']),
+    1,
+    "side-heavy slide: exact 0.25+0.25 -> 1; pair (an,fruchtmuse) 0.5; extra 1 -> -0.5; no first-token; no contiguous = 1"
+);
+ok("relevanceScore: 'an' downgrades side suffixes like 'mit'");
+
 // === slugTokensFromUrl ===
 
 // Case 7: tokens extracted from a chefkoch CDN url

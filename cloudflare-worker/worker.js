@@ -51,7 +51,7 @@ function normalizeToken(token) {
 // Side-dish indicators: from the first indicator on, German dish suffixes
 // ("mit X", "dazu", "als Beilage", ...) weigh only a quarter — a side-heavy
 // slide must not outrank the pure main dish.
-const SIDE_INDICATORS = ['mit', 'dazu', 'beilage', 'beilagen', 'garnitur', 'garniert', 'serviert'];
+const SIDE_INDICATORS = ['mit', 'an', 'dazu', 'beilage', 'beilagen', 'garnitur', 'garniert', 'serviert'];
 
 function queryTokenWeights(queryTokens) {
     const weights = [];
