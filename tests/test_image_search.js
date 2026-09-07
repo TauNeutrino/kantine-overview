@@ -218,6 +218,14 @@ ok("sanitizeDishQuery: 'Schweinsbraten (AFO)' -> 'Schweinsbraten'");
 assertEquals(sanitizeDishQuery('Chili sin Carne (vegan)'), 'Chili sin Carne (vegan)', "word-like parentheses must survive the sanitizer");
 ok("sanitizeDishQuery: 'Chili sin Carne (vegan)' survives");
 
+// Case 9e: long all-caps allergen groups are stripped too (real menu data)
+assertEquals(sanitizeDishQuery('Faschierter Braten mit Püree und Karotten (ACGLM)'), 'Faschierter Braten mit Püree und Karotten', "all-caps allergen group '(ACGLM)' must be removed");
+ok("sanitizeDishQuery: '(ACGLM)' removed");
+
+// Case 9f: quotes are stripped (phrase search breaks recipe-site queries)
+assertEquals(sanitizeDishQuery('"Hühnerfleisch Szechuan" mit Reis'), 'Hühnerfleisch Szechuan mit Reis', "quotation marks must be removed");
+ok("sanitizeDishQuery: '\"Hühnerfleisch Szechuan\" mit Reis' -> 'Hühnerfleisch Szechuan mit Reis'");
+
 // === Part 1: buildGoogleImageUrl ===
 
 // Case 10: encodeURIComponent + udm=2, no other parameters

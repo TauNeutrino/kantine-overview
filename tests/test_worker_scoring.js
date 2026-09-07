@@ -90,10 +90,18 @@ ok("relevanceScore: indicator token quartered (4.75)");
 // Case 6: prefix-only is NOT a match anymore (exact semantics)
 assertEquals(
     relevanceScore(['kartoffel'], ['kartoffelgulasch']),
-    -0.5,
-    "0 exact + 0 pairs − 1 extra slug token (0.5), no contiguous substring = -0.5"
+    1,
+    "substring containment both ways at half weight: 0.5 exact -> 1"
 );
-ok("relevanceScore: prefix similarity scores -0.5 (exact-only)");
+ok("relevanceScore: partial substring match scores 1 (half weight)");
+
+// Case 6e: glued compound from real menu data — 'gemüselasagnemit' matches 'lasagne'
+assertEquals(
+    relevanceScore(['lasagne', 'mit', 'tomatensauce'], ['gemüselasagnemit', 'tomatensauce']),
+    2.5,
+    "exact 'tomatensauce'(1) + partial 'gemüselasagnemit'~'lasagne'(0.5) -> 1.5*2 = 3; pairs none; extra 3-2=1 -> -0.5; no first-token; no contiguous = 2.5"
+);
+ok("relevanceScore: glued compound partially matches its ingredient (2.5)");
 
 // Case 6b: full query as-is with a prefix — the strongest signal
 assertEquals(

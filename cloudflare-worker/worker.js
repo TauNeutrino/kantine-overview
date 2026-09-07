@@ -63,6 +63,14 @@ function queryTokenWeights(queryTokens) {
     return weights;
 }
 
+function partialMatchWeight(slugTokens, queryToken) {
+    if (queryToken.length < 4) return 0;
+    for (const slugToken of slugTokens) {
+        if (slugToken.length >= 4 && (slugToken.includes(queryToken) || queryToken.includes(slugToken))) return 0.5;
+    }
+    return 0;
+}
+
 function relevanceScore(slugTokens, queryTokens) {
     const slug = slugTokens.map(normalizeToken);
     const query = queryTokens.map(normalizeToken);
@@ -72,6 +80,9 @@ function relevanceScore(slugTokens, queryTokens) {
     for (let i = 0; i < query.length; i++) {
         if (slug.includes(query[i])) {
             exact += weights[i];
+            matched.add(query[i]);
+        } else if (partialMatchWeight(slug, query[i]) > 0) {
+            exact += weights[i] * 0.5;
             matched.add(query[i]);
         }
     }

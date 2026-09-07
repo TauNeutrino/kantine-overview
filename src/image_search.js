@@ -34,6 +34,8 @@ export function getMainCourseLine(split, langMode) {
 export function sanitizeDishQuery(text) {
     const cleaned = String(text || '')
         .replace(/\s*\([A-Za-z]{1,4}(?:\s*,\s*[A-Za-z]{1,4})*\)/g, '')
+        .replace(/\s*\([A-Z][A-Z,\s]*[A-Z]\)/g, '')
+        .replace(/["„“”]/g, '')
         .replace(/\d+[.,]\d+\s*€?/g, '')
         .replace(/^[\s•·▪◦‣*–—-]+/, '')
         .replace(/\s+/g, ' ')
