@@ -30,7 +30,7 @@ const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 
 // Revision marker — bump on every worker change so live deployments are
 // verifiable with one curl (Cloudflare auto-deploy can lag or fail silently).
-const WORKER_REV = '2026-09-07-quality';
+const WORKER_REV = '2026-09-08-at-synonyms';
 
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), {
@@ -61,12 +61,21 @@ const AUSTRIAN_FOOD_SYNONYMS = {
     marillen: 'aprikosen', topfen: 'quark', palatschinken: 'pfannkuchen',
     semmel: 'broetchen', schlagobers: 'sahne', obers: 'sahne', rahm: 'sahne',
     eierschwammerl: 'pfifferlinge', karfiol: 'blumenkohl', kraut: 'kohl',
-    vogelsalat: 'feldsalat', ribisel: 'johannisbeeren', powidl: 'pflaumenmus',
+    vogerlsalat: 'feldsalat', ribisel: 'johannisbeeren', powidl: 'pflaumenmus',
     germ: 'hefe', staubzucker: 'puderzucker', stelze: 'haxe', beuschel: 'lunge',
     // Vegetarische Proteine und englische Menü-Begriffe — verhindern, dass
     // "Soja-Tikka" auf Chicken-Tikka-Rezepte zeigt (Protein-Äquivalenz unten).
     tofu: 'soja', chicken: 'haehnchen', beef: 'rind', pork: 'schwein',
-    turkey: 'puten', salmon: 'lachs', huhn: 'haehnchen', huehner: 'haehnchen'
+    turkey: 'puten', salmon: 'lachs', huhn: 'haehnchen', huehner: 'haehnchen',
+    // Österreichisch → standardsprachlich (chefkoch-Probe 2026-09: melanzani
+    // 0/39, kren 2/41, semmelkren 3/41, schopfsteak 0/19 on-topic Bilder)
+    melanzani: 'aubergine', kren: 'meerrettich', semmelkren: 'meerrettich',
+    schopfsteak: 'schweinenackensteak', schweinsschopf: 'schweinenackensteak',
+    faschiertes: 'hackfleisch', faschierte: 'hackfleisch', faschiertem: 'hackfleisch',
+    wuerstel: 'wuerstchen', kaeferbohnen: 'bohnen', kaeferbohne: 'bohne',
+    geselchtes: 'speck', eierschoeberl: 'eierknoedel', rotkraut: 'rotkohl',
+    jungzwiebel: 'fruehlingszwiebeln', schnitzerl: 'schnitzel',
+    sauerrahm: 'schmand', depreziner: 'debreziner'
 };
 
 // Generische Menü-Zeilen ("Suppe, kleiner Salat + Dessert", "Kleine
@@ -266,18 +275,17 @@ function searchCandidates(query) {
     return [...new Set(candidates)].filter(candidate => candidate.length >= 3);
 }
 
-// Wortweise kanonisierte Suchvariante: nur Wörter, die selbst kein bekanntes
-// Lebensmittel sind, bekommen Kompositum-Synonyme ("frisches Grillhendl" ->
-// "frisches grillhaehnchen"). Direkte Tabellenwörter (semmel, erdäpfel) bleiben
-// unverändert — chefkoch indext sie; Compound-Bruchstücke wie "grillhendl"
-// findet es dagegen nur in der standardsprachlichen Form (grillhendl: 9
-// Junk-Treffer, grillhaehnchen: 39 exakte). Original zuerst, Kanonisierung
-// als Eskalationsstufe.
+// Wortweise kanonisierte Suchvariante: Tabellenwörter werden ersetzt
+// ("Melanzani" -> "aubergine", "frisches Grillhendl" -> "grillhaehnchen") —
+// die Original-Suche läuft zuerst, die kanonisierte Variante eskaliert nur,
+// wenn deren Pool das Quality-Gate verfehlt. Direkte AT-Wörter sind auf
+// chefkoch durchwegs schlecht indexiert (melanzani 0/39, kren 2/41,
+// semmelkren 3/41 on-topic).
 function canonicalSearchVariant(query) {
     const words = String(query).trim().split(/\s+/).filter(Boolean);
     const mapped = words.map(word => {
         const normalized = normalizeToken(word);
-        if (AUSTRIAN_FOOD_SYNONYMS[normalized]) return word;
+        if (AUSTRIAN_FOOD_SYNONYMS[normalized]) return AUSTRIAN_FOOD_SYNONYMS[normalized];
         for (const [key, value] of Object.entries(AUSTRIAN_FOOD_SYNONYMS)) {
             if (key.length >= 4 && normalized.endsWith(key)) return normalized.slice(0, normalized.length - key.length) + value;
         }
@@ -453,8 +461,13 @@ async function fetchFromEatsmarter(searchQuery, scoringTokens) {
 }
 
 // Generische Menü-Zeilen ohne Gerichtsnamen ("Suppe, kleiner Salat + Dessert")
-// -> keine Bilder, der Client zeigt seinen "Bei Google öffnen"-Fallback.
+// und Side-Fragmente, deren Hauptgericht der Splitter verschluckt hat
+// ("mit Nachos", "mit Tomatensauce") -> keine Bilder, der Client zeigt seinen
+// "Bei Google öffnen"-Fallback.
+const SIDE_START_RE = /^(mit|an|dazu|und|oder|als|beilage)\b/;
+
 function isGenericQuery(searchQuery) {
+    if (SIDE_START_RE.test(String(searchQuery).trim().toLowerCase())) return true;
     const tokens = String(searchQuery)
         .toLowerCase()
         .split(/[\s,+/&·]+/)

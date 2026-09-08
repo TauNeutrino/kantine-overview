@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.5] - 2026-09-08
+
+### Changed
+
+- **Österreichisch-Deutsch-Synonyme Batch 2 (datengetrieben aus allen Menüdaten)**: `melanzani`→Aubergine, `kren`/`semmelkren`→Meerrettich, `schopfsteak`/`Schweinsschopf`→Schweinenackensteak, `faschiertes`→Hackfleisch, `Würstel`→Würstchen, `Käferbohnen`→Bohnen, `Geselchtes`→Speck, `Eierschöberl`→Eierknödel, `Rotkraut`→Rotkohl, `Jungzwiebel`→Frühlingszwiebeln, `Schnitzerl`→Schnitzel, `Sauerrahm`→Schmand, `Depreziner`→Debrecziner, `Vogerlsalat`→Feldsalat (Tippfehler im alten Key `vogelsalat` korrigiert). Empirisch belegt per Chefkoch-Probe: melanzani 0/39, kren 2/41, semmelkren 3/41, schopfsteak 0/19 on-topic-Bilder.
+- **Suchseiten-Kanonisierung ersetzt jetzt auch direkte Tabellenwörter**: Die Original-Suche läuft weiterhin zuerst, die kanonisierte Form eskaliert nur bei Gate-Fehlschlag.
+- **Side-Fragment-Filter**: Splitter-Zeilen ohne Hauptgericht („mit Oliven", „mit Nachos", „mit Tomatensauce" — der Splitter hatte das Gericht verschluckt) erzeugen keinen Bild-Link mehr (Client) bzw. liefern leer (Worker) statt beliebiger Treffer.
+
 ## [2.2.4] - 2026-09-07
 
 ### Changed

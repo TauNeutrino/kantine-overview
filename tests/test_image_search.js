@@ -244,6 +244,14 @@ ok("sanitizeDishQuery: 'kleiner Salat und Nachspeise' -> null");
 assertEquals(sanitizeDishQuery('Salatteller mit Frühlingsrolle'), 'Salatteller mit Frühlingsrolle', "real dish names with mit-sides must survive the generic filter");
 ok("sanitizeDishQuery: 'Salatteller mit Frühlingsrolle' survives");
 
+// === sanitizeDishQuery: side fragments (splitter swallowed the dish name) -> null ===
+assertEquals(sanitizeDishQuery('mit Oliven'), null, "side fragment 'mit Oliven' must not become a search query");
+ok("sanitizeDishQuery: 'mit Oliven' -> null");
+assertEquals(sanitizeDishQuery('mit Tomatensauce (AFLO)'), null, "side fragment with allergen code must not become a search query");
+ok("sanitizeDishQuery: 'mit Tomatensauce (AFLO)' -> null");
+assertEquals(sanitizeDishQuery('mit Basmatireis, Brombeer Joghurt (F)'), null, "side fragment 'mit Basmatireis...' must not become a search query");
+ok("sanitizeDishQuery: 'mit Basmatireis, Brombeer Joghurt' -> null");
+
 // === Part 1: buildGoogleImageUrl ===
 
 // Case 10: encodeURIComponent + udm=2, no other parameters

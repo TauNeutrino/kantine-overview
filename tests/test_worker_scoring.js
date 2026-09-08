@@ -333,15 +333,43 @@ ok(`relevanceScore: Soja-Tikka matches tofu-tikka (${tofuTikka}) over chicken-ti
 // Fix 2: canonical search variants
 assertEquals(
     canonicalSearchVariant('frisches Grillhendl mit Semmel'),
-    'frisches grillhaehnchen mit Semmel',
-    "unknown compound word grillhendl must canonicalize; known word Semmel stays"
+    'frisches grillhaehnchen mit broetchen',
+    "grillhendl AND semmel both canonicalize for the recipe-site search"
 );
 assertEquals(canonicalSearchVariant('Kaiserschmarren mit Apfelmus'), null, "standard German query has no canonical variant");
+assertEquals(
+    canonicalSearchVariant('Melanzani mit Tomaten'),
+    'aubergine mit Tomaten',
+    "direct table words are replaced in the search variant too (melanzani: 0/39 on-topic on chefkoch)"
+);
 if (!mergedSearchCandidates('frisches Grillhndl').includes('frisches Grillhndl')) {
     console.error('❌ merged candidates must keep the original query');
     process.exit(1);
 }
 ok("canonicalSearchVariant: grillhendl -> grillhaehnchen, originals kept");
+
+// Fix 2: AT-synonym batch 2 (2026-09 menu-data scan, chefkoch-probed)
+assertEquals(
+    relevanceScore(['aubergine'], ['melanzani']),
+    7,
+    "melanzani ≡ aubergine via synonym group (2 exact + first-token 1 + contiguous 4)"
+);
+assertEquals(
+    relevanceScore(['meerrettich'], ['semmelkren']),
+    7,
+    "semmelkren ≡ meerrettich (direct key, no suffix surgery needed)"
+);
+assertEquals(
+    relevanceScore(['putenschnitzel'], ['putenschnitzerl']),
+    3,
+    "schnitzerl suffix key: putenschnitzerl ≡ putenschnitzel (2 exact via group + first-token 1; no contiguous, spellings differ)"
+);
+assertEquals(
+    relevanceScore(['feldsalat'], ['vogerlsalat']),
+    7,
+    "vogerlsalat ≡ feldsalat (key spelling fixed from 'vogelsalat')"
+);
+ok("relevanceScore: AT-synonyms melanzani/kren/semmelkren/schnitzerl/vogerlsalat resolve");
 
 // Fix 7: generic queries are detected
 assertEquals(isGenericQuery('Suppe, kleiner Salat + Dessert'), true, "generic combo line");
@@ -349,6 +377,12 @@ assertEquals(isGenericQuery('Kleine Hauptspeise von Menü 3'), true, "generic la
 assertEquals(isGenericQuery('Kaiserschmarren mit Apfelmus'), false, "real dish must not be flagged generic");
 assertEquals(isGenericQuery('Salatteller mit Frühlingsrolle'), false, "dish with side must not be flagged generic");
 ok("isGenericQuery: generic lines detected, real dishes pass");
+
+// Fix 7b: side fragments (splitter swallowed the dish name) are generic
+assertEquals(isGenericQuery('mit Oliven'), true, "side fragment 'mit Oliven'");
+assertEquals(isGenericQuery('mit Tomatensauce (AFLO)'), true, "side fragment with allergen code");
+assertEquals(isGenericQuery('Tortellini mit Oliven'), false, "dish starting with main noun must not be flagged");
+ok("isGenericQuery: side fragments detected (Fix 7b)");
 
 // Fix 3+1: quality gate + global score merge (mocked fetch, full handler path)
 async function runQualityGateTests() {

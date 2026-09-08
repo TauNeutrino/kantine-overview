@@ -36,7 +36,15 @@ const GENERIC_QUERY_WORDS = new Set([
     'beilage', 'beilagen', 'mix'
 ])
 
+// Side-Fragmente, deren Hauptgericht der Splitter verschluckt hat ("mit
+// Nachos", "mit Tomatensauce", "mit Oliven"), sind keine Gerichtsnamen —
+// für sie gibt es kein sinnvolles Rezeptfoto, weder beim Worker noch bei
+// Wikipedia/Commons. Die Zeile bekommt keinen Bild-Link (statt eines
+// beliebigen Müll-Treffers).
+const SIDE_START_RE = /^(mit|an|dazu|und|oder|als|beilage)\b/i
+
 function isGenericDishQuery(cleaned) {
+    if (SIDE_START_RE.test(cleaned.toLowerCase())) return true
     const tokens = cleaned.toLowerCase()
         .split(/[\s,+/&·]+/)
         .map(token => token
