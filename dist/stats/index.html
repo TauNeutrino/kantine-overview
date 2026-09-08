@@ -204,7 +204,9 @@ async function fetchGistData() {
 
 const COLORS = ['#029AA8','#E95454','#FFB347','#48C774','#A855F7','#3B82F6','#F59E0B','#EC4899','#14B8A6','#8B5CF6','#F97316','#06B6D4','#84CC16','#D946EF'];
 const WEEKDAY = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
-const FEATURES = ['starts','highlight','order','lang_switch','theme_switch','week_nav','refresh','login','logout','order_history','highlights_mgr','order_placed','order_cancelled'];
+const FEATURES = ['starts','highlight','order','lang_switch','theme_switch','week_nav','refresh','login','logout','order_history','highlights_mgr','order_placed','order_cancelled',
+    'dish_image_popup',
+    'dish_image_tab'];
 
 function renderDashboard(data) {
     const days = Object.keys(data.daily).sort();
