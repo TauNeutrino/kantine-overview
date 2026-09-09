@@ -12,12 +12,12 @@ export const LOANWORDS = new Set([
     'bulgur', 'falafel', 'hummus', 'masala', 'chana', 'ravaya', 'yakitori', 'donut',
     'muffin', 'parmesan', 'mozzarella', 'feta', 'focaccia', 'baguette', 'panini',
     'gyros', 'baklava', 'wrap', 'bowl', 'dip', 'wok', 'sushi', 'curry', 'chili',
-    'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
-    'ciabatta', 'bruschetta', 'antipasti', 'carpaccio', 'bolognese', 'pomodoro',
-    'tagliatelle', 'carbonara', 'arrabiata', 'arabiata',
+    'con', 'sin', 'carne', 'nachos', 'tacos', 'burrito', 'kebab', 'doner', 'quiche', 'wedges', 'polenta',
+    'ciabatta', 'bruschetta', 'antipasti', 'olive', 'olives', 'oliven', 'carpaccio', 'bolognese', 'pomodoro',
+    'tagliatelle', 'carbonara', 'arrabiata', 'arabiata', 'arrabbiata',
     'fusilli', 'farfalle', 'tortellini', 'tortelloni', 'macaroni', 'linguine',
     'fettuccine', 'rigatoni', 'orecchiette', 'pappardelle', 'cannelloni',
-    'conchiglie', 'bucatini',
+    'conchiglie', 'bucatini', 'jambalaya',
     'schnitzel', 'schöberl', 'backerbsen', 'strudel', 'spätzle', 'spaetzle',
     'pizza', 'zucchini', 'minestrone', 'cheddar', 'tofu', 'croutons', 'quinoa',
     'harissa', 'prosciutto', 'steak', 'burger'
@@ -26,5 +26,14 @@ export const LOANWORDS = new Set([
 export function isLoanword(token) {
     if (!token) return false;
     const w = String(token).toLowerCase().replace(/[^a-zäöüß]/g, '');
-    return w.length > 0 && LOANWORDS.has(w);
+    if (w.length === 0) return false;
+    if (LOANWORDS.has(w)) return true;
+    // German compounds ending in a cross-lingual food word ("Linsenlasagne",
+    // "Spinatlasagne", "Himbeerstrudel") inherit its ambiguity — a trigram
+    // model misreads them as English and findDishBoundary would cut the dish
+    // name off its own side. Suffix must be a full loanword (>= 4 chars).
+    for (const loan of LOANWORDS) {
+        if (loan.length >= 4 && w.length > loan.length && w.endsWith(loan)) return true;
+    }
+    return false;
 }

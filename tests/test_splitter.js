@@ -135,4 +135,33 @@ assert(fusilli.en.includes('Pea mint soup'), 'fusilli en soup');
 assert(!fusilli.en.includes('Pea mint soup Fusilli'), 'fusilli en soup has no head-noun leak');
 assert(fusilli.en.includes('Fusilli with zucchini- lemon cream, and olives (AFO)'), 'fusilli en main');
 
+// Regression: Spanish-origin dish words ("sin"/"con"/"carne") score English
+// on the trigram model and used to drag the dish name onto the EN side,
+// leaving a bare side fragment ("mit Nachos") as the DE line. They are
+// loanwords now, so the boundary lands after the soup again.
+const chiliSin = splitLanguage('Kohlrabicremesuppe / Kohlrabi cream soup Chili sin Carne mit Nachos / Chili sin carne with nachos(F) Bananen Joghurt / Banana yogurt(F)');
+assert(countBullets(chiliSin.de) === 3, 'chili-sin de 3');
+assert(countBullets(chiliSin.en) === 3, 'chili-sin en 3');
+assert(chiliSin.de.includes('Chili sin Carne mit Nachos (F)'), 'chili-sin de keeps dish name');
+assert(chiliSin.en.includes('Kohlrabi cream soup\n') || chiliSin.en.split('\n')[0] === '• Kohlrabi cream soup', 'chili-sin en soup has no dish leak');
+assert(!chiliSin.de.split('\n')[1].match(/^•?\s*mit\b/i) || chiliSin.de.includes('Chili sin Carne'), 'chili-sin de line 2 is not a bare side fragment');
+
+const chiliCon = splitLanguage('Rindssuppe / Beef soup Chili con Carne mit Semmel / Chili con carne with bread roll(A) Kuchen / Cake(B)');
+assert(chiliCon.de.includes('Chili con Carne mit Semmel (A)'), 'chili-con de keeps dish name');
+assert(chiliCon.en.split('\n')[0] === '• Beef soup', 'chili-con en soup has no dish leak');
+
+// Regression: German compounds ending in a loanword ("Linsenlasagne",
+// "Spinatlasagne") inherit its cross-lingual ambiguity and must not be
+// mistaken for the English side either.
+const linsenlasagne = splitLanguage('Kartoffel- Salbeisuppe / Potato sage soup Linsenlasagne mit Tomatensauce / Lentil lasagne with tomato sauce(AFLO) Schoko- Bananenkuchen / Chocolate banana cake(AF)');
+assert(linsenlasagne.de.includes('Linsenlasagne mit Tomatensauce (AFLO)'), 'linsenlasagne de keeps dish name');
+assert(linsenlasagne.en.split('\n')[0] === '• Potato sage soup', 'linsenlasagne en soup has no dish leak');
+
+const jambalaya = splitLanguage('Hühnersuppe mit Reis / Chicken soup with rice Jambalaya mit Tofu und Joghurtdip / Jambalaya with  tofu and yogurt dip Mini Plunder / Mini danishes(ACGHO)');
+assert(jambalaya.de.includes('Jambalaya mit Tofu und Joghurtdip'), 'jambalaya de keeps dish name');
+
+const arrabbiata = splitLanguage('Kohlrabicremesuppe / Kohlrabi cream soup Penne al Arrabbiata mit Oliven / Penne al arrabbiata with olives(AO) Kirsch Joghurt / Cherry yogurt(F)');
+assert(arrabbiata.de.includes('Penne al Arrabbiata mit Oliven (AO)'), 'arrabbiata de keeps dish name');
+assert(arrabbiata.en.split('\n')[0] === '• Kohlrabi cream soup', 'arrabbiata en soup has no dish leak');
+
 console.log('✅ All splitter tests passed!');

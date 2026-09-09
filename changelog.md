@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.6] - 2026-09-08
+
+### Fixed
+
+- **Splitter schluckte Gerichte mit spanischen Lehnwörtern**: „Chili sin/con Carne" wertete das Trigramm-Modell als englisch, sodass der Gerichtenamen auf die EN-Seite wanderte und als DE-Zeile nur ein Beilagen-Fragment übrig blieb („mit Nachos"). `sin`/`con`/`carne` sind jetzt Loanwords (neutral) — die Grenze landet wieder nach der Suppe (Head-Noun-Bonus + Großschreibung). Betraf auch „Chili con Carne".
+- **Splitter schluckte Komposita auf Lehnwort-Basis**: „Linsenlasagne"/„Spinatlasagne" werteten englisch → gleiche Fehlerklasse („mit Tomatensauce" als Zeile 2). `isLoanword` matcht jetzt zusätzlich Komposita, die auf ein volles Lehnwort enden (≥4 Zeichen).
+- **Fehlende Lehnwörter ergänzt**: `Jambalaya`, `Arrabbiata` (Menü-Schreibweise mit Doppel-r; nur `arrabiata` war drin), `Olive`/`Oliven`/`Olives` (kommen in beiden Sprachen vor, werteten einseitig englisch).
+- **Messbar**: Präpositions-Zeilen („mit …") als 2. Kurs über alle Live-Menüdaten: 8 → 1 (Rest: komma-verleimter Sonderfall, dessen Bild-Link bereits clientseitig unterdrückt ist).
+
 ## [2.2.5] - 2026-09-08
 
 ### Changed
