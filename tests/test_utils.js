@@ -234,6 +234,13 @@ assert(countCourses(blockInline.de) === 4, 'block inline: de 4 courses');
 assert(!/Potato Cauliflower/.test(blockInline.de), 'block inline: english soup stays out of de');
 assert(blockInline.en.includes('Potato Cauliflower Soup'), 'block inline: translation kept');
 
+// M6 generic line ("Suppe, kleiner Salat + Dessert") is a template, not a medium split.
+const m6Line = sandbox.splitLanguage('Suppe, kleiner Salat + Dessert / soup small salad and dessert');
+assertEquals(m6Line.label, 'template', 'M6 line label template');
+assertEquals(countCourses(m6Line.de), 1, 'M6 line stays one course');
+assertEquals(m6Line.de, '• Suppe, kleiner Salat + Dessert', 'M6 line de text');
+assertEquals(m6Line.en, '• soup small salad and dessert', 'M6 line en text');
+
 // --- Test getLocalizedText ---
 console.log("Testing getLocalizedText...");
 const menu = "Pizza / Pizza";

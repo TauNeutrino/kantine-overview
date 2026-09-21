@@ -43,6 +43,17 @@ assert(r2 !== null && r2.label === 'template', 'no-space variant matches');
 const r3 = matchTemplate('Gemüsebouillon mit Backerbsen / Vegetable broth with baked peas(ACLM)');
 assert(r3 === null, 'non-template returns null');
 
+const m6 = matchTemplate('Suppe, kleiner Salat + Dessert / soup small salad and dessert');
+assert(m6 !== null && m6.label === 'template' && m6.confidence === 1.0, 'M6 single-course template matches');
+assertEquals(m6.de, '• Suppe, kleiner Salat + Dessert', 'M6 DE output');
+assertEquals(m6.en, '• soup small salad and dessert', 'M6 EN output');
+
+const m6Comma = matchTemplate('Suppe, kleiner Salat + Dessert, soup, small salad and dessert');
+assert(m6Comma !== null && m6Comma.label === 'template', 'M6 comma variant matches');
+
+const m6Space = matchTemplate('Suppe, kleiner Salat + Dessert  / soup small salad and dessert');
+assert(m6Space !== null && m6Space.label === 'template', 'M6 double-space variant matches');
+
 assert(matchTemplate('') === null, 'empty returns null');
 assert(matchTemplate(null) === null, 'null returns null');
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.9] - 2026-09-21
+
+### Fixed
+
+- **M6-Zeile als Template**: `Suppe, kleiner Salat + Dessert / soup small salad and dessert` (auch mit Komma-Trennung) lief bisher als `medium`-Split durch die Pipeline. Die Zeile ist jetzt ein Template und bleibt ein Gang — `label: template`, Konfidenz 1.0. Nebeneffekt laut FR-123: für diese generische Zeile erscheint kein Gerichts-Bild-Link mehr.
+
 ## [2.2.8] - 2026-09-21
 
 ### Fixed

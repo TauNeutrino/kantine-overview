@@ -37,6 +37,18 @@ const TEMPLATES = [
       notes: [],
     },
   },
+  {
+    test: (t) => /^Suppe,\s*kleiner\s+Salat\s*\+\s*Dessert\s*[/,]\s*soup,?\s*small\s+salad\s+and\s+dessert$/i.test(String(t).trim()),
+    result: {
+      de: '• Suppe, kleiner Salat + Dessert',
+      en: '• soup small salad and dessert',
+      raw: '• Suppe, kleiner Salat + Dessert / soup small salad and dessert',
+      label: 'template',
+      confidence: 1.0,
+      subScores: { anchor: 1, purity: 1, course: 1, coverage: 1 },
+      notes: [],
+    },
+  },
 ];
 
 export function matchTemplate(normalizedText) {

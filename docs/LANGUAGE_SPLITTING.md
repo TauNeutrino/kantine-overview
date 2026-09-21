@@ -74,7 +74,7 @@ Bestimmte Menüformate sind bekannt und können ohne Sprachmodell verarbeitet we
 
 | Funktion | Zweck |
 |----------|-------|
-| `matchTemplate(text)` | Erkennt z. B. `Suppe / Soup Salat / Salad Dessert` und erzeugt direkt drei Gänge mit `label: 'template'` |
+| `matchTemplate(text)` | Erkennt z. B. `Suppe / Soup Salat / Salad Dessert` und erzeugt direkt drei Gänge mit `label: 'template'`; ebenso die M6-Zeile `Suppe, kleiner Salat + Dessert / soup small salad and dessert` als **einen** Gang (Slash- oder Komma-Trennung). |
 
 Vorteil: schnell, robust und unabhängig von Tippfehlern.
 
