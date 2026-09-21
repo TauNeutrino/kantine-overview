@@ -99,4 +99,27 @@ assert(countBullets(mixedComma.en) === 2, 'mixed-comma en 2 courses');
 assert(mixedComma.en.includes('beef soup (A)'), 'mixed-comma en soup');
 assert(mixedComma.en.includes('pork schnitzel (B)'), 'mixed-comma en main');
 
+// Inline translation of the first course plus a trailing block (mixed source row).
+const inlineBlock = splitLanguage('Süßkartoffel Blumenkohlsuppe (LMCOG) Potato Cauliflower Soup (LMCOG) Beef Stew (Kartoffel, Zwiebel,Sellerie,Erbsen) (LMCOG) mit Sauerrahm, Gebäck (A) Donut (ACGH) Beef Stew ( Onion,Celery,Potatoes, Peas) with sour cream, pastries, donut');
+assert(countBullets(inlineBlock.de) === 4, 'inline-block de 4 courses');
+assert(countBullets(inlineBlock.en) === 4, 'inline-block en 4 courses');
+assert(inlineBlock.de.includes('Süßkartoffel Blumenkohlsuppe (LMCOG)'), 'inline-block de soup');
+assert(inlineBlock.de.includes('Donut (ACGH)'), 'inline-block de dessert');
+assert(!/Potato Cauliflower/.test(inlineBlock.de), 'inline-block de keeps no english soup');
+assert(inlineBlock.en.includes('Potato Cauliflower Soup (LMCOG)'), 'inline-block inline translation kept');
+assert(inlineBlock.en.includes('pastries (A)'), 'inline-block addendum translated');
+
+// Variant arbitration: the addendum merge must not swallow a real course.
+const variantCase = splitLanguage('Gemüsecremesuppe (L) Spinatlasagne (AFO) mit Tomatensauce, Beeren Nusskuchen (AFH) Vegetable cream soup, Spinach lasagna with tomato sauce, berries nut cake');
+assert(countBullets(variantCase.de) === 3, 'variant-case de 3 courses');
+assert(variantCase.de.includes('Spinatlasagne (AFO)'), 'variant-case lasagne stays its own course');
+assert(variantCase.en.includes('berries nut cake (AFH)'), 'variant-case en dessert');
+assert(['high','medium'].includes(variantCase.label), 'variant-case label high/medium');
+
+// Ambiguous cue words ("Sauce") must not make English segments look German.
+const sauceCue = splitLanguage('Süßkartoffel Blumenkohlsuppe (LMCOG) Gebratene Hühnerbrust in cremiger Whiskeysauce mit Spätzle (LMCOG) Donut (ACGH) Sweet Potato Cauliflower Soup (LMCOG) Roasted Chicken Breast in Creamy Whiskey Sauce with Spaetzle, Donut');
+assert(countBullets(sauceCue.de) === 3, 'sauce-cue de 3 courses');
+assert(!/Roasted Chicken/.test(sauceCue.de), 'sauce-cue de has no english main');
+assert(sauceCue.de.includes('Donut (ACGH)'), 'sauce-cue de dessert');
+
 console.log('✅ All block format tests passed!');

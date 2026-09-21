@@ -11,12 +11,14 @@ import { scoreSplit } from './score.js';
 //    Beef soup with cheese dumplings (LMCGA) Pike-perch fillet ... (DAG) curd cream"
 //
 // The English block is separated by mirrored allergen codes, by commas, or by
-// nothing at all ("... small portion of ..."). These texts contain no top-level
-// slash, so the slash pipeline (segment/dishes) cannot read them — this module
-// reconstructs the courses for that shape instead.
+// nothing at all ("... small portion of ..."). Some descriptions also translate
+// the first course inline ("DE1 (A) EN1 (A) DE2 (B) ..."), so an English
+// segment only starts the trailing block when no German segment follows it.
+// These texts contain no top-level slash, so the slash pipeline
+// (segment/dishes) cannot read them — this module reconstructs the courses.
 
 const ALLERGEN_RE = /\(\s*([A-Z]{1,10}(?:\s*,\s*[A-Z]{1,10})*)\s*\)/g;
-const BLOCK_CUES = /\b(Portion|Gebäck|Gemüse|Kartoffel|Sauce|Salat|Suppe|Menü|Käse|Obstgarten)\b/;
+const BLOCK_CUES = /\b(Gebäck|Gemüse|Kartoffel|Salat|Suppe|Menü|Käse|Obstgarten)\b/;
 const ADDENDUM_RE = /^(m\.|mit|und)\s/i;
 const SMALL_PORTION_DE_RE = /kleine?n?\s*Portion/i;
 const SMALL_PORTION_EN_RE = /\bsmall portion\b/i;
@@ -45,6 +47,14 @@ function isEnglishish(segment, langModel) {
     return langModel.scoreLang(segment) < -2;
 }
 
+// 'unknown' covers loanword-only dish names ("Donut", "Sushi"): too little
+// signal for the language model, but structurally part of the German block.
+function classifySegment(segment, langModel) {
+    if (isGermanish(segment, langModel)) return 'de';
+    if (isEnglishish(segment, langModel)) return 'en';
+    return 'unknown';
+}
+
 function collectAnchors(text) {
     const anchors = [];
     ALLERGEN_RE.lastIndex = 0;
@@ -55,14 +65,29 @@ function collectAnchors(text) {
     return anchors;
 }
 
+function collectSegments(text) {
+    const segments = [];
+    let cursor = 0;
+    for (const anchor of collectAnchors(text)) {
+        const segment = text.slice(cursor, anchor.start).trim();
+        if (segment) segments.push({ text: segment, code: anchor.code, start: cursor });
+        cursor = anchor.end;
+    }
+    const tail = text.slice(cursor).trim();
+    if (tail) segments.push({ text: tail, code: '', start: cursor });
+    return segments;
+}
+
 // Fragments like "m. Schnittlauchdip" or "mit Sauerrahm, Gebäck" continue the
 // dish before them — the source anchors them separately, the translation does not.
 function mergeAddenda(courses) {
     const merged = [];
     for (const course of courses) {
         if (merged.length > 0 && ADDENDUM_RE.test(course.text)) {
-            merged[merged.length - 1].text += ' ' + course.text;
-            merged[merged.length - 1].code = course.code;
+            const previous = merged[merged.length - 1];
+            previous.text += ' ' + course.text;
+            previous.code = course.code;
+            if (course.enInline) previous.enInline = (previous.enInline ? previous.enInline + ' ' : '') + course.enInline;
         } else {
             merged.push({ ...course });
         }
@@ -70,7 +95,15 @@ function mergeAddenda(courses) {
     return merged;
 }
 
-function distributeEnglish(englishBlock, courses) {
+function withCode(text, code) {
+    return code ? `${text} (${code})` : text;
+}
+
+function bulletList(parts) {
+    return parts.length > 0 ? '• ' + parts.join('\n• ') : '';
+}
+
+function distributeEnglish(englishBlock, count, smallPortionCourseIndex) {
     const anchors = collectAnchors(englishBlock);
     if (anchors.length > 0) {
         const parts = [];
@@ -81,85 +114,31 @@ function distributeEnglish(englishBlock, courses) {
         }
         const tail = englishBlock.slice(cursor).trim();
         if (tail) parts.push(tail);
-        if (parts.length === courses.length && parts.every(Boolean)) return parts;
+        if (parts.length === count && parts.every(Boolean)) return parts;
     }
 
     const phrases = splitTopLevel(englishBlock);
-    if (phrases.length === courses.length) return phrases;
+    if (phrases.length === count) return phrases;
 
     const enIndex = englishBlock.search(SMALL_PORTION_EN_RE);
-    const deIndex = courses.findIndex(c => SMALL_PORTION_DE_RE.test(c.text));
-    if (enIndex > 0 && deIndex > 0) {
-        const parts = [englishBlock.slice(0, enIndex).trim(), englishBlock.slice(enIndex).trim()];
-        if (parts.length === courses.length) return parts;
+    if (count === 2 && enIndex > 0 && smallPortionCourseIndex > 0) {
+        return [englishBlock.slice(0, enIndex).trim(), englishBlock.slice(enIndex).trim()];
     }
 
     return null;
 }
 
-function bulletList(parts) {
-    return parts.length > 0 ? '• ' + parts.join('\n• ') : '';
+// Inline translations show up in the trailing block again in malformed source
+// rows — drop the inline bullet in that case instead of printing it twice.
+function dropDuplicates(inlinePieces, englishBlock) {
+    const blockKey = englishBlock.toLowerCase().replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ');
+    return inlinePieces.filter(piece => {
+        const key = piece.toLowerCase().replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+        return !key || !blockKey.includes(key);
+    });
 }
 
-// Reads the German-block/English-block menu shape. Returns null when the text
-// is not that shape (slash format, single course, no readable structure) so the
-// caller can fall back to the regular pipeline.
-export function splitBlockFormat(normalizedText, langModel) {
-    if (!normalizedText || hasTopLevelSlash(normalizedText)) return null;
-
-    const anchors = collectAnchors(normalizedText);
-    if (anchors.length < 2) return null;
-
-    const germanCourses = [];
-    let cursor = 0;
-    let englishStart = -1;
-    for (const anchor of anchors) {
-        const segment = normalizedText.slice(cursor, anchor.start).trim();
-        if (!segment) {
-            cursor = anchor.end;
-            continue;
-        }
-        if (!isGermanish(segment, langModel)) {
-            englishStart = cursor;
-            break;
-        }
-        germanCourses.push({ text: segment, code: anchor.code });
-        cursor = anchor.end;
-    }
-    if (englishStart === -1) englishStart = cursor;
-
-    const courses = mergeAddenda(germanCourses);
-    if (courses.length < 2) return null;
-
-    const englishBlock = normalizedText.slice(englishStart).trim();
-    if (!englishBlock || !isEnglishish(englishBlock, langModel)) return null;
-
-    const fragments = distributeEnglish(englishBlock, courses);
-    if (!fragments) {
-        // German side is reliable, the English block stays one ordered line.
-        return {
-            courses: null,
-            de: bulletList(courses.map(c => `${c.text} (${c.code})`)),
-            en: bulletList([englishBlock.replace(/\s+/g, ' ').trim()]),
-            raw: '• ' + normalizedText,
-            label: 'medium',
-            confidence: 0.6,
-            subScores: { anchor: 1, purity: 0.5, course: 0.6, coverage: 0.9 }
-        };
-    }
-
-    const scored = courses.map((course, i) => {
-        const fragment = fragments[i];
-        const en = fragment.includes(`(${course.code})`) ? fragment : `${fragment} (${course.code})`;
-        return {
-            de: `${course.text} (${course.code})`,
-            en,
-            allergen: course.code,
-            mono: false,
-            anchored: true
-        };
-    });
-
+function buildResult(scored, normalizedText, langModel) {
     const result = scoreSplit({ courses: scored, notes: [], raw: normalizedText, langModel });
     return {
         courses: scored,
@@ -169,5 +148,101 @@ export function splitBlockFormat(normalizedText, langModel) {
         label: result.label,
         confidence: result.confidence,
         subScores: result.subScores
+    };
+}
+
+// Reads the German-block/English-block menu shape. Returns null when the text
+// is not that shape (slash format, single course, no readable structure) so the
+// caller can fall back to the regular pipeline.
+export function splitBlockFormat(normalizedText, langModel) {
+    if (!normalizedText || hasTopLevelSlash(normalizedText)) return null;
+
+    const segments = collectSegments(normalizedText);
+    if (segments.length < 2) return null;
+
+    const kinds = segments.map(s => classifySegment(s.text, langModel));
+    const germanLater = new Array(segments.length).fill(false);
+    for (let i = segments.length - 2; i >= 0; i--) {
+        germanLater[i] = germanLater[i + 1] || kinds[i + 1] === 'de';
+    }
+
+    const courses = [];
+    let trailingStart = -1;
+    for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        if (kinds[i] === 'en') {
+            const last = courses.length - 1;
+            if (germanLater[i] && last >= 0) {
+                courses[last].enInline = courses[last].enInline
+                    ? courses[last].enInline + ' ' + segment.text
+                    : segment.text;
+                continue;
+            }
+            trailingStart = segment.start;
+            break;
+        }
+        courses.push({ text: segment.text, code: segment.code, enInline: '' });
+    }
+    if (courses.length < 2) return null;
+
+    const mergedCourses = mergeAddenda(courses);
+    const englishBlock = trailingStart >= 0 ? normalizedText.slice(trailingStart).trim() : '';
+
+    if (!englishBlock || !isEnglishish(englishBlock, langModel)) {
+        // No usable trailing block: only inline translations can carry this split.
+        if (!mergedCourses.some(c => c.enInline)) return null;
+        const scored = mergedCourses.map(course => ({
+            de: withCode(course.text, course.code),
+            en: withCode(course.enInline || course.text, course.code),
+            allergen: course.code,
+            mono: !course.enInline,
+            anchored: !!course.code
+        }));
+        return buildResult(scored, normalizedText, langModel);
+    }
+
+    // Merging addenda is usually right ("m. Schnittlauchdip"), but it must not
+    // swallow a real course ("mit Tomatensauce, Beeren Nusskuchen"). The
+    // translation block arbitrates: use the variant whose course count can be
+    // distributed across the English fragments.
+    const variants = [mergedCourses];
+    if (mergedCourses.length !== courses.length) variants.push(courses.map(c => ({ ...c })));
+
+    for (const variant of variants) {
+        const hasInline = variant.some(c => c.enInline);
+        const targets = hasInline ? variant.filter(c => !c.enInline) : variant;
+        if (targets.length === 0) continue;
+        const portionIndex = variant.findIndex(c => SMALL_PORTION_DE_RE.test(c.text));
+        const fragments = distributeEnglish(englishBlock, targets.length, portionIndex);
+        if (!fragments) continue;
+
+        targets.forEach((course, i) => { course.en = fragments[i]; });
+        const scored = variant.map(course => {
+            const english = course.en || course.enInline;
+            return {
+                de: withCode(course.text, course.code),
+                en: withCode(english || course.text, course.code),
+                allergen: course.code,
+                mono: !english,
+                anchored: !!course.code
+            };
+        });
+        return buildResult(scored, normalizedText, langModel);
+    }
+
+    // Graceful tier: German side stays per course, every English piece stays in order.
+    const inlinePieces = dropDuplicates(
+        mergedCourses.filter(c => c.enInline).map(c => withCode(c.enInline, c.code)),
+        englishBlock
+    );
+    const pieces = [...inlinePieces, englishBlock.replace(/\s+/g, ' ').trim()];
+    return {
+        courses: null,
+        de: bulletList(mergedCourses.map(c => withCode(c.text, c.code))),
+        en: bulletList(pieces),
+        raw: '• ' + normalizedText,
+        label: 'medium',
+        confidence: 0.6,
+        subScores: { anchor: 1, purity: 0.5, course: 0.6, coverage: 0.9 }
     };
 }

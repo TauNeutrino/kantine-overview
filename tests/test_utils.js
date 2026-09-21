@@ -228,6 +228,12 @@ assert(countCourses(blockGraceful.de) === 3, 'block graceful: de 3 courses');
 assert(!/\b(vegetable|soup|beef)\b/i.test(blockGraceful.de.replace(/\([^)]*\)/g, '')), 'block graceful: no english in de');
 assert(blockGraceful.en.includes('chocolate pudding'), 'block graceful: en block complete');
 
+// Inline English for the first course (mixed source row) must not leak into the de column.
+const blockInline = sandbox.splitLanguage('Süßkartoffel Blumenkohlsuppe (LMCOG) Potato Cauliflower Soup (LMCOG) Beef Stew (Kartoffel, Zwiebel,Sellerie,Erbsen) (LMCOG) mit Sauerrahm, Gebäck (A) Donut (ACGH) Beef Stew ( Onion,Celery,Potatoes, Peas) with sour cream, pastries, donut');
+assert(countCourses(blockInline.de) === 4, 'block inline: de 4 courses');
+assert(!/Potato Cauliflower/.test(blockInline.de), 'block inline: english soup stays out of de');
+assert(blockInline.en.includes('Potato Cauliflower Soup'), 'block inline: translation kept');
+
 // --- Test getLocalizedText ---
 console.log("Testing getLocalizedText...");
 const menu = "Pizza / Pizza";

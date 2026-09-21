@@ -735,13 +735,27 @@ export function createDayCard(day) {
     return card;
 }
 
+/** Tag names that exist as GitHub Releases (used to badge released versions in dev mode). */
+async function fetchReleaseTagSet() {
+    try {
+        const resp = await fetch(`${GITHUB_API}/releases?per_page=100`, { headers: githubHeaders() });
+        if (!resp.ok) return new Set();
+        const data = await resp.json();
+        return new Set(data.map(entry => entry.tag_name));
+    } catch (e) {
+        console.warn('[Kantine] Release-Check fehlgeschlagen:', e);
+        return new Set();
+    }
+}
+
 export async function fetchVersions(devMode) {
     const endpoint = devMode
         ? `${GITHUB_API}/tags?per_page=20`
         : `${GITHUB_API}/releases?per_page=20`;
 
-    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost
-    const storedEtag = localStorage.getItem(LS.VERSION_ETAG);
+    // Send stored ETag (if any) for conditional request — GitHub returns 304 at no rate-limit cost.
+    // Dev mode skips it: release membership can change while the tag list stays the same.
+    const storedEtag = devMode ? null : localStorage.getItem(LS.VERSION_ETAG);
     const resp = await fetch(endpoint, { headers: githubHeaders(storedEtag) });
 
     // 304 Not Modified — content unchanged, skip processing
@@ -755,10 +769,13 @@ export async function fetchVersions(devMode) {
     }
 
     // Persist new ETag for next conditional request
-    const newEtag = resp.headers.get('ETag');
-    if (newEtag) localStorage.setItem(LS.VERSION_ETAG, newEtag);
+    if (!devMode) {
+        const newEtag = resp.headers.get('ETag');
+        if (newEtag) localStorage.setItem(LS.VERSION_ETAG, newEtag);
+    }
 
     const data = await resp.json();
+    const releaseTags = devMode ? await fetchReleaseTagSet() : null;
 
     return data.map(item => {
         const tag = devMode ? item.name : item.tag_name;
@@ -769,7 +786,8 @@ export async function fetchVersions(devMode) {
             rawUrl: `${RAW_INSTALLER_BASE}/${tag}/dist/install.html`,
             // GitHub file browser URL: opened directly in new tab
             githubUrl: `${GITHUB_FILE_BASE}/${tag}/dist/install.html`,
-            body: item.body || ''
+            body: item.body || '',
+            isRelease: devMode ? releaseTags.has(tag) : true
         };
     });
 }
@@ -932,7 +950,7 @@ export function openVersionMenu() {
         const dm = devToggle.checked;
         container.innerHTML = '<p style="color:var(--text-secondary);">Lade Versionen...</p>';
 
-        function renderVersionsList(versions) {
+        function renderVersionsList(versions, devMode) {
             if (!versions || !versions.length) {
                 container.innerHTML = '<p style="color:var(--text-secondary);">Keine Versionen gefunden.</p>';
                 return;
@@ -951,9 +969,14 @@ export function openVersionMenu() {
                 if (isCurrent) badge = '<span class="badge-current">✓ Installiert</span>';
                 else if (isNew) badge = '<span class="badge-new">⬆ Neu!</span>';
 
+                const releaseBadge = (devMode && v.isRelease)
+                    ? `<span class="badge-release" title="${escapeHtml(t('releaseBadgeTooltip'))}">${escapeHtml(t('releaseBadge'))}</span>`
+                    : '';
+
                 li.innerHTML = `
                     <div class="version-info">
                         <strong>${escapeHtml(v.tag)}</strong>
+                        ${releaseBadge}
                         ${badge}
                     </div>
                     <div class="version-actions">
@@ -989,7 +1012,7 @@ export function openVersionMenu() {
             }
 
             if (cached && cached.devMode === dm && cached.versions) {
-                renderVersionsList(cached.versions);
+                renderVersionsList(cached.versions, dm);
             }
 
             const liveVersions = await fetchVersions(dm);
@@ -1001,7 +1024,7 @@ export function openVersionMenu() {
                     localStorage.setItem(LS.VERSION_CACHE, JSON.stringify({
                         timestamp: Date.now(), devMode: dm, versions: liveVersions
                     }));
-                    renderVersionsList(liveVersions);
+                    renderVersionsList(liveVersions, dm);
                 }
             }
 

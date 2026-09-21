@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.8] - 2026-09-21
+
+### Fixed
+
+- **Block-Splitter: Inline-Übersetzungen und Fehlklassifikationen**: Zeilen wie `DE1 (LMCOG) EN1 (LMCOG) DE2 … Donut (ACGH) EN2` (erster Gang inline übersetzt) fielen weiter auf Rohausgabe zurück. Segmente werden jetzt als `de`/`en`/`unknown` klassifiziert: ein englisches Segment startet den Übersetzungsblock nur, wenn kein deutsches Segment mehr folgt — sonst ist es die Inline-Übersetzung des vorigen Kurses. Zusätzlich: ambivalente Cues (`Sauce`, `Portion`) aus der Deutsch-Erkennung entfernt (englische Texte wurden sonst als Deutsch gelesen) und ein Varianten-Schiedsrichter für den Addendum-Merge — er greift nur, wenn die Gangzahl zum englischen Block passt, damit `mit Tomatensauce, Beeren Nusskuchen` keinen echten Gang mehr verschluckt.
+- **Messbar (KW39, 28 Texte)**: Fallback 1 → 0, `low` 1 → 0, falsche Spalten 4 → 1 (Rest: im Quelltext verleimtes Deutsch/Englisch). **Altdaten (627 Fixture-Einträge)**: 0 Regressionen, 15 verbesserte Einträge (vorher 13), 611 unverändert; `eval-splitter` alle Schwellen erfüllt.
+
+### Added
+
+- **Release-Badge im Dev-Mode**: Die Versionsliste markiert Tags, die zusätzlich als GitHub Release existieren, mit einem neutralen `Release`-Badge (Tooltip: offizielles Release, kein reiner Dev-Tag). Dafür wird im Dev-Mode zusätzlich die Releases-Liste geladen (bewusst ohne ETag, da Release-Zugehörigkeit sich ohne Tag-Änderung ändern kann). Im Stable-Mode entfällt das Badge.
+
 ## [2.2.7] - 2026-09-21
 
 ### Fixed

@@ -93,8 +93,10 @@ Diese Texte enthalten keinen Top-Level-Slash — die Slash-Pipeline (`segment`/`
 | Stufe | Verhalten |
 |-------|-----------|
 | `splitBlockFormat()` | Erkennt das Format nur, wenn der Text **keinen** Top-Level-Slash enthält und mindestens zwei deutsche Anker existieren. Sonst `null` → reguläre Pipeline. |
+| Segmentklassifikation | Jedes Segment wird `de`, `en` oder `unknown` (Lehnwort-Gerichte wie `Donut`, `Sushi`). Ein englisches Segment startet den Übersetzungsblock nur, wenn **kein** deutsches Segment mehr folgt — sonst ist es die Inline-Übersetzung des vorigen Kurses (`DE1 (A) EN1 (A) DE2 (B) …`). `unknown`-Segmente gehören strukturell zum deutschen Block. |
 | Ankerklassifikation | Ein Allergen zählt nur als Kursgrenze, wenn der Text davor deutsch ist. Gespiegelte Codes im englischen Block werden dadurch nicht als neue Gänge missverstanden. |
 | `mergeAddenda()` | Fragmente wie `m. Schnittlauchdip` oder `mit Sauerrahm, Gebäck` gehören zum vorigen Gericht und werden angehängt. |
+| Varianten-Schiedsrichter | Der Merge wird nur übernommen, wenn die entstehende Gangzahl zum englischen Block passt — sonst gewinnt die ungemergte Variante. Verhindert, dass ein echter Gang (`mit Tomatensauce, Beeren Nusskuchen`) im Vorgänger verschwindet. |
 | `distributeEnglish()` | Verteilt den englischen Block: (1) gespiegelte Allergen-Codes, (2) Komma-Split (paren-aware), (3) Cue `small portion` ↔ `kleine Portion`. |
 | Graceful Tier | Lässt sich der Block nicht 1:1 aufteilen, bleibt die **deutsche Spalte pro Gang korrekt** und der englische Block wird als eine geordnete Zeile erhalten (`label: medium`). |
 
@@ -236,5 +238,5 @@ EN:
 
 ## Bekannte Grenzen
 
-- **Block-Format**: `DE1 (A) DE2 (B) DE3 (C) EN1, EN2, EN3` wird über `splitBlockFormat()` verteilt (Codes, Kommas, Portions-Cue). Nur wenn nichts davon greift, bleibt der englische Block als eine Zeile erhalten (Graceful Tier, `medium`) — deutsche Spalte bleibt korrekt. Echte Restfälle: eingeschobenes Englisch mitten im deutschen Block (z. B. `DE1 EN1 DE2 DE3 ... EN2`) und abgeschnittene Quelltexte.
+- **Block-Format**: `DE1 (A) DE2 (B) DE3 (C) EN1, EN2, EN3` wird über `splitBlockFormat()` verteilt (Codes, Kommas, Portions-Cue, Inline-Übersetzungen). Nur wenn nichts davon greift, bleibt der englische Block als eine Zeile erhalten (Graceful Tier, `medium`) — deutsche Spalte bleibt korrekt. Echte Restfälle: im Quelltext verleimte Deutsch/Englisch-Fragmente (z. B. `Kokos-Pana-Cotta … , ed lentil soup …`) und abgeschnittene Quelltexte.
 - **Lehnwörter**: Gerichte wie `Vanillepudding` oder `Spaghetti Carbonara` können vom Modell leicht als englisch gewertet werden. Die Strafsumme in `findDishBoundary` kompensiert das, solange die Gesamtstruktur stimmt.

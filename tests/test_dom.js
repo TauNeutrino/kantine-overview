@@ -730,7 +730,70 @@ async function runDishImageTests() {
     w.matchMedia = realMatchMedia;
 }
 
-runDishImageTests().then(() => {
+// Dev-mode version list: tags that also exist as GitHub Releases get a badge.
+async function runVersionBadgeTests() {
+    const w = dom.window;
+    const d = w.document;
+    const DEV_KEY = 'kantine_dev_mode';
+    const CACHE_KEY = 'kantine_version_cache';
+    const previousFetch = w.fetch;
+    const previousDev = w.localStorage.getItem(DEV_KEY);
+
+    if (!d.getElementById('dev-mode-toggle')) {
+        const toggle = d.createElement('input');
+        toggle.type = 'checkbox';
+        toggle.id = 'dev-mode-toggle';
+        d.body.appendChild(toggle);
+    }
+
+    w.localStorage.setItem(DEV_KEY, 'true');
+    w.localStorage.removeItem(CACHE_KEY);
+
+    w.fetch = (url) => {
+        const target = String(url);
+        if (target.includes('/tags')) {
+            return Promise.resolve({
+                ok: true, status: 200, headers: { get: () => null },
+                json: () => Promise.resolve([{ name: 'v2.2.7' }, { name: 'v2.2.0' }])
+            });
+        }
+        if (target.includes('/releases')) {
+            return Promise.resolve({
+                ok: true, status: 200, headers: { get: () => null },
+                json: () => Promise.resolve([{ tag_name: 'v2.2.0' }])
+            });
+        }
+        return Promise.reject(new Error('version badge test: unexpected fetch ' + target));
+    };
+
+    try {
+        d.querySelector('.version-tag').click();
+        await sleep(150);
+
+        const items = Array.from(d.querySelectorAll('#version-list-container .version-item'));
+        if (items.length !== 2) throw new Error('version badge: expected 2 items, got ' + items.length);
+
+        const released = items.find(li => li.textContent.includes('v2.2.0'));
+        const devOnly = items.find(li => li.textContent.includes('v2.2.7'));
+        if (!released || !released.querySelector('.badge-release')) {
+            throw new Error('version badge: released tag must carry .badge-release');
+        }
+        if (!devOnly || devOnly.querySelector('.badge-release')) {
+            throw new Error('version badge: dev-only tag must not carry .badge-release');
+        }
+        console.log('OK version list badges released tags in dev mode');
+    } finally {
+        d.getElementById('btn-version-close').click();
+        w.fetch = previousFetch;
+        if (previousDev === null) w.localStorage.removeItem(DEV_KEY);
+        else w.localStorage.setItem(DEV_KEY, previousDev);
+        w.localStorage.removeItem(CACHE_KEY);
+    }
+}
+
+runDishImageTests()
+    .then(runVersionBadgeTests)
+    .then(() => {
     console.log("✅ Dish Image Trigger Link Tests Passed");
     process.exit(0);
 }).catch((err) => {
