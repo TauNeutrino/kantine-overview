@@ -59,6 +59,10 @@ export function normalize(text) {
     // 3. Collapse whitespace
     modifiedText = modifiedText.replace(/\s{2,}/g, ' ').trim();
 
+    // 3b. Drop a truncated trailing parenthetical (the source field limit cuts
+    // mid-allergen, e.g. "... and yoghurt (")
+    modifiedText = modifiedText.replace(/\(\s*$/, '').trim();
+
     return {
         text: modifiedText,
         notes: notes

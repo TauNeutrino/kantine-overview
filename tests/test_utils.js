@@ -51,6 +51,7 @@ cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/langModelSeed.js')
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/segment.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/boundary.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/score.js'),'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/blockFormat.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/dishes.js'),'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(__dirname, '..', 'src/lang/splitter.js'),'utf8'));
 
@@ -215,6 +216,17 @@ assert(stroganoff.de.includes('(Beef)'), "Non-allergen paren preserved in de");
 // NEW: Note parking — note not in course text
 const withNote = sandbox.splitLanguage("Kürbiscremesuppe / Pumpkin cream Achtung Änderung Grillhendl (A)");
 assert(!withNote.de.includes('Achtung Änderung') || withNote.notes.length > 0, "Note parked or absent from de");
+
+// --- Block format (Bessa layout since 2026-04: one German block, then the English block) ---
+const blockComma = sandbox.splitLanguage('Rindsuppe m. Kaspressknödel (LMCGA) Putengeschnetzeltes in Kokos Currysauce m. Basmatireis (LMCFO) Obstgarten (G) Beef soup with cheese dumplings, Turkey strips in coconut curry sauce with basmati rice, curd cream');
+assert(countCourses(blockComma.de) === 3, 'block format: 3 german courses');
+assert(!/\b(with|and|from|soup|cream)\b/i.test(blockComma.de.replace(/\([^)]*\)/g, '')), 'block format: de column stays german');
+assert(blockComma.en.includes('Turkey strips in coconut curry sauce'), 'block format: en main course');
+
+const blockGraceful = sandbox.splitLanguage('Gemüsebouillon mit Grießnockerl (ACGLM) Saures Rindfleisch (LM) Schokopudding (G) Vegetable soup with semolina dumplings (ACGLM) Sour beef chocolate pudding');
+assert(countCourses(blockGraceful.de) === 3, 'block graceful: de 3 courses');
+assert(!/\b(vegetable|soup|beef)\b/i.test(blockGraceful.de.replace(/\([^)]*\)/g, '')), 'block graceful: no english in de');
+assert(blockGraceful.en.includes('chocolate pudding'), 'block graceful: en block complete');
 
 // --- Test getLocalizedText ---
 console.log("Testing getLocalizedText...");

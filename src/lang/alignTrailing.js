@@ -5,12 +5,12 @@ import { isLoanword } from './loanwords.js';
 const MIN_ENGLISH_SCORE = -0.8;
 const MIN_DETECT_CONFIDENCE = 0.7;
 
-const GERMAN_FUNCTION_WORDS = new Set([
-    'mit', 'und', 'auf', 'von', 'vom', 'nach', 'in', 'an', 'zu', 'aus',
+export const GERMAN_FUNCTION_WORDS = new Set([
+    'mit', 'und', 'auf', 'von', 'vom', 'nach', 'zu', 'aus',
     'bei', 'für', 'über', 'unter', 'der', 'die', 'das', 'des', 'dem', 'den',
 ]);
 
-function splitTopLevel(text) {
+export function splitTopLevel(text) {
     if (!text || typeof text !== 'string') return [];
 
     const phrases = [];
@@ -119,7 +119,7 @@ function repairInterleavedEnglish(courses, langModel) {
 
         const rest = phrases.slice(1).join(', ').trim();
         if (!rest) continue;
-        const restHasGerman = !isStronglyEnglish(rest, langModel) && /[a-zäöüß]{3,}/i.test(rest);
+        const restHasGerman = (langModel.scoreLang(rest) > 0 || /[äöüßÄÖÜ]/.test(rest)) && /[a-zäöüß]{3,}/i.test(rest);
         if (!restHasGerman) continue;
 
         changed[i] = {

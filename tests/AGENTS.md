@@ -43,5 +43,5 @@ The GitHub Actions workflow `.github/workflows/build-and-deploy.yml` calls `npm 
 - The following tests must be run manually with `node tests/<file>`:
   - DOM tests: `tests/test_dom.js`
   - `StatsTracker` unit tests: `tests/stats-tracker.test.js`
-  - Lang module tests: `test_splitter.js`, `test_segment.js`, `test_boundary.js`, `test_normalize.js`, `test_templates.js`, `test_score.js`, `test_langmodel.js`, `test_align_trailing.js`, etc.
+  - Lang module tests: `test_splitter.js`, `test_block_format.js`, `test_segment.js`, `test_boundary.js`, `test_normalize.js`, `test_templates.js`, `test_score.js`, `test_langmodel.js`, `test_align_trailing.js`, etc.
   - Security/repro scripts: `tests/test_security.js`, `tests/repro_vulnerability.js`

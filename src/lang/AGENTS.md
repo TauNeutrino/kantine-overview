@@ -13,6 +13,7 @@
 - `langModel.js` — trigram classifier built from seed data.
 - `langModelSeed.js` — generated lookup tables (`trigramsDe`, `trigramsEn`, `funcDe`, `funcEn`).
 - `segment.js` — splits text into candidate DE/EN courses.
+- `blockFormat.js` — reads the block layout (German block + trailing English block, no top-level slash); runs before `segment.js`.
 - `alignTrailing.js` — moves trailing English tokens to the English side.
 - `dishes.js` — splits slash-separated combined dishes.
 - `boundary.js` — finds the language boundary inside a mixed chunk.
@@ -29,6 +30,7 @@
 - Split quality → `score.js`.
 - Boundary logic → `boundary.js`.
 - Slash dish splitting → `dishes.js`.
+- Block layout (2026-04+) → `blockFormat.js`.
 - Template matching → `templates.js`.
 
 ## TRAINING/TESTING

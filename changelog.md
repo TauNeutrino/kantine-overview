@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.7] - 2026-09-21
+
+### Fixed
+
+- **Neues Bessa-Menüformat (Block-Layout seit 2026-04)**: Beschreibungen bestehen jetzt aus einem deutschen Block mit Allergenankern und einem englischen Übersetzungsblock ohne Slash („DE1 (A) DE2 (B) DE3 (C) EN1, EN2, EN3"). Der Splitter fiel dafür reihenweise auf Rohausgabe zurück oder verteilte Englisch in die deutsche Spalte. Neues Modul `src/lang/blockFormat.js` erkennt das Format (nur ohne Top-Level-Slash), filtert gespiegelte Allergen-Codes, merged Zusatz-Fragmente (`m. Schnittlauchdip`) und verteilt den englischen Block über Codes → Komma-Split → `small portion`-Cue; ist keine 1:1-Zuordnung möglich, bleibt die deutsche Spalte pro Gang korrekt und der englische Block als geordnete Zeile erhalten (Graceful Tier, `medium`).
+- **Messbar (KW39, 28 Texte)**: Fallback 17 → 1, falsche Spalten 19 → 2. **Altdaten (627 Fixture-Einträge, beide Formate)**: 0 Regressionen, 13 verbesserte Einträge, 613 unverändert.
+- **Kleinere Fixes**: `in`/`an` aus der deutschen Funktionswortliste entfernt (englische Alltagswörter führten zu Fehl-Repairs), `repairInterleavedEnglish` verlangt jetzt echtes Deutsch-Signal für den Rest-Text, abgeschnittene Quelltexte mit offener Klammer („… yoghurt (") werden bereinigt.
+
 ## [2.2.6] - 2026-09-08
 
 ### Fixed

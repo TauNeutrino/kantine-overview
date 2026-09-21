@@ -120,6 +120,7 @@ try {
       'segment.js',       // depends: normalize
       'boundary.js',      // resolveBoundary(fragment, langModel) — langModel passed in
       'score.js',         // depends: LABELS from types.js
+      'blockFormat.js',   // depends: alignTrailing, score
       'dishes.js',
       'splitter.js',      // depends: normalize, templates, segment, boundary, score, langModel, LANG_MODEL_SEED, alignTrailing
     ];

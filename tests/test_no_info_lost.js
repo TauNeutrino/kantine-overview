@@ -20,6 +20,7 @@ eval(
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/segment.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/boundary.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/score.js'), 'utf8')) + '\n' +
+  cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/blockFormat.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/dishes.js'), 'utf8')) + '\n' +
   cleanSrc(fs.readFileSync(path.join(ROOT, 'src/lang/splitter.js'), 'utf8'))
 );

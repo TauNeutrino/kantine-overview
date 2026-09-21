@@ -29,6 +29,9 @@ normalize()        ── Parkt Hinweise, repariert Allergen-/Slash-Schreibfehle
 matchTemplate()    ── Schneller Pfad für Muster wie "Suppe / Soup Salat / Salad Dessert"
     │
     ▼
+splitBlockFormat() ── Neues Format (ab 2026-04): deutscher Block + englischer Übersetzungsblock
+    │
+    ▼
 segment()          ── Zerlegt in gängige Blöcke, an gültigen Allergen-Klammern verankert
     │
     ▼
@@ -74,6 +77,26 @@ Bestimmte Menüformate sind bekannt und können ohne Sprachmodell verarbeitet we
 | `matchTemplate(text)` | Erkennt z. B. `Suppe / Soup Salat / Salad Dessert` und erzeugt direkt drei Gänge mit `label: 'template'` |
 
 Vorteil: schnell, robust und unabhängig von Tippfehlern.
+
+---
+
+## 2b. Block-Format (`blockFormat.js`)
+
+Seit April 2026 liefert Bessa die Beschreibungen in einem anderen Layout: **ein deutscher Block mit den Allergenankern, danach der englische Übersetzungsblock als Ganzes.**
+
+```
+DE1 (A) DE2 (B) DE3 (C) EN1, EN2, EN3
+```
+
+Diese Texte enthalten keinen Top-Level-Slash — die Slash-Pipeline (`segment`/`dishes`) kann sie nicht lesen, deshalb übernimmt `splitBlockFormat()` vor der Segmentierung:
+
+| Stufe | Verhalten |
+|-------|-----------|
+| `splitBlockFormat()` | Erkennt das Format nur, wenn der Text **keinen** Top-Level-Slash enthält und mindestens zwei deutsche Anker existieren. Sonst `null` → reguläre Pipeline. |
+| Ankerklassifikation | Ein Allergen zählt nur als Kursgrenze, wenn der Text davor deutsch ist. Gespiegelte Codes im englischen Block werden dadurch nicht als neue Gänge missverstanden. |
+| `mergeAddenda()` | Fragmente wie `m. Schnittlauchdip` oder `mit Sauerrahm, Gebäck` gehören zum vorigen Gericht und werden angehängt. |
+| `distributeEnglish()` | Verteilt den englischen Block: (1) gespiegelte Allergen-Codes, (2) Komma-Split (paren-aware), (3) Cue `small portion` ↔ `kleine Portion`. |
+| Graceful Tier | Lässt sich der Block nicht 1:1 aufteilen, bleibt die **deutsche Spalte pro Gang korrekt** und der englische Block wird als eine geordnete Zeile erhalten (`label: medium`). |
 
 ---
 
@@ -213,5 +236,5 @@ EN:
 
 ## Bekannte Grenzen
 
-- **Komma-Formate**: `DE1 (A) DE2 (B) EN1, EN2, EN3` werden nur verteilt, wenn die Phrasenzahl exakt zu den deutschen Gängen passt. Bei mehrdeutigen oder unvollständigen englischen Seiten fällt der Splitter zurück auf Rohausgabe.
+- **Block-Format**: `DE1 (A) DE2 (B) DE3 (C) EN1, EN2, EN3` wird über `splitBlockFormat()` verteilt (Codes, Kommas, Portions-Cue). Nur wenn nichts davon greift, bleibt der englische Block als eine Zeile erhalten (Graceful Tier, `medium`) — deutsche Spalte bleibt korrekt. Echte Restfälle: eingeschobenes Englisch mitten im deutschen Block (z. B. `DE1 EN1 DE2 DE3 ... EN2`) und abgeschnittene Quelltexte.
 - **Lehnwörter**: Gerichte wie `Vanillepudding` oder `Spaghetti Carbonara` können vom Modell leicht als englisch gewertet werden. Die Strafsumme in `findDishBoundary` kompensiert das, solange die Gesamtstruktur stimmt.

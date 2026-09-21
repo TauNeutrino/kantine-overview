@@ -7,6 +7,7 @@ import { scoreSplit } from './score.js';
 import { createLangModel } from './langModel.js';
 import { LANG_MODEL_SEED } from './langModelSeed.js';
 import { alignTrailingEnglish } from './alignTrailing.js';
+import { splitBlockFormat } from './blockFormat.js';
 
 // The lang model is immutable after construction (no delta/learning mutations),
 // so a single module-level instance is reused across all splits instead of
@@ -141,6 +142,16 @@ export function splitLanguage(text, options = {}) {
     }
 
     const langModel = (options && options.langModel) ? options.langModel : SHARED_LANG_MODEL;
+
+    const blockResult = splitBlockFormat(normText, langModel);
+    if (blockResult) {
+        const noteText = notes.length > 0 ? '\n' + notes.join(' ') : '';
+        blockResult.de += noteText;
+        blockResult.en += noteText;
+        blockResult.raw += noteText;
+        blockResult.notes = notes;
+        return blockResult;
+    }
 
     let courses = segment(normText);
     courses = mergeTrailingAnnotations(courses);
