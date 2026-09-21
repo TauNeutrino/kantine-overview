@@ -101,14 +101,9 @@ function bulletList(parts) {
     return parts.length > 0 ? '• ' + parts.join('\n• ') : '';
 }
 
-/**
- * Reads the German-block/English-block menu shape. Returns null when the text
- * is not that shape (slash format, single course, no readable structure) so the
- * caller can fall back to the regular pipeline.
- *
- * @param {string} normalizedText
- * @param {{ scoreLang: (t: string) => number }} langModel
- */
+// Reads the German-block/English-block menu shape. Returns null when the text
+// is not that shape (slash format, single course, no readable structure) so the
+// caller can fall back to the regular pipeline.
 export function splitBlockFormat(normalizedText, langModel) {
     if (!normalizedText || hasTopLevelSlash(normalizedText)) return null;
 
