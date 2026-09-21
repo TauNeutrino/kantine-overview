@@ -326,6 +326,41 @@ const testCode = `
         if (!titleAttr.includes('score')) throw new Error('Badge tooltip must contain score');
         console.log("✅ Confidence Badge (DEV Mode) Test Passed");
 
+        console.log("--- Testing Heatmap Visibility (DEV Mode) ---");
+        const heatmapDay = {
+            date: '2026-06-25',
+            weekday: 4,
+            items: [
+                {
+                    id: 'item_200',
+                    articleId: 200,
+                    name: 'M6 Suppe',
+                    description: 'Suppe, kleiner Salat + Dessert / soup small salad and dessert',
+                    price: 3,
+                    available: true,
+                    amountTracking: false
+                },
+                {
+                    id: 'item_201',
+                    articleId: 201,
+                    name: 'Unsichere Zeile',
+                    description: 'Selleriecremesuppe (GLM) celery cream soup, Rindschnitzel "Brase" auf Pastinakenpüree (AGLMO) Holunder Zitronencreme (G) beef schnitzel in vegetable sauce',
+                    price: 5.5,
+                    available: true,
+                    amountTracking: false
+                }
+            ]
+        };
+        const heatCard = window.createDayCard(heatmapDay);
+        const heatItems = heatCard ? Array.from(heatCard.querySelectorAll('.menu-item')) : [];
+        const templateItem = heatItems.find(el => el.textContent.includes('M6 Suppe'));
+        const uncertainItem = heatItems.find(el => el.textContent.includes('Unsichere Zeile'));
+        if (!templateItem || !uncertainItem) throw new Error('Heatmap test: mock items missing');
+        if (templateItem.querySelector('.heatmap-row')) throw new Error('Template line must not show the DE/EN heatmap');
+        if (!templateItem.querySelector('.confidence-badge')) throw new Error('Template line keeps its confidence badge');
+        if (!uncertainItem.querySelector('.heatmap-row')) throw new Error('Non-template item must keep the heatmap');
+        console.log("✅ Heatmap Visibility (DEV Mode) Test Passed");
+
         window.__TEST_PASSED = true;
     `;
 

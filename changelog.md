@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.10] - 2026-09-21
+
+### Changed
+
+- **Dev-Mode-Heatmap bei Templates ausgeblendet**: Für Template-Zeilen (z. B. „Suppe, kleiner Salat + Dessert") wird die Zeichen-Klassifizierung (blau = EN … rot = DE) nicht mehr gerendert — die Zuordnung ist dort fest, eine Analyse wäre irreführend. Das Confidence-Badge (`template`) bleibt sichtbar.
+
 ## [2.2.9] - 2026-09-21
 
 ### Fixed

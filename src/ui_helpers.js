@@ -552,7 +552,7 @@ export function createDayCard(day) {
         }
 
         let heatmapHtml = '';
-        if (dm && lbl !== 'high') {
+        if (dm && lbl !== 'high' && lbl !== 'template') {
             const descText = item.description || '';
             const affinities = heatmapLangModel.scoreCharAffinities(descText);
             const chars = affinities.map(({char, affinity}) => {
