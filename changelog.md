@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.11] - 2026-10-22
+
+### Fixed
+
+- **Order-Fehler-Anzeige**: Bei abgelehnten Bestellungen (HTTP 400) wurde nur `data.detail` geprüft — feldspezifische DRF-Fehler (z. B. `{"date": ["…"]}`) kollabierten in den generischen Toast „Bestellung fehlgeschlagen". Der Toast zeigt jetzt Statuscode und alle Fehlerfelder, zusätzlich loggt die Console den kompletten Response-Body (`[Kantine] Order failed 400 …`). Diagnose-Hilfe für das aktuelle Problem „Bestellung nächste Woche → 400".
+
 ## [2.2.10] - 2026-09-21
 
 ### Changed

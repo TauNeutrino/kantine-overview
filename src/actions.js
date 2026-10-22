@@ -398,6 +398,19 @@ export function renderHistory(orders) {
     });
 }
 
+// Flatten a DRF error body into one readable message, e.g. "date: Invalid date." —
+// field-specific errors (not just `detail`) must reach the toast, otherwise 400s stay opaque.
+function formatApiError(data) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        return 'Bestellung fehlgeschlagen';
+    }
+    const msgs = Object.entries(data).map(([field, value]) => {
+        const text = Array.isArray(value) ? value.join('; ') : String(value);
+        return field === 'detail' || field === 'non_field_errors' ? text : `${field}: ${text}`;
+    });
+    return msgs.join(' | ') || 'Bestellung fehlgeschlagen';
+}
+
 export async function placeOrder(date, articleId, name, price, description) {
     if (!authToken) return;
     try {
@@ -470,8 +483,14 @@ export async function placeOrder(date, articleId, name, price, description) {
             await fetchOrders();
             await refreshMenuForDate(date);
         } else {
-            const data = await response.json();
-            showToast(`Fehler: ${data.detail || data.non_field_errors?.[0] || 'Bestellung fehlgeschlagen'}`, 'error');
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (e) {
+                // Non-JSON error body: fall through with empty object
+            }
+            console.error('[Kantine] Order failed', response.status, JSON.stringify(data));
+            showToast(`Fehler (${response.status}): ${formatApiError(data)}`, 'error');
             await refreshMenuForDate(date);
         }
     } catch (error) {

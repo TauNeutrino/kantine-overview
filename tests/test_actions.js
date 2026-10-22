@@ -127,3 +127,60 @@ sandbox.allWeeks = [{ weekNumber: 10, year: 2024, days: [{ date: '2024-03-05' }]
 assertEquals(sandbox.isCacheFresh(), true, "Should return true when cache is fresh and current week has data");
 
 console.log("✅ isCacheFresh Unit Tests Passed!");
+
+// === formatApiError / placeOrder error toast tests ===
+// Regression guard: 400 responses with field-specific errors (e.g. {"date": [...]})
+// must reach the toast in full, not collapse into the generic fallback message.
+console.log("Testing placeOrder error message formatting...");
+
+// Case 1: DRF field errors are surfaced with the field name
+assertEquals(
+    sandbox.formatApiError({ date: ['Invalid date.'] }),
+    'date: Invalid date.',
+    "Field-specific 400 errors must be prefixed with the field name"
+);
+
+// Case 2: Multiple field errors are joined
+assertEquals(
+    sandbox.formatApiError({ date: ['Invalid date.'], items: ['Required.'] }),
+    'date: Invalid date. | items: Required.',
+    "Multiple field errors are joined with ' | '"
+);
+
+// Case 3: detail stays unprefixed
+assertEquals(
+    sandbox.formatApiError({ detail: 'Not allowed.' }),
+    'Not allowed.',
+    "detail errors are shown unprefixed"
+);
+
+// Case 4: empty / non-object body falls back to the generic message
+assertEquals(
+    sandbox.formatApiError({}),
+    'Bestellung fehlgeschlagen',
+    "Empty error body falls back to generic message"
+);
+
+// Case 5: end-to-end — placeOrder with a 400 field-error response shows the full
+// field error in the toast (previously only data.detail was checked)
+sandbox.API_BASE = 'https://api.test';
+sandbox.VENUE_ID = 591;
+sandbox.MENU_ID = 1;
+sandbox.crypto = { randomUUID: () => 'test-uuid' };
+let toastMessage = null;
+sandbox.showToast = (msg) => { toastMessage = msg; };
+sandbox.fetch = async (url) => {
+    if (String(url).includes('/auth/user/')) {
+        return { ok: true, json: async () => ({ first_name: 'A', last_name: 'B', email: 'a@b.c' }) };
+    }
+    return { ok: false, status: 400, json: async () => ({ date: ['Invalid date.'] }) };
+};
+
+(async () => {
+    await sandbox.placeOrder('2026-10-27', 123, 'Schnitzel', '9.90', 'desc');
+    if (!toastMessage || !toastMessage.includes('400') || !toastMessage.includes('date: Invalid date.')) {
+        console.error(`❌ Assertion Failed: placeOrder 400 must surface field errors in toast. Got: ${JSON.stringify(toastMessage)}`);
+        process.exit(1);
+    }
+    console.log("✅ placeOrder Error Toast Tests Passed!");
+})();
