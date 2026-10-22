@@ -101,8 +101,8 @@ assert(mixedComma.en.includes('pork schnitzel (B)'), 'mixed-comma en main');
 
 // Inline translation of the first course plus a trailing block (mixed source row).
 const inlineBlock = splitLanguage('Süßkartoffel Blumenkohlsuppe (LMCOG) Potato Cauliflower Soup (LMCOG) Beef Stew (Kartoffel, Zwiebel,Sellerie,Erbsen) (LMCOG) mit Sauerrahm, Gebäck (A) Donut (ACGH) Beef Stew ( Onion,Celery,Potatoes, Peas) with sour cream, pastries, donut');
-assert(countBullets(inlineBlock.de) === 4, 'inline-block de 4 courses');
-assert(countBullets(inlineBlock.en) === 4, 'inline-block en 4 courses');
+assert(countBullets(inlineBlock.de) === 3, 'inline-block de 3 courses');
+assert(countBullets(inlineBlock.en) === 3, 'inline-block en 3 courses');
 assert(inlineBlock.de.includes('Süßkartoffel Blumenkohlsuppe (LMCOG)'), 'inline-block de soup');
 assert(inlineBlock.de.includes('Donut (ACGH)'), 'inline-block de dessert');
 assert(!/Potato Cauliflower/.test(inlineBlock.de), 'inline-block de keeps no english soup');

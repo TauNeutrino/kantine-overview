@@ -404,6 +404,7 @@ function stepTests(ctx) {
     'tests/test_utils.js',
     'test_logic.js',
     'tests/test_dom.js',
+    'tests/test_lang_regression.js',
     'tests/stats-tracker.test.js',
   ];
   let allPassed = true;

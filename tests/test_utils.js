@@ -230,9 +230,10 @@ assert(blockGraceful.en.includes('chocolate pudding'), 'block graceful: en block
 
 // Inline English for the first course (mixed source row) must not leak into the de column.
 const blockInline = sandbox.splitLanguage('Süßkartoffel Blumenkohlsuppe (LMCOG) Potato Cauliflower Soup (LMCOG) Beef Stew (Kartoffel, Zwiebel,Sellerie,Erbsen) (LMCOG) mit Sauerrahm, Gebäck (A) Donut (ACGH) Beef Stew ( Onion,Celery,Potatoes, Peas) with sour cream, pastries, donut');
-assert(countCourses(blockInline.de) === 4, 'block inline: de 4 courses');
+assert(countCourses(blockInline.de) === 3, 'block inline: de 3 courses');
 assert(!/Potato Cauliflower/.test(blockInline.de), 'block inline: english soup stays out of de');
 assert(blockInline.en.includes('Potato Cauliflower Soup'), 'block inline: translation kept');
+assert(blockInline.de.includes('mit Sauerrahm, Gebäck'), 'block inline: addendum merged into main course');
 
 // M6 generic line ("Suppe, kleiner Salat + Dessert") is a template, not a medium split.
 const m6Line = sandbox.splitLanguage('Suppe, kleiner Salat + Dessert / soup small salad and dessert');

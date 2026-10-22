@@ -13,7 +13,7 @@
 - `langModel.js` — trigram classifier built from seed data.
 - `langModelSeed.js` — generated lookup tables (`trigramsDe`, `trigramsEn`, `funcDe`, `funcEn`).
 - `segment.js` — splits text into candidate DE/EN courses.
-- `blockFormat.js` — reads the block layout (German block + trailing English block, no top-level slash); runs before `segment.js`.
+- `blockFormat.js` — reads the block layout (German block + trailing English block, mixed segments split at their language boundary); runs before `segment.js`.
 - `alignTrailing.js` — moves trailing English tokens to the English side.
 - `dishes.js` — splits slash-separated combined dishes.
 - `boundary.js` — finds the language boundary inside a mixed chunk.
@@ -41,6 +41,7 @@
 - Tests use `tests/_langLoader.js`, a CommonJS VM sandbox that strips ES6 import/export so lang modules run under Node.
 - Lang tests: `test_splitter.js`, `test_segment.js`, `test_boundary.js`, `test_normalize.js`, `test_templates.js`, `test_score.js`, `test_langmodel.js`, `test_align_trailing.js`, `test_heatmap.js`.
 - Only `test_heatmap.js` runs with `npm test`; run the rest manually.
+- `tests/test_lang_regression.js` is the CI gate for this subsystem: it replays every known menu text (menu-cache fixture + live weeks) and compares the split against `tests/lang_regression_snapshot.json`. Regenerate after an intended change with `UPDATE_LANG_SNAPSHOT=1 node tests/test_lang_regression.js`.
 
 ## CONVENTIONS
 

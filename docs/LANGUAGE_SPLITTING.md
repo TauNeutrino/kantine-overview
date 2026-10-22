@@ -92,13 +92,19 @@ Diese Texte enthalten keinen Top-Level-Slash — die Slash-Pipeline (`segment`/`
 
 | Stufe | Verhalten |
 |-------|-----------|
-| `splitBlockFormat()` | Erkennt das Format nur, wenn der Text **keinen** Top-Level-Slash enthält und mindestens zwei deutsche Anker existieren. Sonst `null` → reguläre Pipeline. |
-| Segmentklassifikation | Jedes Segment wird `de`, `en` oder `unknown` (Lehnwort-Gerichte wie `Donut`, `Sushi`). Ein englisches Segment startet den Übersetzungsblock nur, wenn **kein** deutsches Segment mehr folgt — sonst ist es die Inline-Übersetzung des vorigen Kurses (`DE1 (A) EN1 (A) DE2 (B) …`). `unknown`-Segmente gehören strukturell zum deutschen Block. |
-| Ankerklassifikation | Ein Allergen zählt nur als Kursgrenze, wenn der Text davor deutsch ist. Gespiegelte Codes im englischen Block werden dadurch nicht als neue Gänge missverstanden. |
+| `splitBlockFormat()` | Liest das Format nur, wenn mindestens zwei Anker existieren. Enthält ein Segment einen Top-Level-Slash, entscheidet die Sprachrichtung: **DE links / EN rechts** = klassisches Slash-Format → `null` → reguläre Pipeline. **EN links / DE rechts** = Hybrid (`DE1 (A) EN1 / DE2 (B) …`) → die englische Hälfte wird zur Inline-Übersetzung, die deutsche zum neuen Gang. |
+| Segmentklassifikation | Jedes Segment wird `de`, `en` oder `unknown` (Lehnwort-Gerichte wie `Donut`, `Sushi`). `unknown`-Segmente gehören strukturell zum deutschen Block. |
+| Sprachgrenze im Segment | Ein gemischtes Segment wird **an seiner Sprachgrenze geteilt**, nicht als Ganzes klassifiziert: genau eine englische Komma-Phrase → ist sie die erste, wird sie Inline-Übersetzung des vorigen Gangs und der Rest der Gang; steht sie in der Mitte, ist der deutsche Teil davor ein eigener Gang (mit der englischen Phrase als Übersetzung), der Teil danach der Gang mit dem Anker. |
+| Inline-Übersetzung | Ein englisch aussehendes Segment **vor** dem Übersetzungsblock ist die Übersetzung des Gangs, dessen Allergen-Code es wiederholt (`DE1 (A) EN1 (A) DE2 (B) …`) — der Code ist der Zuordnungsanker. Ohne Code und mit folgendem deutschen Segment zählt es ebenfalls als Inline-Übersetzung; sonst bleibt es ein deutscher Produktname (`Balisto`). |
+| Übersetzungsblock | Der **letzte** Segment ist der Übersetzungsblock, wenn er englisch ist. Ein führender Slash wird entfernt (`/ indian; peas, …`). |
 | `mergeAddenda()` | Fragmente wie `m. Schnittlauchdip` oder `mit Sauerrahm, Gebäck` gehören zum vorigen Gericht und werden angehängt. |
 | Varianten-Schiedsrichter | Der Merge wird nur übernommen, wenn die entstehende Gangzahl zum englischen Block passt — sonst gewinnt die ungemergte Variante. Verhindert, dass ein echter Gang (`mit Tomatensauce, Beeren Nusskuchen`) im Vorgänger verschwindet. |
-| `distributeEnglish()` | Verteilt den englischen Block: (1) gespiegelte Allergen-Codes, (2) Komma-Split (paren-aware), (3) Cue `small portion` ↔ `kleine Portion`. |
+| `distributeEnglish()` | Verteilt den englischen Block: (1) gespiegelte Allergen-Codes, (2) Slash-Split (ein Gang je Teil), (3) Komma-Split (paren-aware), (4) Ausrichtung am Gannamen (`Balisto` ↔ `balisto`), (5) Cue `small portion` ↔ `kleine Portion`. |
 | Graceful Tier | Lässt sich der Block nicht 1:1 aufteilen, bleibt die **deutsche Spalte pro Gang korrekt** und der englische Block wird als eine geordnete Zeile erhalten (`label: medium`). |
+
+### Regressions-Gate
+
+`tests/test_lang_regression.js` fährt **alle** bekannten Speisekarten-Texte (627 Fixture-Einträge + 80 Live-Wochen) durch den Splitter und vergleicht Label, Konfidenz, Gangzahl und Textsignatur gegen `tests/lang_regression_snapshot.json`. Der Test läuft in `npm test` **und** in der Build-Testliste (CI-Gate). Snapshot neu erzeugen: `UPDATE_LANG_SNAPSHOT=1 node tests/test_lang_regression.js`.
 
 ---
 

@@ -14,17 +14,22 @@ The kantine-overview test suite is a collection of plain Node scripts. There is 
 
 ## WHAT RUNS IN CI
 
-`npm test` runs exactly five scripts in sequence, as defined in `package.json`:
+`npm test` runs exactly eight scripts in sequence, as defined in `package.json`:
 
 1. `node tests/test_utils.js`
 2. `node tests/test_actions.js`
 3. `node test_logic.js`
 4. `node tests/stats-integration.test.js`
 5. `node tests/test_heatmap.js`
+6. `node tests/test_image_search.js`
+7. `node tests/test_worker_scoring.js`
+8. `node tests/test_lang_regression.js`
+
+`tests/test_lang_regression.js` is the **language regression gate**: it runs every known menu text (627 fixture descriptions from `tests/test_kantine_menuCache.json` plus the 80 live-week descriptions in `tests/fixtures/lang_live_weeks.json`) through the splitter and compares label, confidence, course counts and a text signature against `tests/lang_regression_snapshot.json`. After an intended change to `src/lang/`, regenerate the snapshot with `UPDATE_LANG_SNAPSHOT=1 node tests/test_lang_regression.js` and review the diff.
 
 Run `npm run build` before `npm test`; `test_logic.js` and `stats-integration.test.js` need `dist/kantine.bundle.js`.
 
-The GitHub Actions workflow `.github/workflows/build-and-deploy.yml` calls `npm run build` (which runs its own internal test step) but does not invoke `npm test` separately.
+The GitHub Actions workflow `.github/workflows/build-and-deploy.yml` calls `npm run build` (which runs its own internal test step — including `tests/test_lang_regression.js`) but does not invoke `npm test` separately.
 
 ## HOW TO ADD A TEST
 

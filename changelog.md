@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.12] - 2026-10-22
+
+### Fixed
+
+- **Block-Splitter: gemischte Segmente an der Sprachgrenze geteilt**: In den Wochen 42–44 mischt Bessa beide Layouts. Zeilen wie `Gemüsebouillon mit Backerbsen (ACLM) vegetable soup / Rinderschmorbraten … (ACGLMO) Heidelbeerjoghurt (G) braised beef roast …` (Hybrid: eine Inline-Übersetzung, dann ein Slash, dann der nächste deutsche Gang) und `Saure Rahmsuppe (AGLM) sour cream soup, Frisches Grillhendl mit Semmel (A) Nußkrone (ACGH) roast chicken …` (Inline-Übersetzung am Segmentanfang bzw. in der Segmentmitte) fielen vorher auf Rohausgabe zurück bzw. landeten mit englischen Texten in der **deutschen** Spalte. Gemischte Segmente werden jetzt an ihrer Sprachgrenze geteilt: die englische Hälfte wird zur Inline-Übersetzung, der deutsche Rest zum Gang. Das klassische Slash-Format (`DE / EN`) läuft unverändert über die reguläre Pipeline.
+- **Produktnamen bleiben deutsch**: `Balisto` sah englisch aus und wurde zum englischen Übersetzungsblock. Eine Inline-Übersetzung wird jetzt am wiederholten Allergen-Code erkannt (`DE1 (A) EN1 (A) DE2 …`); englisch aussehende Segmente ohne Code-Zuordnung bleiben deutsche Gänge.
+- **Übersetzungsblock = letztes Segment**: Ein führender Slash im englischen Block (`/ indian; peas, …`) wird entfernt, ein slash-getrennter englischer Block wird Gang für Gang verteilt, und ein Produktname am Blockende (`Balisto` ↔ `balisto`) richtet die Aufteilung aus.
+- **M6-Zeile mit neuer Schreibweise**: `Suppe, kleiner Beilagensalat + Dessert` (und die Variante mit `Desert`) wird als Template erkannt und bleibt ein Gang — die Zeile spiegelt den Quelltext.
+
+### Added
+
+- **Regressions-Gate für den Sprachsplitter** (`tests/test_lang_regression.js`): fährt **alle** bekannten Menübeschreibungen — 627 Fixture-Einträge plus 80 live erfasste Texte der Wochen 39, 43 und 44 — durch den Splitter und vergleicht Label, Konfidenz, Gangzahl und Textsignatur gegen `tests/lang_regression_snapshot.json`. Jede unbeabsichtigte Änderung lässt den Test fehlschlagen. Läuft in `npm test` **und** in der Build-Testliste (CI-Gate); Snapshot nach beabsichtigter Änderung neu erzeugen mit `UPDATE_LANG_SNAPSHOT=1 node tests/test_lang_regression.js`.
+
+### Changed
+
+- **Messbar**: KW44 (22 Texte, nächste Woche) Fallback 1 → 0, vier Zeilen von `medium` auf `high` mit sauberer deutscher Spalte; KW39 (28 Texte) und KW43 (30 Texte) unverändert ohne Regression; Altbestand (627 Einträge) 10 Einträge verbessert, keine Regression — bis auf eine Fixture-Zeile mit abgeschnittener Quelle, in der die englische Übersetzung um einen Gang verschoben ist (die deutsche Spalte ist dort jetzt korrekt aufgeteilt).
+
 ## [2.2.11] - 2026-10-22
 
 ### Fixed

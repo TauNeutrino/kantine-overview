@@ -1,0 +1,5684 @@
+{
+ "generated": "2026-10-22",
+ "datasets": [
+  {
+   "name": "menu-cache-2026-02..09",
+   "source": "tests/test_kantine_menuCache.json",
+   "count": 627,
+   "infoLoss": [
+    "2026-W21 2026-05-18 M2 Gourmetteller",
+    "2026-W21 2026-05-18 M4 Ginko vegan",
+    "2026-W22 2026-05-26 M6 Suppe, kleiner Salat + Dessert"
+   ],
+   "expect": [
+    {
+     "id": "2026-W9 2026-02-25 M1 Herzhaftes MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "9b0a1278"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M2 Gourmetteller MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "42c8c31c"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M3F Basisch und Glutenarm MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b4b28c4f"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M4 Ginko vegan MI 2",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "ebca81c2"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M5 Salat mit Gebäck MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "336fce00"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M6 Suppe, kleiner Salat + Dessert MI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W9 2026-02-25 M7F Kleines Hauptspeisenmenü MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "42c8c31c"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M1 Herzhaftes DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "b8d731fa"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M2 Gourmetteller DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ed775e9d"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M3 Basisch und Glutenarm  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "1454b5ff"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "714f1a2a"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M5 Salat mit Gebäck  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a9836003"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M6 Suppe, kleiner Salat + Dessert  DO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W9 2026-02-26 M7F Kleines Hauptspeisenmenü DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ed775e9d"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M1 Herzhaftes MO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "77d7cd25"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M2 Gourmetteller MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5c1e9ea6"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M3F Basisch und Glutenarm MO 1",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "ae5237e2"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M4 Ginko vegan MO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "dc920e17"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M5F Salat mit Gebäck MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "365032e5"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M6 Suppe, kleiner Salat + Dessert MO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W10 2026-03-02 M7F Kleines Hauptspeisenmenü MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5c1e9ea6"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M1 Herzhaftes DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4c7e0f1a"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M2 Gourmetteller DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "651f5d8f"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M3 Süß DI 1",
+     "label": "high",
+     "conf": 0.96,
+     "de": 3,
+     "en": 3,
+     "sig": "58f9115b"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M4 Ginko vegan DI 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "8b7e6549"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M5F Salat mit Gebäck DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "327fe9f3"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M6 Suppe, kleiner Salat + Dessert DI 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W10 2026-03-03 M7F Kleines Hauptspeisenmenü DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "651f5d8f"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M1 Herzhaftes MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "953b7c87"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M2 Gourmetteller MI 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "2bd296fd"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M3F Basisch und Glutenarm MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d8862d50"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M4 Ginko vegan MI 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "5404d32c"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M5F Salat mit Gebäck MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "debd0ae3"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M6 Suppe, kleiner Salat + Dessert MI 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W10 2026-03-04 M7F Kleines Hauptspeisenmenü MI 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "2bd296fd"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M1 Herzhaftes DO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "5e5a6e43"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M2 Gourmetteller DO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "714b460a"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M3 Basisch und Glutenarm DO 1",
+     "label": "medium",
+     "conf": 0.75,
+     "de": 3,
+     "en": 3,
+     "sig": "6d676c23"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M4 Ginko vegan DO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "06c122ca"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M5F Salat mit Gebäck DO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "5bddd11f"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M6 Suppe, kleiner Salat + Dessert DO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W10 2026-03-05 M7F Kleines Hauptspeisenmenü DO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "714b460a"
+    },
+    {
+     "id": "2026-W10 2026-03-06 M1 W1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "87f6520e"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M1 Herzhaftes MO 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "9cbd85a5"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M2 Gourmetteller MO 2",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "ced31147"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M3F Basisch und Glutenarm MO 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "7a2dbf78"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M4 Ginko vegan MO 2",
+     "label": "high",
+     "conf": 0.85,
+     "de": 3,
+     "en": 3,
+     "sig": "7c0e47d9"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M5F Salat mit Gebäck MO 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "e4bc9dbd"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M6 Suppe, kleiner Salat + Dessert MO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W11 2026-03-09 M7F Kleines Hauptspeisenmenü MO 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "7a2dbf78"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M1 Herzhaftes DI 2",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "c637dff6"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M2 Gourmetteller DI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "be7c3e33"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M3 Süß DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "7eadf574"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M4 Ginko vegan DI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "816ed50a"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M5F Salat mit Gebäck DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4d867d2a"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M6 Suppe, kleiner Salat + Dessert DI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W11 2026-03-10 M7F Kleines Hauptspeisenmenü DI 2",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "c637dff6"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M1 Herzhaftes MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0c04201a"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M2 Gourmetteller MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "ccbd888d"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M3F Basisch und Glutenarm MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "72a1b8d6"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M4 Ginko vegan MI 2",
+     "label": "medium",
+     "conf": 0.76,
+     "de": 3,
+     "en": 3,
+     "sig": "cdbaf249"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M5F Salat mit Gebäck MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "6316ae5c"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M6 Suppe, kleiner Salat + Dessert MI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W11 2026-03-11 M7F Kleines Hauptspeisenmenü MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "ccbd888d"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M1 Herzhaftes DO 2",
+     "label": "medium",
+     "conf": 0.71,
+     "de": 3,
+     "en": 3,
+     "sig": "f19394fd"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M2 Gourmetteller DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "506e90be"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M3 Basisch und Glutenarm  DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4cfb7ea5"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "bcdc0efc"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M5F Salat mit Gebäck  DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "07024c4f"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M6 Suppe, kleiner Salat + Dessert  DO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W11 2026-03-12 M7F Kleines Hauptspeisenmenü DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "506e90be"
+    },
+    {
+     "id": "2026-W11 2026-03-13 Freitag Mittagsgericht",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "22c71ac1"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M1 Herzhaftes MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "55e5f73a"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M2 Gourmetteller MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "cec64af3"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M3F Basisch und Glutenarm MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "962d28a6"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M4 Ginko vegan MO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "6ed4f1c0"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M5F Salat mit Gebäck MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "53022ca3"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M6 Suppe, kleiner Salat + Dessert MO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W12 2026-03-16 M7F Kleines Hauptspeisenmenü MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "cec64af3"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M1 Herzhaftes DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "0adee33c"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M2 Gourmetteller DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "32fd6272"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M3 Süß DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "7fb69e30"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M4 Ginko vegan DI 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "65d22821"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M5F Salat mit Gebäck DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "959cbc33"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M6 Suppe, kleiner Salat + Dessert DI 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W12 2026-03-17 M7F Kleines Hauptspeisenmenü DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "32fd6272"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M1 Herzhaftes MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "6840a3b2"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M2 Gourmetteller MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "3f3c5d9e"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M3F Basisch und Glutenarm MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "65f3309f"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M4 Ginko vegan MI 1",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "aacd7480"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M5F Salat mit Gebäck MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f029feb0"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M6 Suppe, kleiner Salat + Dessert MI 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W12 2026-03-18 M7F Kleines Hauptspeisenmenü MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "65f3309f"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M1 Herzhaftes DO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "42ee9754"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M2 Gourmetteller DO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "dd9d23bd"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M3 Basisch und Glutenarm DO 1",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "a024cd72"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M4 Ginko vegan DO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "8bbff7e8"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M5F Salat mit Gebäck DO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ec1578df"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M6 Suppe, kleiner Salat + Dessert DO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W12 2026-03-19 M7F Kleines Hauptspeisenmenü DO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "dd9d23bd"
+    },
+    {
+     "id": "2026-W12 2026-03-20 Freitag Mittagsgericht",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "a2335089"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M1 Herzhaftes MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "717dd2fe"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M2 Gourmetteller MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "3c3fc79a"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M3F Basisch und Glutenarm MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5ff34d9c"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M4 Ginko vegan MO 2",
+     "label": "medium",
+     "conf": 0.72,
+     "de": 3,
+     "en": 3,
+     "sig": "de170b97"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M5F Salat mit Gebäck MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a21efb58"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M6 Suppe, kleiner Salat + Dessert MO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W13 2026-03-23 M7F Kleines Hauptspeisenmenü MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f1eeb104"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M1 Herzhaftes DI 2",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "f761d3da"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M2 Gourmetteller DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5af7e6d9"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M3 Süß DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4bf1a021"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M4 Ginko vegan DI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "59ae2cf8"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M5F Salat mit Gebäck DI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "9698ca87"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M6 Suppe, kleiner Salat + Dessert DI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W13 2026-03-24 M7F Kleines Hauptspeisenmenü DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5af7e6d9"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M1 Herzhaftes MI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "0c13fef0"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M2 Gourmetteller MI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "615bc8a8"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M3F Basisch und Glutenarm MI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "cc4df01f"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M4 Ginko vegan MI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "e22da4e5"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M5F Salat mit Gebäck MI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "f0a9eca2"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M6 Suppe, kleiner Salat + Dessert MI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W13 2026-03-25 M7F Kleines Hauptspeisenmenü MI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "615bc8a8"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M1 Herzhaftes DO 2",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "dc167b49"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M2 Gourmetteller DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "82777dda"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M3 Basisch und Glutenarm  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8b050699"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "feac8f27"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M5F Salat mit Gebäck  DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "44e5a95a"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M6 Suppe, kleiner Salat + Dessert  DO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W13 2026-03-26 M7F Kleines Hauptspeisenmenü DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "82777dda"
+    },
+    {
+     "id": "2026-W13 2026-03-27 Knapp-Pizza W2",
+     "label": "high",
+     "conf": 1,
+     "de": 2,
+     "en": 2,
+     "sig": "99fed0ac"
+    },
+    {
+     "id": "2026-W13 2026-03-27 Knapp-Veggie-Pizza W2",
+     "label": "high",
+     "conf": 1,
+     "de": 2,
+     "en": 2,
+     "sig": "112155f2"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M1 Herzhaftes DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "37d14ad6"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M2 Gourmetteller DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "2eba0b96"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M3 Basisch/ Glutenarm DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "fa03cd03"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M4 Ginko vegan DI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "80614058"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M5F Salat mit Gebäck DI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "e43b293b"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M6 Suppe, kleiner Salat + Dessert DI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W15 2026-04-07 M7F Kleines Hauptspeisenmenü DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "2eba0b96"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M1 Herzhaftes MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "07f28b14"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M2 Gourmetteller MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "9fddc716"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M3F Süß MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "23a174c3"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M4 Ginko vegan MI 2",
+     "label": "medium",
+     "conf": 0.76,
+     "de": 3,
+     "en": 3,
+     "sig": "51faefc3"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M5F Salat mit Gebäck MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "db32aadf"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M6 Suppe, kleiner Salat + Dessert MI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W15 2026-04-08 M7F Kleines Hauptspeisenmenü MI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "9fddc716"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M1 Herzhaftes DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5d41234f"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M2 Gourmetteller DO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "3ef1ebdd"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M3 Basisch und Glutenarm  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d2f7303e"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "f6fe53f3"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M5F Salat mit Gebäck  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "09065fc4"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M6 Suppe, kleiner Salat + Dessert  DO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W15 2026-04-09 M7F Kleines Hauptspeisenmenü DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5d41234f"
+    },
+    {
+     "id": "2026-W15 2026-04-10 M1 W2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "b9ad025f"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M1 Herzhaftes MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "06000cd8"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M2 Gourmetteller MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d898e471"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M3F Basisch und Glutenarm MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4c478093"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M4 Ginko vegan MO 1",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "0f4afb79"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M5F Salat mit Gebäck MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "aeae0348"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M6 Suppe, kleiner Salat + Dessert MO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W16 2026-04-13 M7F Kleines Hauptspeisenmenü MO 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d898e471"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "f280baff"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "eb17ccc5"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M3 Süß",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4303560d"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "c55ef96c"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "60d75fc4"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W16 2026-04-14 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "eb17ccc5"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1c951abe"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "85f80391"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "9e99335c"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "00eb51b6"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "37976c41"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W16 2026-04-15 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1c951abe"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1f461e3f"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "25253b6d"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "be752f06"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "fc1f34c4"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "cb0b4ba7"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W16 2026-04-16 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "25253b6d"
+    },
+    {
+     "id": "2026-W16 2026-04-17 KNAPP-Pizza",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "33dfc900"
+    },
+    {
+     "id": "2026-W16 2026-04-17 KNAPP-Veggie-Pizza",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "097f4a57"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M1 Herzhaftes MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "afa2c947"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M2 Gourmetteller MO 2",
+     "label": "medium",
+     "conf": 0.74,
+     "de": 3,
+     "en": 3,
+     "sig": "3289fca1"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M3F Basisch und Glutenarm MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "bcf7c5ac"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M4 Ginko vegan MO 2",
+     "label": "medium",
+     "conf": 0.76,
+     "de": 2,
+     "en": 2,
+     "sig": "488c631a"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M5F Salat mit Gebäck MO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "db0a9699"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M6 Suppe, kleiner Salat + Dessert MO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W17 2026-04-20 M7F Kleines Hauptspeisenmenü MO 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "45c90b1f"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M1 Herzhaftes DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "dc9745f6"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M2 Gourmetteller DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a4daea28"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M3 Süß DI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "2977ca7a"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M4 Ginko vegan DI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "1d0b4b32"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M5F Salat mit Gebäck DI 2",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1637a757"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M6 Suppe, kleiner Salat + Dessert DI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W17 2026-04-21 M7F Kleines Hauptspeisenmenü DI 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a4daea28"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M1 Herzhaftes MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "f30223fa"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M2 Gourmetteller MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "6613874d"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M3 Basisch und Glutenarm MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "dbdb08fe"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M4 Ginko vegan MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "47629b87"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M5 Salat mit Gebäck MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "7bab85d5"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M6 Suppe, kleiner Salat + Dessert MI 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W17 2026-04-22 M7 Kleines Hauptspeisenmenü MI 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "6613874d"
+    },
+    {
+     "id": "2026-W17 2026-04-23 Menü Grillhendl",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b2202f33"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M2 Gourmetteller DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5bc48fde"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M3 Basisch und Glutenarm  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e05c44a4"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "873d3385"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M5F Salat mit Gebäck  DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "44d4ad7c"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M6 Suppe, kleiner Salat + Dessert  DO 2",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W17 2026-04-23 M7F Kleines Hauptspeisenmenü DO 2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5bc48fde"
+    },
+    {
+     "id": "2026-W17 2026-04-24 M1 Freitags Gericht",
+     "label": "high",
+     "conf": 0.84,
+     "de": 1,
+     "en": 1,
+     "sig": "7a5bb515"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M1 Herzhaftes MO 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "9e2efc1c"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M2 Gourmetteller MO 1",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "d843d38c"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M3 Basisch und Glutenarm MO 1",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "b3e88daf"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M4 Ginko vegan MO 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "b25c0b84"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M5F Salat mit Gebäck MO 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "d6da36ce"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M6 Suppe, kleiner Salat + Dessert MO 1",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 3,
+     "en": 3,
+     "sig": "043552d2"
+    },
+    {
+     "id": "2026-W18 2026-04-27 M7 Kleines Hauptspeisenmenü MO 1",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "17ce32c4"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M1 Herzhaftes DI 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "e8ea341c"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M2 Gourmetteller DI 1",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "9b0da34e"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M3 Süß DI 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ef2c0762"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M4 Ginko vegan DI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5560a493"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M5F Salat mit Gebäck DI 1",
+     "label": "medium",
+     "conf": 0.78,
+     "de": 2,
+     "en": 2,
+     "sig": "12394146"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M6 Suppe, kleiner Salat + Dessert DI 1",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "6789c24b"
+    },
+    {
+     "id": "2026-W18 2026-04-28 M7F Kleines Hauptspeisenmenü DI 1",
+     "label": "medium",
+     "conf": 0.78,
+     "de": 2,
+     "en": 2,
+     "sig": "bd89a5f8"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M1 Herzhaftes MI 1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "376ec71a"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M2 Gourmetteller MI 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "ae2ca421"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M3 Basisch und Glutenarm MI 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "0a525679"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M4 Ginko vegan MI 1",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "aa6be007"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M5 Salat mit Gebäck MI 1",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "71daeeb3"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M6 Suppe, kleiner Salat + Dessert MI 1",
+     "label": "medium",
+     "conf": 0.65,
+     "de": 1,
+     "en": 1,
+     "sig": "ffe9f875"
+    },
+    {
+     "id": "2026-W18 2026-04-29 M7F Kleines Hauptspeisenmenü MI 1",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "fecabee1"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M1 Herzhaftes DO 1",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "28ef9de4"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M2 Gourmetteller DO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "9b83dddf"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M3 Basisch und Glutenarm DO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "7eaabf94"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M4 Ginko vegan DO 1",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "301b5e4d"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M5 Salat mit Gebäck DO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "9cf168ca"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M6 Suppe, kleiner Salat + Dessert DO 1",
+     "label": "medium",
+     "conf": 0.65,
+     "de": 1,
+     "en": 1,
+     "sig": "29ad4e4f"
+    },
+    {
+     "id": "2026-W18 2026-04-30 M7F Kleines Hauptspeisenmenü DO 1",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "4c7236ff"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a76c6560"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "04893125"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "956c58f7"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "7ed9049c"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "5f4288da"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W19 2026-05-04 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "04893125"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4972e612"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1eed9734"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M3 Süß",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "1c43e4ec"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.83,
+     "de": 3,
+     "en": 3,
+     "sig": "ce15f7af"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "1da0925d"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W19 2026-05-05 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1eed9734"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "dfa598d5"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e4a0ee8a"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "ce55e768"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.81,
+     "de": 3,
+     "en": 3,
+     "sig": "0db240ac"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "2dde134b"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W19 2026-05-06 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "ce55e768"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "874695b6"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "009e30cb"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "56d51eb8"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "f1e88010"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d5eaa74f"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W19 2026-05-07 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "874695b6"
+    },
+    {
+     "id": "2026-W19 2026-05-08 M1 Hauptgericht",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "fb3935ba"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M1 Herzhaftes MO 1",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "2e8afafc"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M2 Gourmetteller MO 1",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "d72d571e"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M3F Basisch und Glutenarm MO 1",
+     "label": "high",
+     "conf": 0.81,
+     "de": 3,
+     "en": 3,
+     "sig": "9525fcbe"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M4 Ginko vegan MO 1",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "4c4bdeb5"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M5F Salat mit Gebäck MO 1",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "6a843e4a"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M6 Suppe, kleiner Salat + Dessert MO 1",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W20 2026-05-11 M7F Kleines Hauptspeisenmenü MO 1",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "d72d571e"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "27cfa908"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.83,
+     "de": 3,
+     "en": 3,
+     "sig": "dd9ac3c5"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M3 Süß",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a68ead95"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "b9a40ed4"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e6c3f284"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W20 2026-05-12 M7F Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "27cfa908"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "80af513f"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.84,
+     "de": 3,
+     "en": 3,
+     "sig": "66ca5803"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M3 Basisch und Glutenarm",
+     "label": "medium",
+     "conf": 0.78,
+     "de": 3,
+     "en": 3,
+     "sig": "c96352c0"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "1d71aede"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "02621c07"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W20 2026-05-13 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.84,
+     "de": 3,
+     "en": 3,
+     "sig": "66ca5803"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "7a368ac6"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "2bef7ef6"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M3 Basisch und Glutenarm",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "0c55fc99"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 2,
+     "en": 2,
+     "sig": "a981e091"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M5F Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "c8ee367f"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "75bf4b56"
+    },
+    {
+     "id": "2026-W21 2026-05-18 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "18d5f05d"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M1 Herzhaftes",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "5e04cf73"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M2 Gourmetteller",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "af0953f2"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M3 Süß",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "64a06631"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.72,
+     "de": 2,
+     "en": 2,
+     "sig": "2af38922"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "ecf568b9"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "75bf4b56"
+    },
+    {
+     "id": "2026-W21 2026-05-19 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "c8024297"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.9,
+     "de": 3,
+     "en": 3,
+     "sig": "5a0dea44"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "90fffeff"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M3F Basisch und Glutenarm",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "d81cf0e1"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M4 Ginko vegan",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "8cbc67e5"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "82bc0eb1"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "75bf4b56"
+    },
+    {
+     "id": "2026-W21 2026-05-20 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "e75a5b42"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M1 Herzhaftes DO 2",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "598d96e1"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M2 Gourmetteller",
+     "label": "fallback",
+     "conf": 0,
+     "de": 5,
+     "en": 5,
+     "sig": "83c7c77a"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M3 Basisch und Glutenarm",
+     "label": "medium",
+     "conf": 0.79,
+     "de": 2,
+     "en": 2,
+     "sig": "f2b3ca5b"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "bf9adbf5"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "50121eb2"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "e6a60361"
+    },
+    {
+     "id": "2026-W21 2026-05-21 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "60019f48"
+    },
+    {
+     "id": "2026-W21 2026-05-22 M1",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "6091dcea"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "80d3e1cf"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "0f0949bf"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M3 Süß",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0d9c1e11"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.73,
+     "de": 2,
+     "en": 2,
+     "sig": "e9274ee4"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "1fadfc29"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W22 2026-05-26 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "80d3e1cf"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "37233fcf"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "f99af1f7"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M3F Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "b6cbfa81"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "052148a0"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M5F Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "6559dfdc"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W22 2026-05-27 M7F Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "f99af1f7"
+    },
+    {
+     "id": "2026-W22 2026-05-28 Menü Grillhendl",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "e4153967"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "02e62a0d"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "bf562c8a"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "18e7f3c1"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "4b9b23b2"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W22 2026-05-28 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "bf562c8a"
+    },
+    {
+     "id": "2026-W22 2026-05-29 Knapp-Pizza",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "be769967"
+    },
+    {
+     "id": "2026-W22 2026-05-29 Knapp-Veggie-Pizza",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "f35bfec8"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M1 Herzhaftes",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "1692ddeb"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M2 Gourmetteller",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "9b6dcc10"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M3 Basisch und Glutenarm",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "bb36f387"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "4efcdc33"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M5 Salat mit Gebäck",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "11ebc51a"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M6 Suppe, kleiner Salat + Dessert",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "f8d8ef3e"
+    },
+    {
+     "id": "2026-W23 2026-06-01 M7 Kleines Hauptspeisenmenü",
+     "label": "low",
+     "conf": 0.5,
+     "de": 2,
+     "en": 2,
+     "sig": "308e24a7"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "272cf498"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M2 Gourmetteller",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "4e080b00"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M3 Süß",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b378c719"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M4 Ginko vegan",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "4c53014a"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a93aa28b"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M6 Suppe, kleiner Salat + Dessert",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "90ff3797"
+    },
+    {
+     "id": "2026-W23 2026-06-02 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 1,
+     "sig": "ee923b46"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M1 Herzhaftes",
+     "label": "fallback",
+     "conf": 0,
+     "de": 4,
+     "en": 4,
+     "sig": "c94712cc"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "e6d917a1"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "e81f5c12"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M4 Ginko vegan",
+     "label": "low",
+     "conf": 0.32,
+     "de": 2,
+     "en": 2,
+     "sig": "585b62a3"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.65,
+     "de": 3,
+     "en": 3,
+     "sig": "a727d25b"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M6 Suppe, kleiner Salat + Dessert",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "3945491b"
+    },
+    {
+     "id": "2026-W23 2026-06-03 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "ac05e494"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M1 Herzhaftes",
+     "label": "medium",
+     "conf": 0.71,
+     "de": 3,
+     "en": 3,
+     "sig": "79aa7fe1"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M2 Gourmetteller  aus \"Knapp Cookery\"",
+     "label": "medium",
+     "conf": 0.71,
+     "de": 3,
+     "en": 3,
+     "sig": "46f52ee0"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M3 Basisch und Glutenarm",
+     "label": "medium",
+     "conf": 0.76,
+     "de": 3,
+     "en": 3,
+     "sig": "e19ccc80"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 3,
+     "en": 3,
+     "sig": "7594326e"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 3,
+     "en": 3,
+     "sig": "1cda0c53"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W24 2026-06-08 M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.71,
+     "de": 3,
+     "en": 3,
+     "sig": "46f52ee0"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a2a7c1e8"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M2 Gourmetteller aus \"Knapp Cookery\"",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "4515863f"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M3 Basisch / Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "23a647e4"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "68832d39"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a192ba0b"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W24 2026-06-09 M7 Kleines Hauptspeisenmenü aus \"Knapp Cookery\"",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "12ec0607"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "725315a2"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M2 Gourmetteller aus \"Knapp Cookery\"",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a9857ad2"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f2b7d2ca"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "6104931b"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a8f7c5f2"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W24 2026-06-10 M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "874e0a99"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "98d0a8ea"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M2 Gourmetteller aus \"Knapp Cookery)",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "65a4be42"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ece16015"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "da0093d6"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "98de3913"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W24 2026-06-11 M7 Kleines Hauptspeisenmenü aus \"Knapp Cookery\"",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "65a4be42"
+    },
+    {
+     "id": "2026-W24 2026-06-12 M1 Bowl",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "c9131d17"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "cd9d0a41"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "94b478ca"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d8e7fa5a"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "5009236e"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "6d144b76"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W25 2026-06-15 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d8e7fa5a"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4657d93b"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a1f39830"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M3 Süß DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "b709c0c8"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.83,
+     "de": 3,
+     "en": 3,
+     "sig": "d80a130c"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "8664fc17"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W25 2026-06-16 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a1f39830"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "3df2cd5d"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0ab8f4f3"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "bacd8089"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M4 Ginko vegan MI",
+     "label": "medium",
+     "conf": 0.76,
+     "de": 3,
+     "en": 3,
+     "sig": "7e503dce"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b2e03224"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W25 2026-06-17 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0ab8f4f3"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "6560ef0c"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "50356cc3"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M3 Basisch und Glutenarm  DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "24406f46"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M4 Ginko vegan  DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "63d7352c"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M5 Salat mit Gebäck  DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "036002e0"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M6 Suppe, kleiner Salat + Dessert  DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W25 2026-06-18 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "24406f46"
+    },
+    {
+     "id": "2026-W25 2026-06-19 Knapp-Pizza W2",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "31719d43"
+    },
+    {
+     "id": "2026-W25 2026-06-19 Knapp-Veggie-Pizza W2",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "55f3dfcb"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "113367e4"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b5a6f93f"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8ce45797"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "c48424c7"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8cb2d284"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W26 2026-06-22 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b5a6f93f"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "d26e594f"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8b0a1697"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M3 Süß DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "3ddf395c"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "8408419a"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "12573903"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W26 2026-06-23 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8b0a1697"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "951fac98"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4bab8364"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "29015283"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M4 Ginko vegan MI",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 3,
+     "en": 3,
+     "sig": "84ca573f"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5278180c"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W26 2026-06-24 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4bab8364"
+    },
+    {
+     "id": "2026-W26 2026-06-25 Menü Grillhendl",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "1f23cdc6"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.96,
+     "de": 3,
+     "en": 3,
+     "sig": "2c36387d"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M3 Basisch und Glutenarm DO 1",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "eed06546"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M4 Ginko vegan DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "2d0471fa"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M5 Salat mit Gebäck DO",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "49f2ed8d"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M6 Suppe, kleiner Salat + Dessert DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W26 2026-06-25 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "ddd774b8"
+    },
+    {
+     "id": "2026-W26 2026-06-26 M1",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "68059206"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f0eb8506"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "01561dfe"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.81,
+     "de": 3,
+     "en": 3,
+     "sig": "038e6299"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "a2470909"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "6ed065ac"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W27 2026-06-29 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f0eb8506"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "bf9fc587"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M2 Gourmetteller DI",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 3,
+     "en": 3,
+     "sig": "706fea83"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M3 Süß DI",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "8971ff85"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "d4441579"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "b205252b"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W27 2026-06-30 M7 Kleines Hauptspeisenmenü DI",
+     "label": "medium",
+     "conf": 0.77,
+     "de": 3,
+     "en": 3,
+     "sig": "706fea83"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "720753f5"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "31800846"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "459725e2"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M4 Ginko vegan MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "16be9a55"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "44ccef1f"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W27 2026-07-01 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "720753f5"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "30ddc56c"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b98d09e3"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M3 Basisch und Glutenarm  DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "c7812f6f"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M4 Ginko vegan  DO",
+     "label": "high",
+     "conf": 0.83,
+     "de": 3,
+     "en": 3,
+     "sig": "40f11c31"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M5 Salat mit Gebäck  DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4c9f98f7"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M6 Suppe, kleiner Salat + Dessert  DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W27 2026-07-02 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "30ddc56c"
+    },
+    {
+     "id": "2026-W27 2026-07-03 M1 W",
+     "label": "low",
+     "conf": 0.52,
+     "de": 1,
+     "en": 1,
+     "sig": "3f6fe042"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "b67f9846"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "2d50c80b"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "d0cf2aa0"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "3a870b9b"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "97dd9f06"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W28 2026-07-06 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "2d50c80b"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M1 Herzhaftes DI",
+     "label": "fallback",
+     "conf": 0,
+     "de": 3,
+     "en": 3,
+     "sig": "f990a398"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "c67a6c8f"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M3 Basisch und Glutenarm DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "c80c9508"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.83,
+     "de": 3,
+     "en": 3,
+     "sig": "eebbf356"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "2afffa3b"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W28 2026-07-07 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "c67a6c8f"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "a8baf930"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e8739c14"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "54f72b5d"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M4 Ginko vegan MI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "c9b1ad16"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0893b902"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W28 2026-07-08 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e8739c14"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "716ea0e6"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "7330bb12"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M3 Basisch und Glutenarm DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "91a8a793"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M4 Ginko vegan DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "0a6fc995"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M5 Salat mit Gebäck DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "fec58496"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M6 Suppe, kleiner Salat + Dessert DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W28 2026-07-09 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "716ea0e6"
+    },
+    {
+     "id": "2026-W28 2026-07-10 Knapp-Pizza W",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "11895fe6"
+    },
+    {
+     "id": "2026-W28 2026-07-10 Knapp-Veggie-Pizza W",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "e218aa6a"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "545deabd"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "2047704b"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "2f9e3515"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "8f4c3c7c"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "38e190d0"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W29 2026-07-13 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "920f7dce"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "296dd5d8"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "f8482f51"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M3 Süß DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "5eecb318"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "02cee8cd"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "dadbb70c"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W29 2026-07-14 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "f8482f51"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "fa841dad"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5f059f31"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "38f8448c"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M4 Ginko vegan MI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "4b801135"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d6e73acf"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W29 2026-07-15 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5f059f31"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b28c21ef"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "7e2c95fc"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M3 Basisch und Glutenarm  DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "df8e7a52"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M4 Ginko vegan  DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "d62507fa"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M5 Salat mit Gebäck  DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "2bbf2672"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M6 Suppe, kleiner Salat + Dessert  DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W29 2026-07-16 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "df8e7a52"
+    },
+    {
+     "id": "2026-W29 2026-07-17 M1 Fr",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "9a611b43"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "4c8fa022"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5cc52d86"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "1d7c6040"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "95357f17"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "e52005fc"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W30 2026-07-20 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5cc52d86"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "3f163617"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "598a46ad"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M3 Süß DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "03217cab"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "18bdc699"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "392072fe"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W30 2026-07-21 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "3f163617"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "f2da8fa2"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "9a4c5bd4"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "fb52c213"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M4 Ginko vegan MI",
+     "label": "medium",
+     "conf": 0.66,
+     "de": 3,
+     "en": 3,
+     "sig": "4fbb87e9"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "48afeecf"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W30 2026-07-22 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "f2da8fa2"
+    },
+    {
+     "id": "2026-W30 2026-07-23 Menü Grillhendl",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "3a25b036"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "7cf08ba7"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M3 Basisch und Glutenarm DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "66cc7e30"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M4 Ginko vegan DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "b27d4564"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M5 Salat mit Gebäck DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "ac8ba904"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M6 Suppe, kleiner Salat + Dessert DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W30 2026-07-23 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "66cc7e30"
+    },
+    {
+     "id": "2026-W30 2026-07-24 M1 Fr",
+     "label": "high",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "3f771c74"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "410a26b8"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "74802d8c"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "25eb96c8"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "83f7dc6e"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "1f16b132"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W31 2026-07-27 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "25eb96c8"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "a56725a5"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "5e12a63e"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M3 Süß DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "de97ae97"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "870c4c1d"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "f3426b4b"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "low",
+     "conf": 0.52,
+     "de": 1,
+     "en": 1,
+     "sig": "2c509eee"
+    },
+    {
+     "id": "2026-W31 2026-07-28 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "5e12a63e"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.91,
+     "de": 3,
+     "en": 3,
+     "sig": "5d7a6cb9"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "572c5d09"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "f31c2cce"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M4 Ginko vegan MI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "c4d1bd08"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "7c76bf76"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W31 2026-07-29 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.91,
+     "de": 3,
+     "en": 3,
+     "sig": "5d7a6cb9"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "fbae6d99"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a7f7ab87"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M3 Basisch und Glutenarm  DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "d60d217f"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M4 Ginko vegan  DO",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "93471f91"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M5 Salat mit Gebäck  DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "56636371"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M6 Suppe, kleiner Salat + Dessert  DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W31 2026-07-30 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0213cd1a"
+    },
+    {
+     "id": "2026-W31 2026-07-31 M1 W2",
+     "label": "high",
+     "conf": 0.99,
+     "de": 1,
+     "en": 1,
+     "sig": "cdac508b"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M1 Herzhaftes MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a59db606"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M2 Gourmetteller MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "2c66da81"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M3 Basisch und Glutenarm MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8e628914"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M4 Ginko vegan MO",
+     "label": "high",
+     "conf": 0.85,
+     "de": 3,
+     "en": 3,
+     "sig": "5aeb1ad3"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M5 Salat mit Gebäck MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "67ac0415"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M6 Suppe, kleiner Salat + Dessert MO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W32 2026-08-03 M7 Kleines Hauptspeisenmenü MO",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "8e628914"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M1 Herzhaftes DI",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "7f4c6e01"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M2 Gourmetteller DI",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "2b8a6078"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M3 Basisch/Glutenarm DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b56af55c"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M4 Ginko vegan DI",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "79782ea2"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M5 Salat mit Gebäck DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "695a4e3e"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M6 Suppe, kleiner Salat + Dessert DI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W32 2026-08-04 M7 Kleines Hauptspeisenmenü DI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b56af55c"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M1 Herzhaftes MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "19b1c49a"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M2 Gourmetteller MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "f2ff3524"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M3 Basisch und Glutenarm MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "5114f273"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M4 Ginko vegan MI",
+     "label": "high",
+     "conf": 0.81,
+     "de": 3,
+     "en": 3,
+     "sig": "1cc5f0e8"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M5 Salat mit Gebäck MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "25ddc3fe"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M6 Suppe, kleiner Salat + Dessert MI",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W32 2026-08-05 M7 Kleines Hauptspeisenmenü MI",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "19b1c49a"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M1 Herzhaftes DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "02043b31"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M2 Gourmetteller DO",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "146059c6"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M3 Basisch und Glutenarm DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "4e9ee885"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M4 Ginko vegan DO",
+     "label": "high",
+     "conf": 0.86,
+     "de": 3,
+     "en": 3,
+     "sig": "92c9b730"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M5 Salat mit Gebäck DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "5f1f3fb4"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M6 Suppe, kleiner Salat + Dessert DO",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "2026-W32 2026-08-06 M7 Kleines Hauptspeisenmenü DO",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "4e9ee885"
+    },
+    {
+     "id": "2026-W32 2026-08-07 Knapp-Pizza",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "b706ddad"
+    },
+    {
+     "id": "2026-W32 2026-08-07 Knapp-Veggie-Pizza",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "0469a42c"
+    }
+   ]
+  },
+  {
+   "name": "live-weeks-2026-09..10",
+   "source": "tests/fixtures/lang_live_weeks.json",
+   "count": 80,
+   "infoLoss": [
+    "kw39 | 2026-09-22 Tuesday | M3 Süß",
+    "kw44 | 2026-10-29 Thursday | M4 Ginko vegan"
+   ],
+   "expect": [
+    {
+     "id": "kw39 | 2026-09-21 Monday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "878045f6"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "b7d3ce3e"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "04ee96a4"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "ada7c542"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "244bb1ce"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "e6a60361"
+    },
+    {
+     "id": "kw39 | 2026-09-21 Monday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.79,
+     "de": 2,
+     "en": 2,
+     "sig": "9f6f8ff3"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "9b57c339"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "8965f345"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M3 Süß",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 3,
+     "sig": "6fab1ad1"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M4 Ginko vegan DI 2",
+     "label": "high",
+     "conf": 0.92,
+     "de": 3,
+     "en": 3,
+     "sig": "4dccb8f6"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.68,
+     "de": 2,
+     "en": 2,
+     "sig": "f6cee51b"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "e6a60361"
+    },
+    {
+     "id": "kw39 | 2026-09-22 Tuesday | M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.85,
+     "de": 3,
+     "en": 3,
+     "sig": "77f89b6e"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M1 Herzhaftes",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "24cf28ee"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "fda89eb2"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M3 Basisch und Glutenarm",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "41c36738"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.63,
+     "de": 2,
+     "en": 2,
+     "sig": "c10c43ac"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M5 Salat mit Gebäck",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "44c0d84b"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "e6a60361"
+    },
+    {
+     "id": "kw39 | 2026-09-23 Wednesday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "cb6be40c"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | Menü Grillhendl",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "bc67014a"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | M2 Gourmetteller",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "35eadee5"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | M3 Basisch und Glutenarm  DO 2",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "d5fdb260"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | M4 Ginko vegan  DO 2",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "0f6b140b"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "e6a60361"
+    },
+    {
+     "id": "kw39 | 2026-09-24 Thursday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 1,
+     "sig": "0bca1724"
+    },
+    {
+     "id": "kw39 | 2026-09-25 Friday | M1 W2 Freitagsmenü",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 2,
+     "en": 2,
+     "sig": "4d751ceb"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "98df1356"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "b1336013"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "6d5cd14d"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "95d7659f"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "dd846c4d"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "kw43 | 2026-10-19 Monday | M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.82,
+     "de": 3,
+     "en": 3,
+     "sig": "98df1356"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0bd460ac"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "6d82aa1f"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M3 Süß",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "d43e9b45"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M4 Ginko vegan",
+     "label": "high",
+     "conf": 0.88,
+     "de": 3,
+     "en": 3,
+     "sig": "b1214858"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "cbdf3adc"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "kw43 | 2026-10-20 Tuesday | M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "0bd460ac"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "098d319e"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a0763704"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "7096be7e"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M4 Ginko vegan MI 2",
+     "label": "high",
+     "conf": 0.87,
+     "de": 3,
+     "en": 3,
+     "sig": "f57d689f"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.97,
+     "de": 3,
+     "en": 3,
+     "sig": "1839337f"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "kw43 | 2026-10-21 Wednesday | M7 Kleines Hauptspeinenmenü",
+     "label": "high",
+     "conf": 0.95,
+     "de": 3,
+     "en": 3,
+     "sig": "098d319e"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "0fff1c7c"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "8b8badc5"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "cbec7b78"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M4 Ginko vegan  DO 2",
+     "label": "medium",
+     "conf": 0.71,
+     "de": 3,
+     "en": 3,
+     "sig": "43dd14a4"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "3f92326a"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 3,
+     "en": 3,
+     "sig": "5054d4ad"
+    },
+    {
+     "id": "kw43 | 2026-10-22 Thursday | M7 Kleines Hauptspeisenmenü",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "cbec7b78"
+    },
+    {
+     "id": "kw43 | 2026-10-23 Friday | KNAPP - Pizza",
+     "label": "high",
+     "conf": 0.84,
+     "de": 1,
+     "en": 1,
+     "sig": "9f5d9df5"
+    },
+    {
+     "id": "kw43 | 2026-10-23 Friday | KNAPP - Veggie-Pizza",
+     "label": "high",
+     "conf": 0.98,
+     "de": 1,
+     "en": 1,
+     "sig": "05f1759c"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "1df8baec"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M2 Gourmetteller",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "2800e734"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "c7f02679"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 3,
+     "en": 2,
+     "sig": "8a663e98"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.93,
+     "de": 3,
+     "en": 3,
+     "sig": "8336a735"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "8937cfc4"
+    },
+    {
+     "id": "kw44 | 2026-10-27 Tuesday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "e335a7ac"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "c13406e8"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M2 Gourmetteller",
+     "label": "medium",
+     "conf": 0.6,
+     "de": 4,
+     "en": 2,
+     "sig": "90d35d9c"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "58739dee"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.75,
+     "de": 3,
+     "en": 3,
+     "sig": "9b2288fd"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.99,
+     "de": 3,
+     "en": 3,
+     "sig": "a8828276"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "8937cfc4"
+    },
+    {
+     "id": "kw44 | 2026-10-28 Wednesday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "74a3fa35"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M1 Herzhaftes",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "dbcd0160"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M2 Gourmetteller",
+     "label": "medium",
+     "conf": 0.79,
+     "de": 2,
+     "en": 2,
+     "sig": "95a22c71"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M3 Basisch und Glutenarm",
+     "label": "high",
+     "conf": 0.94,
+     "de": 3,
+     "en": 3,
+     "sig": "7c86aead"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M4 Ginko vegan",
+     "label": "medium",
+     "conf": 0.61,
+     "de": 2,
+     "en": 2,
+     "sig": "b6586540"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M5 Salat mit Gebäck",
+     "label": "high",
+     "conf": 0.98,
+     "de": 3,
+     "en": 3,
+     "sig": "1d3d3bba"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M6 Suppe, kleiner Salat + Dessert",
+     "label": "template",
+     "conf": 1,
+     "de": 1,
+     "en": 1,
+     "sig": "1131cd53"
+    },
+    {
+     "id": "kw44 | 2026-10-29 Thursday | M7 Kleines Hauptspeisenmenü",
+     "label": "medium",
+     "conf": 0.62,
+     "de": 2,
+     "en": 2,
+     "sig": "3efa5e9c"
+    },
+    {
+     "id": "kw44 | 2026-10-30 Friday | M1 W1",
+     "label": "medium",
+     "conf": 0.64,
+     "de": 1,
+     "en": 1,
+     "sig": "5b31f87b"
+    }
+   ]
+  }
+ ]
+}
