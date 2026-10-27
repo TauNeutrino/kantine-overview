@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-10-27
+
+### Fixed
+
+- **Stable-Release: Bestellungen nach Zeitumstellung wieder möglich** (DST-Bugfix aus v2.2.13, siehe unten). Das Order-`date` wird jetzt DST-sicher aus der lokalen Wanduhrzeit der Kantine abgeleitet; außerdem zeigt der Toast bei abgelehnten Bestellungen den vollen API-Fehler (Fix aus v2.2.11). Keine weiteren Änderungen gegenüber v2.2.13.
+
 ## [2.2.13] - 2026-10-27
 
 ### Fixed
