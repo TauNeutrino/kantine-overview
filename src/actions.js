@@ -1,6 +1,6 @@
 import { authToken, currentUser, orderMap, userFlags, pollIntervalId, highlightTags, allWeeks, currentWeekNumber, currentYear, langMode, setAuthToken, setCurrentUser, setOrderMap, setUserFlags, setPollIntervalId, setHighlightTags, setAllWeeks, setCurrentWeekNumber, setCurrentYear } from './state.js';
 import { getISOWeek, getWeekYear, escapeHtml, getRelativeTime, isNewer } from './utils.js';
-import { API_BASE, VENUE_ID, MENU_ID, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, LS } from './constants.js';
+import { API_BASE, VENUE_ID, MENU_ID, VENUE_TIME_ZONE, POLL_INTERVAL_MS, GITHUB_API, INSTALLER_BASE, LS } from './constants.js';
 import { apiHeaders, githubHeaders } from './api.js';
 import { renderVisibleWeeks, updateNextWeekBadge, updateAlarmBell } from './ui_helpers.js';
 import { t } from './i18n.js';
@@ -411,6 +411,45 @@ function formatApiError(data) {
     return msgs.join(' | ') || 'Bestellung fehlgeschlagen';
 }
 
+// UTC offset (ms) of `timeZone` at the given instant, via Intl (DST-aware,
+// no library needed — browsers ship current IANA tz data).
+function tzOffsetMs(utcMs, timeZone) {
+    const parts = {};
+    const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    for (const part of dtf.formatToParts(new Date(utcMs))) {
+        parts[part.type] = part.value;
+    }
+    const asUtc = Date.UTC(
+        parseInt(parts.year, 10),
+        parseInt(parts.month, 10) - 1,
+        parseInt(parts.day, 10),
+        parseInt(parts.hour, 10) % 24,
+        parseInt(parts.minute, 10),
+        parseInt(parts.second, 10)
+    );
+    return asUtc - utcMs;
+}
+
+// Convert a wall-clock time on `dateStr` (YYYY-MM-DD) in the venue's timezone
+// to a UTC ISO string. The API validates the order date against the venue's
+// online-ordering window in local time, so the UTC instant must be derived
+// from the local wall clock — a fixed instant (e.g. T09:00:00Z) drifts one
+// hour at every DST change and lands outside the window.
+function wallClockToUtcIso(dateStr, wallClock, timeZone) {
+    const naive = Date.parse(`${dateStr}T${wallClock}:00Z`);
+    const offset = tzOffsetMs(naive, timeZone);
+    return new Date(naive - offset).toISOString();
+}
+
 export async function placeOrder(date, articleId, name, price, description) {
     if (!authToken) return;
     try {
@@ -448,7 +487,7 @@ export async function placeOrder(date, articleId, name, price, description) {
             venue: VENUE_ID,
             states: [],
             order_state: 1,
-            date: `${date}T09:00:00.000Z`,
+            date: wallClockToUtcIso(date, '11:00', VENUE_TIME_ZONE),
             payment_method: 'payroll',
             customer: {
                 first_name: userData.first_name,

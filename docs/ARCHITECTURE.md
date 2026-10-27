@@ -121,6 +121,26 @@ Der **Bootloader selbst** kann sich nicht auto-updaten. Er entscheidet zwar, wel
 
 Für eine zukünftige Benachrichtigung („Bitte Lesezeichen neu installieren“) kann die Haupt-App eine entsprechende Meldung anzeigen. Das ist aber keine Bootloader-Funktion und muss in der Haupt-App implementiert werden.
 
+## Bessa API: Bestell-Payload
+
+Bestellungen gehen als `POST https://api.bessa.app/v1/user/orders/` (Payload in `placeOrder`, `src/actions.js`):
+
+| Feld | Wert | Anmerkung |
+|------|------|-----------|
+| `order_type` | `7` | |
+| `order_state` | `1` | |
+| `payment_method` | `'payroll'` | Lohnabzug |
+| `venue` | `591` | Knapp-Kantine |
+| `date` | UTC-ISO-String | ⚠ siehe unten |
+| `items[0].price` | String | `String(parseFloat(price))` |
+| `customer` | aus `/auth/user/` | Name/E-Mail werden nie persistiert |
+
+### `date`-Feld: Zeitzonen-Semantik ⚠
+
+Die Bessa-API validiert `date` gegen das **Online-Bestellfenster der Kantine in Ortszeit** (`Europe/Vienna`). Bei Verstoß antwortet sie mit `400` und `{"non_field_errors":["Onlinebestellung sind nicht verfügbar, bitte sehen Sie sich die Öffnungszeiten an."]}`.
+
+Daraus folgt die zwingende Regel: Das UTC-Instant muss aus der **lokalen Wanduhrzeit** am Bestelltag abgeleitet werden (`wallClockToUtcIso(date, '11:00', VENUE_TIME_ZONE)` in `src/actions.js`, Zeitzone als `VENUE_TIME_ZONE` in `src/constants.js`). Ein fest genageltes Instant wie `T09:00:00.000Z` ist **falsch**: Es driftet bei jeder Zeitumstellung um eine Stunde relativ zur Ortszeit — im Sommer 2026 war 09:00Z = 11:00 CEST (im Fenster), nach der Umstellung auf CET nur mehr 10:00 (außerhalb), und alle Bestellungen schlugen mit obigem 400er fehl (Bug bis v2.2.12, gefixt in v2.2.13). Die Umrechnung nutzt `Intl.DateTimeFormat` mit den IANA-Zeitzonendaten des Browsers — kein zusätzliches Zeitzonen-Paket nötig, und Sommer-/Winterzeit werden automatisch korrekt behandelt.
+
 ## Sicherheit
 
 - **Kommunikation:** HTTPS mit TLS 1.3 für alle API-Aufrufe

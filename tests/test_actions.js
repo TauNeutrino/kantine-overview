@@ -166,6 +166,7 @@ assertEquals(
 sandbox.API_BASE = 'https://api.test';
 sandbox.VENUE_ID = 591;
 sandbox.MENU_ID = 1;
+sandbox.VENUE_TIME_ZONE = 'Europe/Vienna';
 sandbox.crypto = { randomUUID: () => 'test-uuid' };
 let toastMessage = null;
 sandbox.showToast = (msg) => { toastMessage = msg; };
@@ -183,4 +184,44 @@ sandbox.fetch = async (url) => {
         process.exit(1);
     }
     console.log("✅ placeOrder Error Toast Tests Passed!");
+
+    // === DST-safe order date tests ===
+    // The order `date` must map to 11:00 venue-local wall clock on the order day,
+    // regardless of summer/winter time. Regression: a fixed instant (T09:00:00Z)
+    // drifted across the venue's ordering window at the DST change.
+    console.log("Testing DST-safe order date conversion...");
+
+    // Winter (CET, UTC+1): 11:00 local → 10:00Z
+    assertEquals(
+        sandbox.wallClockToUtcIso('2026-10-28', '11:00', sandbox.VENUE_TIME_ZONE),
+        '2026-10-28T10:00:00.000Z',
+        "Winter time: 11:00 Vienna must convert to 10:00Z"
+    );
+
+    // Summer (CEST, UTC+2): 11:00 local → 09:00Z (the instant that used to work)
+    assertEquals(
+        sandbox.wallClockToUtcIso('2026-07-01', '11:00', sandbox.VENUE_TIME_ZONE),
+        '2026-07-01T09:00:00.000Z',
+        "Summer time: 11:00 Vienna must convert to 09:00Z"
+    );
+
+    // placeOrder POST body carries the DST-correct instant
+    let postedDate = null;
+    sandbox.fetch = async (url, opts) => {
+        if (String(url).includes('/auth/user/')) {
+            return { ok: true, json: async () => ({ first_name: 'A', last_name: 'B', email: 'a@b.c' }) };
+        }
+        if (opts && opts.method === 'POST') {
+            postedDate = JSON.parse(opts.body).date;
+            return { ok: false, status: 400, json: async () => ({ date: ['Invalid date.'] }) };
+        }
+        return { ok: false, status: 400, json: async () => ({}) };
+    };
+    await sandbox.placeOrder('2026-10-28', 123, 'Schnitzel', '9.90', 'desc');
+    assertEquals(
+        postedDate,
+        '2026-10-28T10:00:00.000Z',
+        "placeOrder must send the DST-correct venue-local instant"
+    );
+    console.log("✅ DST-safe Order Date Tests Passed!");
 })();

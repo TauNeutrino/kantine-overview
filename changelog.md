@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.13] - 2026-10-27
+
+### Fixed
+
+- **Zeitumstellungs-Bug bei Bestellungen (DST)**: Das Order-Payload sendete ein fest genageltes UTC-Instant (`T09:00:00.000Z`) als Bestelldatum. Vor der Zeitumstellung entsprach das 11:00 Ortszeit (Anfang des Online-Bestellfensters der Kantine), nach der Umstellung auf CET nur mehr 10:00 — außerhalb des Fensters. Die Bessa-API lehnte jede Bestellung mit `400 {"non_field_errors":["Onlinebestellung sind nicht verfügbar, …"]}` ab. Das Datum wird jetzt aus der lokalen Wanduhrzeit (11:00 Europe/Vienna, `VENUE_TIME_ZONE`) per `Intl.DateTimeFormat` DST-sicher in UTC umgerechnet (`wallClockToUtcIso`) — zeitumstellungsfest, ohne externe Bibliothek. Dokumentiert in `docs/ARCHITECTURE.md` (Abschnitt „Bessa API: Bestell-Payload").
+
 ## [2.2.12] - 2026-10-22
 
 ### Fixed

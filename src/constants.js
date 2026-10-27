@@ -20,6 +20,15 @@ export const VENUE_ID = 591;
 /** Bessa menu ID for the weekly lunch menu. */
 export const MENU_ID = 7;
 
+/**
+ * IANA timezone of the venue. Order `date` fields must be sent as UTC instants
+ * that map back to a valid local wall-clock time here — the Bessa API validates
+ * them against the venue's online-ordering window (local time). Never hardcode
+ * a UTC instant for a local wall clock: it drifts one hour at every DST change
+ * (see placeOrder / wallClockToUtcIso and docs/ARCHITECTURE.md).
+ */
+export const VENUE_TIME_ZONE = 'Europe/Vienna';
+
 /** Polling interval for flagged-menu availability checks (5 minutes). */
 export const POLL_INTERVAL_MS = 5 * 60 * 1000;
 
