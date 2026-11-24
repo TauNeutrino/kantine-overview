@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-11-24
+
+### Fixed
+
+- **Split-Fehler bei fehlender schließender Klammer (GH #29)**: In den Menü-Rohdaten fehlt gelegentlich die `)` nach einem Allergen-Code (z. B. `Cream of chicken soup(GLM  Salat mit …`). Die offene Klammer frass daraufhin alles bis zur nächsten Allergen-Klammer als eine Gruppe; der Gerichts-Trenner `/` („… Zwiebel / Salad …") wurde als Allergen-Slash interpretiert, Folgegerichte kollabierten in das erste Gericht und der DE/EN-Split lief auf `medium`-Confidence mit falscher Zuordnung (EN-Bullets enthielten deutschen Text). Neu in `normalize.js` (Schritt 2b `closeUnclosedAllergenParens`): Eine mitten im Text offene Klammer wird geschlossen, wenn ihr Inhalt mit einem Allergen-Code-förmigen Token beginnt (1–8 Großbuchstaben, dann Whitespace, dann Folgetext). Nicht-Allergen-Parens und das Trailing-Case (Schritt 3b) bleiben unverändert. Fall-Split geht von `medium` (0.78) auf `high` (0.99), Regression-Gate (707 Texte) unverändert, volle Testsuite grün.
+
+
 ## [2.3.0] - 2026-10-27
 
 ### Fixed

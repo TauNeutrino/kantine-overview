@@ -3,6 +3,50 @@ export function isValidAllergen(content) {
     return /^[A-Z](\s*,?\s*[A-Z])*$/.test(content.trim());
 }
 
+/**
+ * Closes an allergen parenthesis whose closing ')' is missing mid-text
+ * (source field corruption, e.g. "soup(GLM  Salat mit ...").
+ * A '(' whose content runs to the next '(' without a ')' is unclosed; if its
+ * content starts with an uppercase-only token (allergen-code shape, 1-8
+ * letters) followed by whitespace and real dish text (lowercase letters),
+ * the paren is closed right after the token. Anything else is left as-is —
+ * the trailing truncated paren case stays with the dedicated step 3b.
+ * @param {string} text
+ * @returns {string}
+ */
+function closeUnclosedAllergenParens(text) {
+    if (!text || typeof text !== 'string') return text;
+    let out = '';
+    let i = 0;
+    while (i < text.length) {
+        const ch = text[i];
+        out += ch;
+        if (ch !== '(') {
+            i++;
+            continue;
+        }
+        // Content of this paren: up to the next '(' or ')', whichever comes first
+        let j = i + 1;
+        while (j < text.length && text[j] !== '(' && text[j] !== ')') j++;
+        if (j < text.length && text[j] === ')') {
+            // Properly closed — copy verbatim
+            out += text.slice(i + 1, j + 1);
+            i = j + 1;
+            continue;
+        }
+        // Unclosed (next '(' or end of text): try to repair
+        const content = text.slice(i + 1, j);
+        const m = content.match(/^([A-Z]{1,8})\s+/);
+        if (m && /[a-zäöüß]/.test(content.slice(m[0].length))) {
+            out += m[1] + ') ' + content.slice(m[0].length);
+        } else {
+            out += content;
+        }
+        i = j;
+    }
+    return out;
+}
+
 export function normalize(text) {
     let modifiedText = text;
     let notes = [];
@@ -14,6 +58,12 @@ export function normalize(text) {
 
     // 2. Repair slash-before-allergen: /ACLM) -> (ACLM)
     modifiedText = modifiedText.replace(/\/([A-Z]{1,8})\)/g, '($1)');
+
+    // 2b. Close an allergen parenthesis whose ')' was dropped by the source,
+    //     e.g. "soup(GLM  Salat mit ..." -> "soup(GLM) Salat mit ...".
+    //     An unclosed paren mid-text otherwise swallows the following dishes
+    //     into one paren group, hiding the top-level '/' dish separators.
+    modifiedText = closeUnclosedAllergenParens(modifiedText);
 
     // 4. Detect and park notes (doing it before step 3 to use the 6 spaces rule)
     

@@ -44,6 +44,26 @@ assertEquals(
     "Should repair /A)"
 );
 
+// Unclosed allergen paren mid-text (missing ')' after the code, GH issue #29):
+assertEquals(
+    normalize("Soup(GLM  Salad with ham next dish(ALM)").text,
+    "Soup(GLM) Salad with ham next dish(ALM)",
+    "Should close unclosed allergen paren before next dish text"
+);
+
+assertEquals(
+    normalize("salad(ACLMKuchen").text,
+    "salad(ACLMKuchen",
+    "Should NOT close unclosed paren when no whitespace separates code from text"
+);
+
+// Non-allergen unclosed paren stays untouched:
+assertEquals(
+    normalize("Salat (mit Käse und Schinken(ALM)").text,
+    "Salat (mit Käse und Schinken(ALM)",
+    "Should not touch unclosed non-allergen paren"
+);
+
 assertEquals(
     normalize("Mango- curry with rice(A/F/N)").text,
     "Mango- curry with rice(AFN)",
