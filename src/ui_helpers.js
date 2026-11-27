@@ -490,17 +490,18 @@ export function createDayCard(day) {
     const todayDateStr = new Date().toISOString().split('T')[0];
     const isToday = day.date === todayDateStr;
 
+    // Keep the API's menu order (stable sort, comparator returns 0 for ties);
+    // only today floats already-ordered items to the top.
     const sortedItems = [...day.items].sort((a, b) => {
-        if (isToday) {
-            const aId = a.articleId || parseInt(a.id.split('_')[1]);
-            const bId = b.articleId || parseInt(b.id.split('_')[1]);
-            const aOrdered = orderMap.has(`${day.date}_${aId}`);
-            const bOrdered = orderMap.has(`${day.date}_${bId}`);
+        if (!isToday) return 0;
+        const aId = a.articleId || parseInt(a.id.split('_')[1]);
+        const bId = b.articleId || parseInt(b.id.split('_')[1]);
+        const aOrdered = orderMap.has(`${day.date}_${aId}`);
+        const bOrdered = orderMap.has(`${day.date}_${bId}`);
 
-            if (aOrdered && !bOrdered) return -1;
-            if (!aOrdered && bOrdered) return 1;
-        }
-        return a.name.localeCompare(b.name);
+        if (aOrdered && !bOrdered) return -1;
+        if (!aOrdered && bOrdered) return 1;
+        return 0;
     });
 
     sortedItems.forEach(item => {

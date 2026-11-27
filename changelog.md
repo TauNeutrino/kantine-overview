@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.2] - 2026-11-27
+
+### Fixed
+
+- **Menü-Reihenfolge pro Tag (GH #30)**: Menüs innerhalb eines Tages wurden alphabetisch nach Name sortiert (`localeCompare`) — „Menü Grillhendl" landete dadurch hinter „Menü 1/2/…". Die Reihenfolge aus der Bessa-API (die gewünschte Speiseplan-Ordnung) wird jetzt unverändert übernommen (stabile Sortierung). Die Ausnahme für „heute" bleibt: bereits bestellte Items schwimmen weiter nach oben, danach gilt ebenfalls die API-Reihenfolge. regression test in `tests/test_dom.js`.
+
 ## [2.3.1] - 2026-11-24
 
 ### Fixed

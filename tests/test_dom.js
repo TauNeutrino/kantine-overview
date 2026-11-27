@@ -361,6 +361,25 @@ const testCode = `
         if (!uncertainItem.querySelector('.heatmap-row')) throw new Error('Non-template item must keep the heatmap');
         console.log("✅ Heatmap Visibility (DEV Mode) Test Passed");
 
+        console.log("--- Testing Menu Item Order (API order, no alpha sort) ---");
+        // GH #30: "Menü Grillhendl" must not drop behind "Menü 1/2/…" —
+        // day.items arrive in the API's menu order and must render in that order.
+        const orderDay = {
+            date: '2026-06-24',
+            weekday: 3,
+            items: [
+                { id: 'item_301', articleId: 301, name: 'Menü Grillhendl', description: 'Grillhendl / roast chicken', price: 8.9, available: true, amountTracking: false },
+                { id: 'item_302', articleId: 302, name: 'Menü 1', description: 'Suppe / soup', price: 6.5, available: true, amountTracking: false },
+                { id: 'item_303', articleId: 303, name: 'Menü Vegetarisch', description: 'Vegetarisch / vegetarian', price: 6.5, available: true, amountTracking: false }
+            ]
+        };
+        const orderCard = window.createDayCard(orderDay);
+        const orderedNames = orderCard ? Array.from(orderCard.querySelectorAll('.menu-item'))
+            .map(el => el.textContent) : [];
+        if (!orderedNames[0].includes('Menü Grillhendl')) throw new Error('Menu order: API order must be preserved, got: ' + JSON.stringify(orderedNames));
+        if (!orderedNames[1].includes('Menü 1') || !orderedNames[2].includes('Menü Vegetarisch')) throw new Error('Menu order: subsequent items out of API order');
+        console.log("✅ Menu Item Order Test Passed");
+
         window.__TEST_PASSED = true;
     `;
 
